@@ -55,11 +55,11 @@
     cursor: pointer;
     margin: 6px 4px;
   }
-  #browser-tabs > a.newtab {
+  #browser-tabs > a.close {
     padding: 8px 12px 5px 10px;
     margin: 0;
   }
-  #browser-tabs > a.newtab:hover {
+  #browser-tabs > a.close:hover {
     color: #fff;
     background: rgb(99, 190, 229);
   }
@@ -89,9 +89,9 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div
-      span#page-name Loading...
-      a.newtab X
+    div#tab
+      span#tab-name Loading...
+      a.close X
 </template>
 
 <script>

@@ -93,7 +93,7 @@
       a(@click="refresh")
         icon(name="refresh")
     .input-group
-      input#url-input(type="text", @keyup.enter="go", @click.once="$event.target.select();")
+      input#url-input(type="text", @keyup.enter="navigateTo", @click.once="$event.target.select();")
 </template>
 
 <script>
@@ -102,6 +102,16 @@
   import 'vue-awesome/icons/angle-left';
   import 'vue-awesome/icons/angle-right';
   import 'vue-awesome/icons/refresh';
+
+  function normalizedUri(input) {
+    const prefix = 'http://';
+
+    if (!/^([^:\/]+)(:\/\/)/g.test(input) && !prefix.includes(input)) {
+      input = prefix + input;
+    }
+
+    return input;
+  }
 
   export default {
     components: {
@@ -124,8 +134,8 @@
         const webview = document.getElementById('browser-page');
         webview.reload();
       },
-      go(event) {
-        document.getElementById('browser-page').src = event.target.value;
+      navigateTo(event) {
+        document.getElementById('browser-page').src = normalizedUri(event.target.value);
       },
     },
   };

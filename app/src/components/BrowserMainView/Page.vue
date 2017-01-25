@@ -41,13 +41,16 @@
   export default {
     // When this component get mounted, register following handler for webview's 'dom-ready' event.
     mounted() {
+      // navbar events initilization
       const webview = document.getElementById('browser-page');
       const navbar = document.getElementById('browser-navbar');
-      const tab = document.getElementById('page-name');
+      const tab = document.getElementById('tab-name');
       const urlInput = document.getElementById('url-input');
+
       webview.addEventListener('did-start-loading', () => {
         tab.innerHTML = 'Loading...';
       });
+
       webview.addEventListener('page-title-set', () => {
         tab.innerHTML = webview.getTitle();
         urlInput.value = webview.getURL();
@@ -62,6 +65,31 @@
         } else {
           controls[2].className = 'disabled';
         }
+      });
+
+      function createNewTab(url) {
+        alert(url);
+      }
+
+      function createContextMenu(event, remote) {
+        const { Menu, MenuItem } = remote;
+        const menu = new Menu();
+
+        if (event.params.linkURL) {
+          menu.append(new MenuItem({
+            label: 'Open Link in New Tab',
+            click: () => {
+              createNewTab(event.params.linkURL);
+            },
+          }));
+        }
+
+        menu.popup(remote.getCurrentWindow());
+      }
+
+      webview.addEventListener('context-menu', (event) => {
+        const electron = require('electron');
+        createContextMenu(event, electron.remote);
       });
     },
   };
