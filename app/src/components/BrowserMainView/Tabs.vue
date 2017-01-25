@@ -88,8 +88,18 @@
 </style>
 
 <template lang="pug">
-  #browser-tabs
+  #browser-tabs(@dblclick="maximize")
     div
       span#page-name Loading...
       a.newtab X
 </template>
+
+<script>
+  export default {
+    methods: {
+      maximize() {
+        this.$electron.remote.getCurrentWindow().maximize();
+      },
+    },
+  };
+</script>

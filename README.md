@@ -2,6 +2,8 @@
 
 > An electron-vue based browser
 
+<img src="http://i.imgur.com/xlbmdgg.png" width="540">
+
 ## Build Setup
 
 ``` bash
