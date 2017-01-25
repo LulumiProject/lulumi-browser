@@ -1,0 +1,7 @@
+// 將您的設定放入此檔案中以覆寫預設值和使用者設定。
+{
+    "editor.tabSize": 2,
+    "files.associations": {
+        "*.vue": "vue"
+    }
+}
