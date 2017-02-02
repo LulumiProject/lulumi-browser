@@ -18,7 +18,7 @@
 
   #nav {
     position: fixed;
-    margin-top: -26px;
+    margin-top: -30px;
   }
 </style>
 

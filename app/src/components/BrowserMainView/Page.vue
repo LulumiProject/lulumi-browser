@@ -51,6 +51,12 @@
         tab.innerHTML = 'Loading...';
       });
 
+      webview.addEventListener('did-stop-loading', () => {
+        if (tab.innerHTML === 'Loading...') {
+          tab.innerHTML = webview.getTitle();
+        }
+      });
+
       webview.addEventListener('page-title-set', () => {
         tab.innerHTML = webview.getTitle();
         urlInput.value = webview.getURL();
