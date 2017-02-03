@@ -20,9 +20,9 @@
 <template lang="pug">
   div
     #nav
-      tabs
-      navbar
-    page
+      tabs(:pages="pages")
+      navbar(:page="page")
+    page(v-for="page in pages", :page="page", :currentPageIndex="currentPageIndex", ref="page")
 </template>
 
 <script>
@@ -31,11 +31,69 @@
   import Page from './BrowserMainView/Page';
 
   export default {
+    data() {
+      return {
+        pages: [this.createPageObject()],
+        currentPageIndex: 0,
+      };
+    },
     components: {
       Tabs,
       Navbar,
       Page,
     },
     name: 'browser-main',
+    methods: {
+      createPageObject(url) {
+        return {
+          location: url || 'https://www.github.com/qazbnm456/electron-vue-browser',
+          statusText: false,
+          title: 'new tab',
+          isLoading: false,
+          isSearching: false,
+          canGoBack: false,
+          canGoForward: false,
+          canRefresh: false,
+        };
+      },
+      getWebView(i) {
+        return this.$refs.page[i].$refs.webview;
+      },
+      getPageObject() {
+        return this.pages[this.currentPageIndex];
+      },
+      onDidStartLoading(event, page) {
+        page.isLoading = true;
+        page.title = false;
+      },
+      onDomReady(event, page, pageIndex) {
+        const webview = this.getWebView(pageIndex);
+        page.canGoBack = webview.canGoBack();
+        page.canGoForward = webview.canGoForward();
+        page.canRefresh = true;
+      },
+      onDidStopLoading(event, page, pageIndex) {
+        const webview = this.getWebView(pageIndex);
+        page.statusText = false;
+        page.location = webview.getURL();
+        page.canGoBack = webview.canGoBack();
+        page.canGoForward = webview.canGoForward();
+        if (!page.title) {
+          page.title = page.location;
+        }
+        page.isLoading = false;
+      },
+      onPageTitleSet(event) {
+        const page = this.getPageObject();
+        page.title = event.title;
+        page.location = this.getWebView().getURL();
+      },
+    },
+    mounted() {
+      this.onDidStartLoading.bind(this);
+      this.onDomReady.bind(this);
+      this.onDidStopLoading.bind(this);
+      this.onPageTitleSet.bind(this);
+    },
   };
 </script>

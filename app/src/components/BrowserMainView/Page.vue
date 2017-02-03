@@ -1,21 +1,17 @@
 <style scoped>
-  #webviews {
-    position: relative;
-  }
-
-  #webviews webview {
+  webview {
     height: calc(100vh - 62px);
     width: 100vw;
     outline: none;
     position: absolute;
   }
 
-  #webviews webview[hidden] {
-	display: flex !important;
-	visibility: hidden;
+  webview[hidden] {
+    display: flex !important;
+    visibility: hidden;
   }
 
-  #webviews webview.fullscreen {
+  webview.fullscreen {
     position: fixed;
     top: 0;
     left: 0;
@@ -26,21 +22,51 @@
 
   /* hack to work around display: none issues with webviews */
 
-  #webviews webview.hidden {
+  webview.hidden {
     visibility: hidden;
   }
 </style>
 
 <template lang="pug">
-  #webviews
-    webview#browser-page(src="https://www.github.com/qazbnm456/electron-vue-browser", autosize="on")
+  webview(ref="webview", src="https://github.com/qazbnm456/electron-vue-browser")
 </template>
 
 <script>
   export default {
-    // When this component get mounted, register following handler for webview's 'dom-ready' event.
+    props: [
+      'page',
+      'currentPageIndex',
+    ],
+    methods: {
+      webviewHandler(self, fnName) {
+        return (event) => {
+          if (self.$parent[fnName]) {
+            self.$parent[fnName](event, this.page, this.currentPageIndex);
+          }
+        };
+      },
+    },
     mounted() {
+      const webviewEvents = {
+        'load-commit': 'onLoadCommit',
+        'did-start-loading': 'onDidStartLoading',
+        'did-stop-loading': 'onDidStopLoading',
+        'did-finish-load': 'onDidFinishLoading',
+        'did-fail-load': 'onDidFailLoad',
+        'did-get-response-details': 'onDidGetResponseDetails',
+        'did-get-redirect-request': 'onDidGetRedirectRequest',
+        'dom-ready': 'onDomReady',
+        'page-title-set': 'onPageTitleSet',
+        'ipc-message': 'onIpcMessage',
+        'console-message': 'onConsoleMessage',
+      };
+
+      Object.keys(webviewEvents).forEach((key) => {
+        this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
+      });
+
       // navbar events initilization
+      /*
       const webview = document.getElementById('browser-page');
       const navbar = document.getElementById('browser-navbar');
       const tab = document.getElementById('tab-name');
@@ -72,8 +98,14 @@
         }
       });
 
+      function createPageObject(url) {
+        return {
+          location: url,
+        };
+      }
+
       function createNewTab(url) {
-        alert(url);
+        createPageObject(url);
       }
 
       function createContextMenu(event, remote) {
@@ -96,6 +128,7 @@
         const electron = require('electron');
         createContextMenu(event, electron.remote);
       });
+      */
     },
   };
 </script>

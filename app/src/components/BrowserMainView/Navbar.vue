@@ -114,6 +114,9 @@
   }
 
   export default {
+    props: [
+      'pages',
+    ],
     components: {
       Icon,
     },
@@ -135,8 +138,15 @@
         webview.reload();
       },
       navigateTo(event) {
-        document.getElementById('browser-page').src = normalizedUri(event.target.value);
+        this.$refs.page.$refs.webview.src = normalizedUri(event.target.value);
       },
     },
+    /*
+    mounted() {
+      if (this.page.location) {
+        this.$refs.page.$refs.webview.src = normalizedUri(this.page.location);
+      }
+    },
+    */
   };
 </script>

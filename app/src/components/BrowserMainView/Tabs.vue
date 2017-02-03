@@ -87,8 +87,8 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div.active#tab
-      span#tab-name Loading...
+    div#tab(v-for="page in this.pages")
+      span#tab-name {{ page.title }}
       a.close
         icon(name="times")
     a.newtab
@@ -99,6 +99,9 @@
   import 'vue-awesome/icons/times';
 
   export default {
+    props: [
+      'pages',
+    ],
     components: {
       Icon,
     },
