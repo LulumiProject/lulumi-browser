@@ -15,11 +15,6 @@
     overflow: hidden;
     -webkit-user-select: none;
   }
-
-  #nav {
-    position: fixed;
-    margin-top: -30px;
-  }
 </style>
 
 <template lang="pug">

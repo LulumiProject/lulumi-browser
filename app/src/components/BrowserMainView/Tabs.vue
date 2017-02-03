@@ -3,6 +3,7 @@
     display: flex;
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
     font-size: 13px;
+    height: 27px;
     -webkit-app-region: drag;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -13,7 +14,7 @@
     display: flex;
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
     color: #777;
-    border-top: 25px solid #ccc;
+    border-top: 1px solid #ccc;
     border-right: 1px solid #ccc;
     cursor: default;
     white-space: nowrap;
@@ -55,11 +56,11 @@
     cursor: pointer;
     margin: 6px 4px;
   }
-  #browser-tabs > a.close {
+  #browser-tabs > a.newtab {
     padding: 8px 12px 5px 10px;
     margin: 0;
   }
-  #browser-tabs > a.close:hover {
+  #browser-tabs > a.newtab:hover {
     color: #fff;
     background: rgb(99, 190, 229);
   }
@@ -82,20 +83,25 @@
     text-shadow: 0 0 1px rgba(50, 1, 1, 1);
     margin-left: 8px;
   }
-  #browser-tabs > a.close i {
-    font-size: 12.5px
-  }
 </style>
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div#tab
+    div.active#tab
       span#tab-name Loading...
-      a.close X
+      a.close
+        icon(name="times")
+    a.newtab
 </template>
 
 <script>
+  import Icon from 'vue-awesome/components/Icon';
+  import 'vue-awesome/icons/times';
+
   export default {
+    components: {
+      Icon,
+    },
     methods: {
       maximize() {
         this.$electron.remote.getCurrentWindow().maximize();
