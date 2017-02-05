@@ -96,7 +96,7 @@
           icon(name="spinner", v-show="page.isLoading")
         </transition>
         | {{ page.title || 'loading' }}
-      a.close
+      a.close(@click.self="$parent.onTabClose($event, $event.target.previousSibling.id)")
         icon(name="times")
     a.newtab(@click="$parent.onNewTab()")
 </template>

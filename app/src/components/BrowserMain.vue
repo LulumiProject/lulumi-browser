@@ -61,6 +61,29 @@
         this.pages.push(this.createPageObject(url));
         this.currentPageIndex = this.pages.length - 1;
       },
+      closeTab(pageIndex) {
+        // last tab, full reset
+        if (this.pages.length === 1) {
+          this.pages = [this.createPageObject()];
+          this.currentPageIndex = 0;
+        } else {
+          this.pages.splice(pageIndex, 1);
+
+          // find the nearest adjacent page to make active
+          if (this.currentPageIndex >= pageIndex) {
+            for (let i = pageIndex; i >= 0; i--) {
+              if (this.pages[i]) {
+                this.currentPageIndex = i;
+              }
+            }
+            for (let i = pageIndex; i < this.pages.length; i++) {
+              if (this.pages[i]) {
+                this.currentPageIndex = i;
+              }
+            }
+          }
+        }
+      },
       getWebView(i) {
         i = (typeof i === 'undefined') ? this.currentPageIndex : i;
         return this.$refs[`page-${i}`][0].$refs.webview;
