@@ -107,6 +107,18 @@
       onTabClose(event, pageIndex) {
         this.closeTab(pageIndex);
       },
+      onClickHome() {
+        this.getWebView().goToIndex(0);
+      },
+      onClickBack() {
+        this.getWebView().goBack();
+      },
+      onClickForward() {
+        this.getWebView().goForward();
+      },
+      onClickRefresh() {
+        this.getWebView().reload();
+      },
       onEnterLocation(location) {
         this.getPage().navigateTo(location);
       },

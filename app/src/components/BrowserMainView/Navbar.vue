@@ -84,13 +84,13 @@
 <template lang="pug">
   #browser-navbar
     .control-group
-      a(@click="home")
+      a(@click="$parent.onClickHome")
         icon(name="angle-double-left")
-      a.disabled(@click="backward")
+      a(@click="$parent.onClickBack", :class="page.canGoBack ? '' : 'disabled'")
         icon(name="angle-left")
-      a.disabled(@click="forward")
+      a(@click="$parent.onClickBack", :class="page.canGoForward ? '' : 'disabled'")
         icon(name="angle-right")
-      a(@click="refresh")
+      a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
     .input-group
       input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", @click="$parent.onChangeLocation($event.target.value)", :value="page.location")
@@ -110,30 +110,5 @@
     components: {
       Icon,
     },
-    methods: {
-      home() {
-        const webview = document.getElementById('browser-page');
-        webview.goToIndex(0);
-      },
-      backward() {
-        const webview = document.getElementById('browser-page');
-        webview.goBack();
-      },
-      forward() {
-        const webview = document.getElementById('browser-page');
-        webview.goForward();
-      },
-      refresh() {
-        const webview = document.getElementById('browser-page');
-        webview.reload();
-      },
-    },
-    /*
-    mounted() {
-      if (this.page.location) {
-        this.$refs.page.$refs.webview.src = normalizedUri(this.page.location);
-      }
-    },
-    */
   };
 </script>
