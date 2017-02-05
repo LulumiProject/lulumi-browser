@@ -5,12 +5,10 @@
     outline: none;
     position: absolute;
   }
-
   webview[hidden] {
     display: flex !important;
     visibility: hidden;
   }
-
   webview.fullscreen {
     position: fixed;
     top: 0;
@@ -19,9 +17,7 @@
     height: 100vh;
     z-index: 99;
   }
-
   /* hack to work around display: none issues with webviews */
-
   webview.hidden {
     visibility: hidden;
   }

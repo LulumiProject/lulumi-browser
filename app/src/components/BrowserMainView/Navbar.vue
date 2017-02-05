@@ -9,40 +9,33 @@
     background: linear-gradient(to bottom, #eee, #ddd);
     border-bottom: 1px solid #aaa;
   }
-
   #browser-navbar a {
     text-decoration: none;
     color: #777;
     cursor: pointer;
   }
-
   #browser-navbar a:hover {
     text-decoration: none;
     color: blue;
   }
-
   #browser-navbar a.disabled {
     color: #bbb;
     cursor: default;
   }
-
   #browser-navbar a {
     flex: 1;
   }
-
   #browser-navbar .control-group {
     display: flex;
     flex: 1;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
   }
-
   #browser-navbar .input-group {
     flex: 9;
     display: flex;
     margin: 0 5px;
   }
-
   #browser-navbar .input-group input {
     flex: 1;
     margin: 4px 0 3px;
@@ -56,7 +49,6 @@
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
   }
-
   #browser-navbar .input-group input:focus, 
   #browser-navbar .input-group input:active, 
   #browser-navbar .input-group input:hover {
@@ -65,7 +57,6 @@
     background: #fff;
     border: 1px solid #bbb;
   }
-
   #browser-navbar .input-group a {
     border: 1px solid #bbb;
     border-left: 0;
@@ -74,7 +65,6 @@
     flex: 0 0 30px;
     text-align: center;
   }
-
   #browser-navbar a:last-child {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -88,7 +78,7 @@
         icon(name="angle-double-left")
       a(@click="$parent.onClickBack", :class="page.canGoBack ? '' : 'disabled'")
         icon(name="angle-left")
-      a(@click="$parent.onClickBack", :class="page.canGoForward ? '' : 'disabled'")
+      a(@click="$parent.onClickForward", :class="page.canGoForward ? '' : 'disabled'")
         icon(name="angle-right")
       a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")

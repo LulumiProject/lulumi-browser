@@ -4,11 +4,9 @@
     padding: 0;
     box-sizing: border-box;
   }
-
   [hidden] {
     display: none !important;
   }
-
   body,
   html {
     position: relative;

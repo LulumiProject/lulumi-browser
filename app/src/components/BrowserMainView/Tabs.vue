@@ -34,7 +34,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  #browser-tabs > div > span > i {
+  #browser-tabs > div > span > svg {
     margin-left: 5px;
   }
   #browser-tabs > div > a {
@@ -68,14 +68,14 @@
     color: rgb(32, 205, 20);
     text-shadow: 0 0 1px rgba(8, 77, 3, 1);
   }
-  #browser-tabs > a.maximize i {
+  #browser-tabs > a.maximize svg {
     font-size: 12.5px
   }
   #browser-tabs > a.minimize {
     color: rgb(255, 213, 0);
     text-shadow: 0 0 1px rgba(65, 42, 2, 1);
   }
-  #browser-tabs > a.minimize i {
+  #browser-tabs > a.minimize svg {
     font-size: 12.5px
   }
   #browser-tabs > a.close {
@@ -83,20 +83,30 @@
     text-shadow: 0 0 1px rgba(50, 1, 1, 1);
     margin-left: 8px;
   }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+  }
+  .fade-enter, .fade-leave-active {
+    opacity: 0
+  }
 </style>
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
     div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      span(:id="`${i}`", @click="onClick") {{ page.title }}
+      span(:id="`${i}`", @click="$parent.onTabClick($event, $event.target.id)") {{ page.title || 'loading' }}
+        <transition name="fade">
+          icon(name="spinner", v-show="page.isLoading")
+        </transition>
       a.close
         icon(name="times")
-    a.newtab(@click="onNewTab")
+    a.newtab(@click="$parent.onNewTab()")
 </template>
 
 <script>
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/times';
+  import 'vue-awesome/icons/spinner';
 
   export default {
     props: [
@@ -109,12 +119,6 @@
     methods: {
       maximize() {
         this.$electron.remote.getCurrentWindow().maximize();
-      },
-      onClick(event) {
-        this.$parent.onTabClick(event, event.target.id);
-      },
-      onNewTab() {
-        this.$parent.onNewTab();
       },
     },
   };
