@@ -20,8 +20,8 @@
 <template lang="pug">
   div
     #nav
-      tabs(:pages="pages")
-      navbar(:page="page")
+      tabs(:pages="pages", :currentPageIndex="currentPageIndex")
+      navbar(:page="getPageObject()")
     page(v-for="(page, i) in pages", :page="page", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${i}`")
 </template>
 
@@ -57,13 +57,20 @@
         };
       },
       createTab(url) {
-        this.createPageObject(url);
+        this.pages.push(this.createPageObject(url));
+        this.currentPageIndex = this.pages.length - 1;
       },
       getWebView(i) {
+        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
         return this.$refs[`page-${i}`][0].$refs.webview;
       },
-      getPageObject() {
-        return this.pages[this.currentPageIndex];
+      getPage(i) {
+        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
+        return this.$refs[`page-${i}`][0];
+      },
+      getPageObject(i) {
+        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
+        return this.pages[i];
       },
       onDidStartLoading(event, page) {
         page.isLoading = true;
@@ -99,6 +106,13 @@
       },
       onTabClose(event, pageIndex) {
         this.closeTab(pageIndex);
+      },
+      onEnterLocation(location) {
+        this.getPage().navigateTo(location);
+      },
+      onChangeLocation(location) {
+        const page = this.getPageObject();
+        page.location = location;
       },
     },
     mounted() {

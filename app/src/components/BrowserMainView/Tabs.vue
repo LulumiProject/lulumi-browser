@@ -87,11 +87,11 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div(v-for="(page, i) in this.pages")
+    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
       span(:id="`${i}`", @click="onClick") {{ page.title }}
       a.close
         icon(name="times")
-    a.newtab
+    a.newtab(@click="onNewTab")
 </template>
 
 <script>
@@ -101,6 +101,7 @@
   export default {
     props: [
       'pages',
+      'currentPageIndex',
     ],
     components: {
       Icon,
@@ -111,6 +112,9 @@
       },
       onClick(event) {
         this.$parent.onTabClick(event, event.target.id);
+      },
+      onNewTab() {
+        this.$parent.onNewTab();
       },
     },
   };

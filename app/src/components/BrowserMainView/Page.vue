@@ -28,7 +28,7 @@
 </style>
 
 <template lang="pug">
-  webview(ref="webview", src="https://github.com/qazbnm456/electron-vue-browser")
+  webview(ref="webview")
 </template>
 
 <script>
@@ -38,6 +38,18 @@
       'pageIndex',
     ],
     methods: {
+      normalizedUri(input) {
+        const prefix = 'http://';
+
+        if (!/^([^:\/]+)(:\/\/)/g.test(input) && !prefix.includes(input)) {
+          input = prefix + input;
+        }
+
+        return input;
+      },
+      navigateTo(location) {
+        this.$refs.webview.src = this.normalizedUri(location);
+      },
       webviewHandler(self, fnName) {
         return (event) => {
           if (self.$parent[fnName]) {
@@ -64,6 +76,10 @@
       Object.keys(webviewEvents).forEach((key) => {
         this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
+
+      if (this.page.location) {
+        this.navigateTo(this.page.location);
+      }
 
       // navbar events initilization
       /*

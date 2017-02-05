@@ -93,7 +93,7 @@
       a(@click="refresh")
         icon(name="refresh")
     .input-group
-      input#url-input(type="text", @keyup.enter="navigateTo", @click.once="$event.target.select();")
+      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", @click="$parent.onChangeLocation($event.target.value)", :value="page.location")
 </template>
 
 <script>
@@ -103,19 +103,9 @@
   import 'vue-awesome/icons/angle-right';
   import 'vue-awesome/icons/refresh';
 
-  function normalizedUri(input) {
-    const prefix = 'http://';
-
-    if (!/^([^:\/]+)(:\/\/)/g.test(input) && !prefix.includes(input)) {
-      input = prefix + input;
-    }
-
-    return input;
-  }
-
   export default {
     props: [
-      'pages',
+      'page',
     ],
     components: {
       Icon,
@@ -136,9 +126,6 @@
       refresh() {
         const webview = document.getElementById('browser-page');
         webview.reload();
-      },
-      navigateTo(event) {
-        this.$refs.page.$refs.webview.src = normalizedUri(event.target.value);
       },
     },
     /*
