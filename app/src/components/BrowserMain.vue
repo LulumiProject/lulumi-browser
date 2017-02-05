@@ -70,6 +70,7 @@
         i = (typeof i === 'undefined') ? this.currentPageIndex : i;
         return this.pages[i];
       },
+      // pageHandlers
       onDidStartLoading(event, page) {
         page.isLoading = true;
         page.title = false;
@@ -96,6 +97,7 @@
         page.title = event.title;
         page.location = this.getWebView().getURL();
       },
+      // tabHandlers
       onNewTab() {
         this.createTab();
       },
@@ -105,6 +107,7 @@
       onTabClose(event, pageIndex) {
         this.closeTab(pageIndex);
       },
+      // navHandlers
       onClickHome() {
         this.getWebView().goToIndex(0);
       },
@@ -124,6 +127,22 @@
         const page = this.getPageObject();
         page.location = location;
       },
+      // onWebviewContextMenu
+      onWebviewContextMenu(event) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+
+        if (event.params.linkURL) {
+          menu.append(new MenuItem({
+            label: 'Open Link in New Tab',
+            click: () => {
+              this.createTab(event.params.linkURL);
+            },
+          }));
+        }
+
+        menu.popup(this.$electron.remote.getCurrentWindow());
+      },
     },
     mounted() {
       this.onDidStartLoading.bind(this);
@@ -133,6 +152,7 @@
       this.onNewTab.bind(this);
       this.onTabClick.bind(this);
       this.onTabClose.bind(this);
+      this.onWebviewContextMenu.bind(this);
     },
   };
 </script>

@@ -73,74 +73,13 @@
         this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
+      this.$refs.webview.addEventListener('context-menu', (event) => {
+        this.$parent.onWebviewContextMenu(event);
+      });
+
       if (this.page.location) {
         this.navigateTo(this.page.location);
       }
-
-      // navbar events initilization
-      /*
-      const webview = document.getElementById('browser-page');
-      const navbar = document.getElementById('browser-navbar');
-      const tab = document.getElementById('tab-name');
-      const urlInput = document.getElementById('url-input');
-
-      webview.addEventListener('did-start-loading', () => {
-        tab.innerHTML = 'Loading...';
-      });
-
-      webview.addEventListener('did-stop-loading', () => {
-        if (tab.innerHTML === 'Loading...') {
-          tab.innerHTML = webview.getTitle();
-        }
-      });
-
-      webview.addEventListener('page-title-set', () => {
-        tab.innerHTML = webview.getTitle();
-        urlInput.value = webview.getURL();
-        const controls = navbar.children[0].children;
-        if (webview.canGoBack()) {
-          controls[1].className = '';
-        } else {
-          controls[1].className = 'disabled';
-        }
-        if (webview.canGoForward()) {
-          controls[2].className = '';
-        } else {
-          controls[2].className = 'disabled';
-        }
-      });
-
-      function createPageObject(url) {
-        return {
-          location: url,
-        };
-      }
-
-      function createNewTab(url) {
-        createPageObject(url);
-      }
-
-      function createContextMenu(event, remote) {
-        const { Menu, MenuItem } = remote;
-        const menu = new Menu();
-
-        if (event.params.linkURL) {
-          menu.append(new MenuItem({
-            label: 'Open Link in New Tab',
-            click: () => {
-              createNewTab(event.params.linkURL);
-            },
-          }));
-        }
-
-        menu.popup(remote.getCurrentWindow());
-      }
-
-      webview.addEventListener('context-menu', (event) => {
-        const electron = require('electron');
-        createContextMenu(event, electron.remote);
-      });
-      */
     },
   };
 </script>
