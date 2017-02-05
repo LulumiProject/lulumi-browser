@@ -13,6 +13,9 @@
     overflow: hidden;
     -webkit-user-select: none;
   }
+  #nav {
+    width: 100vw;
+  }
 </style>
 
 <template lang="pug">

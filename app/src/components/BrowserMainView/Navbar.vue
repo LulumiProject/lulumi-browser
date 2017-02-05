@@ -2,7 +2,6 @@
   #browser-navbar {
     display: flex;
     height: 35px;
-    width: 100vw;
     padding: 0 5px;
     font-size: 15px;
     font-weight: 100;

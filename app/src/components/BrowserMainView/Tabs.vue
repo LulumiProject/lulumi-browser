@@ -18,10 +18,7 @@
     border-right: 1px solid #ccc;
     cursor: default;
     white-space: nowrap;
-  }
-  #browser-tabs > div:nth-child(4) {
-    border-left: 1px solid #ccc;
-    margin-left: 7px;
+    overflow:hidden;
   }
   #browser-tabs > div.active {
     -webkit-app-region: drag;
@@ -94,10 +91,11 @@
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
     div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      span(:id="`${i}`", @click="$parent.onTabClick($event, $event.target.id)") {{ page.title || 'loading' }}
+      span(:id="`${i}`", @click="$parent.onTabClick($event, $event.target.id)")
         <transition name="fade">
           icon(name="spinner", v-show="page.isLoading")
         </transition>
+        | {{ page.title || 'loading' }}
       a.close
         icon(name="times")
     a.newtab(@click="$parent.onNewTab()")
