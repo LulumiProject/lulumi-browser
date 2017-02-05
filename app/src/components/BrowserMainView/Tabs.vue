@@ -87,8 +87,8 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div#tab(v-for="page in this.pages")
-      span#tab-name {{ page.title }}
+    div(v-for="(page, i) in this.pages")
+      span(:id="`${i}`", @click="onClick") {{ page.title }}
       a.close
         icon(name="times")
     a.newtab
@@ -108,6 +108,9 @@
     methods: {
       maximize() {
         this.$electron.remote.getCurrentWindow().maximize();
+      },
+      onClick(event) {
+        this.$parent.onTabClick(event, event.target.id);
       },
     },
   };

@@ -35,13 +35,13 @@
   export default {
     props: [
       'page',
-      'currentPageIndex',
+      'pageIndex',
     ],
     methods: {
       webviewHandler(self, fnName) {
         return (event) => {
           if (self.$parent[fnName]) {
-            self.$parent[fnName](event, this.page, this.currentPageIndex);
+            self.$parent[fnName](event, this.page, this.pageIndex);
           }
         };
       },

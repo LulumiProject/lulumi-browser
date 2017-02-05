@@ -22,7 +22,7 @@
     #nav
       tabs(:pages="pages")
       navbar(:page="page")
-    page(v-for="page in pages", :page="page", :currentPageIndex="currentPageIndex", ref="page")
+    page(v-for="(page, i) in pages", :page="page", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${i}`")
 </template>
 
 <script>
@@ -56,8 +56,11 @@
           canRefresh: false,
         };
       },
+      createTab(url) {
+        this.createPageObject(url);
+      },
       getWebView(i) {
-        return this.$refs.page[i].$refs.webview;
+        return this.$refs[`page-${i}`][0].$refs.webview;
       },
       getPageObject() {
         return this.pages[this.currentPageIndex];
@@ -88,12 +91,24 @@
         page.title = event.title;
         page.location = this.getWebView().getURL();
       },
+      onNewTab() {
+        this.createTab();
+      },
+      onTabClick(event, pageIndex) {
+        this.currentPageIndex = pageIndex;
+      },
+      onTabClose(event, pageIndex) {
+        this.closeTab(pageIndex);
+      },
     },
     mounted() {
       this.onDidStartLoading.bind(this);
       this.onDomReady.bind(this);
       this.onDidStopLoading.bind(this);
       this.onPageTitleSet.bind(this);
+      this.onNewTab.bind(this);
+      this.onTabClick.bind(this);
+      this.onTabClose.bind(this);
     },
   };
 </script>
