@@ -135,7 +135,7 @@
       },
       // navHandlers
       onClickHome() {
-        this.getWebView().goToIndex(0);
+        this.getPage().navigateTo();
       },
       onClickBack() {
         this.getWebView().goBack();

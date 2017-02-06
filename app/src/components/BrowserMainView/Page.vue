@@ -44,7 +44,7 @@
         return input;
       },
       navigateTo(location) {
-        this.$refs.webview.src = this.normalizedUri(location);
+        this.$refs.webview.src = this.normalizedUri(location || 'https://github.com/qazbnm456/electron-vue-browser');
       },
       webviewHandler(self, fnName) {
         return (event) => {
