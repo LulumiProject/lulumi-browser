@@ -23,7 +23,7 @@
     #nav
       tabs(:pages="pages", :currentPageIndex="currentPageIndex")
       navbar(:page="getPageObject()")
-    page(v-for="(page, i) in pages", :page="page", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${i}`")
+    page(v-for="(page, i) in pages", :page="page", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.location}`")
 </template>
 
 <script>

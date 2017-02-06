@@ -90,13 +90,13 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      span(:id="`${i}`", @click="$parent.onTabClick($event, $event.target.id)")
+    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''", :key="`browse-tab-${i}`")
+      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))")
         <transition name="fade">
           icon(name="spinner", v-show="page.isLoading")
         </transition>
         | {{ page.title || 'loading' }}
-      a.close(@click.self="$parent.onTabClose($event, $event.target.previousSibling.id)")
+      a.close(@click.self="$parent.onTabClose($event, parseInt($event.target.previousSibling.id))")
         icon(name="times")
     a.newtab(@click="$parent.onNewTab()")
 </template>
