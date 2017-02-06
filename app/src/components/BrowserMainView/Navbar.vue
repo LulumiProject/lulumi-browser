@@ -82,7 +82,7 @@
       a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
     .input-group
-      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", @click="$parent.onChangeLocation($event.target.value)", :value="page.location")
+      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", v-focus="focused", @focus="$event.target.select()", :value="page.location")
 </template>
 
 <script>
@@ -92,7 +92,17 @@
   import 'vue-awesome/icons/angle-right';
   import 'vue-awesome/icons/refresh';
 
+  import { focus } from 'vue-focus';
+
   export default {
+    directives: {
+      focus,
+    },
+    data() {
+      return {
+        focused: false,
+      };
+    },
     props: [
       'page',
     ],

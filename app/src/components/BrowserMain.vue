@@ -47,7 +47,7 @@
     methods: {
       createPageObject(url) {
         return {
-          location: url || 'https://www.github.com/qazbnm456/electron-vue-browser',
+          location: url || 'https://github.com/qazbnm456/electron-vue-browser',
           statusText: false,
           title: 'new tab',
           isLoading: false,
@@ -148,10 +148,6 @@
       },
       onEnterLocation(location) {
         this.getPage().navigateTo(location);
-      },
-      onChangeLocation(location) {
-        const page = this.getPageObject();
-        page.location = location;
       },
       // onWebviewContextMenu
       onWebviewContextMenu(event) {

@@ -90,7 +90,7 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="maximize")
-    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''", :key="`browse-tab-${i}`")
+    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
       span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))")
         <transition name="fade">
           icon(name="spinner", v-show="page.isLoading")
