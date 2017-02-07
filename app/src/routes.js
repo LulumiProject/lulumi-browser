@@ -2,7 +2,7 @@ export default [
   {
     path: '/',
     name: 'browser-main',
-    component: require('components/BrowserMain'),
+    component: require('components/BrowserMainView'),
   },
   {
     path: '*',

@@ -1,8 +1,6 @@
-'use strict'
+const path = require('path');
 
-const path = require('path')
-
-let config = {
+const config = {
   // Name of electron app
   // Will be used in production builds
   name: 'electron-vue-browser',
@@ -24,10 +22,10 @@ let config = {
     ignore: /\b(node_modules|src|index\.pug|icons)\b/,
     out: path.join(__dirname, 'builds'),
     overwrite: true,
-    platform: process.env.PLATFORM_TARGET || 'all'
-  }
-}
+    platform: process.env.PLATFORM_TARGET || 'all',
+  },
+};
 
-config.building.name = config.name
+config.building.name = config.name;
 
-module.exports = config
+module.exports = config;
