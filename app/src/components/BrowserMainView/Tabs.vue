@@ -89,14 +89,14 @@
 </style>
 
 <template lang="pug">
-  #browser-tabs(@dblclick="maximize")
+  #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
     div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))")
+      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu="$parent.onTabContextMenu($event, i)")
         <transition name="fade">
           icon(name="spinner", v-show="page.isLoading")
         </transition>
         | {{ page.title || 'loading' }}
-      a.close(@click.self="$parent.onTabClose($event, parseInt($event.target.previousSibling.id))")
+      a.close(@click="onClose")
         icon(name="times")
     a.newtab(@click="$parent.onNewTab()")
 </template>
@@ -119,8 +119,18 @@
       },
     },
     methods: {
-      maximize() {
-        this.$electron.remote.getCurrentWindow().maximize();
+      onClose(event) {
+        let id = null;
+        try {
+          id = event.target.previousSibling.id;
+        } catch (e) {
+          try {
+            id = event.target.parentNode.previousSibling.id;
+          } catch (e) {
+            id = event.target.parentNode.parentNode.previousSibling.id;
+          }
+        }
+        this.$parent.onTabClose(event, parseInt(id, 10));
       },
     },
   };

@@ -82,7 +82,7 @@
       a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
     .input-group
-      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", v-focus="focused", @focus="$event.target.select()", :value="page.location")
+      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", v-focus="focused", @focus="$event.target.select()", :value="page.location", @contextmenu="$parent.onNavContextMenu")
 </template>
 
 <script>
@@ -103,11 +103,13 @@
         focused: false,
       };
     },
-    props: [
-      'page',
-    ],
     components: {
       Icon,
+    },
+    computed: {
+      page() {
+        return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+      },
     },
   };
 </script>

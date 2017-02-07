@@ -80,6 +80,10 @@ const mutations = {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
     state.pages[payload.pageIndex].location = payload.webview.getURL();
   },
+  [types.UPDATE_LOCATION](state, url) {
+    state.pages[state.currentPageIndex].location = url;
+    // state.pages.splice(state.currentPageIndex, 1, createPageObject(url));
+  },
 };
 
 export default {
