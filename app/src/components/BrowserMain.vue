@@ -21,9 +21,9 @@
 <template lang="pug">
   div
     #nav
-      tabs(:pages="pages", :currentPageIndex="currentPageIndex")
+      tabs
       navbar(:page="getPageObject()")
-    page(v-for="(page, i) in pages", :page="page", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.location}`")
+    page(v-for="(page, i) in pages", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
 </template>
 
 <script>
@@ -32,106 +32,68 @@
   import Page from './BrowserMainView/Page';
 
   export default {
-    data() {
-      return {
-        pages: [this.createPageObject()],
-        currentPageIndex: 0,
-      };
-    },
     components: {
       Tabs,
       Navbar,
       Page,
     },
     name: 'browser-main',
+    computed: {
+      pages() {
+        return this.$store.getters.pages;
+      },
+      currentPageIndex() {
+        return this.$store.getters.currentPageIndex;
+      },
+    },
     methods: {
-      createPageObject(url) {
-        return {
-          location: url || 'https://github.com/qazbnm456/electron-vue-browser',
-          statusText: false,
-          title: 'new tab',
-          isLoading: false,
-          isSearching: false,
-          canGoBack: false,
-          canGoForward: false,
-          canRefresh: false,
-        };
-      },
-      createTab(url) {
-        this.pages.push(this.createPageObject(url));
-        this.currentPageIndex = this.pages.length - 1;
-      },
-      closeTab(pageIndex) {
-        // last tab, full reset
-        if (this.pages.length === 1) {
-          this.pages = [this.createPageObject()];
-          this.currentPageIndex = 0;
-        } else {
-          this.pages.splice(pageIndex, 1);
-
-          // find the nearest adjacent page to make active
-          if (this.currentPageIndex >= pageIndex) {
-            for (let i = pageIndex; i >= 0; i--) {
-              if (this.pages[i]) {
-                this.currentPageIndex = i;
-              }
-            }
-            for (let i = pageIndex; i < this.pages.length; i++) {
-              if (this.pages[i]) {
-                this.currentPageIndex = i;
-              }
-            }
-          }
-        }
-      },
       getWebView(i) {
-        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
+        i = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
         return this.$refs[`page-${i}`][0].$refs.webview;
       },
       getPage(i) {
-        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
+        i = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
         return this.$refs[`page-${i}`][0];
       },
       getPageObject(i) {
-        i = (typeof i === 'undefined') ? this.currentPageIndex : i;
-        return this.pages[i];
+        i = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
+        return this.$store.getters.pages[i];
       },
       // pageHandlers
-      onDidStartLoading(event, page) {
-        page.isLoading = true;
-        page.title = false;
+      onDidStartLoading(event, pageIndex) {
+        this.$store.dispatch('didStartLoading', pageIndex);
       },
-      onDomReady(event, page, pageIndex) {
+      onDomReady(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
-        page.canGoBack = webview.canGoBack();
-        page.canGoForward = webview.canGoForward();
-        page.canRefresh = true;
+        this.$store.dispatch('domReady', {
+          pageIndex,
+          webview,
+        });
       },
-      onDidStopLoading(event, page, pageIndex) {
+      onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
-        page.statusText = false;
-        page.location = webview.getURL();
-        page.canGoBack = webview.canGoBack();
-        page.canGoForward = webview.canGoForward();
-        if (!page.title) {
-          page.title = page.location;
-        }
-        page.isLoading = false;
+        this.$store.dispatch('didStopLoading', {
+          pageIndex,
+          webview,
+        });
       },
-      onPageTitleSet(event) {
-        const page = this.getPageObject();
-        page.title = event.title;
-        page.location = this.getWebView().getURL();
+      onPageTitleSet(event, pageIndex) {
+        const webview = this.getWebView(pageIndex);
+        this.$store.dispatch('pageTitleSet', {
+          pageIndex,
+          webview,
+        });
       },
       // tabHandlers
       onNewTab() {
-        this.createTab();
+        this.$store.dispatch('incrementPid');
+        this.$store.dispatch('createTab');
       },
       onTabClick(event, pageIndex) {
-        this.currentPageIndex = pageIndex;
+        this.$store.dispatch('clickTab', pageIndex);
       },
       onTabClose(event, pageIndex) {
-        this.closeTab(pageIndex);
+        this.$store.dispatch('closeTab', pageIndex);
       },
       // navHandlers
       onClickHome() {
@@ -158,7 +120,8 @@
           menu.append(new MenuItem({
             label: 'Open Link in New Tab',
             click: () => {
-              this.createTab(event.params.linkURL);
+              this.$store.dispatch('incrementPid');
+              this.$store.dispatch('createTab', event.params.linkURL);
             },
           }));
         }

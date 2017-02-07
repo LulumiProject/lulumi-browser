@@ -107,12 +107,16 @@
   import 'vue-awesome/icons/spinner';
 
   export default {
-    props: [
-      'pages',
-      'currentPageIndex',
-    ],
     components: {
       Icon,
+    },
+    computed: {
+      pages() {
+        return this.$store.getters.pages;
+      },
+      currentPageIndex() {
+        return this.$store.getters.currentPageIndex;
+      },
     },
     methods: {
       maximize() {

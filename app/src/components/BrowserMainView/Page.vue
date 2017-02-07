@@ -30,7 +30,6 @@
 <script>
   export default {
     props: [
-      'page',
       'pageIndex',
     ],
     methods: {
@@ -49,7 +48,7 @@
       webviewHandler(self, fnName) {
         return (event) => {
           if (self.$parent[fnName]) {
-            self.$parent[fnName](event, this.page, this.pageIndex);
+            self.$parent[fnName](event, this.pageIndex);
           }
         };
       },
@@ -77,8 +76,8 @@
         this.$parent.onWebviewContextMenu(event);
       });
 
-      if (this.page.location) {
-        this.navigateTo(this.page.location);
+      if (this.$store.getters.pages[this.pageIndex].location) {
+        this.navigateTo(this.$store.getters.pages[this.pageIndex].location);
       }
     },
   };
