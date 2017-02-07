@@ -124,7 +124,86 @@
               this.$store.dispatch('createTab', event.params.linkURL);
             },
           }));
+          menu.append(new MenuItem({
+            label: 'Copy Link Address',
+            click: () => {
+              this.$electron.clipboard.writeText(event.params.linkURL);
+            },
+          }));
         }
+
+        if (event.params.hasImageContents) {
+          menu.append(new MenuItem({
+            label: 'Save Image As...',
+            click: () => {
+              alert('ToDo...');
+            },
+          }));
+          menu.append(new MenuItem({
+            label: 'Copy Image URL',
+            click: () => {
+              this.$electron.clipboard.writeText(event.params.srcURL);
+            },
+          }));
+          menu.append(new MenuItem({
+            label: 'Open Image in New Tab',
+            click: () => {
+              this.$store.dispatch('incrementPid');
+              this.$store.dispatch('createTab', event.params.srcURL);
+            },
+          }));
+        }
+
+        if (event.params.selectionText) {
+          menu.append(new MenuItem({
+            label: 'Copy',
+            click: () => {
+              this.$electron.clipboard.writeText(event.params.selectionText);
+            },
+          }));
+        }
+
+        if (this.getPageObject().canGoBack) {
+          menu.append(new MenuItem({
+            label: 'Back',
+            click: () => {
+              this.getWebView().goBack();
+            },
+          }));
+        }
+
+        if (this.getPageObject().canGoForward) {
+          menu.append(new MenuItem({
+            label: 'Forward',
+            click: () => {
+              this.getWebView().goForward();
+            },
+          }));
+        }
+
+        if (this.getPageObject().canRefresh) {
+          menu.append(new MenuItem({
+            label: 'Reload',
+            click: () => {
+              this.getWebView().reload();
+            },
+          }));
+        }
+
+        menu.append(new MenuItem({ type: 'separator' }));
+        menu.append(new MenuItem({
+          label: 'Select All',
+          click: () => {
+            this.getWebView().selectAll();
+          },
+        }));
+        menu.append(new MenuItem({ type: 'separator' }));
+        menu.append(new MenuItem({
+          label: 'Inspect Element',
+          click: () => {
+            this.getWebView().inspectElement(event.params.x, event.params.y);
+          },
+        }));
 
         menu.popup(this.$electron.remote.getCurrentWindow());
       },
