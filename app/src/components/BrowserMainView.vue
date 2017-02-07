@@ -23,7 +23,7 @@
     #nav
       tabs
       navbar
-    page(v-for="(page, i) in pages", v-show="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
+    page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
 </template>
 
 <script>

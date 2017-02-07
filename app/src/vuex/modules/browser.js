@@ -28,8 +28,12 @@ const mutations = {
   // tab handler
   [types.CREATE_TAB](state, url) {
     state.pages.push(createPageObject(url));
-    state.currentPageIndex = state.pages.length - 1;
-    state.pages[state.currentPageIndex].pid = state.pid;
+    if (url) {
+      state.pages[state.pages.length - 1].pid = state.pid;
+    } else {
+      state.currentPageIndex = state.pages.length - 1;
+      state.pages[state.currentPageIndex].pid = state.pid;
+    }
   },
   [types.CLOSE_TAB](state, pageIndex) {
     if (state.pages.length === 1) {

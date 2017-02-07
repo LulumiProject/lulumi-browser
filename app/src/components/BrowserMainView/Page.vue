@@ -24,12 +24,13 @@
 </style>
 
 <template lang="pug">
-  webview(ref="webview")
+  webview(ref="webview", :class="isActive ? 'active' : 'hidden'")
 </template>
 
 <script>
   export default {
     props: [
+      'isActive',
       'pageIndex',
     ],
     methods: {

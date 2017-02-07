@@ -1,4 +1,5 @@
 .DS_Store
+yarn-error.log
 app/dist/index.html
 app/dist/build.js
 app/dist/styles.css
