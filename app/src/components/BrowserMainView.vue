@@ -107,6 +107,20 @@
           muted,
         });
       },
+      onPageFaviconUpdated(event, pageIndex) {
+        this.$store.dispatch('pageFaviconUpdated', {
+          pageIndex,
+          url: event.favicons[0],
+        });
+      },
+      onEnterHtmlFullScreen() {
+        this.$el.querySelector('#nav').style.height = 0;
+        this.getWebView().style.height = '100vh';
+      },
+      onLeaveHtmlFullScreen() {
+        this.$el.querySelector('#nav').style.height = '62px';
+        this.getWebView().style.height = 'calc(100vh - 62px)';
+      },
       // tabHandlers
       onNewTab() {
         this.$store.dispatch('incrementPid');
@@ -343,6 +357,7 @@
       this.onMediaStartedPlaying.bind(this);
       this.onMediaPaused.bind(this);
       this.onToggleAudio.bind(this);
+      this.onPageFaviconUpdated.bind(this);
       this.onNewTab.bind(this);
       this.onTabClick.bind(this);
       this.onTabClose.bind(this);

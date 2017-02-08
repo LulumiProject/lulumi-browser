@@ -31,10 +31,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  #browser-tab {
+  .browser-tab {
     align-items: center;
   }
-  #browser-tab > div {
+  .browser-tab > div, .browser-tab > img, .browser-tab > svg {
     margin-left: 10px;
   }
   #browser-tabs > div > a {
@@ -93,10 +93,11 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
-    #browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+    .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+      icon(name="spinner", v-if="page.isLoading")
+      img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
       <transition name="fade">
-        icon(name="spinner", v-if="page.isLoading")
-        div(v-else-if="page.hasMedia", @click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
+        div(v-if="page.hasMedia", @click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
           icon(name="volume-off", v-if="page.isAudioMuted")
           icon(name="volume-up", v-else)
       </transition>

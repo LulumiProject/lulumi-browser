@@ -38,6 +38,9 @@ export const mediaPaused = ({ commit }, pageIndex) => {
 export const toggleAudio = ({ commit }, muted) => {
   commit(types.TOGGLE_AUDIO, muted);
 };
+export const pageFaviconUpdated = ({ commit }, pageIndex, url) => {
+  commit(types.PAGE_FAVICON_UPDATED, pageIndex, url);
+};
 
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);

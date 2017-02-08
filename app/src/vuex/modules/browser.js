@@ -5,6 +5,7 @@ function createPageObject(url) {
     pid: 0,
     location: url || 'https://github.com/qazbnm456/electron-vue-browser',
     statusText: false,
+    favicon: 'https://github.com/favicon.ico',
     title: 'new tab',
     isLoading: false,
     isSearching: false,
@@ -96,6 +97,9 @@ const mutations = {
   },
   [types.TOGGLE_AUDIO](state, payload) {
     state.pages[payload.pageIndex].isAudioMuted = payload.muted;
+  },
+  [types.PAGE_FAVICON_UPDATED](state, payload) {
+    state.pages[payload.pageIndex].favicon = payload.url;
   },
   [types.UPDATE_LOCATION](state, url) {
     state.pages[state.currentPageIndex].location = decodeURIComponent(url);

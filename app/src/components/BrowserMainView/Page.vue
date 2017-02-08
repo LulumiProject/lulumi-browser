@@ -95,6 +95,9 @@
         'update-target-url': 'onUpdateTargetUrl',
         'media-started-playing': 'onMediaStartedPlaying',
         'media-paused': 'onMediaPaused',
+        'page-favicon-updated': 'onPageFaviconUpdated',
+        'enter-html-full-screen': 'onEnterHtmlFullScreen',
+        'leave-html-full-screen': 'onLeaveHtmlFullScreen',
       };
 
       Object.keys(webviewEvents).forEach((key) => {
