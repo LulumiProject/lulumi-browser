@@ -31,9 +31,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  #browser-tabs > div > span > svg {
-    margin-right: 5px;
-    vertical-align: middle;
+  #browser-tab {
+    align-items: center;
+  }
+  #browser-tab > div {
+    margin-left: 10px;
   }
   #browser-tabs > div > a {
     -webkit-app-region: no-drag;
@@ -91,11 +93,14 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
-    div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+    #browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+      <transition name="fade">
+        icon(name="spinner", v-if="page.isLoading")
+        div(v-else-if="page.hasMedia", @click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
+          icon(name="volume-off", v-if="page.isAudioMuted")
+          icon(name="volume-up", v-else)
+      </transition>
       span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.preventDefault="$parent.onTabContextMenu($event, i)")
-        <transition name="fade">
-          icon(name="spinner", v-show="page.isLoading")
-        </transition>
         | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
@@ -106,6 +111,8 @@
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/times';
   import 'vue-awesome/icons/spinner';
+  import 'vue-awesome/icons/volume-up';
+  import 'vue-awesome/icons/volume-off';
 
   export default {
     components: {

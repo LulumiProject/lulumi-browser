@@ -91,10 +91,21 @@
         });
       },
       onMediaStartedPlaying(event, pageIndex) {
-        this.$store.dispatch('mediaStartedPlaying', pageIndex);
+        const webview = this.getWebView(pageIndex);
+        this.$store.dispatch('mediaStartedPlaying', {
+          pageIndex,
+          webview,
+        });
       },
       onMediaPaused(event, pageIndex) {
         this.$store.dispatch('mediaPaused', pageIndex);
+      },
+      onToggleAudio(event, pageIndex, muted) {
+        this.getWebView(pageIndex).setAudioMuted(muted);
+        this.$store.dispatch('toggleAudio', {
+          pageIndex,
+          muted,
+        });
       },
       // tabHandlers
       onNewTab() {
@@ -331,6 +342,7 @@
       this.onUpdateTargetUrl.bind(this);
       this.onMediaStartedPlaying.bind(this);
       this.onMediaPaused.bind(this);
+      this.onToggleAudio.bind(this);
       this.onNewTab.bind(this);
       this.onTabClick.bind(this);
       this.onTabClose.bind(this);

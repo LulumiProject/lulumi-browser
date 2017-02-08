@@ -35,6 +35,9 @@ export const mediaStartedPlaying = ({ commit }, pageIndex) => {
 export const mediaPaused = ({ commit }, pageIndex) => {
   commit(types.MEDIA_PAUSED, pageIndex);
 };
+export const toggleAudio = ({ commit }, muted) => {
+  commit(types.TOGGLE_AUDIO, muted);
+};
 
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);

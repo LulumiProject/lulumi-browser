@@ -12,6 +12,7 @@ function createPageObject(url) {
     canGoForward: false,
     canRefresh: false,
     hasMedia: false,
+    isAudioMuted: false,
   };
 }
 
@@ -64,7 +65,6 @@ const mutations = {
   // page handlers
   [types.DID_START_LOADING](state, pageIndex) {
     state.pages[pageIndex].isLoading = true;
-    state.pages[pageIndex].title = false;
   },
   [types.DOM_READY](state, payload) {
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
@@ -87,11 +87,15 @@ const mutations = {
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText = decodeURIComponent(payload.url);
   },
-  [types.MEDIA_STARTED_PLAYING](state, pageIndex) {
-    state.pages[pageIndex].hasMedia = true;
+  [types.MEDIA_STARTED_PLAYING](state, payload) {
+    state.pages[payload.pageIndex].hasMedia = true;
+    state.pages[payload.pageIndex].isAudioMuted = payload.webview.isAudioMuted();
   },
   [types.MEDIA_PAUSED](state, pageIndex) {
     state.pages[pageIndex].hasMedia = false;
+  },
+  [types.TOGGLE_AUDIO](state, payload) {
+    state.pages[payload.pageIndex].isAudioMuted = payload.muted;
   },
   [types.UPDATE_LOCATION](state, url) {
     state.pages[state.currentPageIndex].location = decodeURIComponent(url);
