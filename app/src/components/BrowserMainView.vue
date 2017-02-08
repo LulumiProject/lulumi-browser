@@ -84,6 +84,12 @@
           webview,
         });
       },
+      onUpdateTargetUrl(event, pageIndex) {
+        this.$store.dispatch('updateTargetUrl', {
+          pageIndex,
+          url: event.url,
+        });
+      },
       // tabHandlers
       onNewTab() {
         this.$store.dispatch('incrementPid');
@@ -189,6 +195,35 @@
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
 
+        if (this.getPageObject().canGoBack) {
+          menu.append(new MenuItem({
+            label: 'Back',
+            click: () => {
+              this.getWebView().goBack();
+            },
+          }));
+        }
+
+        if (this.getPageObject().canGoForward) {
+          menu.append(new MenuItem({
+            label: 'Forward',
+            click: () => {
+              this.getWebView().goForward();
+            },
+          }));
+        }
+
+        if (this.getPageObject().canRefresh) {
+          menu.append(new MenuItem({
+            label: 'Reload',
+            click: () => {
+              this.getWebView().reload();
+            },
+          }));
+        }
+
+        menu.append(new MenuItem({ type: 'separator' }));
+
         if (event.params.linkURL) {
           menu.append(new MenuItem({
             label: 'Open Link in New Tab',
@@ -236,34 +271,6 @@
           }));
         }
 
-        if (this.getPageObject().canGoBack) {
-          menu.append(new MenuItem({
-            label: 'Back',
-            click: () => {
-              this.getWebView().goBack();
-            },
-          }));
-        }
-
-        if (this.getPageObject().canGoForward) {
-          menu.append(new MenuItem({
-            label: 'Forward',
-            click: () => {
-              this.getWebView().goForward();
-            },
-          }));
-        }
-
-        if (this.getPageObject().canRefresh) {
-          menu.append(new MenuItem({
-            label: 'Reload',
-            click: () => {
-              this.getWebView().reload();
-            },
-          }));
-        }
-
-        menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
           label: 'Select All',
           click: () => {

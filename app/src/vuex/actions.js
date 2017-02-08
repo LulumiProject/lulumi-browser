@@ -26,6 +26,9 @@ export const didStopLoading = ({ commit }, pageIndex, webview) => {
 export const pageTitleSet = ({ commit }, pageIndex, webview) => {
   commit(types.PAGE_TITLE_SET, pageIndex, webview);
 };
+export const updateTargetUrl = ({ commit }, pageIndex, url) => {
+  commit(types.UPDATE_TARGET_URL, pageIndex, url);
+};
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);
 };

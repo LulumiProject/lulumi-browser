@@ -32,7 +32,8 @@
     text-overflow: ellipsis;
   }
   #browser-tabs > div > span > svg {
-    margin-left: 5px;
+    margin-right: 5px;
+    vertical-align: middle;
   }
   #browser-tabs > div > a {
     -webkit-app-region: no-drag;
@@ -91,7 +92,7 @@
 <template lang="pug">
   #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
     div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu="$parent.onTabContextMenu($event, i)")
+      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.preventDefault="$parent.onTabContextMenu($event, i)")
         <transition name="fade">
           icon(name="spinner", v-show="page.isLoading")
         </transition>

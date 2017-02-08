@@ -18,7 +18,7 @@
       );
     background-position: center;
     display: flex;
-    font-family: Lato, Helvetica, sans-serif;
+    font-family: 'Source Code Pro', Courier, monospace;;
     text-align: center;
   }
 </style>

@@ -21,10 +21,30 @@
   webview.hidden {
     visibility: hidden;
   }
+
+  #browser-page-status {
+    background: #F3F3F3;
+    border-color: #d3d3d3;
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 4px;
+    bottom: 0;
+    color: #555555;
+    font-size: 13px;
+    left: 0;
+    max-width: 40%;
+    overflow-x: hidden;
+    padding: 0.2em 0.5em;
+    position: absolute;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 </style>
 
 <template lang="pug">
-  webview(ref="webview", :class="isActive ? 'active' : 'hidden'")
+  div
+    webview(ref="webview", :class="isActive ? 'active' : 'hidden'")
+    #browser-page-status(v-show="page.statusText") {{ page.statusText }}
 </template>
 
 <script>
@@ -33,6 +53,11 @@
       'isActive',
       'pageIndex',
     ],
+    computed: {
+      page() {
+        return this.$store.getters.pages[this.pageIndex];
+      },
+    },
     methods: {
       normalizedUri(input) {
         const prefix = 'http://';
@@ -67,6 +92,7 @@
         'page-title-set': 'onPageTitleSet',
         'ipc-message': 'onIpcMessage',
         'console-message': 'onConsoleMessage',
+        'update-target-url': 'onUpdateTargetUrl',
       };
 
       Object.keys(webviewEvents).forEach((key) => {
