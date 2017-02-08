@@ -154,17 +154,17 @@
         const clipboard = this.$electron.clipboard;
 
         menu.append(new MenuItem({
-          label: 'Copy',
-          click: () => {
-            clipboard.writeText(el.value.slice(el.selectionStart, el.selectionEnd));
-          },
-        }));
-        menu.append(new MenuItem({
           label: 'Cut',
           click: () => {
             const location = el.value.slice(0, el.selectionStart) + el.value.slice(el.selectionEnd);
             clipboard.writeText(el.value.slice(el.selectionStart, el.selectionEnd));
             this.$store.dispatch('updateLocation', location);
+          },
+        }));
+        menu.append(new MenuItem({
+          label: 'Copy',
+          click: () => {
+            clipboard.writeText(el.value.slice(el.selectionStart, el.selectionEnd));
           },
         }));
         menu.append(new MenuItem({
@@ -195,33 +195,65 @@
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
 
-        if (this.getPageObject().canGoBack) {
+        if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
-            label: 'Back',
+            label: 'Undo',
             click: () => {
-              this.getWebView().goBack();
+              this.getWebView().undo();
             },
           }));
         }
 
-        if (this.getPageObject().canGoForward) {
+        if (event.params.editFlags.canRedo) {
           menu.append(new MenuItem({
-            label: 'Forward',
+            label: 'Redo',
             click: () => {
-              this.getWebView().goForward();
+              this.getWebView().redo();
             },
           }));
         }
 
-        if (this.getPageObject().canRefresh) {
+        menu.append(new MenuItem({ type: 'separator' }));
+
+        if (event.params.editFlags.canCut) {
           menu.append(new MenuItem({
-            label: 'Reload',
+            label: 'Cut',
             click: () => {
-              this.getWebView().reload();
+              this.getWebView().cut();
             },
           }));
         }
 
+        if (event.params.editFlags.canCopy) {
+          menu.append(new MenuItem({
+            label: 'Copy',
+            click: () => {
+              this.getWebView().copy();
+            },
+          }));
+        }
+
+        if (event.params.editFlags.canPaste) {
+          menu.append(new MenuItem({
+            label: 'Paste',
+            click: () => {
+              this.getWebView().pasteAndMatchStyle();
+            },
+          }));
+          menu.append(new MenuItem({
+            label: 'Paste Without Formatting',
+            click: () => {
+              this.getWebView().paste();
+            },
+          }));
+        }
+
+        menu.append(new MenuItem({
+          label: 'Select All',
+          click: () => {
+            this.getWebView().selectAll();
+          },
+        }));
         menu.append(new MenuItem({ type: 'separator' }));
 
         if (event.params.linkURL) {
@@ -262,22 +294,17 @@
           }));
         }
 
-        if (event.params.selectionText) {
+        menu.append(new MenuItem({ type: 'separator' }));
+        const macOS = /^darwin/.test(process.platform);
+        if (macOS) {
           menu.append(new MenuItem({
-            label: 'Copy',
+            label: `Look up "${event.params.selectionText}"`,
             click: () => {
-              clipboard.writeText(event.params.selectionText);
+              this.getWebView().showDefinitionForSelection();
             },
           }));
+          menu.append(new MenuItem({ type: 'separator' }));
         }
-
-        menu.append(new MenuItem({
-          label: 'Select All',
-          click: () => {
-            this.getWebView().selectAll();
-          },
-        }));
-        menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
           label: 'Inspect Element',
           click: () => {
