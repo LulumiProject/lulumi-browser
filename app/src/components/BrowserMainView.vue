@@ -90,6 +90,12 @@
           url: event.url,
         });
       },
+      onMediaStartedPlaying(event, pageIndex) {
+        this.$store.dispatch('mediaStartedPlaying', pageIndex);
+      },
+      onMediaPaused(event, pageIndex) {
+        this.$store.dispatch('mediaPaused', pageIndex);
+      },
       // tabHandlers
       onNewTab() {
         this.$store.dispatch('incrementPid');
@@ -297,13 +303,15 @@
         menu.append(new MenuItem({ type: 'separator' }));
         const macOS = /^darwin/.test(process.platform);
         if (macOS) {
-          menu.append(new MenuItem({
-            label: `Look up "${event.params.selectionText}"`,
-            click: () => {
-              this.getWebView().showDefinitionForSelection();
-            },
-          }));
-          menu.append(new MenuItem({ type: 'separator' }));
+          if (event.params.selectionText) {
+            menu.append(new MenuItem({
+              label: `Look up "${event.params.selectionText}"`,
+              click: () => {
+                this.getWebView().showDefinitionForSelection();
+              },
+            }));
+            menu.append(new MenuItem({ type: 'separator' }));
+          }
         }
         menu.append(new MenuItem({
           label: 'Inspect Element',
@@ -320,6 +328,9 @@
       this.onDomReady.bind(this);
       this.onDidStopLoading.bind(this);
       this.onPageTitleSet.bind(this);
+      this.onUpdateTargetUrl.bind(this);
+      this.onMediaStartedPlaying.bind(this);
+      this.onMediaPaused.bind(this);
       this.onNewTab.bind(this);
       this.onTabClick.bind(this);
       this.onTabClose.bind(this);

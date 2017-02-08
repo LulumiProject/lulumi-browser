@@ -93,6 +93,8 @@
         'ipc-message': 'onIpcMessage',
         'console-message': 'onConsoleMessage',
         'update-target-url': 'onUpdateTargetUrl',
+        'media-started-playing': 'onMediaStartedPlaying',
+        'media-paused': 'onMediaPaused',
       };
 
       Object.keys(webviewEvents).forEach((key) => {

@@ -29,6 +29,13 @@ export const pageTitleSet = ({ commit }, pageIndex, webview) => {
 export const updateTargetUrl = ({ commit }, pageIndex, url) => {
   commit(types.UPDATE_TARGET_URL, pageIndex, url);
 };
+export const mediaStartedPlaying = ({ commit }, pageIndex) => {
+  commit(types.MEDIA_STARTED_PLAYING, pageIndex);
+};
+export const mediaPaused = ({ commit }, pageIndex) => {
+  commit(types.MEDIA_PAUSED, pageIndex);
+};
+
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);
 };

@@ -11,6 +11,7 @@ function createPageObject(url) {
     canGoBack: false,
     canGoForward: false,
     canRefresh: false,
+    hasMedia: false,
   };
 }
 
@@ -82,10 +83,15 @@ const mutations = {
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
-    state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText = decodeURIComponent(payload.url);
+  },
+  [types.MEDIA_STARTED_PLAYING](state, pageIndex) {
+    state.pages[pageIndex].hasMedia = true;
+  },
+  [types.MEDIA_PAUSED](state, pageIndex) {
+    state.pages[pageIndex].hasMedia = false;
   },
   [types.UPDATE_LOCATION](state, url) {
     state.pages[state.currentPageIndex].location = decodeURIComponent(url);
