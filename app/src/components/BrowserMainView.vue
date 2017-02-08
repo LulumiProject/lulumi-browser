@@ -186,26 +186,15 @@
 
         menu.append(new MenuItem({
           label: 'Cut',
-          click: () => {
-            const location = el.value.slice(0, el.selectionStart) + el.value.slice(el.selectionEnd);
-            clipboard.writeText(el.value.slice(el.selectionStart, el.selectionEnd));
-            this.$store.dispatch('updateLocation', location);
-          },
+          role: 'cut',
         }));
         menu.append(new MenuItem({
           label: 'Copy',
-          click: () => {
-            clipboard.writeText(el.value.slice(el.selectionStart, el.selectionEnd));
-          },
+          role: 'copy',
         }));
         menu.append(new MenuItem({
           label: 'Paste',
-          click: () => {
-            let location = el.value.slice(0, el.selectionStart);
-            location += clipboard.readText();
-            location += el.value.slice(el.selectionEnd);
-            this.$store.dispatch('updateLocation', location);
-          },
+          role: 'paste',
         }));
         menu.append(new MenuItem({
           label: 'Paste and Go',
@@ -229,18 +218,16 @@
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
             label: 'Undo',
-            click: () => {
-              this.getWebView().undo();
-            },
+            accelerator: 'CmdOrCtrl+Z',
+            role: 'undo',
           }));
         }
 
         if (event.params.editFlags.canRedo) {
           menu.append(new MenuItem({
             label: 'Redo',
-            click: () => {
-              this.getWebView().redo();
-            },
+            accelerator: 'Shift+CmdOrCtrl+Z',
+            role: 'redo',
           }));
         }
 
@@ -249,41 +236,36 @@
         if (event.params.editFlags.canCut) {
           menu.append(new MenuItem({
             label: 'Cut',
-            click: () => {
-              this.getWebView().cut();
-            },
+            accelerator: 'CmdOrCtrl+X',
+            role: 'cut',
           }));
         }
 
         if (event.params.editFlags.canCopy) {
           menu.append(new MenuItem({
             label: 'Copy',
-            click: () => {
-              this.getWebView().copy();
-            },
+            accelerator: 'CmdOrCtrl+C',
+            role: 'copy',
           }));
         }
 
         if (event.params.editFlags.canPaste) {
           menu.append(new MenuItem({
             label: 'Paste',
-            click: () => {
-              this.getWebView().pasteAndMatchStyle();
-            },
+            accelerator: 'CmdOrCtrl+V',
+            role: 'paste',
           }));
           menu.append(new MenuItem({
             label: 'Paste Without Formatting',
-            click: () => {
-              this.getWebView().paste();
-            },
+            accelerator: 'Shift+CmdOrCtrl+V',
+            role: 'pasteandmatchstyle',
           }));
         }
 
         menu.append(new MenuItem({
           label: 'Select All',
-          click: () => {
-            this.getWebView().selectAll();
-          },
+          accelerator: 'CmdOrCtrl+A',
+          role: 'selectall',
         }));
         menu.append(new MenuItem({ type: 'separator' }));
 
