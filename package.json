@@ -75,6 +75,7 @@
     "vue-html-loader": "^1.2.2",
     "vue-loader": "^9.5.1",
     "vue-style-loader": "^1.0.0",
+    "element-ui": "^1.1.6",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"
   },

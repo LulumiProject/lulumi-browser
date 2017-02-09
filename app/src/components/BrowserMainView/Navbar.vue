@@ -30,31 +30,14 @@
     align-items: center;
     justify-content: center;
   }
-  #browser-navbar .input-group {
+  #browser-navbar > .input-group {
     flex: 9;
     display: flex;
     margin: 0 5px;
   }
-  #browser-navbar .input-group input {
+  #url-input {
     flex: 1;
-    margin: 4px 0 3px;
-    padding: 0 5px;
-    font-size: 14px;
-    color: #808080;
-    outline: 0;
-    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.2);
-    background: #fff;
-    border: 1px solid #bbb;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-  }
-  #browser-navbar .input-group input:focus, 
-  #browser-navbar .input-group input:active, 
-  #browser-navbar .input-group input:hover {
-    outline: 0;
-    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.2);
-    background: #fff;
-    border: 1px solid #bbb;
+    display: flex;
   }
   #browser-navbar .input-group a {
     border: 1px solid #bbb;
@@ -82,10 +65,24 @@
       a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
     .input-group
-      input#url-input(type="text", @keyup.enter="$parent.onEnterLocation($event.target.value)", v-focus="focused", @focus="$event.target.select()", :value="page.location", @contextmenu="$parent.onNavContextMenu")
+      good-custom-autocomplete#url-input(
+        @input="$store.dispatch('updateLocation', $event)",
+        @select="$parent.onEnterLocation($event.value)",
+        :on-icon-click="handleIconClick",
+        :trigger-on-focus="false",
+        placeholder='Enter a URL or search a term',
+        :fetch-suggestions="querySearch",
+        v-focus="focused",
+        :value="page.location",
+        @contextmenu="$parent.onNavContextMenu",
+        popper-class='my-autocomplete',
+        custom-item='url-suggestion')
 </template>
 
 <script>
+  import Vue from 'vue';
+  import '../../css/el-autocomplete';
+
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/angle-double-left';
   import 'vue-awesome/icons/angle-left';
@@ -94,6 +91,23 @@
 
   import { focus } from 'vue-focus';
 
+  Vue.component('url-suggestion', {
+    functional: true,
+    render(h, ctx) {
+      const item = ctx.props.item;
+      return h('li', ctx.data, [
+        h('div', { attrs: { class: 'location' } }, [item.value]),
+        h('span', { attrs: { class: 'name' } }, [item.title]),
+      ]);
+    },
+    props: {
+      item: {
+        type: Object,
+        required: true,
+      },
+    },
+  });
+
   export default {
     directives: {
       focus,
@@ -101,6 +115,16 @@
     data() {
       return {
         focused: false,
+        suggestions: [
+          {
+            title: 'google',
+            value: 'www.google.com',
+          },
+          {
+            title: 'youtube',
+            value: 'www.youtube.com',
+          },
+        ],
       };
     },
     components: {
@@ -109,6 +133,17 @@
     computed: {
       page() {
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+      },
+    },
+    methods: {
+      querySearch(queryString, cb) {
+        const suggestions = this.suggestions;
+        const results =
+          queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
+        cb(results);
+      },
+      createFilter(queryString) {
+        return (suggestion) => (suggestion.title.indexOf(queryString.toLowerCase()) === 0);
       },
     },
   };
