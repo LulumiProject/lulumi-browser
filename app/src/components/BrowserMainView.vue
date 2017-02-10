@@ -31,6 +31,8 @@
   import Navbar from './BrowserMainView/Navbar';
   import Page from './BrowserMainView/Page';
 
+  import urlUtil from '../js/lib/urlutil';
+
   export default {
     components: {
       Tabs,
@@ -146,7 +148,13 @@
         this.getWebView().reload();
       },
       onEnterLocation(location) {
-        this.getPage().navigateTo(location);
+        if (urlUtil.isNotURL(location)) {
+          const newLocation = `https://www.google.com/search?q=${location}`;
+          this.$store.dispatch('updateLocation', newLocation);
+          this.getPage().navigateTo(newLocation);
+        } else {
+          this.getPage().navigateTo(location);
+        }
       },
       // onTabContextMenu
       onTabContextMenu(event, pageIndex) {

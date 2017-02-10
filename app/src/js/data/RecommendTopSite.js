@@ -113,6 +113,10 @@ const recommendTopSite = [
     value: 'quora.com',
   },
   {
+    title: 'CTFtime',
+    value: 'ctftime.org',
+  },
+  {
     title: '巴哈姆特電玩資訊站',
     value: 'gamer.com.tw',
   },
