@@ -36,6 +36,14 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
         }
       });
     },
+    handleChange(value) {
+      this.$emit('input', value);
+      if (!this.triggerOnFocus && !value) {
+        this.suggestions = [];
+        return;
+      }
+      this.getData(value);
+    },
     handleFocus(event) {
       event.target.select();
       this.isFocus = true;
