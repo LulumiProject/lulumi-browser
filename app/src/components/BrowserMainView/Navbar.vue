@@ -64,7 +64,7 @@
         icon(name="angle-right")
       a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
-    .input-group
+    .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
         @input="$store.dispatch('updateLocation', $event)",
         @select="$parent.onEnterLocation($event.value)",
@@ -74,7 +74,6 @@
         :fetch-suggestions="querySearch",
         v-focus="focused",
         :value="page.location",
-        @contextmenu="$parent.onNavContextMenu",
         popper-class='my-autocomplete',
         custom-item='url-suggestion')
 </template>

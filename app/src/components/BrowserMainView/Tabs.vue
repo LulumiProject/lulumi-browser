@@ -101,7 +101,7 @@
           icon(name="volume-off", v-if="page.isAudioMuted")
           icon(name="volume-up", v-else)
       </transition>
-      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.preventDefault="$parent.onTabContextMenu($event, i)")
+      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
         | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
