@@ -12,8 +12,17 @@ Vue.use(Resource);
 Vue.use(Router);
 Vue.config.debug = true;
 
+// Customize Autocomplete component to match out needs
 const CustomAutocomplete = Vue.extend(Autocomplete);
 const GoodCustomAutocomplete = CustomAutocomplete.extend({
+  computed: {
+    suggestionVisible() {
+      const suggestions = this.suggestions;
+      const isValidData = Array.isArray(suggestions) && suggestions.length > 0;
+      // Don't show suggestions if we have no input there
+      return (isValidData || this.loading) && this.isFocus && this.value;
+    },
+  },
   methods: {
     handleFocus(event) {
       event.target.select();
@@ -27,7 +36,6 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
             && this.highlightedIndex >= 0
             && this.highlightedIndex < this.suggestions.length) {
         this.select(this.suggestions[this.highlightedIndex]);
-        console.log(this.suggestions[this.highlightedIndex].value);
       } else {
         this.$parent.$parent.onEnterLocation(event.target.value);
         this.select({ value: event.target.value });

@@ -51,6 +51,10 @@ ul.my-autocomplete {
   font-size: 12px;
   color: rgb(156, 39, 176);
 }
+.my-autocomplete > li:hover {
+  color: #fff;
+  background: #00bcd4;
+}
 .my-autocomplete > li.highlighted {
   color: #fff;
   background: #00bcd4;
