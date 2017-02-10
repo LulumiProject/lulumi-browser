@@ -24,6 +24,18 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
     },
   },
   methods: {
+    getData(queryString) {
+      this.loading = true;
+      this.fetchSuggestions(queryString, (suggestions) => {
+        this.loading = false;
+        if (Array.isArray(suggestions)) {
+          this.suggestions = suggestions;
+          this.highlightedIndex = 0;
+        } else {
+          console.error('autocomplete suggestions must be an array');
+        }
+      });
+    },
     handleFocus(event) {
       event.target.select();
       this.isFocus = true;

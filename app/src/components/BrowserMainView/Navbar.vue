@@ -90,13 +90,15 @@
 
   import { focus } from 'vue-focus';
 
+  import recommendTopSite from '../../js/data/RecommendTopSite';
+
   Vue.component('url-suggestion', {
     functional: true,
     render(h, ctx) {
       const item = ctx.props.item;
       return h('li', ctx.data, [
         h('div', { attrs: { class: 'location' } }, [item.value]),
-        h('span', { attrs: { class: 'name' } }, [item.title]),
+        h('span', { attrs: { class: 'name' } }, [item.title || '']),
       ]);
     },
     props: {
@@ -114,16 +116,7 @@
     data() {
       return {
         focused: false,
-        suggestions: [
-          {
-            title: 'google',
-            value: 'www.google.com',
-          },
-          {
-            title: 'youtube',
-            value: 'www.youtube.com',
-          },
-        ],
+        suggestions: recommendTopSite,
       };
     },
     components: {
@@ -142,7 +135,7 @@
         cb(results);
       },
       createFilter(queryString) {
-        return (suggestion) => (suggestion.title.indexOf(queryString.toLowerCase()) === 0);
+        return (suggestion) => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
       },
     },
   };
