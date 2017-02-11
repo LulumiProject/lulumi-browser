@@ -98,6 +98,7 @@
         'page-favicon-updated': 'onPageFaviconUpdated',
         'enter-html-full-screen': 'onEnterHtmlFullScreen',
         'leave-html-full-screen': 'onLeaveHtmlFullScreen',
+        'new-window': 'onNewWindow',
       };
 
       Object.keys(webviewEvents).forEach((key) => {

@@ -123,6 +123,10 @@
         this.$el.querySelector('#nav').style.height = '62px';
         this.getWebView().style.height = 'calc(100vh - 62px)';
       },
+      onNewWindow(event) {
+        this.$store.dispatch('incrementPid');
+        this.$store.dispatch('createTab', event.url);
+      },
       // tabHandlers
       onNewTab() {
         this.$store.dispatch('incrementPid');
