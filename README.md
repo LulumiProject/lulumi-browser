@@ -3,8 +3,8 @@
 > An electron-vue based browser
 
 <p align="center">
-  <a href="http://i.imgur.com/z0tWLI9.png" target="_blank">
-    <img src="http://i.imgur.com/z0tWLI9.png" width="700px">
+  <a href="http://i.imgur.com/kqiSae3.png" target="_blank">
+    <img src="http://i.imgur.com/kqiSae3.png" width="700px">
   </a>
 </p>
 

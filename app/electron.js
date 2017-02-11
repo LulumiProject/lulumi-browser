@@ -25,7 +25,9 @@ function createWindow () {
     width: 1080,
     minWidth: 320,
     minHeight: 500,
-    frame: false,
+    titleBarStyle: 'hidden-inset',
+    autoHideMenuBar: true,
+    frame: true,
   })
 
   mainWindow.loadURL(config.url)

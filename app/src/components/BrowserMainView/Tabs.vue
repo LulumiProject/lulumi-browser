@@ -2,13 +2,17 @@
   #browser-tabs {
     display: flex;
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
-    font-size: 13px;
-    height: 27px;
+    font-size: 15px;
+    height: 38px;
     -webkit-app-region: drag;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
   }
-  #browser-tabs > div {
+  #browser-tabs > div.window-buttons {
+    -webkit-app-region: no-drag;
+    padding-right: 80px;
+  }
+  #browser-tabs > div.browser-tab {
     -webkit-app-region: no-drag;
     flex: 1;
     display: flex;
@@ -41,6 +45,7 @@
     -webkit-app-region: no-drag;
     display: inline-block;
     padding: 5px 10px;
+    margin-right: 5px;
     cursor: pointer;
     float: right;
   }
@@ -93,6 +98,7 @@
 
 <template lang="pug">
   #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
+    .window-buttons
     .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
       icon(name="spinner", v-if="page.isLoading")
       img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
