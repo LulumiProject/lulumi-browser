@@ -35,4 +35,4 @@ $ yarn run pack
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8367a88](https://github.com/SimulatedGREG/electron-vue/commit/8367a88efc538964408e4d608379860304ddf802) and developed by [@qazbnm456](https://github.com/qazbnm456).
