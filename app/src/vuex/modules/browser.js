@@ -74,16 +74,19 @@ const mutations = {
   },
   [types.DID_STOP_LOADING](state, payload) {
     state.pages[payload.pageIndex].statusText = false;
-    state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
     state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
     if (!state.pages[payload.pageIndex].title) {
       state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
     }
+    if (!state.pages[payload.pageIndex].location) {
+      state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
+    }
     state.pages[payload.pageIndex].isLoading = false;
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
+    state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText = decodeURIComponent(payload.url);
