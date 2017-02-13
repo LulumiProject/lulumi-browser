@@ -3,14 +3,14 @@
     display: flex;
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
     font-size: 15px;
-    height: 38px;
+    height: 27px;
     -webkit-app-region: drag;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
   }
   #browser-tabs > div.window-buttons {
     -webkit-app-region: no-drag;
-    padding-right: 80px;
+    padding-right: 70px;
   }
   #browser-tabs > div.browser-tab {
     -webkit-app-region: no-drag;
