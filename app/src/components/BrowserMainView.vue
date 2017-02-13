@@ -34,6 +34,17 @@
   import urlUtil from '../js/lib/urlutil';
 
   export default {
+    data() {
+      return {
+        trackingFingers: false,
+        swipeGesture: false,
+        isSwipeOnEdge: false,
+        deltaX: 0,
+        deltaY: 0,
+        startTime: 0,
+        time: 0,
+      };
+    },
     components: {
       Tabs,
       Navbar,
@@ -126,6 +137,39 @@
       onNewWindow(event) {
         this.$store.dispatch('incrementPid');
         this.$store.dispatch('createTab', event.url);
+      },
+      onWheel(event) {
+        if (this.trackingFingers) {
+          this.deltaX = this.deltaX + event.deltaX;
+          this.deltaY = this.deltaY + event.deltaY;
+          this.time = (new Date()).getTime() - this.startTime;
+        }
+      },
+      onScrollTouchBegin(event, swipeGesture) {
+        if (swipeGesture) {
+          this.trackingFingers = true;
+          this.isSwipeOnEdge = false;
+          this.startTime = (new Date()).getTime();
+        }
+      },
+      onScrollTouchEnd(event, pageIndex) {
+        if (this.time > 50
+              && this.trackingFingers
+              && Math.abs(this.deltaY) < 50
+              && this.isSwipeOnEdge) {
+          if (this.deltaX > 70) {
+            this.getWebView(pageIndex).goForward();
+          } else if (this.deltaX < -70) {
+            this.getWebView(pageIndex).goBack();
+          }
+        }
+        this.trackingFingers = false;
+        this.deltaX = 0;
+        this.deltaY = 0;
+        this.startTime = 0;
+      },
+      onScrollTouchEdge() {
+        this.isSwipeOnEdge = true;
       },
       // tabHandlers
       onNewTab() {
@@ -369,6 +413,8 @@
       this.onTabClose.bind(this);
       this.onTabContextMenu.bind(this);
       this.onWebviewContextMenu.bind(this);
+      this.onScrollTouchBegin.bind(this);
+      this.onScrollTouchEnd.bind(this);
     },
   };
 </script>

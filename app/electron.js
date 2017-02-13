@@ -1,11 +1,12 @@
 'use strict'
 
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, systemPreferences } = require('electron')
 const path = require('path')
 const menu = require('./browser/menu')
 
 let mainWindow
 let config = {}
+const swipeGesture = systemPreferences.isSwipeTrackingFromScrollEventsEnabled();
 
 if (process.env.NODE_ENV === 'development') {
   config = require('../config')
@@ -42,6 +43,18 @@ function createWindow () {
       .then((name) => mainWindow.webContents.openDevTools())
       .catch((err) => console.log('An error occurred: ', err))
   }
+
+  mainWindow.on('scroll-touch-begin', (event) => {
+    mainWindow.webContents.send('scroll-touch-begin', swipeGesture);
+  });
+
+  mainWindow.on('scroll-touch-end', (event) => {
+    mainWindow.webContents.send('scroll-touch-end');
+  });
+
+  mainWindow.on('scroll-touch-edge', function (event) {
+    mainWindow.webContents.send('scroll-touch-edge');
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

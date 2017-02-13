@@ -99,6 +99,8 @@
         'enter-html-full-screen': 'onEnterHtmlFullScreen',
         'leave-html-full-screen': 'onLeaveHtmlFullScreen',
         'new-window': 'onNewWindow',
+        'scroll-touch-begin': 'onScrollTouchBegin',
+        'scroll-touch-end': 'onScrollTouchEnd',
       };
 
       Object.keys(webviewEvents).forEach((key) => {
@@ -107,6 +109,29 @@
 
       this.$refs.webview.addEventListener('context-menu', (event) => {
         this.$parent.onWebviewContextMenu(event);
+      });
+
+      this.$refs.webview.addEventListener('wheel', (event) => {
+        if (this.$parent.onWheel) {
+          this.$parent.onWheel(event);
+        }
+      }, { passive: true });
+
+      const ipc = this.$electron.ipcRenderer;
+      ipc.on('scroll-touch-begin', (event, swipeGesture) => {
+        if (this.$parent.onScrollTouchBegin) {
+          this.$parent.onScrollTouchBegin(event, swipeGesture);
+        }
+      });
+      ipc.on('scroll-touch-end', (event) => {
+        if (this.$parent.onScrollTouchEnd) {
+          this.$parent.onScrollTouchEnd(event, this.pageIndex);
+        }
+      });
+      ipc.on('scroll-touch-edge', (event) => {
+        if (this.$parent.onScrollTouchEdge) {
+          this.$parent.onScrollTouchEdge(event);
+        }
       });
 
       if (this.$store.getters.pages[this.pageIndex].location) {
