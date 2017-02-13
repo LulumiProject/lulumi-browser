@@ -97,8 +97,12 @@
     render(h, ctx) {
       const item = ctx.props.item;
       return h('li', ctx.data, [
-        h('div', { attrs: { class: 'location' } }, [item.value]),
-        h('span', { attrs: { class: 'name' } }, [item.title || '']),
+        h('div', { attrs: { class: 'location' } }, [item.value,
+          h('span', { attrs: { class: 'name' } }, [
+            ' - ',
+            item.title || '',
+          ]),
+        ]),
       ]);
     },
     props: {
