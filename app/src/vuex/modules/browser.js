@@ -1,4 +1,5 @@
 import * as types from '../mutation-types';
+import urlUtil from '../../js/lib/urlutil';
 
 function createPageObject(url) {
   return {
@@ -30,7 +31,18 @@ const mutations = {
   },
   // tab handler
   [types.CREATE_TAB](state, url) {
-    state.pages.push(createPageObject(url));
+    let newUrl = null;
+    if (urlUtil.isURL(url)) {
+      newUrl = url;
+      state.pages.push(createPageObject(newUrl));
+    } else {
+      if (url) {
+        newUrl = `https://www.google.com/search?q=${url}`;
+        state.pages.push(createPageObject(newUrl));
+      } else {
+        state.pages.push(createPageObject());
+      }
+    }
     if (url) {
       state.pages[state.pages.length - 1].pid = state.pid;
     } else {

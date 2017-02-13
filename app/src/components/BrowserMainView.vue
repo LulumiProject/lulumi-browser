@@ -261,6 +261,18 @@
           }));
         }
 
+        if (event.params.selectionText) {
+          if (event.params.editFlags.canCopy) {
+            menu.append(new MenuItem({
+              label: `Search for "${event.params.selectionText}"`,
+              click: () => {
+                this.$store.dispatch('incrementPid');
+                this.$store.dispatch('createTab', event.params.selectionText);
+              },
+            }));
+          }
+        }
+
         if (event.params.editFlags.canPaste) {
           menu.append(new MenuItem({
             label: 'Paste',
