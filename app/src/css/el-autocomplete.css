@@ -60,3 +60,37 @@ ul.my-autocomplete {
   color: #fff;
   background: #00bcd4;
 }
+@font-face{
+  font-family: element-icons;
+  src: url(https://unpkg.com/element-ui@1.1.6/lib/theme-default/fonts/element-icons.eot?t=1472440741);
+  src: url(https://unpkg.com/element-ui@1.1.6/lib/theme-default/fonts/element-icons.woff?t=1472440741) format('woff'), url(https://unpkg.com/element-ui@1.1.6/lib/theme-default/fonts/element-icons.ttf?t=1472440741) format('truetype'), url(https://unpkg.com/element-ui@1.1.6/lib/theme-default/fonts/element-icons.svg?t=1472440741#el-icon) format('svg');
+  font-weight: 400;
+  font-style: normal;
+}
+@keyframes rotating {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(1turn);
+  }
+}
+[class*=" el-icon-"], [class^=el-icon-] {
+    font-family: element-icons!important;
+    speak: none;
+    font-style: normal;
+    font-weight: 400;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: baseline;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.el-icon-loading:before{
+  content: "\e616";
+}
+.el-icon-loading{
+  animation: rotating 1s linear infinite;
+}

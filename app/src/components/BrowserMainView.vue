@@ -357,7 +357,33 @@
           menu.append(new MenuItem({
             label: 'Save Image As...',
             click: () => {
-              alert('ToDo...');
+              const fs = require('fs');
+              const path = require('path');
+              const electron = this.$electron;
+              urlUtil.getFilenameFromUrl(event.params.srcURL).then(
+                (filename) => {
+                  const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
+                  electron.remote.dialog.showSaveDialog(
+                    electron.remote.getCurrentWindow(), {
+                      defaultPath,
+                      filters: [
+                        {
+                          name: 'Images',
+                          extensions: ['jpg', 'jpeg', 'png', 'gif'],
+                        },
+                      ],
+                    }, (filename) => {
+                      if (filename) {
+                        const { getBase64FromImageUrl } = require('../js/lib/imageutil');
+                        getBase64FromImageUrl(event.params.srcURL).then((dataURL) => {
+                          fs.writeFileSync(filename,
+                            electron.nativeImage.createFromDataURL(dataURL).toPNG());
+                        });
+                      }
+                    },
+                  );
+                }
+              );
             },
           }));
           menu.append(new MenuItem({

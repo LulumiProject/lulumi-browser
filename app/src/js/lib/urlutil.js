@@ -248,6 +248,28 @@ const urlUtil = {
     }
     return '';
   },
+
+  /**
+   * Gets the filename of the image from a URL.
+   * @param {string} url The URL to find a filename of the image
+   * @return {string} filename The filename of the image
+   */
+  getFilenameFromUrl(url) {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onerror = () => {
+        resolve('');
+        reject();
+      };
+      img.onload = () => {
+        const urllib = require('url');
+        const path = require('path');
+        const parsed = urllib.parse(url);
+        resolve(path.basename(parsed.pathname));
+      };
+      img.src = url;
+    });
+  },
 };
 
 module.exports = urlUtil;

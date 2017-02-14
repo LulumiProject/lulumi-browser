@@ -38,7 +38,7 @@
   .browser-tab {
     align-items: center;
   }
-  .browser-tab > div, .browser-tab > img, .browser-tab > svg {
+  .browser-tab > div, .browser-tab > i, .browser-tab > img, .browser-tab > svg {
     margin-left: 10px;
   }
   #browser-tabs > div > a {
@@ -100,7 +100,7 @@
   #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
     .window-buttons
     .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      icon(name="spinner", v-if="page.isLoading")
+      i.el-icon-loading(v-if="page.isLoading")
       img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
       <transition name="fade">
         div(v-if="page.hasMedia", @click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
@@ -117,7 +117,6 @@
 <script>
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/times';
-  import 'vue-awesome/icons/spinner';
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
 
