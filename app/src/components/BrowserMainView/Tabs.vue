@@ -29,6 +29,10 @@
     background: linear-gradient(to bottom, #e5e5e5 90%, #ddd);
     color: #555;
   }
+  #browser-tabs > div.ghost {
+    opacity: .5;
+    background: #C8EBFB;
+  }
   #browser-tabs > div > span {
     flex: 1;
     padding: 6px 0 4px 12px;
@@ -97,7 +101,7 @@
 </style>
 
 <template lang="pug">
-  #browser-tabs(@dblclick="$electron.remote.getCurrentWindow().maximize()")
+  #browser-tabs(v-sortable, @dblclick="$electron.remote.getCurrentWindow().maximize()")
     .window-buttons
     .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
       i.el-icon-loading(v-if="page.isLoading")
@@ -120,7 +124,18 @@
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
 
+  import Sortable from 'sortablejs';
+
   export default {
+    directives: {
+      sortable: {
+        update(el) {
+          Sortable.create(el, {
+            ghostClass: 'ghost',
+          });
+        },
+      },
+    },
     components: {
       Icon,
     },
