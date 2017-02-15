@@ -4,16 +4,14 @@
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
     font-size: 15px;
     height: 38px;
-    -webkit-app-region: drag;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
   }
   #browser-tabs > div.window-buttons {
-    -webkit-app-region: no-drag;
+    -webkit-app-region: drag;
     padding-right: 80px;
   }
   #browser-tabs > div.browser-tab {
-    -webkit-app-region: no-drag;
     flex: 1;
     display: flex;
     background: linear-gradient(to bottom, #ddd 90%, #bbb);
@@ -25,7 +23,6 @@
     overflow:hidden;
   }
   #browser-tabs > div.active {
-    -webkit-app-region: drag;
     background: linear-gradient(to bottom, #e5e5e5 90%, #ddd);
     color: #555;
   }
@@ -36,13 +33,21 @@
   #browser-tabs > div > span {
     flex: 1;
     padding: 6px 0 4px 12px;
+    line-height: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .browser-tab {
     align-items: center;
   }
-  .browser-tab > div, .browser-tab > i, .browser-tab > img, .browser-tab > svg {
+  #tab-icons {
+    margin-top: 3px;
+  }
+  #tab-icons > div, #tab-icons > img {
+    margin-left: 10px;
+  }
+  #tab-icons > i, #tab-icons > svg {
+    width: 20px;
     margin-left: 10px;
   }
   #browser-tabs > div > a {
@@ -104,12 +109,12 @@
   #browser-tabs(v-sortable, @dblclick="$electron.remote.getCurrentWindow().maximize()")
     .window-buttons
     .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      i.el-icon-loading(v-if="page.isLoading")
-      img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
       <transition name="fade">
-        div(v-if="page.hasMedia", @click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
-          icon(name="volume-off", v-if="page.isAudioMuted")
-          icon(name="volume-up", v-else)
+        div#tab-icons(@click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
+          i.el-icon-loading(v-if="page.isLoading")
+          img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
+          icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
+          icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
       </transition>
       span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
         | {{ page.title || 'loading' }}
@@ -131,6 +136,8 @@
       sortable: {
         update(el) {
           Sortable.create(el, {
+            draggable: '.browser-tab',
+            animation: 150,
             ghostClass: 'ghost',
           });
         },
