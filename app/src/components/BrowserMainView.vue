@@ -274,7 +274,6 @@
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
             label: 'Undo',
-            accelerator: 'CmdOrCtrl+Z',
             role: 'undo',
           }));
         }
@@ -282,7 +281,6 @@
         if (event.params.editFlags.canRedo) {
           menu.append(new MenuItem({
             label: 'Redo',
-            accelerator: 'Shift+CmdOrCtrl+Z',
             role: 'redo',
           }));
         }
@@ -292,7 +290,6 @@
         if (event.params.editFlags.canCut) {
           menu.append(new MenuItem({
             label: 'Cut',
-            accelerator: 'CmdOrCtrl+X',
             role: 'cut',
           }));
         }
@@ -300,7 +297,6 @@
         if (event.params.editFlags.canCopy) {
           menu.append(new MenuItem({
             label: 'Copy',
-            accelerator: 'CmdOrCtrl+C',
             role: 'copy',
           }));
         }
@@ -320,19 +316,16 @@
         if (event.params.editFlags.canPaste) {
           menu.append(new MenuItem({
             label: 'Paste',
-            accelerator: 'CmdOrCtrl+V',
             role: 'paste',
           }));
           menu.append(new MenuItem({
             label: 'Paste Without Formatting',
-            accelerator: 'Shift+CmdOrCtrl+V',
             role: 'pasteandmatchstyle',
           }));
         }
 
         menu.append(new MenuItem({
           label: 'Select All',
-          accelerator: 'CmdOrCtrl+A',
           role: 'selectall',
         }));
         menu.append(new MenuItem({ type: 'separator' }));
