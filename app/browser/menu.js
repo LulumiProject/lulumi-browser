@@ -1,4 +1,4 @@
-const { app, Menu } = require('electron');
+const { app, Menu, BrowserWindow } = require('electron');
 
 const template = [
   {
@@ -37,7 +37,11 @@ const template = [
     label: 'View',
     submenu: [
       {
-        role: 'reload',
+        label: 'reload',
+        accelerator: 'Cmd+R',
+        click: () => {
+          BrowserWindow.getFocusedWindow().webContents.send('reload');
+        },
       },
       {
         role: 'forcereload',

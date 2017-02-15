@@ -169,5 +169,13 @@
         this.$parent.onTabClose(event, parseInt(id, 10));
       },
     },
+    mounted() {
+      const ipc = this.$electron.ipcRenderer;
+      ipc.on('reload', () => {
+        if (this.$parent.onClickRefresh) {
+          this.$parent.onClickRefresh();
+        }
+      });
+    },
   };
 </script>
