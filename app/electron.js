@@ -6,7 +6,8 @@ const menu = require('./browser/menu')
 
 let mainWindow
 let config = {}
-const swipeGesture = systemPreferences.isSwipeTrackingFromScrollEventsEnabled();
+const isDarwin = process.platform === 'darwin'
+const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
 
 if (process.env.NODE_ENV === 'development') {
   config = require('../config')
