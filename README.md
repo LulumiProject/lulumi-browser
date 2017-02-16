@@ -1,6 +1,6 @@
-# electron-vue-browser
+# Lulumi-browser
 
-> An electron-vue based browser
+> Lulumi-browser is a light weight browser coded with vue and electron
 
 <p align="center">
   <a href="http://i.imgur.com/kqiSae3.png" target="_blank">

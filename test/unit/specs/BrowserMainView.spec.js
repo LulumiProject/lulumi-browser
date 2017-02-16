@@ -9,7 +9,7 @@ Vue.use(Vuex);
 function createPageObject(url) {
   return {
     pid: 0,
-    location: url || 'https://github.com/qazbnm456/electron-vue-browser',
+    location: url || 'https://github.com/qazbnm456/lulumi-browser',
     statusText: false,
     title: 'new tab',
     isLoading: false,

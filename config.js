@@ -3,7 +3,7 @@ const path = require('path');
 const config = {
   // Name of electron app
   // Will be used in production builds
-  name: 'electron-vue-browser',
+  name: 'lulumi-browser',
 
   // Use ESLint (extends `airbnb`)
   // Further changes can be made in `.eslintrc.js`

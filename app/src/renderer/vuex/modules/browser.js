@@ -4,7 +4,7 @@ import urlUtil from '../../js/lib/urlutil';
 function createPageObject(url) {
   return {
     pid: 0,
-    location: url || 'https://github.com/qazbnm456/electron-vue-browser',
+    location: url || 'https://github.com/qazbnm456/lulumi-browser',
     statusText: false,
     favicon: 'https://github.com/favicon.ico',
     title: 'new tab',

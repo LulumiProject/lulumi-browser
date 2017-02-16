@@ -1,7 +1,9 @@
 {
-  "name": "electron-vue-browser",
-  "version": "0.0.0",
-  "description": "An electron-vue project",
+  "name": "lulumi-browser",
+  "productName": "Lulumi-browser",
+  "version": "1.0.0",
+  "electronVersion": "1.4.15",
+  "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "scripts": {
     "build": "node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
@@ -22,8 +24,8 @@
     "vuex:module": "node tasks/vuex/module.js",
     "postinstall": "npm run lint:fix && cd app && npm install"
   },
-  "author": "Greg Holguin <simulatedgreg@gmail.com>",
-  "license": "MIT",
+  "author": "Boik Su <boiksu@tdohacker.org>",
+  "license": "Apache-2.0",
   "devDependencies": {
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",

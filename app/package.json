@@ -1,7 +1,9 @@
 {
-  "name": "electron-vue-browser",
-  "version": "0.0.0",
-  "description": "An electron-vue based browser",
+  "name": "lulumi-browser",
+  "productName": "Lulumi-browser",
+  "version": "1.0.0",
+  "electronVersion": "1.4.15",
+  "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "main": "./dist/main.js",
   "dependencies": {
     "vue": "^2.1.10",
@@ -11,5 +13,6 @@
     "vuex": "^2.1.2"
   },
   "devDependencies": {},
-  "author": "Boik Su <boiksu@tdohacker.org>"
+  "author": "Boik Su <boiksu@tdohacker.org>",
+  "license": "Apache-2.0"
 }

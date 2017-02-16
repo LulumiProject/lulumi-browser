@@ -26,7 +26,7 @@
         return input;
       },
       navigateTo(location) {
-        this.$refs.webview.src = this.normalizedUri(location || 'https://github.com/qazbnm456/electron-vue-browser');
+        this.$refs.webview.src = this.normalizedUri(location || 'https://github.com/qazbnm456/lulumi-browser');
       },
       webviewHandler(self, fnName) {
         return (event) => {
