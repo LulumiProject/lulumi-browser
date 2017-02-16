@@ -21,8 +21,8 @@ let rendererConfig = {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader',
-          loader: 'css-loader'
+          fallback: 'style-loader',
+          use: 'css-loader'
         })
       },
       {
@@ -32,7 +32,7 @@ let rendererConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [ path.resolve(__dirname, 'app/src/renderer') ],
+        include: [ path.resolve(__dirname, 'app/src/renderer'), path.resolve('node_modules/vue-awesome') ],
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {
@@ -45,11 +45,15 @@ let rendererConfig = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-          scss: 'vue-style-loader!css-loader!sass-loader'
-        },
+        use: [
+          {
+            loader: 'vue-loader',
+            options: {
+              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+              scss: 'vue-style-loader!css-loader!sass-loader'
+            },
+          }
+        ],
       },
       {
         test: /\.pug$/,
@@ -133,7 +137,6 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.LoaderOptionsPlugin({
       minimize: true
     }),
-    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false

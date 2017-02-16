@@ -16,16 +16,16 @@ let mainConfig = {
     rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: 'babel-loader',
         exclude: /node_modules/
       },
       {
         test: /\.json$/,
-        loader: 'json-loader'
+        use: 'json-loader'
       },
       {
         test: /\.node$/,
-        loader: 'node-loader'
+        use: 'node-loader'
       }
     ]
   },
