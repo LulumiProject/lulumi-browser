@@ -1,5 +1,7 @@
 'use strict'
 
+process.env.BABEL_ENV = 'renderer'
+
 const path = require('path')
 const pkg = require('./app/package.json')
 const settings = require('./config.js')
@@ -8,20 +10,20 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-let config = {
+let rendererConfig = {
   devtool: '#eval-source-map',
-  eslint: {
-    formatter: require('eslint-friendly-formatter')
-  },
   entry: {
-    build: path.join(__dirname, 'app/src/main.js')
+    renderer: path.join(__dirname, 'app/src/renderer/main.js')
   },
+  externals: Object.keys(pkg.dependencies || {}),
   module: {
-    preLoaders: [],
-    loaders: [
+    rules: [
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader')
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader'
+        })
       },
       {
         test: /\.html$/,
@@ -30,6 +32,7 @@ let config = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
+        include: [ path.resolve(__dirname, 'app/src/renderer') ],
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {
@@ -37,8 +40,16 @@ let config = {
         loader: 'json-loader'
       },
       {
+        test: /\.node$/,
+        loader: 'node-loader'
+      },
+      {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+          scss: 'vue-style-loader!css-loader!sass-loader'
+        },
       },
       {
         test: /\.pug$/,
@@ -49,7 +60,7 @@ let config = {
         loader: 'url-loader',
         query: {
           limit: 10000,
-          name: 'imgs/[name].[hash:7].[ext]'
+          name: 'imgs/[name].[ext]'
         }
       },
       {
@@ -57,7 +68,7 @@ let config = {
         loader: 'url-loader',
         query: {
           limit: 10000,
-          name: 'fonts/[name].[hash:7].[ext]'
+          name: 'fonts/[name].[ext]'
         }
       }
     ]
@@ -67,32 +78,29 @@ let config = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './app/index.pug',
-      title: settings.name
+      appModules: process.env.NODE_ENV !== 'production'
+        ? path.resolve(__dirname, 'app/node_modules')
+        : false,
     }),
-    new webpack.NoErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
     filename: '[name].js',
+    libraryTarget: 'commonjs2',
     path: path.join(__dirname, 'app/dist')
   },
   resolve: {
     alias: {
-      'components': path.join(__dirname, 'app/src/components'),
-      'src': path.join(__dirname, 'app/src')
+      'components': path.join(__dirname, 'app/src/renderer/components'),
+      'renderer': path.join(__dirname, 'app/src/renderer')
     },
-    extensions: ['', '.js', '.vue', '.json', '.css'],
-    fallback: [path.join(__dirname, 'app/node_modules')]
+    extensions: ['.js', '.vue', '.json', '.css', '.node'],
+    modules: [
+      path.join(__dirname, 'app/node_modules'),
+      path.join(__dirname, 'node_modules')
+    ]
   },
-  resolveLoader: {
-    root: path.join(__dirname, 'node_modules')
-  },
-  target: 'electron-renderer',
-  vue: {
-    loaders: {
-      sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-      scss: 'vue-style-loader!css-loader!sass-loader'
-    }
-  }
+  target: 'electron-renderer'
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -100,29 +108,30 @@ if (process.env.NODE_ENV !== 'production') {
    * Apply ESLint
    */
   if (settings.eslint) {
-    config.module.preLoaders.push(
+    rendererConfig.module.rules.push(
       {
-        test: /\.js$/,
+        test: /\.(js|vue)$/,
         loader: 'eslint-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.vue$/,
-        loader: 'eslint-loader'
+        enforce: 'pre',
+        exclude: /node_modules/,
+        options: { formatter: require('eslint-friendly-formatter') }
       }
     )
   }
 }
 
 /**
- * Adjust config for production settings
+ * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-  config.devtool = ''
+  rendererConfig.devtool = ''
 
-  config.plugins.push(
+  rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
@@ -133,4 +142,4 @@ if (process.env.NODE_ENV === 'production') {
   )
 }
 
-module.exports = config
+module.exports = rendererConfig

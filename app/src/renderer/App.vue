@@ -1,3 +1,17 @@
+<template>
+  <div id="#app">
+    <router-view></router-view>
+  </div>
+</template>
+
+<script>
+  import store from 'renderer/vuex/store';
+
+  export default {
+    store,
+  };
+</script>
+
 <style>
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
@@ -19,20 +33,7 @@
     background-position: center;
     display: flex;
     font-family: 'Source Code Pro', Courier, monospace;;
+    justify-content: center;
     text-align: center;
   }
 </style>
-
-<template>
-  <div>
-    <router-view></router-view>
-  </div>
-</template>
-
-<script>
-  import store from 'src/vuex/store';
-
-  export default {
-    store,
-  };
-</script>

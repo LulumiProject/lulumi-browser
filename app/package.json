@@ -2,13 +2,13 @@
   "name": "electron-vue-browser",
   "version": "0.0.0",
   "description": "An electron-vue based browser",
-  "main": "electron.js",
+  "main": "./dist/main.js",
   "dependencies": {
-    "vue": "^2.0.1",
-    "vue-electron": "^1.0.0",
-    "vue-resource": "^1.0.3",
-    "vue-router": "^2.0.0",
-    "vuex": "^2.0.0"
+    "vue": "^2.1.10",
+    "vue-electron": "^1.0.6",
+    "vue-resource": "^1.2.0",
+    "vue-router": "^2.2.1",
+    "vuex": "^2.1.2"
   },
   "devDependencies": {},
   "author": "Boik Su <boiksu@tdohacker.org>"

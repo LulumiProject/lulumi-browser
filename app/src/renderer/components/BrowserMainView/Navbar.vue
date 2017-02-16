@@ -1,58 +1,3 @@
-<style scoped>
-  #browser-navbar {
-    display: flex;
-    height: 35px;
-    padding: 0 5px;
-    font-size: 15px;
-    font-weight: 100;
-    background: linear-gradient(to bottom, #eee, #ddd);
-    border-bottom: 1px solid #aaa;
-  }
-  #browser-navbar a {
-    text-decoration: none;
-    color: #777;
-    cursor: pointer;
-  }
-  #browser-navbar a:hover {
-    text-decoration: none;
-    color: blue;
-  }
-  #browser-navbar a.disabled {
-    color: #bbb;
-    cursor: default;
-  }
-  #browser-navbar a {
-    flex: 1;
-  }
-  #browser-navbar .control-group {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  }
-  #browser-navbar > .input-group {
-    flex: 9;
-    display: flex;
-    margin: 0 5px;
-  }
-  #url-input {
-    flex: 1;
-    display: flex;
-  }
-  #browser-navbar .input-group a {
-    border: 1px solid #bbb;
-    border-left: 0;
-    padding: 4px 0;
-    margin: 4px 0 3px;
-    flex: 0 0 30px;
-    text-align: center;
-  }
-  #browser-navbar a:last-child {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-  }
-</style>
-
 <template lang="pug">
   #browser-navbar
     .control-group
@@ -68,7 +13,6 @@
       good-custom-autocomplete#url-input(
         @input="$store.dispatch('updateLocation', $event)",
         @select="$parent.onEnterLocation($event.value)",
-        :on-icon-click="handleIconClick",
         :trigger-on-focus="false",
         placeholder='Enter a URL or search a term',
         :fetch-suggestions="querySearch",
@@ -144,3 +88,58 @@
     },
   };
 </script>
+
+<style scoped>
+  #browser-navbar {
+    display: flex;
+    height: 35px;
+    padding: 0 5px;
+    font-size: 15px;
+    font-weight: 100;
+    background: linear-gradient(to bottom, #eee, #ddd);
+    border-bottom: 1px solid #aaa;
+  }
+  #browser-navbar a {
+    text-decoration: none;
+    color: #777;
+    cursor: pointer;
+  }
+  #browser-navbar a:hover {
+    text-decoration: none;
+    color: blue;
+  }
+  #browser-navbar a.disabled {
+    color: #bbb;
+    cursor: default;
+  }
+  #browser-navbar a {
+    flex: 1;
+  }
+  #browser-navbar .control-group {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+  #browser-navbar > .input-group {
+    flex: 9;
+    display: flex;
+    margin: 0 5px;
+  }
+  #url-input {
+    flex: 1;
+    display: flex;
+  }
+  #browser-navbar .input-group a {
+    border: 1px solid #bbb;
+    border-left: 0;
+    padding: 4px 0;
+    margin: 4px 0 3px;
+    flex: 0 0 30px;
+    text-align: center;
+  }
+  #browser-navbar a:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+</style>

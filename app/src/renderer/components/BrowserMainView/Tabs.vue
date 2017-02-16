@@ -1,3 +1,78 @@
+<template lang="pug">
+  #browser-tabs(v-sortable="", @dblclick="$electron.remote.getCurrentWindow().maximize()")
+    .window-buttons
+    .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+      <transition name="fade">
+        div#tab-icons(@click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
+          i.el-icon-loading(v-if="page.isLoading")
+          img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
+          icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
+          icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
+      </transition>
+      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
+        | {{ page.title || 'loading' }}
+      a.close(@click="onClose")
+        icon(name="times")
+    a.newtab(@click="$parent.onNewTab()")
+</template>
+
+<script>
+  import Icon from 'vue-awesome/components/Icon';
+  import 'vue-awesome/icons/times';
+  import 'vue-awesome/icons/volume-up';
+  import 'vue-awesome/icons/volume-off';
+
+  import Sortable from 'sortablejs';
+
+  export default {
+    directives: {
+      sortable: {
+        update(el) {
+          Sortable.create(el, {
+            draggable: '.browser-tab',
+            animation: 150,
+            ghostClass: 'ghost',
+          });
+        },
+      },
+    },
+    components: {
+      Icon,
+    },
+    computed: {
+      pages() {
+        return this.$store.getters.pages;
+      },
+      currentPageIndex() {
+        return this.$store.getters.currentPageIndex;
+      },
+    },
+    methods: {
+      onClose(event) {
+        let id = null;
+        try {
+          id = event.target.previousSibling.id;
+        } catch (e) {
+          try {
+            id = event.target.parentNode.previousSibling.id;
+          } catch (e) {
+            id = event.target.parentNode.parentNode.previousSibling.id;
+          }
+        }
+        this.$parent.onTabClose(event, parseInt(id, 10));
+      },
+    },
+    mounted() {
+      const ipc = this.$electron.ipcRenderer;
+      ipc.on('reload', () => {
+        if (this.$parent.onClickRefresh) {
+          this.$parent.onClickRefresh();
+        }
+      });
+    },
+  };
+</script>
+
 <style scoped>
   #browser-tabs {
     display: flex;
@@ -104,78 +179,3 @@
     opacity: 0
   }
 </style>
-
-<template lang="pug">
-  #browser-tabs(v-sortable, @dblclick="$electron.remote.getCurrentWindow().maximize()")
-    .window-buttons
-    .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
-      <transition name="fade">
-        div#tab-icons(@click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
-          i.el-icon-loading(v-if="page.isLoading")
-          img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
-          icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
-          icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
-      </transition>
-      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
-        | {{ page.title || 'loading' }}
-      a.close(@click="onClose")
-        icon(name="times")
-    a.newtab(@click="$parent.onNewTab()")
-</template>
-
-<script>
-  import Icon from 'vue-awesome/components/Icon';
-  import 'vue-awesome/icons/times';
-  import 'vue-awesome/icons/volume-up';
-  import 'vue-awesome/icons/volume-off';
-
-  import Sortable from 'sortablejs';
-
-  export default {
-    directives: {
-      sortable: {
-        update(el) {
-          Sortable.create(el, {
-            draggable: '.browser-tab',
-            animation: 150,
-            ghostClass: 'ghost',
-          });
-        },
-      },
-    },
-    components: {
-      Icon,
-    },
-    computed: {
-      pages() {
-        return this.$store.getters.pages;
-      },
-      currentPageIndex() {
-        return this.$store.getters.currentPageIndex;
-      },
-    },
-    methods: {
-      onClose(event) {
-        let id = null;
-        try {
-          id = event.target.previousSibling.id;
-        } catch (e) {
-          try {
-            id = event.target.parentNode.previousSibling.id;
-          } catch (e) {
-            id = event.target.parentNode.parentNode.previousSibling.id;
-          }
-        }
-        this.$parent.onTabClose(event, parseInt(id, 10));
-      },
-    },
-    mounted() {
-      const ipc = this.$electron.ipcRenderer;
-      ipc.on('reload', () => {
-        if (this.$parent.onClickRefresh) {
-          this.$parent.onClickRefresh();
-        }
-      });
-    },
-  };
-</script>

@@ -1,11 +1,13 @@
 .DS_Store
 yarn-error.log
 app/dist/index.html
-app/dist/build.js
+app/dist/main.js
+app/dist/renderer.js
 app/dist/styles.css
 builds/*
+dist/*
 coverage
-node_modules
+node_modules/
 npm-debug.log
 npm-debug.log.*
 thumbs.db

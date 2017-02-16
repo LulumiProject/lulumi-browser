@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import BrowserMainView from 'src/components/BrowserMainView';
+import BrowserMainView from 'renderer/components/BrowserMainView';
 
 import { name } from '../../../config';
 

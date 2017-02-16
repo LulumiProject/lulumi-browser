@@ -1,23 +1,3 @@
-<style scoped>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  [hidden] {
-    display: none !important;
-  }
-  body,
-  html {
-    position: relative;
-    overflow: hidden;
-    -webkit-user-select: none;
-  }
-  #nav {
-    width: 100vw;
-  }
-</style>
-
 <template lang="pug">
   div
     #nav
@@ -437,3 +417,23 @@
     },
   };
 </script>
+
+<style scoped>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  body,
+  html {
+    position: relative;
+    overflow: hidden;
+    -webkit-user-select: none;
+  }
+  #nav {
+    width: 100vw;
+  }
+</style>

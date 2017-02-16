@@ -1,6 +1,3 @@
-/**
- * Credits to https://github.com/bradstewart/electron-boilerplate-vue/blob/master/build/dev-runner.js
- */
 'use strict'
 
 const config = require('../config')
@@ -33,14 +30,12 @@ function run (command, color, name) {
     console.log(format(name, data, color))
 
     /**
-     * Start electron after VALID build
+     * Start electron after successful or warnings compilation
      * (prevents electron from opening a blank window that requires refreshing)
-     *
-     * NOTE: needs more testing for stability
      */
-    if (/VALID/g.test(data.toString().trim().replace(/\n/g, '\n' + repeat(' ', command.length + 2))) && !isElectronOpen) {
+    if (/Compiled/g.test(data.toString().trim().replace(/\n/g, '\n' + repeat(' ', command.length + 2))) && !isElectronOpen) {
       console.log(`${BLUE}Starting electron...\n${END}`)
-      run('cross-env NODE_ENV=development electron app/electron.js', BLUE, 'electron')
+      run('cross-env NODE_ENV=development electron app/src/main/index.dev.js', BLUE, 'electron')
       isElectronOpen = true
     }
   })
@@ -58,4 +53,4 @@ function exit (code) {
 }
 
 console.log(`${YELLOW}Starting webpack-dev-server...\n${END}`)
-run(`webpack-dev-server --inline --hot --colors --port ${config.port} --content-base app/dist`, YELLOW, 'webpack')
+run(`webpack-dev-server --hot --colors --config webpack.renderer.config.js --port ${config.port} --content-base app/dist`, YELLOW, 'webpack')
