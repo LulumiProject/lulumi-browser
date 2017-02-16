@@ -37,8 +37,8 @@ const template = [
     label: 'View',
     submenu: [
       {
-        label: 'reload',
-        accelerator: 'Cmd+R',
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
         click: () => {
           BrowserWindow.getFocusedWindow().webContents.send('reload');
         },
