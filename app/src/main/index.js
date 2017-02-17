@@ -40,7 +40,7 @@ function createWindow() {
         : `file://${__dirname}/../pdfjs/web/viewer.html?${param}`;
       mainWindow.webContents.send('will-download', location);
     }
-  })
+  });
 
   mainWindow.on('scroll-touch-begin', () => {
     mainWindow.webContents.send('scroll-touch-begin', swipeGesture);
