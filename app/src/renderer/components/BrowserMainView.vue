@@ -125,6 +125,9 @@
           this.time = (new Date()).getTime() - this.startTime;
         }
       },
+      onWillDownload(event, pageIndex, location) {
+        this.getPage(pageIndex).navigateTo(location);
+      },
       onScrollTouchBegin(event, swipeGesture) {
         if (swipeGesture) {
           this.trackingFingers = true;

@@ -29,6 +29,19 @@ function createWindow() {
 
   menu.init();
 
+  const ses = mainWindow.webContents.session;
+  ses.on('will-download', (event, item) => {
+    if (item.getMimeType() === 'application/pdf') {
+      event.preventDefault();
+      const qs = require('querystring');
+      const param = qs.stringify({ file: item.getURL() });
+      const location = process.env.NODE_ENV === 'development'
+        ? `file://${__dirname}/../../pdfjs/web/viewer.html?${param}`
+        : `file://${__dirname}/../pdfjs/web/viewer.html?${param}`;
+      mainWindow.webContents.send('will-download', location);
+    }
+  })
+
   mainWindow.on('scroll-touch-begin', () => {
     mainWindow.webContents.send('scroll-touch-begin', swipeGesture);
   });
