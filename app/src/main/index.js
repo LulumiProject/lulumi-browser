@@ -31,10 +31,13 @@ function createWindow() {
 
   const ses = mainWindow.webContents.session;
   ses.on('will-download', (event, item, webContents) => {
-    if (item.getMimeType() === 'application/pdf') {
+    const itemURL = item.getURL();
+    if (item.getMimeType() === 'application/pdf'
+      && itemURL.indexOf('blob:') !== 0
+      && itemURL.indexOf('#pdfjs.action=download') === -1) {
       event.preventDefault();
       const qs = require('querystring');
-      const param = qs.stringify({ file: item.getURL() });
+      const param = qs.stringify({ file: itemURL });
       const PDFViewerURL = process.env.NODE_ENV === 'development'
         ? `file://${__dirname}/../../pdfjs/web/viewer.html`
         : `file://${__dirname}/../pdfjs/web/viewer.html`;
