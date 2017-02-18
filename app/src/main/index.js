@@ -30,15 +30,21 @@ function createWindow() {
   menu.init();
 
   const ses = mainWindow.webContents.session;
-  ses.on('will-download', (event, item) => {
+  ses.on('will-download', (event, item, webContents) => {
     if (item.getMimeType() === 'application/pdf') {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: item.getURL() });
+      const PDFViewerURL = process.env.NODE_ENV === 'development'
+        ? `file://${__dirname}/../../pdfjs/web/viewer.html`
+        : `file://${__dirname}/../pdfjs/web/viewer.html`;
       const location = process.env.NODE_ENV === 'development'
-        ? `file://${__dirname}/../../pdfjs/web/viewer.html?${param}`
-        : `file://${__dirname}/../pdfjs/web/viewer.html?${param}`;
-      mainWindow.webContents.send('will-download', location);
+        ? `${PDFViewerURL}?${param}`
+        : `${PDFViewerURL}?${param}`;
+      mainWindow.webContents.send('will-download', {
+        location,
+        webContentsId: webContents.getId(),
+      });
     }
   });
 

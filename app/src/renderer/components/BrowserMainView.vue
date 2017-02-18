@@ -125,8 +125,10 @@
           this.time = (new Date()).getTime() - this.startTime;
         }
       },
-      onWillDownload(event, pageIndex, location) {
-        this.getPage(pageIndex).navigateTo(location);
+      onWillDownload(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getPage(pageIndex).navigateTo(data.location);
+        }
       },
       onScrollTouchBegin(event, swipeGesture) {
         if (swipeGesture) {

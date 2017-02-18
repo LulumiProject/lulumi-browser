@@ -237,6 +237,19 @@ const urlUtil = {
   },
 
   /**
+   * Gets PDF location from a potential PDFJS URL
+   * @param {string} url
+   * @return {string}
+   */
+  getLocationIfPDF(url) {
+    const PDFViewerURL = '/pdfjs/web/viewer.html';
+    if (url && url.includes(PDFViewerURL)) {
+      return url.replace(/^file:.+\/pdfjs\/web\/viewer.html\?file=(\w+:\/\/.+)/, '$1');
+    }
+    return url;
+  },
+
+  /**
    * Gets the default favicon URL for a URL.
    * @param {string} url The URL to find a favicon for
    * @return {string} url The base favicon URL

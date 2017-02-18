@@ -6,7 +6,7 @@ function createPageObject(url) {
     pid: 0,
     location: url || 'https://github.com/qazbnm456/lulumi-browser',
     statusText: false,
-    favicon: 'https://github.com/favicon.ico',
+    favicon: false,
     title: 'new tab',
     isLoading: false,
     isSearching: false,
@@ -94,11 +94,15 @@ const mutations = {
     if (!state.pages[payload.pageIndex].location) {
       state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
     }
+    if (!state.pages[payload.pageIndex].favicon) {
+      state.pages[payload.pageIndex].favicon = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
+    }
     state.pages[payload.pageIndex].isLoading = false;
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
-    state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
+    state.pages[payload.pageIndex].location = decodeURIComponent(
+      urlUtil.getLocationIfPDF(payload.webview.getURL()));
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText = decodeURIComponent(payload.url);
@@ -117,7 +121,7 @@ const mutations = {
     state.pages[payload.pageIndex].favicon = payload.url;
   },
   [types.UPDATE_LOCATION](state, url) {
-    state.pages[state.currentPageIndex].location = decodeURIComponent(url);
+    state.pages[state.currentPageIndex].location = decodeURIComponent(urlUtil.getLocationIfPDF(url));
   },
 };
 

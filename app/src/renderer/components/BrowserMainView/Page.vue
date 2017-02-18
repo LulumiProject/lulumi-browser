@@ -75,9 +75,9 @@
       }, { passive: true });
 
       const ipc = this.$electron.ipcRenderer;
-      ipc.on('will-download', (event, location) => {
+      ipc.on('will-download', (event, data) => {
         if (this.$parent.onWillDownload) {
-          this.$parent.onWillDownload(event, this.pageIndex, location);
+          this.$parent.onWillDownload(event, this.pageIndex, data);
         }
       });
       ipc.on('scroll-touch-begin', (event, swipeGesture) => {
