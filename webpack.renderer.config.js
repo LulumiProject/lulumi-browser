@@ -12,6 +12,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 let rendererConfig = {
   devtool: '#eval-source-map',
+  devServer: { overlay: true },
   entry: {
     renderer: path.join(__dirname, 'app/src/renderer/main.js')
   },
@@ -20,28 +21,28 @@ let rendererConfig = {
     rules: [
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
+        use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: 'css-loader'
         })
       },
       {
         test: /\.html$/,
-        loader: 'vue-html-loader'
+        use: 'vue-html-loader'
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: 'babel-loader',
         include: [ path.resolve(__dirname, 'app/src/renderer'), path.resolve('node_modules/vue-awesome') ],
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {
         test: /\.json$/,
-        loader: 'json-loader'
+        use: 'json-loader'
       },
       {
         test: /\.node$/,
-        loader: 'node-loader'
+        use: 'node-loader'
       },
       {
         test: /\.vue$/,
@@ -49,8 +50,10 @@ let rendererConfig = {
           {
             loader: 'vue-loader',
             options: {
-              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader'
+              loaders: {
+                sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+                scss: 'vue-style-loader!css-loader!sass-loader'
+              },
             },
           }
         ],
@@ -61,19 +64,23 @@ let rendererConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: 'imgs/[name].[ext]'
-        }
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name].[ext]'
+          }
+        },
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: 'fonts/[name].[ext]'
-        }
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name].[ext]'
+          }
+        },
       }
     ]
   },
@@ -115,10 +122,14 @@ if (process.env.NODE_ENV !== 'production') {
     rendererConfig.module.rules.push(
       {
         test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
         enforce: 'pre',
         exclude: /node_modules/,
-        options: { formatter: require('eslint-friendly-formatter') }
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }
       }
     )
   }

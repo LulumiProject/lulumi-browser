@@ -95,17 +95,19 @@ const mutations = {
       state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
     }
     if (!state.pages[payload.pageIndex].favicon) {
-      state.pages[payload.pageIndex].favicon = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
+      state.pages[payload.pageIndex].favicon
+        = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
     }
     state.pages[payload.pageIndex].isLoading = false;
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
-    state.pages[payload.pageIndex].location = decodeURIComponent(
-      urlUtil.getLocationIfPDF(payload.webview.getURL()));
+    state.pages[payload.pageIndex].location
+      = decodeURIComponent(urlUtil.getLocationIfPDF(payload.webview.getURL()));
   },
   [types.UPDATE_TARGET_URL](state, payload) {
-    state.pages[payload.pageIndex].statusText = decodeURIComponent(payload.url);
+    state.pages[payload.pageIndex].statusText
+      = decodeURIComponent(payload.url);
   },
   [types.MEDIA_STARTED_PLAYING](state, payload) {
     state.pages[payload.pageIndex].hasMedia = true;
@@ -121,7 +123,8 @@ const mutations = {
     state.pages[payload.pageIndex].favicon = payload.url;
   },
   [types.UPDATE_LOCATION](state, url) {
-    state.pages[state.currentPageIndex].location = decodeURIComponent(urlUtil.getLocationIfPDF(url));
+    state.pages[state.currentPageIndex].location
+      = decodeURIComponent(urlUtil.getLocationIfPDF(url));
   },
 };
 
