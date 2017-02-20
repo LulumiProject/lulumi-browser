@@ -30,14 +30,14 @@
     padding: 0 10px;
     margin: 0;
     cursor: pointer;
-    color: #48576a;
+    color: white;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 ul.my-autocomplete {
-  background: aliceblue;
+  background: #324057;
   opacity: 0.9;
 }
 .my-autocomplete > li {
@@ -51,13 +51,13 @@ ul.my-autocomplete {
 }
 .my-autocomplete > li > .location > .name {
   font-size: 12px;
-  color: rgb(156, 39, 176);
+  color: #99A9BF;
 }
 .my-autocomplete > li:hover {
-  color: #fff;
-  background: #00bcd4;
+  color: black;
+  background: #F9FAFC;
 }
 .my-autocomplete > li.highlighted {
-  color: #fff;
-  background: #00bcd4;
+  color: black;
+  background: #F9FAFC;
 }
