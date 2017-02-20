@@ -3,6 +3,7 @@ import Electron from 'vue-electron';
 import Resource from 'vue-resource';
 import Router from 'vue-router';
 import { Autocomplete } from 'element-ui';
+import 'element-ui/lib/theme-default/index';
 
 import App from './App';
 import routes from './routes';
