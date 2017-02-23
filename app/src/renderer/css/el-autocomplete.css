@@ -24,7 +24,7 @@
   background: #fff;
   border: 1px solid #bbb;
 }
-.el-autocomplete__suggestions li {
+.el-autocomplete-suggestion li {
     list-style: none;
     line-height: 36px;
     padding: 0 10px;
@@ -36,28 +36,28 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-ul.my-autocomplete {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap {
   background: #324057;
   opacity: 0.9;
 }
-.my-autocomplete > li {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap > ul > li {
   line-height: normal;
   padding: 7px;
   text-align: left;
 }
-.my-autocomplete > li > .location {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap > ul > li > .location {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.my-autocomplete > li > .location > .name {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap > ul > li > .location > .name {
   font-size: 12px;
   color: #99A9BF;
 }
-.my-autocomplete > li:hover {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap > ul > li:hover {
   color: black;
   background: #F9FAFC;
 }
-.my-autocomplete > li.highlighted {
+.my-autocomplete > .el-scrollbar > .el-autocomplete-suggestion__wrap > ul > li.highlighted {
   color: black;
   background: #F9FAFC;
 }

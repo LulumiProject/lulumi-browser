@@ -13,13 +13,14 @@
       good-custom-autocomplete#url-input(
         @input="$store.dispatch('updateLocation', $event)",
         @select="$parent.onEnterLocation($event.value)",
+        icon="search",
         :trigger-on-focus="false",
-        placeholder='Enter a URL or search a term',
+        placeholder="Enter a URL or search a term",
         :fetch-suggestions="querySearch",
         v-focus="focused",
         :value="page.location",
-        popper-class='my-autocomplete',
-        custom-item='url-suggestion')
+        popper-class="my-autocomplete",
+        custom-item="url-suggestion")
 </template>
 
 <script>
@@ -83,7 +84,7 @@
         cb(results);
       },
       createFilter(queryString) {
-        return (suggestion) => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
+        return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
       },
     },
   };

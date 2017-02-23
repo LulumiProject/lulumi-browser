@@ -140,7 +140,7 @@ if (process.platform === 'darwin') {
           role: 'stopspeaking',
         },
       ],
-    }
+    },
   );
   // Window menu.
   template[3].submenu = [

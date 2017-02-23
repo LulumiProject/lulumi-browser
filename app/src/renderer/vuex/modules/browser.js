@@ -35,13 +35,11 @@ const mutations = {
     if (urlUtil.isURL(url)) {
       newUrl = url;
       state.pages.push(createPageObject(newUrl));
+    } else if (url) {
+      newUrl = `https://www.google.com/search?q=${url}`;
+      state.pages.push(createPageObject(newUrl));
     } else {
-      if (url) {
-        newUrl = `https://www.google.com/search?q=${url}`;
-        state.pages.push(createPageObject(newUrl));
-      } else {
-        state.pages.push(createPageObject());
-      }
+      state.pages.push(createPageObject());
     }
     if (url) {
       state.pages[state.pages.length - 1].pid = state.pid;

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Electron from 'vue-electron';
 import Resource from 'vue-resource';
 import Router from 'vue-router';
-import { Autocomplete } from 'element-ui';
+import { Autocomplete, Scrollbar } from 'element-ui';
 import 'element-ui/lib/theme-default/index';
 
 import App from './App';
@@ -66,6 +66,7 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
   },
 });
 Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
+Vue.component('el-scrollbar', Scrollbar);
 
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),

@@ -1,4 +1,4 @@
-module.exports.getBase64FromImageUrl = (url) =>
+module.exports.getBase64FromImageUrl = url =>
   new Promise((resolve, reject) => {
     const img = new window.Image();
     img.setAttribute('crossOrigin', 'anonymous');
