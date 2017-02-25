@@ -1,5 +1,3 @@
-
-
 import { app, BrowserWindow, systemPreferences } from 'electron';
 import menu from '../browser/menu';
 

@@ -10,7 +10,7 @@
     "vue-electron": "^1.0.6",
     "vue-resource": "^1.2.0",
     "vue-router": "^2.2.1",
-    "vuex": "^2.1.2"
+    "vuex": "^2.1.3"
   },
   "devDependencies": {},
   "author": "Boik Su <boiksu@tdohacker.org>",
