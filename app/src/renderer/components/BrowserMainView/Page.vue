@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    webview(ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
     #browser-page-status(v-show="page.statusText") {{ page.statusText }}
 </template>
 
@@ -112,7 +112,9 @@
   }
   webview[hidden] {
     display: flex !important;
-    visibility: hidden;
+    flex: 0 1;
+    width: 0px;
+    height: 0px;
   }
   webview.fullscreen {
     position: fixed;
@@ -124,7 +126,9 @@
   }
   /* hack to work around display: none issues with webviews */
   webview.hidden {
-    visibility: hidden;
+    flex: 0 1;
+    width: 0px;
+    height: 0px;
   }
 
   #browser-page-status {

@@ -95,8 +95,12 @@ const mutations = {
       state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
     }
     if (!state.pages[payload.pageIndex].favicon) {
-      state.pages[payload.pageIndex].favicon
-        = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
+      if (payload.pageIndex - 1 < 0) {
+        state.pages[payload.pageIndex].favicon = 'https://github.com/favicon.ico';
+      } else {
+        state.pages[payload.pageIndex].favicon
+          = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
+      }
     }
     state.pages[payload.pageIndex].isLoading = false;
   },
