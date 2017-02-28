@@ -7,7 +7,9 @@
         icon(name="angle-left")
       a(@click="$parent.onClickForward", :class="page.canGoForward ? '' : 'disabled'")
         icon(name="angle-right")
-      a(@click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
+      a(v-if="page.isLoading" @click="$parent.onClickStop")
+        icon(name="times")
+      a(v-else @click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
         icon(name="refresh")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
@@ -32,6 +34,7 @@
   import 'vue-awesome/icons/angle-left';
   import 'vue-awesome/icons/angle-right';
   import 'vue-awesome/icons/refresh';
+  import 'vue-awesome/icons/times';
 
   import { focus } from 'vue-focus';
 

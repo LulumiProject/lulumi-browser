@@ -196,6 +196,9 @@
       onClickForward() {
         this.getWebView().goForward();
       },
+      onClickStop() {
+        this.getWebView().stop();
+      },
       onClickRefresh() {
         this.getWebView().reload();
       },
