@@ -78,20 +78,20 @@ vue-electron@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/vue-electron/-/vue-electron-1.0.6.tgz#e798e03180b8933539defe31f92e53b9242b9406"
 
-vue-resource@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/vue-resource/-/vue-resource-1.2.0.tgz#dc368cca958655c79486dde07336db22954af40c"
+vue-resource@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/vue-resource/-/vue-resource-1.2.1.tgz#b3f21dd0e1e491adf8a5be1fe48e586cefeaa8d5"
   dependencies:
     got "^6.7.1"
 
-vue-router@^2.2.1:
+vue-router@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.3.0.tgz#a25c8359e8ca989d22ce79f64322eb0ad0c8670f"
+
+vue@^2.2.1:
   version "2.2.1"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.2.1.tgz#b027f9fac2cf13462725e843d6dc631b6aa077f6"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.2.1.tgz#ddbfd2f0caf38f374f5a36eea2e1edf25225b68e"
 
-vue@^2.1.10:
-  version "2.1.10"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.1.10.tgz#c9235ca48c7925137be5807832ac4e3ac180427b"
-
-vuex@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/vuex/-/vuex-2.1.3.tgz#4f613f8425a274b85b79a83cd28b960938bf1670"
+vuex@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-2.2.1.tgz#a42d0ce18cb0e0359258f84bfd76835ed468c185"

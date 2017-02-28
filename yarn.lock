@@ -1453,10 +1453,6 @@ colors@^1.1.0, colors@^1.1.2, colors@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
-colors@~0.6.0:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/colors/-/colors-0.6.2.tgz#2423fe6678ac0c5dae8852e5d0e5be08c997abcc"
-
 combine-lists@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/combine-lists/-/combine-lists-1.0.1.tgz#458c07e09e0d900fc28b70a3fec2dacd1d2cb7f6"
@@ -2250,9 +2246,9 @@ electron@^1.6.1:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
-element-ui@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.2.1.tgz#02b93500c07d7596faa73985b1450226865a2928"
+element-ui@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.2.2.tgz#b5db2de9d20dcd1c199f435a737d4d714fbf3017"
   dependencies:
     async-validator "^1.6.6"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -3832,11 +3828,11 @@ karma-sourcemap-loader@^0.3.7:
   dependencies:
     graceful-fs "^4.1.2"
 
-karma-spec-reporter@0.0.26:
-  version "0.0.26"
-  resolved "https://registry.yarnpkg.com/karma-spec-reporter/-/karma-spec-reporter-0.0.26.tgz#bf5561377dce1b63cf2c975c1af3e35f199e2265"
+karma-spec-reporter@0.0.30:
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/karma-spec-reporter/-/karma-spec-reporter-0.0.30.tgz#d10b5c8bb441cb1c6adf56785f89d395f2e9093a"
   dependencies:
-    colors "~0.6.0"
+    colors "^1.1.2"
 
 karma-webpack@^2.0.2:
   version "2.0.2"
@@ -3942,7 +3938,7 @@ loader-runner@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-2.3.0.tgz#f482aea82d543e07921700d5a46ef26fdac6b8a2"
 
-loader-utils@^0.2.10, loader-utils@^0.2.16, loader-utils@^0.2.3, loader-utils@^0.2.5, loader-utils@^0.2.7, loader-utils@~0.2.5:
+loader-utils@^0.2.16, loader-utils@^0.2.3, loader-utils@^0.2.5, loader-utils@~0.2.5:
   version "0.2.16"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.16.tgz#f08632066ed8282835dff88dfb52704765adee6d"
   dependencies:
@@ -6123,7 +6119,7 @@ sumchecker@^2.0.1:
   dependencies:
     debug "^2.2.0"
 
-supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.1, supports-color@^3.1.2:
+supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.1.2.tgz#72a262894d9d408b956ca05ff37b2ed8a6e2a2d5"
   dependencies:
@@ -6133,7 +6129,7 @@ supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
-supports-color@^3.2.3:
+supports-color@^3.1.2, supports-color@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
   dependencies:
@@ -6569,13 +6565,9 @@ vue-focus@^2.1.0:
   dependencies:
     loose-envify "^1.2.0"
 
-vue-hot-reload-api@^2.0.1:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.0.9.tgz#2e8cfbfc8e531eea57d8c1f0bd761047c7e11b56"
-
-vue-hot-reload-api@^2.0.10:
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.0.10.tgz#28a12ef10511e70c90f260b0cbc4066b050e8af8"
+vue-hot-reload-api@^2.0.1, vue-hot-reload-api@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.0.11.tgz#bf26374fb73366ce03f799e65ef5dfd0e28a1568"
 
 vue-html-loader@^1.2.4:
   version "1.2.4"
@@ -6587,14 +6579,14 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-loader@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-11.1.0.tgz#8f3fcdd8a233ce96b3e99bd3d56e83cc0f2050f2"
+vue-loader@^11.1.3:
+  version "11.1.3"
+  resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-11.1.3.tgz#8ed9299fba57cdd21595df4ebc74f55518d2574e"
   dependencies:
     consolidate "^0.14.0"
     hash-sum "^1.0.2"
     js-beautify "^1.6.3"
-    loader-utils "^0.2.10"
+    loader-utils "^1.0.2"
     lru-cache "^4.0.1"
     postcss "^5.0.10"
     postcss-load-config "^1.1.0"
@@ -6604,23 +6596,16 @@ vue-loader@^11.1.0:
     vue-style-loader "^2.0.0"
     vue-template-es2015-compiler "^1.2.2"
 
-vue-style-loader@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-2.0.0.tgz#1a3bb55239ac541ee3af0301d66f16fc86786543"
-  dependencies:
-    hash-sum "^1.0.2"
-    loader-utils "^0.2.7"
-
-vue-style-loader@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-2.0.1.tgz#3ec086e900f9a44086b639749dd40bc84673c3cd"
+vue-style-loader@^2.0.0, vue-style-loader@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-2.0.3.tgz#b464ffb6279702d4137a80ac81b5c12ac440f0a0"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-template-compiler@^2.1.10:
-  version "2.1.10"
-  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.1.10.tgz#cb89643adc395e97435585522e43d0a9b1913257"
+vue-template-compiler@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.2.1.tgz#ca5e43db50dc6e761e3c1296313de33091783511"
   dependencies:
     de-indent "^1.0.2"
     he "^1.1.0"
@@ -6632,6 +6617,10 @@ vue-template-es2015-compiler@^1.2.2:
 vue@^2.0.1:
   version "2.1.10"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.1.10.tgz#c9235ca48c7925137be5807832ac4e3ac180427b"
+
+vue@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.2.1.tgz#ddbfd2f0caf38f374f5a36eea2e1edf25225b68e"
 
 watchpack@^1.2.0:
   version "1.2.1"
