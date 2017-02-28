@@ -70,6 +70,21 @@
           webview,
         });
       },
+      onDidFailLoad(event, pageIndex) {
+        this.$store.dispatch('didFailLoad', pageIndex);
+        const appPath = process.env.NODE_ENV === 'development'
+          ? process.cwd()
+          : this.$electron.remote.app.getAppPath();
+        let errorPage = process.env.NODE_ENV === 'development'
+          ? `file://${appPath}/app/pages/error/index.html`
+          : `file://${appPath}/pages/error/index.html`;
+        errorPage += `?ec=${encodeURIComponent(event.errorCode)}`;
+        errorPage += `&url=${encodeURIComponent(event.target.getURL())}`;
+        if (event.errorCode !== -3 && event.validatedURL === event.target.getURL()) {
+          this.getPage().navigateTo(
+            `${errorPage}`);
+        }
+      },
       onPageTitleSet(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
         this.$store.dispatch('pageTitleSet', {
@@ -172,7 +187,11 @@
         this.getPage().navigateTo();
       },
       onClickBack() {
-        this.getWebView().goBack();
+        if (this.getPageObject().error) {
+          this.getWebView().goToOffset(-2);
+        } else {
+          this.getWebView().goBack();
+        }
       },
       onClickForward() {
         this.getWebView().goForward();
@@ -405,6 +424,7 @@
       this.onDidStartLoading.bind(this);
       this.onDomReady.bind(this);
       this.onDidStopLoading.bind(this);
+      this.onDidFailLoad.bind(this);
       this.onPageTitleSet.bind(this);
       this.onUpdateTargetUrl.bind(this);
       this.onMediaStartedPlaying.bind(this);

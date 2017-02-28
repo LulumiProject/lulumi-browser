@@ -13,6 +13,7 @@ function createPageObject(url) {
     canGoBack: false,
     canGoForward: false,
     canRefresh: false,
+    error: false,
     hasMedia: false,
     isAudioMuted: false,
   };
@@ -76,6 +77,7 @@ const mutations = {
   // page handlers
   [types.DID_START_LOADING](state, pageIndex) {
     state.pages[pageIndex].isLoading = true;
+    state.pages[pageIndex].error = false;
   },
   [types.DOM_READY](state, payload) {
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
@@ -97,6 +99,11 @@ const mutations = {
         = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
     }
     state.pages[payload.pageIndex].isLoading = false;
+  },
+  [types.DID_FAIL_LOAD](state, pageIndex) {
+    state.pages[pageIndex].title = 'error';
+    state.pages[pageIndex].location = null;
+    state.pages[pageIndex].error = true;
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
