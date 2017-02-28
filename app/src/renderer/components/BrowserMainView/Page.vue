@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    webview(webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(v-loading.body="page.isLoading" webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
     #browser-page-status(v-show="page.statusText") {{ page.statusText }}
 </template>
 
