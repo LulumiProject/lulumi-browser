@@ -9,7 +9,7 @@
           icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
           icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
       </transition>
-      span(:id="`${i}`", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
+      span(:id="`${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
         | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
@@ -61,6 +61,19 @@
         }
         this.$parent.onTabClose(event, parseInt(id, 10));
       },
+      onMouseMove(event) {
+        const x = event.pageX - event.target.offsetLeft;
+        const y = event.pageY - event.target.offsetTop;
+        const xy = `${x} ${y}`;
+
+        // eslint-disable-next-line max-len
+        const bgWebKit = `-webkit-gradient(radial, ${xy}, 0, ${xy}, 100, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0.0))), linear-gradient(to bottom, #e5e5e5 90%, #ddd)`;
+
+        event.target.parentNode.style.background = bgWebKit;
+      },
+      onMouseLeave(event) {
+        event.target.parentNode.style.background = '';
+      },
     },
     mounted() {
       const ipc = this.$electron.ipcRenderer;
@@ -103,7 +116,7 @@
   }
   #browser-tabs > div.ghost {
     opacity: .5;
-    background: #C8EBFB;
+    color: red;
   }
   #browser-tabs > div > span {
     flex: 1;
