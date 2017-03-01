@@ -13,7 +13,7 @@
         | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
-    a.newtab(@click="$parent.onNewTab()")
+    el-button(class="newtab", size="small", icon="more", @click="$parent.onNewTab()")
 </template>
 
 <script>
@@ -23,6 +23,8 @@
   import 'vue-awesome/icons/volume-off';
 
   import Sortable from 'sortablejs';
+
+  import { Button } from 'element-ui';
 
   export default {
     directives: {
@@ -38,6 +40,7 @@
     },
     components: {
       Icon,
+      'el-button': Button,
     },
     computed: {
       pages() {
@@ -158,13 +161,17 @@
     cursor: pointer;
     margin: 6px 4px;
   }
-  #browser-tabs > a.newtab {
-    padding: 8px 12px 5px 10px;
-    margin: 0;
+  #browser-tabs > button.newtab {
+    border-style: outset;
+    margin: 8px 10px 2px 3px;
+    height: 24px;
+    line-height: 22px;
+    padding-top: 0;
+    padding-bottom: 0;
+    background: linear-gradient(to bottom, #e5e5e5 90%, #ddd);
   }
-  #browser-tabs > a.newtab:hover {
-    color: #fff;
-    background: rgb(99, 190, 229);
+  #browser-tabs > button.newtab:hover {
+    border-style: inset;
   }
   #browser-tabs > a.maximize {
     color: rgb(32, 205, 20);
