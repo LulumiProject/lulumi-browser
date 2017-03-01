@@ -126,8 +126,8 @@
         this.getWebView().style.height = '100vh';
       },
       onLeaveHtmlFullScreen() {
-        this.$el.querySelector('#nav').style.height = '62px';
-        this.getWebView().style.height = 'calc(100vh - 62px)';
+        this.$el.querySelector('#nav').style.height = '73px';
+        this.getWebView().style.height = 'calc(100vh - 73px)';
       },
       onNewWindow(event) {
         this.$store.dispatch('incrementPid');

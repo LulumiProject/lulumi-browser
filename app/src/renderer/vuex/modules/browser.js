@@ -61,11 +61,13 @@ const mutations = {
         for (let i = pageIndex; i >= 0; i--) {
           if (state.pages[i]) {
             state.currentPageIndex = i;
+            return;
           }
         }
         for (let i = pageIndex; i < state.pages.length; i++) {
           if (state.pages[i]) {
             state.currentPageIndex = i;
+            return;
           }
         }
       }
