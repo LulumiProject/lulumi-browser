@@ -13,8 +13,8 @@
         icon(name="refresh")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
-        @input="$store.dispatch('updateLocation', $event)",
-        @select="$parent.onEnterLocation($event.value)",
+        @input="onChange",
+        @select="onSelect",
         icon="search",
         :trigger-on-focus="false",
         placeholder="Enter a URL or search a term",
@@ -37,6 +37,7 @@
   import 'vue-awesome/icons/times';
 
   import { focus } from 'vue-focus';
+  import urlUtil from '../../js/lib/urlutil';
 
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
@@ -68,6 +69,7 @@
     data() {
       return {
         focused: false,
+        value: '',
         suggestions: recommendTopSite,
       };
     },
@@ -80,10 +82,30 @@
       },
     },
     methods: {
+      onChange(val) {
+        this.value = val;
+      },
+      onSelect(event) {
+        if (event.title === 'Google Search') {
+          this.$parent.onEnterLocation(`https://www.google.com/search?q=${event.value}`);
+        } else {
+          this.$parent.onEnterLocation(event.value);
+        }
+      },
       querySearch(queryString, cb) {
         const suggestions = this.suggestions;
         const results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
+        results.push({
+          title: 'Google Search',
+          value: this.value,
+        });
+        if (results.length === 1 && urlUtil.isURL(this.value)) {
+          results.unshift({
+            title: 'Page',
+            value: this.value,
+          });
+        }
         cb(results);
       },
       createFilter(queryString) {

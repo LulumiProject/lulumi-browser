@@ -60,7 +60,10 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
         this.select(this.suggestions[this.highlightedIndex]);
       } else {
         this.$parent.$parent.onEnterLocation(event.target.value);
-        this.select({ value: event.target.value });
+        this.select({
+          title: '',
+          value: event.target.value,
+        });
       }
     },
   },
