@@ -87,7 +87,7 @@
       },
       onSelect(event) {
         if (event.title === 'Google Search') {
-          this.$parent.onEnterLocation(`https://www.google.com/search?q=${event.value}`);
+          this.$parent.onEnterLocation(`${this.$store.getters.searchEngine}${event.value}`);
         } else {
           this.$parent.onEnterLocation(event.value);
         }

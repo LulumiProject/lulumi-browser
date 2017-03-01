@@ -23,6 +23,7 @@ const state = {
   pid: 0,
   pages: [createPageObject()],
   currentPageIndex: 0,
+  searchEngine: 'https://www.google.com/search?q=',
 };
 
 const mutations = {
