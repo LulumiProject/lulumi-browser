@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    webview(v-loading.body="page.isLoading" webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(v-loading.body="page.isLoading && isCurrentPage" element-loading-text="Loading..." webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
     #browser-page-status(v-show="page.statusText") {{ page.statusText }}
     .findinpage-bar(ref="findinpageBar" v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
@@ -15,6 +15,7 @@
     data() {
       return {
         hidden: true,
+        requestId: null,
       };
     },
     props: [
@@ -24,6 +25,9 @@
     computed: {
       page() {
         return this.$store.getters.pages[this.pageIndex];
+      },
+      isCurrentPage() {
+        return (this.pageIndex === this.$store.getters.currentPageIndex);
       },
     },
     methods: {
@@ -111,7 +115,7 @@
           });
 
           if (findinpage.input.value) {
-            findinpage.activeWebview.findInPage(findinpage.input.value);
+            this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value);
           }
         },
         end: () => {
@@ -134,13 +138,13 @@
 
       findinpage.input.addEventListener('input', event => {
         if (event.target.value) {
-          findinpage.activeWebview.findInPage(event.target.value);
+          this.requestId = findinpage.activeWebview.findInPage(event.target.value);
         }
       });
 
       findinpage.input.addEventListener('keypress', event => {
         if (event.keyCode === 13) {
-          findinpage.activeWebview.findInPage(findinpage.input.value, {
+          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
             forward: true,
             findNext: true,
           });
@@ -148,32 +152,38 @@
       });
 
       findinpage.previous.addEventListener('click', () => {
-        findinpage.activeWebview.findInPage(findinpage.input.value, {
-          forward: false,
-          findNext: true,
-        });
+        if (findinpage.input.value) {
+          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
+            forward: false,
+            findNext: true,
+          });
+        }
       });
 
       findinpage.next.addEventListener('click', () => {
-        findinpage.activeWebview.findInPage(findinpage.input.value, {
-          forward: true,
-          findNext: true,
-        });
-      });
-
-      this.$refs.webview.addEventListener('find-in-page', event => {
-        let text = '';
-        if (event.result.matches !== undefined) {
-          if (event.result.matches === 1) {
-            text = ' match';
-          } else {
-            text = ' matches';
-          }
-          findinpage.counter.textContent
-            = `${event.result.activeMatchOrdinal} of ${event.result.matches}${text}`;
+        if (findinpage.input.value) {
+          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
+            forward: true,
+            findNext: true,
+          });
         }
       });
-      ipc.on('find-in-page', () => {
+
+      this.$refs.webview.addEventListener('found-in-page', event => {
+        if (event.result.requestId === this.requestId) {
+          let text = '';
+          if (event.result.matches !== undefined) {
+            if (event.result.matches === 1) {
+              text = ' match';
+            } else {
+              text = ' matches';
+            }
+            findinpage.counter.textContent
+              = `${event.result.activeMatchOrdinal} of ${event.result.matches}${text}`;
+          }
+        }
+      });
+      ipc.on('startFindInPage', () => {
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
           findinpage.start();
         }
@@ -254,10 +264,15 @@
   }
 
   .findinpage-bar {
-    border-style: solid;
+    border-bottom: 1px solid rgb(236, 236, 236);
     border-width: 1px 1px 0 0;
     border-top-right-radius: 4px;
-    padding: 0.2em 0.5em;
+    display: flex;
+    font-size: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    animation: slideIn 25ms;
     position: relative;
   }
 </style>

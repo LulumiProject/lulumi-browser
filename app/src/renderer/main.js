@@ -33,7 +33,7 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
           this.suggestions = suggestions;
           this.highlightedIndex = 0;
         } else {
-          /* eslint-disable no-console */
+          // eslint-disable-next-line no-console
           console.error('autocomplete suggestions must be an array');
         }
       });

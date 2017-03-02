@@ -131,7 +131,7 @@ if (process.platform === 'darwin') {
     {
       label: 'Find',
       accelerator: 'CmdOrCtrl+F',
-      click: () => BrowserWindow.getFocusedWindow().webContents.send('find-in-page'),
+      click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
     },
     {
       label: 'Speech',
