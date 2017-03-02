@@ -27,7 +27,7 @@
 
 <script>
   import Vue from 'vue';
-  import '../../css/el-autocomplete';
+  import { focus } from 'vue-focus';
 
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/angle-double-left';
@@ -36,9 +36,8 @@
   import 'vue-awesome/icons/refresh';
   import 'vue-awesome/icons/times';
 
-  import { focus } from 'vue-focus';
+  import '../../css/el-autocomplete';
   import urlUtil from '../../js/lib/urlutil';
-
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {

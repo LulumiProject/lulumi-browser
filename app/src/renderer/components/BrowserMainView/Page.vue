@@ -44,7 +44,7 @@
         this.$refs.webview.setAttribute('src', this.normalizedUri(location || 'https://github.com/qazbnm456/lulumi-browser'));
       },
       webviewHandler(self, fnName) {
-        return event => {
+        return (event) => {
           if (self.$parent[fnName]) {
             self.$parent[fnName](event, this.pageIndex);
           }
@@ -82,15 +82,15 @@
         'scroll-touch-end': 'onScrollTouchEnd',
       };
 
-      Object.keys(webviewEvents).forEach(key => {
+      Object.keys(webviewEvents).forEach((key) => {
         this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
-      this.$refs.webview.addEventListener('context-menu', event => {
+      this.$refs.webview.addEventListener('context-menu', (event) => {
         this.$parent.onWebviewContextMenu(event);
       });
 
-      this.$refs.webview.addEventListener('wheel', event => {
+      this.$refs.webview.addEventListener('wheel', (event) => {
         if (this.$parent.onWheel) {
           this.$parent.onWheel(event);
         }
@@ -136,13 +136,13 @@
         findinpage.end();
       });
 
-      findinpage.input.addEventListener('input', event => {
+      findinpage.input.addEventListener('input', (event) => {
         if (event.target.value) {
           this.requestId = findinpage.activeWebview.findInPage(event.target.value);
         }
       });
 
-      findinpage.input.addEventListener('keypress', event => {
+      findinpage.input.addEventListener('keypress', (event) => {
         if (event.keyCode === 13) {
           this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
             forward: true,
@@ -169,7 +169,7 @@
         }
       });
 
-      this.$refs.webview.addEventListener('found-in-page', event => {
+      this.$refs.webview.addEventListener('found-in-page', (event) => {
         if (event.result.requestId === this.requestId) {
           let text = '';
           if (event.result.matches !== undefined) {
@@ -199,12 +199,12 @@
           this.$parent.onScrollTouchBegin(event, swipeGesture);
         }
       });
-      ipc.on('scroll-touch-end', event => {
+      ipc.on('scroll-touch-end', (event) => {
         if (this.$parent.onScrollTouchEnd) {
           this.$parent.onScrollTouchEnd(event, this.pageIndex);
         }
       });
-      ipc.on('scroll-touch-edge', event => {
+      ipc.on('scroll-touch-edge', (event) => {
         if (this.$parent.onScrollTouchEdge) {
           this.$parent.onScrollTouchEdge(event);
         }
