@@ -39,9 +39,7 @@ const template = [
       {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
-        click: () => {
-          BrowserWindow.getFocusedWindow().webContents.send('reload');
-        },
+        click: () => BrowserWindow.getFocusedWindow().webContents.send('reload'),
       },
       {
         role: 'forcereload',
@@ -85,7 +83,7 @@ const template = [
     submenu: [
       {
         label: 'Learn More',
-        click() { require('electron').shell.openExternal('http://electron.atom.io'); },
+        click: () => require('electron').shell.openExternal('http://electron.atom.io'),
       },
     ],
   },
@@ -129,6 +127,11 @@ if (process.platform === 'darwin') {
   template[1].submenu.push(
     {
       type: 'separator',
+    },
+    {
+      label: 'Find',
+      accelerator: 'CmdOrCtrl+F',
+      click: () => BrowserWindow.getFocusedWindow().webContents.send('find-in-page'),
     },
     {
       label: 'Speech',

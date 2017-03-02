@@ -2,10 +2,21 @@
   div
     webview(v-loading.body="page.isLoading" webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
     #browser-page-status(v-show="page.statusText") {{ page.statusText }}
+    .findinpage-bar(ref="findinpageBar" v-show="!hidden && isActive")
+      input(ref="findinpageInput", placeholder="Search in Page")
+      span(ref="findinpageCount")
+      i(ref="findinpagePreviousMatch" class="el-icon-arrow-up")
+      i(ref="findinpageNextMatch", class="el-icon-arrow-down")
+      i(ref="findinpageEnd", class="el-icon-circle-close")
 </template>
 
 <script>
   export default {
+    data() {
+      return {
+        hidden: true,
+      };
+    },
     props: [
       'isActive',
       'pageIndex',
@@ -29,11 +40,18 @@
         this.$refs.webview.setAttribute('src', this.normalizedUri(location || 'https://github.com/qazbnm456/lulumi-browser'));
       },
       webviewHandler(self, fnName) {
-        return (event) => {
+        return event => {
           if (self.$parent[fnName]) {
             self.$parent[fnName](event, this.pageIndex);
           }
         };
+      },
+    },
+    watch: {
+      isActive(newState) {
+        if (newState && !this.hidden) {
+          this.$nextTick(() => this.$refs.findinpageInput.focus());
+        }
       },
     },
     mounted() {
@@ -60,21 +78,107 @@
         'scroll-touch-end': 'onScrollTouchEnd',
       };
 
-      Object.keys(webviewEvents).forEach((key) => {
+      Object.keys(webviewEvents).forEach(key => {
         this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
-      this.$refs.webview.addEventListener('context-menu', (event) => {
+      this.$refs.webview.addEventListener('context-menu', event => {
         this.$parent.onWebviewContextMenu(event);
       });
 
-      this.$refs.webview.addEventListener('wheel', (event) => {
+      this.$refs.webview.addEventListener('wheel', event => {
         if (this.$parent.onWheel) {
           this.$parent.onWheel(event);
         }
       }, { passive: true });
 
       const ipc = this.$electron.ipcRenderer;
+
+      const findinpage = {
+        container: this.$refs.findinpageBar,
+        input: this.$refs.findinpageInput,
+        counter: this.$refs.findinpageCount,
+        previous: this.$refs.findinpagePreviousMatch,
+        next: this.$refs.findinpageNextMatch,
+        endButton: this.$refs.findinpageEnd,
+        activeWebview: this.$refs.webview,
+        start: () => {
+          findinpage.counter.textContent = '';
+          this.hidden = false;
+          this.$nextTick(() => {
+            findinpage.input.focus();
+            findinpage.input.select();
+          });
+
+          if (findinpage.input.value) {
+            findinpage.activeWebview.findInPage(findinpage.input.value);
+          }
+        },
+        end: () => {
+          this.hidden = true;
+
+          this.$nextTick(() => {
+            if (findinpage.activeWebview) {
+              findinpage.activeWebview.stopFindInPage('keepSelection');
+              if (findinpage.input === document.activeElement) {
+                findinpage.activeWebview.focus();
+              }
+            }
+          });
+        },
+      };
+
+      findinpage.endButton.addEventListener('click', () => {
+        findinpage.end();
+      });
+
+      findinpage.input.addEventListener('input', event => {
+        if (event.target.value) {
+          findinpage.activeWebview.findInPage(event.target.value);
+        }
+      });
+
+      findinpage.input.addEventListener('keypress', event => {
+        if (event.keyCode === 13) {
+          findinpage.activeWebview.findInPage(findinpage.input.value, {
+            forward: true,
+            findNext: true,
+          });
+        }
+      });
+
+      findinpage.previous.addEventListener('click', () => {
+        findinpage.activeWebview.findInPage(findinpage.input.value, {
+          forward: false,
+          findNext: true,
+        });
+      });
+
+      findinpage.next.addEventListener('click', () => {
+        findinpage.activeWebview.findInPage(findinpage.input.value, {
+          forward: true,
+          findNext: true,
+        });
+      });
+
+      this.$refs.webview.addEventListener('find-in-page', event => {
+        let text = '';
+        if (event.result.matches !== undefined) {
+          if (event.result.matches === 1) {
+            text = ' match';
+          } else {
+            text = ' matches';
+          }
+          findinpage.counter.textContent
+            = `${event.result.activeMatchOrdinal} of ${event.result.matches}${text}`;
+        }
+      });
+      ipc.on('find-in-page', () => {
+        if (this.pageIndex === this.$store.getters.currentPageIndex) {
+          findinpage.start();
+        }
+      });
+
       ipc.on('will-download', (event, data) => {
         if (this.$parent.onWillDownload) {
           this.$parent.onWillDownload(event, this.pageIndex, data);
@@ -85,12 +189,12 @@
           this.$parent.onScrollTouchBegin(event, swipeGesture);
         }
       });
-      ipc.on('scroll-touch-end', (event) => {
+      ipc.on('scroll-touch-end', event => {
         if (this.$parent.onScrollTouchEnd) {
           this.$parent.onScrollTouchEnd(event, this.pageIndex);
         }
       });
-      ipc.on('scroll-touch-edge', (event) => {
+      ipc.on('scroll-touch-edge', event => {
         if (this.$parent.onScrollTouchEdge) {
           this.$parent.onScrollTouchEdge(event);
         }
@@ -147,5 +251,13 @@
     position: absolute;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .findinpage-bar {
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 4px;
+    padding: 0.2em 0.5em;
+    position: relative;
   }
 </style>
