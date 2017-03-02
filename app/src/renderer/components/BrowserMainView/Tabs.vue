@@ -9,8 +9,9 @@
           icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
           icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
       </transition>
-      span(:id="`${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
-        | {{ page.title || 'loading' }}
+      el-tooltip(:content="page.title || 'loading'", placement="bottom")
+        span(:id="`${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
+          | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
     el-button(class="newtab", size="small", icon="more", @click="$parent.onNewTab()")
@@ -24,7 +25,7 @@
 
   import Sortable from 'sortablejs';
 
-  import { Button } from 'element-ui';
+  import { Button, Tooltip } from 'element-ui';
 
   export default {
     directives: {
@@ -41,6 +42,7 @@
     components: {
       Icon,
       'el-button': Button,
+      'el-tooltip': Tooltip,
     },
     computed: {
       pages() {
@@ -121,7 +123,7 @@
     opacity: .5;
     color: red;
   }
-  #browser-tabs > div > span {
+  #browser-tabs > div > span.el-tooltip {
     flex: 1;
     padding: 6px 0 4px 12px;
     line-height: 16px;

@@ -4,6 +4,8 @@
       tabs
       navbar
     page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
+    transition(name="extend")
+      .browser-page-status(v-show="page.statusText") {{ page.statusText }}
 </template>
 
 <script>
@@ -32,6 +34,9 @@
     },
     name: 'browser-main',
     computed: {
+      page() {
+        return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+      },
       pages() {
         return this.$store.getters.pages;
       },
@@ -414,6 +419,16 @@
           }
         }
         menu.append(new MenuItem({
+          label: 'View Source',
+          click: () => {
+            const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
+            if (sourceLocation !== null) {
+              this.$store.dispatch('incrementPid');
+              this.$store.dispatch('createTab', sourceLocation);
+            }
+          },
+        }));
+        menu.append(new MenuItem({
           label: 'Inspect Element',
           click: () => {
             this.getWebView().inspectElement(event.params.x, event.params.y);
@@ -462,5 +477,28 @@
   }
   #nav {
     width: 100vw;
+  }
+
+  .browser-page-status {
+    background: #F3F3F3;
+    border-color: #d3d3d3;
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 4px;
+    bottom: 0;
+    color: #555555;
+    font-size: 13px;
+    left: 0;
+    width: auto;
+    overflow-x: hidden;
+    padding: 0.2em 0.5em;
+    position: absolute;
+  }
+  .extend-enter-active {
+    transition-property: text-overflow, white-space;
+    transition-duration: 1s;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40%;
   }
 </style>

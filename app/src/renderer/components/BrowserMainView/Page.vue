@@ -1,7 +1,6 @@
 <template lang="pug">
   div
     webview(v-loading.body="page.isLoading && isCurrentPage" element-loading-text="Loading..." webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
-    #browser-page-status(v-show="page.statusText") {{ page.statusText }}
     .findinpage-bar(ref="findinpageBar" v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
       span(ref="findinpageCount")
@@ -11,6 +10,8 @@
 </template>
 
 <script>
+  import urlUtil from '../../js/lib/urlutil';
+
   export default {
     data() {
       return {
@@ -31,17 +32,8 @@
       },
     },
     methods: {
-      normalizedUri(input) {
-        const prefix = 'http://';
-
-        if (!/^([^:/]+)(:\/\/)/g.test(input) && !prefix.includes(input)) {
-          input = prefix + input;
-        }
-
-        return input;
-      },
       navigateTo(location) {
-        this.$refs.webview.setAttribute('src', this.normalizedUri(location || 'https://github.com/qazbnm456/lulumi-browser'));
+        this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location || 'https://github.com/qazbnm456/lulumi-browser'));
       },
       webviewHandler(self, fnName) {
         return (event) => {
@@ -243,24 +235,6 @@
     flex: 0 1;
     width: 0px;
     height: 0px;
-  }
-
-  #browser-page-status {
-    background: #F3F3F3;
-    border-color: #d3d3d3;
-    border-style: solid;
-    border-width: 1px 1px 0 0;
-    border-top-right-radius: 4px;
-    bottom: 0;
-    color: #555555;
-    font-size: 13px;
-    left: 0;
-    max-width: 40%;
-    overflow-x: hidden;
-    padding: 0.2em 0.5em;
-    position: absolute;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .findinpage-bar {
