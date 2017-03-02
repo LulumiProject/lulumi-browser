@@ -238,7 +238,7 @@
           },
         }));
 
-        menu.popup(this.$electron.remote.getCurrentWindow());
+        menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
       // onNavContextMenu
       onNavContextMenu(event) {
@@ -270,7 +270,7 @@
           },
         }));
 
-        menu.popup(this.$electron.remote.getCurrentWindow());
+        menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
       // onWebviewContextMenu
       onWebviewContextMenu(event) {
@@ -420,7 +420,7 @@
           },
         }));
 
-        menu.popup(this.$electron.remote.getCurrentWindow());
+        menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
     },
     mounted() {

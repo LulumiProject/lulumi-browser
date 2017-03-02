@@ -2239,9 +2239,9 @@ electron-to-chromium@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.2.tgz#e41bc9488c88e3cfa1e94bde28e8420d7d47c47c"
 
-electron@^1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.6.1.tgz#aa426e83bfb5919c3a492297eff368b67e66f1ae"
+electron@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.6.2.tgz#b0ccd7703f86d09c4d2a7273455c3f993f158994"
   dependencies:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
@@ -6614,11 +6614,7 @@ vue-template-es2015-compiler@^1.2.2:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.5.0.tgz#e4f672ab1718a3abf9171a080daefac31be117e1"
 
-vue@^2.0.1:
-  version "2.1.10"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.1.10.tgz#c9235ca48c7925137be5807832ac4e3ac180427b"
-
-vue@^2.2.1:
+vue@^2.0.1, vue@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.2.1.tgz#ddbfd2f0caf38f374f5a36eea2e1edf25225b68e"
 
