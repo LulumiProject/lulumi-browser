@@ -204,7 +204,7 @@
       },
       onEnterLocation(location) {
         if (urlUtil.isNotURL(location)) {
-          const newLocation = `this.$store.getters.searchEngine${location}`;
+          const newLocation = `${this.$store.getters.searchEngine}${location}`;
           this.$store.dispatch('updateLocation', newLocation);
           this.getPage().navigateTo(newLocation);
         } else {
