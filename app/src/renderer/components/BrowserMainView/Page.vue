@@ -202,9 +202,9 @@
         }
       });
 
-      if (this.$store.getters.pages[this.pageIndex].location) {
-        this.navigateTo(this.$store.getters.pages[this.pageIndex].location);
-      }
+      this.$nextTick(() => {
+        setTimeout(() => this.navigateTo(this.$store.getters.pages[this.pageIndex].location), 100);
+      });
     },
   };
 </script>
