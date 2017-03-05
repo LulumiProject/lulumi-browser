@@ -217,10 +217,9 @@
     position: absolute;
   }
   webview[hidden] {
-    display: flex !important;
     flex: 0 1;
     width: 0px;
-    height: 0px;
+    height: 0px !important;
   }
   webview.fullscreen {
     position: fixed;
@@ -234,7 +233,7 @@
   webview.hidden {
     flex: 0 1;
     width: 0px;
-    height: 0px;
+    height: 0px !important;
   }
 
   .findinpage-bar {
