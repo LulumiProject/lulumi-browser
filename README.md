@@ -3,10 +3,14 @@
 > Lulumi-browser is a light weight browser coded with vue and electron
 
 <p align="center">
-  <a href="http://i.imgur.com/LtOY1kW.png" target="_blank">
-    <img src="http://i.imgur.com/LtOY1kW.png" width="700px">
+  <a href="http://i.imgur.com/RA8RbU4.png" target="_blank">
+    <img src="http://i.imgur.com/RA8RbU4.png" width="700px">
   </a>
 </p>
+
+## Warning
+
+### Currently, Lulumi-browser has only been tested on macOS, and might have some display problems on other platforms.
 
 ## Build Setup
 
@@ -17,8 +21,14 @@ $ yarn
 # serve with hot reload at localhost:9080
 $ yarn run dev
 
-# build electron app for production
+# build electron app for all platforms
 $ yarn run build
+
+# build electron app for the specific target platform
+$ yarn run build:darwin # macOS
+$ yarn run build:linux  # Linux
+$ yarn run build:mas    # Mac AppStore
+$ yarn run build:win32  # Windows
 
 # lint all JS/Vue component files in `app/src`
 $ yarn run lint

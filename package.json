@@ -22,7 +22,7 @@
     "unit": "cross-env BABEL_ENV=testing-unit karma start test/unit/karma.conf.js",
     "postinstall": "npm run lint:fix && cd app && npm install"
   },
-  "author": "Boik Su <boiksu@tdohacker.org>",
+  "author": "Boik Su <boik@tdohacker.org>",
   "license": "Apache-2.0",
   "devDependencies": {
     "babel-core": "^6.23.1",

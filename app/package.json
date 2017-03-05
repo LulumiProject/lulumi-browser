@@ -13,6 +13,6 @@
     "vuex": "^2.2.1"
   },
   "devDependencies": {},
-  "author": "Boik Su <boiksu@tdohacker.org>",
+  "author": "Boik Su <boik@tdohacker.org>",
   "license": "Apache-2.0"
 }
