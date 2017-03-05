@@ -186,21 +186,6 @@
           this.$parent.onWillDownload(event, this.pageIndex, data);
         }
       });
-      ipc.on('scroll-touch-begin', (event, swipeGesture) => {
-        if (this.$parent.onScrollTouchBegin) {
-          this.$parent.onScrollTouchBegin(event, swipeGesture);
-        }
-      });
-      ipc.on('scroll-touch-end', (event) => {
-        if (this.$parent.onScrollTouchEnd) {
-          this.$parent.onScrollTouchEnd(event, this.pageIndex);
-        }
-      });
-      ipc.on('scroll-touch-edge', (event) => {
-        if (this.$parent.onScrollTouchEdge) {
-          this.$parent.onScrollTouchEdge(event);
-        }
-      });
 
       this.$nextTick(() => {
         setTimeout(() => this.navigateTo(this.$store.getters.pages[this.pageIndex].location), 100);

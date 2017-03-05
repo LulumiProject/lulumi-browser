@@ -108,9 +108,11 @@ const mutations = {
     state.pages[payload.pageIndex].isLoading = false;
   },
   [types.DID_FAIL_LOAD](state, pageIndex) {
-    state.pages[pageIndex].title = 'error';
-    state.pages[pageIndex].location = null;
-    state.pages[pageIndex].error = true;
+    if (!state.pages[pageIndex].title) {
+      state.pages[pageIndex].title = 'error';
+      state.pages[pageIndex].location = null;
+      state.pages[pageIndex].error = true;
+    }
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();

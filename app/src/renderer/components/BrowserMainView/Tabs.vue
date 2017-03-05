@@ -9,7 +9,7 @@
           icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted")
           icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
       </transition>
-      el-tooltip(:content="page.title || 'loading'", placement="bottom")
+      el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
         span(:id="`${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
           | {{ page.title || 'loading' }}
       a.close(@click="onClose")

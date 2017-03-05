@@ -86,7 +86,7 @@
         errorPage += `?ec=${encodeURIComponent(event.errorCode)}`;
         errorPage += `&url=${encodeURIComponent(event.target.getURL())}`;
         if (event.errorCode !== -3 && event.validatedURL === event.target.getURL()) {
-          this.getPage().navigateTo(
+          this.getPage(pageIndex).navigateTo(
             `${errorPage}`);
         }
       },
@@ -157,15 +157,15 @@
           this.startTime = (new Date()).getTime();
         }
       },
-      onScrollTouchEnd(event, pageIndex) {
+      onScrollTouchEnd() {
         if (this.time > 50
               && this.trackingFingers
               && Math.abs(this.deltaY) < 50
               && this.isSwipeOnEdge) {
           if (this.deltaX > 70) {
-            this.getWebView(pageIndex).goForward();
+            this.getWebView().goForward();
           } else if (this.deltaX < -70) {
-            this.getWebView(pageIndex).goBack();
+            this.getWebView().goBack();
           }
         }
         this.trackingFingers = false;
@@ -439,6 +439,8 @@
       },
     },
     mounted() {
+      const ipc = this.$electron.ipcRenderer;
+
       this.onDidStartLoading.bind(this);
       this.onDomReady.bind(this);
       this.onDidStopLoading.bind(this);
@@ -456,6 +458,22 @@
       this.onWebviewContextMenu.bind(this);
       this.onScrollTouchBegin.bind(this);
       this.onScrollTouchEnd.bind(this);
+
+      ipc.on('scroll-touch-begin', (event, swipeGesture) => {
+        if (this.onScrollTouchBegin) {
+          this.onScrollTouchBegin(event, swipeGesture);
+        }
+      });
+      ipc.on('scroll-touch-end', (event) => {
+        if (this.onScrollTouchEnd) {
+          this.onScrollTouchEnd(event);
+        }
+      });
+      ipc.on('scroll-touch-edge', (event) => {
+        if (this.onScrollTouchEdge) {
+          this.onScrollTouchEdge(event);
+        }
+      });
     },
   };
 </script>
