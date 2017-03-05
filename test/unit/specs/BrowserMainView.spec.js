@@ -11,7 +11,7 @@ function createPageObject(url) {
     pid: 0,
     location: url || 'https://github.com/qazbnm456/lulumi-browser',
     statusText: false,
-    title: 'new tab',
+    title: false,
     isLoading: false,
     isSearching: false,
     canGoBack: false,

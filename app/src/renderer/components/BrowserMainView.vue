@@ -14,6 +14,7 @@
   import Page from './BrowserMainView/Page';
 
   import urlUtil from '../js/lib/urlutil';
+  import imageUtil from '../js/lib/imageutil';
 
   export default {
     data() {
@@ -367,8 +368,7 @@
                       ],
                     }, (filename) => {
                       if (filename) {
-                        const { getBase64FromImageUrl } = require('../js/lib/imageutil');
-                        getBase64FromImageUrl(event.params.srcURL).then((dataURL) => {
+                        imageUtil.getBase64FromImageUrl(event.params.srcURL).then((dataURL) => {
                           fs.writeFileSync(filename,
                             electron.nativeImage.createFromDataURL(dataURL).toPNG());
                         });

@@ -46,17 +46,15 @@ let rendererConfig = {
       },
       {
         test: /\.vue$/,
-        use: [
-          {
-            loader: 'vue-loader',
-            options: {
-              loaders: {
-                sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-                scss: 'vue-style-loader!css-loader!sass-loader'
-              },
+        use: {
+          loader: 'vue-loader',
+          options: {
+            loaders: {
+              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+              scss: 'vue-style-loader!css-loader!sass-loader'
             },
-          }
-        ],
+          },
+        },
       },
       {
         test: /\.pug$/,

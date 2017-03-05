@@ -22,7 +22,7 @@ delete webpackConfig.externals
 delete webpackConfig.output.libraryTarget
 
 // only apply babel for test files when using isparta
-webpackConfig.module.rules.some((rule, i) => {
+webpackConfig.module.rules.some(rule => {
   if (rule.use === 'babel-loader') {
     rule.include.push(path.resolve(projectRoot, '../test/unit'))
     return true
@@ -31,7 +31,7 @@ webpackConfig.module.rules.some((rule, i) => {
 
 // apply vue option to apply isparta-loader on js
 webpackConfig.module.rules
-  .find(({ rule }) => rule.use === 'vue-loader').use.options.loaders.js = 'babel-loader'
+  .find(rule => rule.use.loader === 'vue-loader').use.options.loaders.js = 'babel-loader'
 
 module.exports = config => {
   config.set({
