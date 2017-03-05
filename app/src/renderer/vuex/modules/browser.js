@@ -51,24 +51,26 @@ const mutations = {
     }
   },
   [types.CLOSE_TAB](state, pageIndex) {
-    if (state.pages.length === 1) {
-      state.pages = [createPageObject()];
-      state.currentPageIndex = 0;
-    } else {
-      state.pages.splice(pageIndex, 1);
+    if (state.pages.length > pageIndex) {
+      if (state.pages.length === 1) {
+        state.pages = [createPageObject()];
+        state.currentPageIndex = 0;
+      } else {
+        state.pages.splice(pageIndex, 1);
 
-      // find the nearest adjacent page to make active
-      if (state.currentPageIndex >= pageIndex) {
-        for (let i = pageIndex; i >= 0; i--) {
-          if (state.pages[i]) {
-            state.currentPageIndex = i;
-            return;
+        // find the nearest adjacent page to make active
+        if (state.currentPageIndex >= pageIndex) {
+          for (let i = pageIndex; i >= 0; i--) {
+            if (state.pages[i]) {
+              state.currentPageIndex = i;
+              return;
+            }
           }
-        }
-        for (let i = pageIndex; i < state.pages.length; i++) {
-          if (state.pages[i]) {
-            state.currentPageIndex = i;
-            return;
+          for (let i = pageIndex; i < state.pages.length; i++) {
+            if (state.pages[i]) {
+              state.currentPageIndex = i;
+              return;
+            }
           }
         }
       }

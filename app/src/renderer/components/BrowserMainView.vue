@@ -136,8 +136,10 @@
         this.getWebView().style.height = 'calc(100vh - 73px)';
       },
       onNewWindow(event) {
-        this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab', event.url);
+        if (event.url !== 'about:blank') {
+          this.$store.dispatch('incrementPid');
+          this.$store.dispatch('createTab', event.url);
+        }
       },
       onWheel(event) {
         if (this.trackingFingers) {
@@ -146,9 +148,14 @@
           this.time = (new Date()).getTime() - this.startTime;
         }
       },
-      onWillDownload(event, pageIndex, data) {
+      onOpenPDF(event, pageIndex, data) {
         if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
           this.getPage(pageIndex).navigateTo(data.location);
+        }
+      },
+      onWillDownloadAnyFile(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.$store.dispatch('closeTab', pageIndex);
         }
       },
       onScrollTouchBegin(event, swipeGesture) {

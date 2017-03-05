@@ -42,8 +42,12 @@ function createWindow() {
       const location = process.env.NODE_ENV === 'development'
         ? `${PDFViewerURL}?${param}`
         : `${PDFViewerURL}?${param}`;
-      mainWindow.webContents.send('will-download', {
+      mainWindow.webContents.send('open-pdf', {
         location,
+        webContentsId: webContents.getId(),
+      });
+    } else {
+      mainWindow.webContents.send('will-download-any-file', {
         webContentsId: webContents.getId(),
       });
     }

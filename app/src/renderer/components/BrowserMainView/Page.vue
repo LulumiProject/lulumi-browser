@@ -181,9 +181,15 @@
         }
       });
 
-      ipc.on('will-download', (event, data) => {
-        if (this.$parent.onWillDownload) {
-          this.$parent.onWillDownload(event, this.pageIndex, data);
+      ipc.on('open-pdf', (event, data) => {
+        if (this.$parent.onOpenPDF) {
+          this.$parent.onOpenPDF(event, this.pageIndex, data);
+        }
+      });
+
+      ipc.on('will-download-any-file', (event, data) => {
+        if (this.$parent.onWillDownloadAnyFile) {
+          this.$parent.onWillDownloadAnyFile(event, this.pageIndex, data);
         }
       });
 
