@@ -1,5 +1,7 @@
-import { app, BrowserWindow, systemPreferences } from 'electron';
+import path from 'path';
+import { app, BrowserWindow, systemPreferences, protocol } from 'electron';
 import menu from '../browser/menu';
+import { lulumiPDFJSPath, lulumiPagesPath } from '../renderer/js/constants/config';
 
 let mainWindow;
 const isDarwin = process.platform === 'darwin';
@@ -36,14 +38,9 @@ function createWindow() {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
-      const PDFViewerURL = process.env.NODE_ENV === 'development'
-        ? `file://${__dirname}/../../pdfjs/web/viewer.html`
-        : `file://${__dirname}/../pdfjs/web/viewer.html`;
-      const location = process.env.NODE_ENV === 'development'
-        ? `${PDFViewerURL}?${param}`
-        : `${PDFViewerURL}?${param}`;
+      const PDFViewerURL = `file://${lulumiPDFJSPath}/web/viewer.html`;
       mainWindow.webContents.send('open-pdf', {
-        location,
+        location: `${PDFViewerURL}?${param}`,
         webContentsId: webContents.getId(),
       });
     } else {
@@ -73,7 +70,18 @@ function createWindow() {
   console.log('mainWindow opened');
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  protocol.registerFileProtocol('lulumi', (request, callback) => {
+    const url = request.url.substr(9);
+    callback({ path: path.normalize(`${lulumiPagesPath}/${url}`) });
+  }, (error) => {
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to register protocol');
+    }
+  });
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

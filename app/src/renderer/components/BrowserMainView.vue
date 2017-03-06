@@ -15,6 +15,8 @@
 
   import urlUtil from '../js/lib/urlutil';
   import imageUtil from '../js/lib/imageutil';
+  import urlResource from '../js/lib/urlresource';
+  import { lulumiPagesCustomProtocol } from '../js/constants/config';
 
   export default {
     data() {
@@ -136,10 +138,8 @@
         this.getWebView().style.height = 'calc(100vh - 73px)';
       },
       onNewWindow(event) {
-        if (event.url !== 'about:blank') {
-          this.$store.dispatch('incrementPid');
-          this.$store.dispatch('createTab', event.url);
-        }
+        this.$store.dispatch('incrementPid');
+        this.$store.dispatch('createTab', event.url);
       },
       onWheel(event) {
         if (this.trackingFingers) {
@@ -216,7 +216,16 @@
         this.getWebView().reload();
       },
       onEnterLocation(location) {
-        if (urlUtil.isNotURL(location)) {
+        if (location.startsWith('about:')) {
+          const newLocation = urlResource.aboutUrls(location);
+          this.getPage().navigateTo(newLocation);
+          this.$store.dispatch('updateTabProperties', {
+            pageIndex: this.currentPageIndex,
+            location,
+            favicon: null,
+            title: location,
+          });
+        } else if (urlUtil.isNotURL(location)) {
           const newLocation = `${this.$store.getters.searchEngine}${location}`;
           this.$store.dispatch('updateLocation', newLocation);
           this.getPage().navigateTo(newLocation);
@@ -290,6 +299,7 @@
         const { Menu, MenuItem } = this.$electron.remote;
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
+        const url = event.target.getURL();
 
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
@@ -425,16 +435,18 @@
             menu.append(new MenuItem({ type: 'separator' }));
           }
         }
-        menu.append(new MenuItem({
-          label: 'View Source',
-          click: () => {
-            const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
-            if (sourceLocation !== null) {
-              this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', sourceLocation);
-            }
-          },
-        }));
+        if (!url.startsWith(lulumiPagesCustomProtocol)) {
+          menu.append(new MenuItem({
+            label: 'View Source',
+            click: () => {
+              const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
+              if (sourceLocation !== null) {
+                this.$store.dispatch('incrementPid');
+                this.$store.dispatch('createTab', sourceLocation);
+              }
+            },
+          }));
+        }
         menu.append(new MenuItem({
           label: 'Inspect Element',
           click: () => {

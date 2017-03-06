@@ -38,8 +38,8 @@ export const mediaStartedPlaying = ({ commit }, pageIndex) => {
 export const mediaPaused = ({ commit }, pageIndex) => {
   commit(types.MEDIA_PAUSED, pageIndex);
 };
-export const toggleAudio = ({ commit }, muted) => {
-  commit(types.TOGGLE_AUDIO, muted);
+export const toggleAudio = ({ commit }, pageIndex, muted) => {
+  commit(types.TOGGLE_AUDIO, pageIndex, muted);
 };
 export const pageFaviconUpdated = ({ commit }, pageIndex, url) => {
   commit(types.PAGE_FAVICON_UPDATED, pageIndex, url);
@@ -48,3 +48,7 @@ export const pageFaviconUpdated = ({ commit }, pageIndex, url) => {
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);
 };
+export const updateTabProperties = ({ commit }, pageIndex, url) => {
+  commit(types.UPDATE_TAB_PROPERTIES, pageIndex, url);
+};
+

@@ -1,10 +1,11 @@
 import * as types from '../mutation-types';
+import { newtab, defaultSearchEngine } from '../../js/constants/config';
 import urlUtil from '../../js/lib/urlutil';
 
 function createPageObject(url) {
   return {
     pid: 0,
-    location: url || 'https://github.com/qazbnm456/lulumi-browser',
+    location: url || newtab.defaultUrl,
     statusText: false,
     favicon: false,
     title: null,
@@ -23,7 +24,7 @@ const state = {
   pid: 0,
   pages: [createPageObject()],
   currentPageIndex: 0,
-  searchEngine: 'https://www.google.com/search?q=',
+  searchEngine: defaultSearchEngine,
 };
 
 const mutations = {
@@ -38,7 +39,7 @@ const mutations = {
       newUrl = url;
       state.pages.push(createPageObject(newUrl));
     } else if (url) {
-      newUrl = `https://www.google.com/search?q=${url}`;
+      newUrl = `${defaultSearchEngine}${url}`;
       state.pages.push(createPageObject(newUrl));
     } else {
       state.pages.push(createPageObject());
@@ -101,10 +102,10 @@ const mutations = {
     }
     if (!state.pages[payload.pageIndex].favicon) {
       if (payload.pageIndex - 1 < 0) {
-        state.pages[payload.pageIndex].favicon = 'https://github.com/favicon.ico';
+        state.pages[payload.pageIndex].favicon = newtab.defaultFavicon;
       } else {
         state.pages[payload.pageIndex].favicon
-          = state.pages[payload.pageIndex - 1].favicon || 'https://github.com/favicon.ico';
+          = state.pages[payload.pageIndex - 1].favicon || newtab.defaultFavicon;
       }
     }
     state.pages[payload.pageIndex].isLoading = false;
@@ -141,6 +142,17 @@ const mutations = {
   [types.UPDATE_LOCATION](state, url) {
     state.pages[state.currentPageIndex].location
       = decodeURIComponent(urlUtil.getLocationIfPDF(url));
+  },
+  [types.UPDATE_TAB_PROPERTIES](state, payload) {
+    if (payload.location) {
+      state.pages[payload.pageIndex].location = payload.location;
+    }
+    if (payload.favicon) {
+      state.pages[payload.pageIndex].favicon = payload.favicon;
+    }
+    if (payload.title) {
+      state.pages[payload.pageIndex].title = payload.title;
+    }
   },
 };
 
