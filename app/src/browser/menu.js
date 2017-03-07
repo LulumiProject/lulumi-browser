@@ -173,6 +173,8 @@ if (process.platform === 'darwin') {
 
 const menu = Menu.buildFromTemplate(template);
 
-module.exports.init = () => {
-  Menu.setApplicationMenu(menu);
+export default {
+  init() {
+    Menu.setApplicationMenu(menu);
+  },
 };

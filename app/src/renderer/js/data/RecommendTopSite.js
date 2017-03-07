@@ -122,4 +122,4 @@ const recommendTopSite = [
   },
 ];
 
-module.exports = recommendTopSite;
+export default recommendTopSite;

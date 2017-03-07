@@ -1,7 +1,6 @@
-import path from 'path';
 import { app, BrowserWindow, systemPreferences, protocol } from 'electron';
 import menu from '../browser/menu';
-import { lulumiPDFJSPath, lulumiPagesPath } from '../renderer/js/constants/config';
+import config from '../renderer/js/constants/config';
 
 let mainWindow;
 const isDarwin = process.platform === 'darwin';
@@ -38,7 +37,7 @@ function createWindow() {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
-      const PDFViewerURL = `file://${lulumiPDFJSPath}/web/viewer.html`;
+      const PDFViewerURL = `file://${config.lulumiPDFJSPath}/web/viewer.html`;
       mainWindow.webContents.send('open-pdf', {
         location: `${PDFViewerURL}?${param}`,
         webContentsId: webContents.getId(),
@@ -48,6 +47,12 @@ function createWindow() {
         webContentsId: webContents.getId(),
       });
     }
+  });
+
+  mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
+    webPreferences.allowDisplayingInsecureContent = true;
+    webPreferences.blinkfeatures = 'OverlayScrollbars';
+    webPreferences.preload = `${config.lulumiAppPath}/pages/preload.js`;
   });
 
   mainWindow.on('scroll-touch-begin', () => {
@@ -73,7 +78,7 @@ function createWindow() {
 app.on('ready', () => {
   protocol.registerFileProtocol('lulumi', (request, callback) => {
     const url = request.url.substr(9);
-    callback({ path: path.normalize(`${lulumiPagesPath}/${url}`) });
+    callback({ path: `${config.lulumiPagesPath}/${url}` });
   }, (error) => {
     if (error) {
       // eslint-disable-next-line no-console

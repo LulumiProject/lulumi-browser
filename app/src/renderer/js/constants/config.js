@@ -1,8 +1,11 @@
-const lulumiAppPath = process.env.NODE_ENV === 'development'
+import path from 'path';
+
+let lulumiAppPath = process.env.NODE_ENV === 'development'
   ? `${__dirname}/../../../../`
   : `${__dirname}/../`;
+lulumiAppPath = path.resolve(lulumiAppPath);
 
-module.exports = {
+export default {
   lulumiPagesCustomProtocol: 'lulumi://',
   newtab: {
     defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',

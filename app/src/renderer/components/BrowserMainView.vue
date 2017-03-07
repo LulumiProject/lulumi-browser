@@ -16,7 +16,6 @@
   import urlUtil from '../js/lib/urlutil';
   import imageUtil from '../js/lib/imageutil';
   import urlResource from '../js/lib/urlresource';
-  import { lulumiPagesCustomProtocol } from '../js/constants/config';
 
   export default {
     data() {
@@ -299,7 +298,6 @@
         const { Menu, MenuItem } = this.$electron.remote;
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
-        const url = event.target.getURL();
 
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
@@ -435,15 +433,13 @@
             menu.append(new MenuItem({ type: 'separator' }));
           }
         }
-        if (!url.startsWith(lulumiPagesCustomProtocol)) {
+        const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
+        if (sourceLocation !== null) {
           menu.append(new MenuItem({
             label: 'View Source',
             click: () => {
-              const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
-              if (sourceLocation !== null) {
-                this.$store.dispatch('incrementPid');
-                this.$store.dispatch('createTab', sourceLocation);
-              }
+              this.$store.dispatch('incrementPid');
+              this.$store.dispatch('createTab', sourceLocation);
             },
           }));
         }

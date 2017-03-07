@@ -50,7 +50,7 @@ let mainConfig = {
     })
   ],
   resolve: {
-    extensions: ['.js', '.json', '.node'],
+    extensions: ['.js', '.json', '.pug'],
     modules: [
       path.join(__dirname, 'app/node_modules')
     ]

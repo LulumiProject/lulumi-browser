@@ -1,10 +1,10 @@
 <template lang="pug">
   div
-    webview(v-loading.body="page.isLoading && isCurrentPage" element-loading-text="Loading..." webpreferences="allowDisplayingInsecureContent" blinkfeatures="OverlayScrollbars" ref="webview", :class="isActive ? 'active' : 'hidden'")
-    .findinpage-bar(ref="findinpageBar" v-show="!hidden && isActive")
+    webview(v-loading.body="page.isLoading && isCurrentPage", element-loading-text="Loading...", ref="webview", :class="isActive ? 'active' : 'hidden'")
+    .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
       span(ref="findinpageCount")
-      i(ref="findinpagePreviousMatch" class="el-icon-arrow-up")
+      i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
       i(ref="findinpageNextMatch", class="el-icon-arrow-down")
       i(ref="findinpageEnd", class="el-icon-circle-close")
 </template>
