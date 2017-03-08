@@ -2,7 +2,7 @@
   "name": "lulumi-browser",
   "productName": "Lulumi-browser",
   "version": "1.0.0",
-  "electronVersion": "1.6.2",
+  "electronVersion": "1.6.3",
   "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "scripts": {
     "build": "node tasks/release.js",
