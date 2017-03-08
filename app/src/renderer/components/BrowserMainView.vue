@@ -153,7 +153,8 @@
         }
       },
       onWillDownloadAnyFile(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+        if ((this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId)
+          && (pageIndex !== this.currentPageIndex)) {
           this.$store.dispatch('closeTab', pageIndex);
         }
       },

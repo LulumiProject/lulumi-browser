@@ -108,7 +108,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       case 'lulumi.html':
         data = [
           ['Lulumi', app.getVersion()],
-          ['libchromiumcontent', process.versions['chrome']],
+          ['libchromiumcontent', process.versions.chrome],
         ];
         break;
       case 'about.html':

@@ -6,6 +6,7 @@
   "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "main": "./dist/main.js",
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "vue": "^2.2.1",
     "vue-electron": "^1.0.6",
     "vue-resource": "^1.2.1",
