@@ -1,4 +1,4 @@
-import { app, BrowserWindow, systemPreferences, protocol } from 'electron';
+import { app, BrowserWindow, systemPreferences, protocol, ipcMain } from 'electron';
 import menu from '../browser/menu';
 import config from '../renderer/js/constants/config';
 
@@ -98,4 +98,30 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.on('lulumi-scheme-loaded', (event, val) => {
+  const [type, param] = val;
+  let data = null;
+  if (type === 'about') {
+    switch (param) {
+      case 'lulumi.html':
+        data = [
+          ['Lulumi', app.getVersion()],
+          ['libchromiumcontent', process.versions['chrome']],
+        ];
+        break;
+      case 'about.html':
+        data = [
+          ['about:about', 'about.html'],
+          ['about:lulumi', 'lulumi.html'],
+        ];
+        break;
+      default:
+        data = 'Todo';
+        break;
+    }
+  }
+  // TODO: It's weird that I have to add setTimeout to make it work.
+  setTimeout(() => event.sender.send('sent-data', data), 100);
 });

@@ -7,6 +7,8 @@ function getLulumiExtUrl(relativeUrl) {
 const urlResource = {
   aboutUrls(url) {
     switch (url) {
+      case 'about:lulumi':
+        return getLulumiExtUrl('about/lulumi');
       case 'about:about':
         return getLulumiExtUrl('about/about');
       case 'about:blank':

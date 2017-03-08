@@ -218,12 +218,6 @@
         if (location.startsWith('about:')) {
           const newLocation = urlResource.aboutUrls(location);
           this.getPage().navigateTo(newLocation);
-          this.$store.dispatch('updateTabProperties', {
-            pageIndex: this.currentPageIndex,
-            location,
-            favicon: null,
-            title: location,
-          });
         } else if (urlUtil.isNotURL(location)) {
           const newLocation = `${this.$store.getters.searchEngine}${location}`;
           this.$store.dispatch('updateLocation', newLocation);

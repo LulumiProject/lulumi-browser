@@ -48,7 +48,4 @@ export const pageFaviconUpdated = ({ commit }, pageIndex, url) => {
 export const updateLocation = ({ commit }, url) => {
   commit(types.UPDATE_LOCATION, url);
 };
-export const updateTabProperties = ({ commit }, pageIndex, url) => {
-  commit(types.UPDATE_TAB_PROPERTIES, pageIndex, url);
-};
 

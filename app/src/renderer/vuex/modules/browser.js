@@ -143,17 +143,6 @@ const mutations = {
     state.pages[state.currentPageIndex].location
       = decodeURIComponent(urlUtil.getLocationIfPDF(url));
   },
-  [types.UPDATE_TAB_PROPERTIES](state, payload) {
-    if (payload.location) {
-      state.pages[payload.pageIndex].location = payload.location;
-    }
-    if (payload.favicon) {
-      state.pages[payload.pageIndex].favicon = payload.favicon;
-    }
-    if (payload.title) {
-      state.pages[payload.pageIndex].title = payload.title;
-    }
-  },
 };
 
 export default {
