@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    webview(v-loading.body="page.isLoading && isCurrentPage", element-loading-text="Loading...", ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(element-loading-text="Loading...", ref="webview", :class="isActive ? 'active' : 'hidden'")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
       span(ref="findinpageCount")
@@ -26,9 +26,6 @@
     computed: {
       page() {
         return this.$store.getters.pages[this.pageIndex];
-      },
-      isCurrentPage() {
-        return (this.pageIndex === this.$store.getters.currentPageIndex);
       },
     },
     methods: {

@@ -1,3 +1,4 @@
+import os from 'os';
 import { app, BrowserWindow, systemPreferences, protocol, ipcMain } from 'electron';
 import menu from '../browser/menu';
 import config from '../renderer/js/constants/config';
@@ -106,9 +107,16 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   if (type === 'about') {
     switch (param) {
       case 'lulumi.html':
+        const versions = process.versions;
         data = [
           ['Lulumi', app.getVersion()],
-          ['libchromiumcontent', process.versions.chrome],
+          ['Electron', versions.electron],
+          ['Node', versions.node],
+          ['libchromiumcontent', versions.chrome],
+          ['V8', versions.v8],
+          ['os.platform', os.platform()],
+          ['os.release', os.release()],
+          ['os.arch', os.arch()],
         ];
         break;
       case 'about.html':
