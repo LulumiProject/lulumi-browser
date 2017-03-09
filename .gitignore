@@ -3,8 +3,10 @@ yarn-error.log
 app/dist/fonts/*
 app/dist/imgs/*
 app/dist/index.html
+app/dist/about.html
 app/dist/main.js
 app/dist/renderer.js
+app/dist/about.js
 app/dist/styles.css
 builds/*
 dist/*

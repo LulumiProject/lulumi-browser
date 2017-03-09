@@ -1,5 +1,6 @@
-// 將您的設定放入此檔案中以覆寫預設值和使用者設定。
+// Place your settings in this file to overwrite the default settings
 {
+    "editor.detectIndentation": false,
     "editor.tabSize": 2,
     "files.associations": {
         "*.vue": "vue"

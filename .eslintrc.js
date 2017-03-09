@@ -21,6 +21,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'import/no-extraneous-dependencies': 0,
     'no-plusplus': ["error", { "allowForLoopAfterthoughts": true }],
-    'import/extensions': 0
+    'import/extensions': 0,
+    'import/prefer-default-export': 0,
   }
 }

@@ -91,6 +91,7 @@ const mutations = {
     state.pages[payload.pageIndex].canRefresh = true;
   },
   [types.DID_STOP_LOADING](state, payload) {
+    const url = payload.webview.getURL();
     state.pages[payload.pageIndex].statusText = false;
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
     state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
@@ -98,7 +99,7 @@ const mutations = {
       state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
     }
     if (!state.pages[payload.pageIndex].location) {
-      state.pages[payload.pageIndex].location = decodeURIComponent(payload.webview.getURL());
+      state.pages[payload.pageIndex].location = decodeURIComponent(url);
     }
     if (!state.pages[payload.pageIndex].favicon) {
       if (payload.pageIndex - 1 < 0) {

@@ -11,7 +11,6 @@ import routes from './routes';
 Vue.use(Electron);
 Vue.use(Resource);
 Vue.use(Router);
-Vue.config.debug = true;
 
 // Customize Autocomplete component to match out needs
 const CustomAutocomplete = Vue.extend(Autocomplete);

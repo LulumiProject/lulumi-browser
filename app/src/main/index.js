@@ -76,18 +76,52 @@ function createWindow() {
   console.log('mainWindow opened');
 }
 
-app.on('ready', () => {
-  protocol.registerFileProtocol('lulumi', (request, callback) => {
-    const url = request.url.substr(9);
-    callback({ path: `${config.lulumiPagesPath}/${url}` });
-  }, (error) => {
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to register protocol');
-    }
+if (process.env.NODE_ENV === 'development') {
+  protocol.registerStandardSchemes(['lulumi']);
+  app.on('ready', () => {
+    protocol.registerHttpProtocol('lulumi', (request, callback) => {
+      const url = request.url.substr((config.lulumiPagesCustomProtocol).length);
+      const [type, param] = url.split('/');
+      if (type === 'about') {
+        if (param.indexOf('#') === 0) {
+          // '#blablabla'
+          callback({ url: `http://localhost:${require('../../../config').port}/about.html` });
+        } else {
+          // 'blablabla'
+          callback({ url: `http://localhost:${require('../../../config').port}/${param}` });
+        }
+      }
+    }, (error) => {
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to register protocol');
+      }
+    });
+    createWindow();
   });
-  createWindow();
-});
+} else {
+  app.on('ready', () => {
+    protocol.registerFileProtocol('lulumi', (request, callback) => {
+      const url = request.url.substr((config.lulumiPagesCustomProtocol).length);
+      const [type, param] = url.split('/');
+      if (type === 'about') {
+        if (param.indexOf('#') === 0) {
+          // '#blablabla'
+          callback({ path: `${__dirname}/about.html` });
+        } else {
+          // 'blablabla'
+          callback({ path: `${__dirname}/${param}` });
+        }
+      }
+    }, (error) => {
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to register protocol');
+      }
+    });
+    createWindow();
+  });
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -102,34 +136,31 @@ app.on('activate', () => {
 });
 
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const [type, param] = val;
-  let data = null;
+  const [type, param] = val.substr((config.lulumiPagesCustomProtocol).length).split('/');
+  const data = {};
   if (type === 'about') {
-    switch (param) {
-      case 'lulumi.html':
-        const versions = process.versions;
-        data = [
-          ['Lulumi', app.getVersion()],
-          ['Electron', versions.electron],
-          ['Node', versions.node],
-          ['libchromiumcontent', versions.chrome],
-          ['V8', versions.v8],
-          ['os.platform', os.platform()],
-          ['os.release', os.release()],
-          ['os.arch', os.arch()],
-        ];
-        break;
-      case 'about.html':
-        data = [
-          ['about:about', 'about.html'],
-          ['about:lulumi', 'lulumi.html'],
-        ];
-        break;
-      default:
-        data = 'Todo';
-        break;
-    }
+    const versions = process.versions;
+
+    data.lulumi = [
+      ['Lulumi', app.getVersion()],
+      ['Electron', versions.electron],
+      ['Node', versions.node],
+      ['libchromiumcontent', versions.chrome],
+      ['V8', versions.v8],
+      ['os.platform', os.platform()],
+      ['os.release', os.release()],
+      ['os.arch', os.arch()],
+    ];
+    data.preferences = [
+      ['test', 'test2'],
+    ];
+    data.about = [
+      [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
+      [`${config.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
+      [`${config.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
+    ];
+    global.sharedObject = {
+      guestData: data,
+    };
   }
-  // TODO: It's weird that I have to add setTimeout to make it work.
-  setTimeout(() => event.sender.send('sent-data', data), 100);
 });
