@@ -253,8 +253,22 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
   rendererConfig.devtool = ''
+  aboutConfig.devtool = ''
 
   rendererConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"'
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
+  )
+  aboutConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),

@@ -136,7 +136,7 @@ app.on('activate', () => {
 });
 
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const [type, param] = val.substr((config.lulumiPagesCustomProtocol).length).split('/');
+  const type = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
   const data = {};
   if (type === 'about') {
     const versions = process.versions;

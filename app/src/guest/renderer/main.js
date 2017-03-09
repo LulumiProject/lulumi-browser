@@ -8,6 +8,11 @@ import routes from './routes';
 Vue.use(Resource);
 Vue.use(Router);
 
+if (process.env.NODE_ENV === 'production') {
+  Vue.config.productionTip = false;
+  Vue.config.devtools = false;
+}
+
 const router = new Router({
   mode: 'history',
   scrollBehavior: () => ({ y: 0 }),

@@ -12,6 +12,11 @@ Vue.use(Electron);
 Vue.use(Resource);
 Vue.use(Router);
 
+if (process.env.NODE_ENV === 'production') {
+  Vue.config.productionTip = false;
+  Vue.config.devtools = false;
+}
+
 // Customize Autocomplete component to match out needs
 const CustomAutocomplete = Vue.extend(Autocomplete);
 const GoodCustomAutocomplete = CustomAutocomplete.extend({
