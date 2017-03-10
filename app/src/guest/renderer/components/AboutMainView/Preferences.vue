@@ -1,15 +1,18 @@
 <template lang="pug">
-  #page-wrapper
-    h1#preferences-name(ref="h1") Preferences
-    h2#preferences-desc(ref="h2")
-    li(v-for="data in datas.lulumi")
-      span(:key="data[1]") {{ `${data[0]} : ${data[1]}` }}
+  #preferences-menu
+    el-col(:span="4")
+      h5 Preferences Page
+      el-menu(theme="dark", class="el-menu-vertical-demo", :router="true")
+        div(v-for="(data, index) in datas.preferences", :key="index")
+          el-menu-item(:index="`${path}/${data[1]}`") {{ data[0] }}  
+    router-view
 </template>
 
 <script>
   export default {
     data() {
       return {
+        path: '/preferences',
         datas: this.$store.getters.about,
       };
     },
@@ -18,10 +21,9 @@
 
 <style scoped>
   html {
-    background-color: #eee
+    background-color: #eee;
   }
-  .dark-mode {
-    background-color: rgb(33, 37, 43);
-    color: lightgrey
+  #preferences-menu {
+    text-align: center;
   }
 </style>

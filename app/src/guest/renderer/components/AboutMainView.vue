@@ -18,10 +18,6 @@
 
 <style scoped>
   html {
-    background-color: #eee
-  }
-  .dark-mode {
-    background-color: rgb(33, 37, 43);
-    color: lightgrey
+    background-color: #eee;
   }
 </style>

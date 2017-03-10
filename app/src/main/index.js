@@ -142,17 +142,42 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     const versions = process.versions;
 
     data.lulumi = [
-      ['Lulumi', app.getVersion()],
-      ['Electron', versions.electron],
-      ['Node', versions.node],
-      ['libchromiumcontent', versions.chrome],
-      ['V8', versions.v8],
-      ['os.platform', os.platform()],
-      ['os.release', os.release()],
-      ['os.arch', os.arch()],
+      {
+        key: 'Lulumi',
+        value: app.getVersion(),
+      },
+      {
+        key: 'Electron',
+        value: versions.electron,
+      },
+      {
+        key: 'Node',
+        value: versions.node
+      },
+      {
+        key: 'libchromiumcontent',
+        value: versions.chrome,
+      },
+      {
+        key: 'V8',
+        value: versions.v8,
+      },
+      {
+        key: 'os.platform',
+        value: os.platform(),
+      },
+      {
+        key: 'os.release',
+        value: os.release(),
+      },
+      {
+        key: 'os.arch',
+        value: os.arch(),
+      },
     ];
     data.preferences = [
-      ['test', 'test2'],
+      ['Search Engine Provider', 'search'],
+      ['Lulumi Version', 'lulumi'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],

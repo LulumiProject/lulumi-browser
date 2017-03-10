@@ -83,7 +83,7 @@ let rendererConfig = {
     ]
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('[name].css'),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './app/index.pug',
@@ -185,7 +185,7 @@ let aboutConfig = {
     ]
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('[name].css'),
     new HtmlWebpackPlugin({
       filename: 'about.html',
       template: './app/src/guest/index.pug',
