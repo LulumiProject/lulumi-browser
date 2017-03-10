@@ -7,3 +7,5 @@ testsContext.keys().forEach(testsContext)
 // you want coverage for.
 const srcContext = require.context('../../app/src/renderer', true, /^\.\/(?!main(\.js)?$)/)
 srcContext.keys().forEach(srcContext)
+const srcGuestContext = require.context('../../app/src/guest/renderer', true, /^\.\/(?!main(\.js)?$)/)
+srcGuestContext.keys().forEach(srcGuestContext)
