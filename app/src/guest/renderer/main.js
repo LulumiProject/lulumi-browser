@@ -23,12 +23,4 @@ const router = new Router({
 new Vue({
   router,
   ...App,
-  mounted() {
-    if (window.data) {
-      this.$store.dispatch('updateAbout', window.data);
-    } else {
-      // eslint-disable-next-line no-alert
-      alert('error');
-    }
-  },
 }).$mount('#app');

@@ -1,26 +1,24 @@
 <template lang="pug">
   #page-wrapper
-    h1#about-name(ref="h1")
+    h1#about-name(ref="h1") About Page
     h2#about-desc(ref="h2")
-    li(v-for="data in datas")
+    li(v-for="data in datas.about")
       router-link(:to="`/${data[1]}`", :key="$route.path") {{ data[0] }}
 </template>
 
 <script>
-  import About from './js/about';
-
   export default {
-    computed: {
-      datas() {
-        return this.$store.getters.about.about;
-      },
+    data() {
+      return {
+        datas: this.$store.getters.about,
+      };
     },
     mounted() {
-      if (this.datas[0] !== undefined) {
-        About(this.$refs);
+      if (window.data) {
+        this.$store.dispatch('updateAbout', window.data);
       } else {
         // eslint-disable-next-line no-alert
-        alert('About.vue error');
+        alert('error');
       }
     },
   };

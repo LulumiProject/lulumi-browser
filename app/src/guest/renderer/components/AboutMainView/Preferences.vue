@@ -5,21 +5,16 @@
 </template>
 
 <script>
-  import Preferences from './js/preferences';
+  import Preferences from '../../js/preferences';
 
   export default {
     computed: {
       datas() {
-        return this.$store.getters.about.preferences;
+        return this.$store.getters.about;
       },
     },
     mounted() {
-      if (this.datas[0] !== undefined) {
-        Preferences(this.$refs, this.datas);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert('Preferences.vue error');
-      }
+      Preferences(this.$refs, this.datas.preferences);
     },
   };
 </script>

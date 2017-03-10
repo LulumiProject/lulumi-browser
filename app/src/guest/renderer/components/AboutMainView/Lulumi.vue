@@ -5,21 +5,16 @@
 </template>
 
 <script>
-  import Lulumi from './js/lulumi';
+  import Lulumi from '../../js/lulumi';
 
   export default {
     computed: {
       datas() {
-        return this.$store.getters.about.lulumi;
+        return this.$store.getters.about;
       },
     },
     mounted() {
-      if (this.datas[0] !== undefined) {
-        Lulumi(this.$refs, this.datas);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert('Lulumi.vue error');
-      }
+      Lulumi(this.$refs, this.datas.lulumi);
     },
   };
 </script>
