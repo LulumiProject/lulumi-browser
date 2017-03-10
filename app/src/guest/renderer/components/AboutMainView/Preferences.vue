@@ -1,20 +1,17 @@
 <template lang="pug">
   #page-wrapper
-    h1#preferences-name(ref="h1")
+    h1#preferences-name(ref="h1") Preferences
     h2#preferences-desc(ref="h2")
+    li(v-for="data in datas.lulumi")
+      span(:key="data[1]") {{ `${data[0]} : ${data[1]}` }}
 </template>
 
 <script>
-  import Preferences from '../../js/preferences';
-
   export default {
-    computed: {
-      datas() {
-        return this.$store.getters.about;
-      },
-    },
-    mounted() {
-      Preferences(this.$refs, this.datas.preferences);
+    data() {
+      return {
+        datas: this.$store.getters.about,
+      };
     },
   };
 </script>

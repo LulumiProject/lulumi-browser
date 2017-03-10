@@ -95,18 +95,25 @@ const mutations = {
     state.pages[payload.pageIndex].statusText = false;
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
     state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-    if (!state.pages[payload.pageIndex].title) {
-      state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
-    }
-    if (!state.pages[payload.pageIndex].location) {
-      state.pages[payload.pageIndex].location = decodeURIComponent(url);
-    }
-    if (!state.pages[payload.pageIndex].favicon) {
-      if (payload.pageIndex - 1 < 0) {
-        state.pages[payload.pageIndex].favicon = config.newtab.defaultFavicon;
-      } else {
-        state.pages[payload.pageIndex].favicon
-          = state.pages[payload.pageIndex - 1].favicon || config.newtab.defaultFavicon;
+    if (url.startsWith(config.lulumiPagesCustomProtocol)) {
+      const guestUrl = require('url').parse(url);
+      const guestHash = guestUrl.hash.substr(2);
+      state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+      state.pages[payload.pageIndex].location = url;
+    } else {
+      if (!state.pages[payload.pageIndex].title) {
+        state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
+      }
+      if (!state.pages[payload.pageIndex].location) {
+        state.pages[payload.pageIndex].location = decodeURIComponent(url);
+      }
+      if (!state.pages[payload.pageIndex].favicon) {
+        if (payload.pageIndex - 1 < 0) {
+          state.pages[payload.pageIndex].favicon = config.newtab.defaultFavicon;
+        } else {
+          state.pages[payload.pageIndex].favicon
+            = state.pages[payload.pageIndex - 1].favicon || config.newtab.defaultFavicon;
+        }
       }
     }
     state.pages[payload.pageIndex].isLoading = false;

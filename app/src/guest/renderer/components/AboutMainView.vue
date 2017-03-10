@@ -13,14 +13,6 @@
         datas: this.$store.getters.about,
       };
     },
-    mounted() {
-      if (window.data) {
-        this.$store.dispatch('updateAbout', window.data);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert('error');
-      }
-    },
   };
 </script>
 
