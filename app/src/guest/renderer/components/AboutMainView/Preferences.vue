@@ -1,11 +1,12 @@
 <template lang="pug">
-  #preferences-menu
+  el-row#preferences-menu
     el-col(:span="4")
       h5 Preferences Page
       el-menu(theme="dark", class="el-menu-vertical-demo", :router="true")
         div(v-for="(data, index) in datas.preferences", :key="index")
           el-menu-item(:index="`${path}/${data[1]}`") {{ data[0] }}  
-    router-view
+    el-col(:span="20")
+      router-view
 </template>
 
 <script>

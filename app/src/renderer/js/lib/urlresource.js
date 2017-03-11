@@ -14,8 +14,9 @@ const urlResource = {
       case 'about:about':
         return getLulumiExtUrl('about/#/');
       case 'about:blank':
-      default:
         return url;
+      default:
+        return getLulumiExtUrl('about/#/');
     }
   },
 };

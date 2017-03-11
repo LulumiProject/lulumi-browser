@@ -177,7 +177,6 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     ];
     data.preferences = [
       ['Search Engine Provider', 'search'],
-      ['Lulumi Version', 'lulumi'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],

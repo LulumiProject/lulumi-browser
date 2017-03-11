@@ -20,11 +20,6 @@ export default [
         component: require('./components/AboutMainView/Preferences/SearchEngineProvider'),
       },
       {
-        path: 'lulumi',
-        name: 'about-main-lulumi',
-        component: require('./components/AboutMainView/Lulumi'),
-      },
-      {
         path: '',
         redirect: 'search',
       },
