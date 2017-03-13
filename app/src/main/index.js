@@ -188,3 +188,23 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     };
   }
 });
+
+ipcMain.on('guest-want-data', (event, val) => {
+  switch(val) {
+    case 'searchEngineProvider':
+      mainWindow.webContents.send('get-search-engine-provider');
+      ipcMain.on('give-search-engine-provider', (e, data) => {
+        event.sender.send('guest-here-your-data', data);
+      });
+      break;
+    default:
+      break;
+  }
+});
+
+ipcMain.on('set-current-search-engine-provider', (event, val) => {
+  mainWindow.webContents.send('set-search-engine-provider', val);
+  ipcMain.on('give-search-engine-provider', (e, data) => {
+    event.sender.send('guest-here-your-data', data);
+  });
+});

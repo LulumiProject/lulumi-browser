@@ -1,44 +1,56 @@
 <template lang="pug">
   div
     h1 Search Engine Provider Page
-    el-table(:data="tableData", :default-sort = "{prop: 'name', order: 'descending'}")
-      el-table-column(prop="date", label="Default", width="180", align="center")
-      el-table-column(prop="name", label="Search Engine", sortable, width="180", align="center")
-      el-table-column(prop="address", label="Shortcut", align="center")
+    el-table(:data="tableData", :default-sort = "{prop: 'name', order: 'descending'}", :row-class-name="currentSearchEngine", @current-change="handleCurrentChange")
+      el-table-column(prop="current", label="Current", width="180", align="center")
+      el-table-column(prop="search", label="Search Engine", align="center")
+      el-table-column(prop="name", label="Name", width="180", align="center")
 </template>
 
 <script>
   export default {
     data() {
       return {
-        tableData: [
-          {
-            date: '2016-05-02',
-            name: 'A',
-            address: 'test 1',
-          },
-          {
-            date: '2016-05-04',
-            name: 'B',
-            address: 'test 2',
-          },
-          {
-            date: '2016-05-01',
-            name: 'C',
-            address: 'test3 ',
-          },
-          {
-            date: '2016-05-03',
-            name: 'D',
-            address: 'test 4',
-          },
-        ],
+        tableData: [],
       };
     },
     methods: {
-      formatter(row) {
-        return row.address;
+      // eslint-disable-next-line consistent-return
+      currentSearchEngine(row) {
+        if (row.current === 'Y') {
+          return 'activated';
+        }
       },
+      handleCurrentChange(obj) {
+        if (obj) {
+          // eslint-disable-next-line no-undef
+          ipcRenderer.send('set-current-search-engine-provider', {
+            search: obj.search,
+            name: obj.name,
+          });
+        }
+      },
+    },
+    mounted() {
+      // eslint-disable-next-line no-undef
+      ipcRenderer.send('guest-want-data', 'searchEngineProvider');
+      // eslint-disable-next-line no-undef
+      ipcRenderer.on('guest-here-your-data', (event, ret) => {
+        this.tableData = [];
+        ret.searchEngine.forEach((val) => {
+          this.tableData.push({
+            current: ret.currentSearchEngine.search === val.search ? 'Y' : 'N',
+            search: val.search,
+            name: val.name,
+          });
+        });
+      });
     },
   };
 </script>
+
+<style>
+  .el-table .activated {
+    background: #e2f0e4;
+  }
+</style>

@@ -10,5 +10,6 @@ process.once('loaded', () => {
 
     global.require = requireTmp;
     global.module = moduleTmp;
+    global.ipcRenderer = ipcRenderer;
   }
 });

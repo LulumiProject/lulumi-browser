@@ -11,7 +11,6 @@ export default [
   },
   {
     path: '/preferences',
-    name: 'about-main-preferences',
     component: require('./components/AboutMainView/Preferences'),
     children: [
       {
@@ -21,6 +20,7 @@ export default [
       },
       {
         path: '',
+        name: 'about-main-preferences',
         redirect: 'search',
       },
     ],

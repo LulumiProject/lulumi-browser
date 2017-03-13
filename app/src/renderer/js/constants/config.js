@@ -5,6 +5,17 @@ let lulumiAppPath = process.env.NODE_ENV === 'development'
   : `${__dirname}/../`;
 lulumiAppPath = path.resolve(lulumiAppPath);
 
+const searchEngine = [
+  {
+    name: 'Google',
+    search: 'https://www.google.com/search?q=',
+  },
+  {
+    name: 'Bing',
+    search: 'https://www.bing.com/search?q=',
+  },
+];
+
 export default {
   lulumiPagesCustomProtocol: 'lulumi://',
   newtab: {
@@ -14,7 +25,8 @@ export default {
   aboutPages: {
     about: 'List of about pages',
   },
-  defaultSearchEngine: 'https://www.google.com/search?q=',
+  searchEngine,
+  currentSearchEngine: searchEngine[0],
   lulumiPagesPath: `${lulumiAppPath}/pages/`,
   lulumiPDFJSPath: `${lulumiAppPath}/pdfjs/`,
   lulumiAppPath,

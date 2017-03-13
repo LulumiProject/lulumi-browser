@@ -24,7 +24,8 @@ const state = {
   pid: 0,
   pages: [createPageObject()],
   currentPageIndex: 0,
-  searchEngine: config.defaultSearchEngine,
+  searchEngine: config.searchEngine,
+  currentSearchEngine: config.currentSearchEngine,
 };
 
 const mutations = {
@@ -39,7 +40,7 @@ const mutations = {
       newUrl = url;
       state.pages.push(createPageObject(newUrl));
     } else if (url) {
-      newUrl = `${config.defaultSearchEngine}${url}`;
+      newUrl = `${config.currentSearchEngine.search}${url}`;
       state.pages.push(createPageObject(newUrl));
     } else {
       state.pages.push(createPageObject());
@@ -150,6 +151,9 @@ const mutations = {
   [types.UPDATE_LOCATION](state, url) {
     state.pages[state.currentPageIndex].location
       = decodeURIComponent(urlUtil.getLocationIfPDF(url));
+  },
+  [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state, val) {
+    state.currentSearchEngine = val;
   },
 };
 

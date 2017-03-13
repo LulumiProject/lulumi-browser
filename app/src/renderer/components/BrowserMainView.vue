@@ -220,7 +220,7 @@
           const newLocation = urlResource.aboutUrls(location);
           this.getPage().navigateTo(newLocation);
         } else if (urlUtil.isNotURL(location)) {
-          const newLocation = `${this.$store.getters.searchEngine}${location}`;
+          const newLocation = `${this.$store.getters.currentSearchEngine.search}${location}`;
           this.$store.dispatch('updateLocation', newLocation);
           this.getPage().navigateTo(newLocation);
         } else {
@@ -483,6 +483,19 @@
         if (this.onScrollTouchEdge) {
           this.onScrollTouchEdge(event);
         }
+      });
+      ipc.on('get-search-engine-provider', () => {
+        ipc.send('give-search-engine-provider', {
+          searchEngine: this.$store.getters.searchEngine,
+          currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
+      });
+      ipc.on('set-search-engine-provider', (event, val) => {
+        this.$store.dispatch('setCurrentSearchEngineProvider', val);
+        ipc.send('give-search-engine-provider', {
+          searchEngine: this.$store.getters.searchEngine,
+          currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
       });
     },
   };

@@ -85,9 +85,9 @@
         this.value = val;
       },
       onSelect(event) {
-        if (event.title === 'Google Search') {
+        if (event.title === `${this.$store.getters.currentSearchEngine.name} Search`) {
           this.$parent.onEnterLocation(
-            `${this.$store.getters.searchEngine}${encodeURIComponent(event.value)}`);
+            `${this.$store.getters.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
         } else {
           this.$parent.onEnterLocation(event.value);
         }
@@ -97,7 +97,7 @@
         const results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
-          title: 'Google Search',
+          title: `${this.$store.getters.currentSearchEngine.name} Search`,
           value: this.value,
         });
         if (results.length === 1 && urlUtil.isURL(this.value)) {
