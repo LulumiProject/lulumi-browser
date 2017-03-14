@@ -1,16 +1,16 @@
 # Lulumi-browser
 
-> Lulumi-browser is a light weight browser coded with vue and electron
+> Lulumi-browser is a light weight browser coded with Vue.js 2 and Electron.
 
 <p align="center">
-  <a href="http://i.imgur.com/RA8RbU4.png" target="_blank">
-    <img src="http://i.imgur.com/RA8RbU4.png" width="700px">
+  <a href="http://i.imgur.com/s8N4yXR.png" target="_blank">
+    <img src="http://i.imgur.com/s8N4yXR.png" width="700px">
   </a>
 </p>
 
 ## Warning
 
-### Currently, Lulumi-browser has only been tested on macOS, and might have some display problems on other platforms.
+### Currently, Lulumi-browser has only been tested on macOS, and might have some display problems on other platforms
 
 ## Build Setup
 
