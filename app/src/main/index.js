@@ -152,7 +152,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       },
       {
         key: 'Node',
-        value: versions.node
+        value: versions.node,
       },
       {
         key: 'libchromiumcontent',
@@ -191,7 +191,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
 });
 
 ipcMain.on('guest-want-data', (event, val) => {
-  switch(val) {
+  switch (val) {
     case 'searchEngineProvider':
       mainWindow.webContents.send('get-search-engine-provider');
       ipcMain.on('give-search-engine-provider', (e, data) => {
