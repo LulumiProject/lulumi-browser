@@ -16,6 +16,8 @@ const searchEngine = [
   },
 ];
 
+const homepage = 'https://github.com/qazbnm456/lulumi-browser';
+
 export default {
   lulumiPagesCustomProtocol: 'lulumi://',
   newtab: {
@@ -27,6 +29,7 @@ export default {
   },
   searchEngine,
   currentSearchEngine: searchEngine[0],
+  homepage,
   lulumiPagesPath: `${lulumiAppPath}/pages/`,
   lulumiPDFJSPath: `${lulumiAppPath}/pdfjs/`,
   lulumiAppPath,

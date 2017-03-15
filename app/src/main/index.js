@@ -177,6 +177,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     ];
     data.preferences = [
       ['Search Engine Provider', 'search'],
+      ['Homepage', 'homepage'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
@@ -197,6 +198,12 @@ ipcMain.on('guest-want-data', (event, val) => {
         event.sender.send('guest-here-your-data', data);
       });
       break;
+    case 'homepage':
+      mainWindow.webContents.send('get-homepage');
+      ipcMain.on('give-homepage', (e, data) => {
+        event.sender.send('guest-here-your-data', data);
+      });
+      break;
     default:
       break;
   }
@@ -205,6 +212,13 @@ ipcMain.on('guest-want-data', (event, val) => {
 ipcMain.on('set-current-search-engine-provider', (event, val) => {
   mainWindow.webContents.send('set-search-engine-provider', val);
   ipcMain.on('give-search-engine-provider', (e, data) => {
+    event.sender.send('guest-here-your-data', data);
+  });
+});
+
+ipcMain.on('set-homepage', (event, val) => {
+  mainWindow.webContents.send('set-homepage', val);
+  ipcMain.on('give-homepage', (e, data) => {
     event.sender.send('guest-here-your-data', data);
   });
 });

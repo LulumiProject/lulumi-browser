@@ -45,6 +45,9 @@
       currentPageIndex() {
         return this.$store.getters.currentPageIndex;
       },
+      homepage() {
+        return this.$store.getters.homepage;
+      },
     },
     methods: {
       getWebView(i) {
@@ -197,7 +200,7 @@
       },
       // navHandlers
       onClickHome() {
-        this.getPage().navigateTo();
+        this.getPage().navigateTo(this.homepage);
       },
       onClickBack() {
         if (this.getPageObject().error) {
@@ -495,6 +498,17 @@
         ipc.send('give-search-engine-provider', {
           searchEngine: this.$store.getters.searchEngine,
           currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
+      });
+      ipc.on('get-homepage', () => {
+        ipc.send('give-homepage', {
+          homepage: this.$store.getters.homepage,
+        });
+      });
+      ipc.on('set-homepage', (event, val) => {
+        this.$store.dispatch('setHomepage', val);
+        ipc.send('give-homepage', {
+          homepage: this.$store.getters.homepage,
         });
       });
     },

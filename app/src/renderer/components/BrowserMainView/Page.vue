@@ -30,7 +30,7 @@
     },
     methods: {
       navigateTo(location) {
-        this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location || 'https://github.com/qazbnm456/lulumi-browser'));
+        this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
       },
       webviewHandler(self, fnName) {
         return (event) => {

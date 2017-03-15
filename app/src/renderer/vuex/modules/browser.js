@@ -26,6 +26,7 @@ const state = {
   currentPageIndex: 0,
   searchEngine: config.searchEngine,
   currentSearchEngine: config.currentSearchEngine,
+  homepage: config.homepage,
 };
 
 const mutations = {
@@ -154,6 +155,9 @@ const mutations = {
   },
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state, val) {
     state.currentSearchEngine = val;
+  },
+  [types.SET_HOMEPAGE](state, val) {
+    state.homepage = val.homepage;
   },
 };
 

@@ -51,3 +51,6 @@ export const updateLocation = ({ commit }, url) => {
 export const setCurrentSearchEngineProvider = ({ commit }, val) => {
   commit(types.SET_CURRENT_SEARCH_ENGINE_PROVIDER, val);
 };
+export const setHomepage = ({ commit }, val) => {
+  commit(types.SET_HOMEPAGE, val);
+};

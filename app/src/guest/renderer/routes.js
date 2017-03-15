@@ -19,6 +19,11 @@ export default [
         component: require('./components/AboutMainView/Preferences/SearchEngineProvider'),
       },
       {
+        path: 'homepage',
+        name: 'about-main-preferences-homepage',
+        component: require('./components/AboutMainView/Preferences/Homepage'),
+      },
+      {
         path: '',
         name: 'about-main-preferences',
         redirect: 'search',
