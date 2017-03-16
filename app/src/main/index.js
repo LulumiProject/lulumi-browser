@@ -147,6 +147,10 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
         value: app.getVersion(),
       },
       {
+        key: 'rev',
+        value: '13b0f20',
+      },
+      {
         key: 'Electron',
         value: versions.electron,
       },
