@@ -178,6 +178,8 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     data.preferences = [
       ['Search Engine Provider', 'search'],
       ['Homepage', 'homepage'],
+      ['Downloads', 'downloads'],
+      ['Extensions', 'extensions'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
@@ -203,6 +205,10 @@ ipcMain.on('guest-want-data', (event, val) => {
       ipcMain.on('give-homepage', (e, data) => {
         event.sender.send('guest-here-your-data', data);
       });
+      break;
+    case 'downloads':
+      break;
+    case 'extensions':
       break;
     default:
       break;
