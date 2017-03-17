@@ -33,7 +33,7 @@
       // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'homepage');
       // eslint-disable-next-line no-undef
-      ipcRenderer.once('guest-here-your-data', (event, ret) => {
+      ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.homepage = ret.homepage;
       });
     },

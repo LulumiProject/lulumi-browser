@@ -48,6 +48,7 @@
       },
     },
     mounted() {
+      const webview = this.$refs.webview;
       const webviewEvents = {
         'load-commit': 'onLoadCommit',
         'did-start-loading': 'onDidStartLoading',
@@ -72,14 +73,14 @@
       };
 
       Object.keys(webviewEvents).forEach((key) => {
-        this.$refs.webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
+        webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
-      this.$refs.webview.addEventListener('context-menu', (event) => {
+      webview.addEventListener('context-menu', (event) => {
         this.$parent.onWebviewContextMenu(event);
       });
 
-      this.$refs.webview.addEventListener('wheel', (event) => {
+      webview.addEventListener('wheel', (event) => {
         if (this.$parent.onWheel) {
           this.$parent.onWheel(event);
         }
@@ -94,7 +95,7 @@
         previous: this.$refs.findinpagePreviousMatch,
         next: this.$refs.findinpageNextMatch,
         endButton: this.$refs.findinpageEnd,
-        activeWebview: this.$refs.webview,
+        activeWebview: webview,
         start: () => {
           findinpage.counter.textContent = '';
           this.hidden = false;
@@ -158,7 +159,7 @@
         }
       });
 
-      this.$refs.webview.addEventListener('found-in-page', (event) => {
+      webview.addEventListener('found-in-page', (event) => {
         if (event.result.requestId === this.requestId) {
           let text = '';
           if (event.result.matches !== undefined) {
@@ -191,32 +192,24 @@
       });
 
       ipc.on('get-search-engine-provider', (event, data) => {
-        if (this.$refs.webview.getWebContents().getId() === data.webContentsId) {
-          ipc.send('give-search-engine-provider', {
-            searchEngine: this.$store.getters.searchEngine,
-            currentSearchEngine: this.$store.getters.currentSearchEngine,
-          });
+        if (this.$parent.onGetSearchEngineProvider) {
+          this.$parent.onGetSearchEngineProvider(event, this.pageIndex, data);
         }
       });
       ipc.on('set-search-engine-provider', (event, val) => {
-        this.$store.dispatch('setCurrentSearchEngineProvider', val);
-        ipc.send('give-search-engine-provider', {
-          searchEngine: this.$store.getters.searchEngine,
-          currentSearchEngine: this.$store.getters.currentSearchEngine,
-        });
+        if (this.$parent.onSetSearchEngineProvider) {
+          this.$parent.onSetSearchEngineProvider(event, this.pageIndex, val);
+        }
       });
       ipc.on('get-homepage', (event, data) => {
-        if (this.$refs.webview.getWebContents().getId() === data.webContentsId) {
-          ipc.send('give-homepage', {
-            homepage: this.$store.getters.homepage,
-          });
+        if (this.$parent.onGetHomepage) {
+          this.$parent.onGetHomepage(event, this.pageIndex, data);
         }
       });
       ipc.on('set-homepage', (event, val) => {
-        this.$store.dispatch('setHomepage', val);
-        ipc.send('give-homepage', {
-          homepage: this.$store.getters.homepage,
-        });
+        if (this.$parent.onSetHomepage) {
+          this.$parent.onSetHomepage(event, this.pageIndex, val);
+        }
       });
 
       this.$nextTick(() => {

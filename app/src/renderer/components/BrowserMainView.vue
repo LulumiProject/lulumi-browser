@@ -187,6 +187,34 @@
       onScrollTouchEdge() {
         this.isSwipeOnEdge = true;
       },
+      onGetSearchEngineProvider(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getWebView(pageIndex).send('guest-here-your-data', {
+            searchEngine: this.$store.getters.searchEngine,
+            currentSearchEngine: this.$store.getters.currentSearchEngine,
+          });
+        }
+      },
+      onSetSearchEngineProvider(event, pageIndex, val) {
+        this.$store.dispatch('setCurrentSearchEngineProvider', val);
+        this.getWebView(pageIndex).send('guest-here-your-data', {
+          searchEngine: this.$store.getters.searchEngine,
+          currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
+      },
+      onGetHomepage(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getWebView(pageIndex).send('guest-here-your-data', {
+            homepage: this.$store.getters.homepage,
+          });
+        }
+      },
+      onSetHomepage(event, pageIndex, val) {
+        this.$store.dispatch('setHomepage', val);
+        this.getWebView(pageIndex).send('guest-here-your-data', {
+          homepage: this.$store.getters.homepage,
+        });
+      },
       // tabHandlers
       onNewTab(location) {
         this.$store.dispatch('incrementPid');

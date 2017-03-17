@@ -35,7 +35,7 @@
       // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'searchEngineProvider');
       // eslint-disable-next-line no-undef
-      ipcRenderer.once('guest-here-your-data', (event, ret) => {
+      ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.tableData = [];
         ret.searchEngine.forEach((val) => {
           this.tableData.push({

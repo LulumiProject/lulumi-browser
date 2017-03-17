@@ -203,16 +203,10 @@ ipcMain.on('guest-want-data', (event, val) => {
       mainWindow.webContents.send('get-search-engine-provider', {
         webContentsId,
       });
-      ipcMain.once('give-search-engine-provider', (e, data) => {
-        event.sender.send('guest-here-your-data', data);
-      });
       break;
     case 'homepage':
       mainWindow.webContents.send('get-homepage', {
         webContentsId,
-      });
-      ipcMain.once('give-homepage', (e, data) => {
-        event.sender.send('guest-here-your-data', data);
       });
       break;
     case 'downloads':
@@ -226,14 +220,8 @@ ipcMain.on('guest-want-data', (event, val) => {
 
 ipcMain.on('set-current-search-engine-provider', (event, val) => {
   mainWindow.webContents.send('set-search-engine-provider', val);
-  ipcMain.once('give-search-engine-provider', (e, data) => {
-    event.sender.send('guest-here-your-data', data);
-  });
 });
 
 ipcMain.on('set-homepage', (event, val) => {
   mainWindow.webContents.send('set-homepage', val);
-  ipcMain.once('give-homepage', (e, data) => {
-    event.sender.send('guest-here-your-data', data);
-  });
 });
