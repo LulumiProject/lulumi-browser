@@ -23,6 +23,7 @@
         :value="page.location",
         popper-class="my-autocomplete",
         custom-item="url-suggestion")
+    el-cascader#dropdown(expand-trigger="hover", :options="options", v-model="selectedOptions", @change="handleChange")
 </template>
 
 <script>
@@ -36,7 +37,11 @@
   import 'vue-awesome/icons/refresh';
   import 'vue-awesome/icons/times';
 
+  import { Cascader } from 'element-ui';
+
   import '../../css/el-autocomplete';
+  import '../../css/el-input';
+  import config from '../../js/constants/config';
   import urlUtil from '../../js/lib/urlutil';
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
@@ -70,10 +75,28 @@
         focused: false,
         value: '',
         suggestions: recommendTopSite,
+        selectedOptions: [],
+        options: [
+          {
+            value: 'preferences',
+            label: 'Preferences',
+          },
+          {
+            value: 'help',
+            label: 'Help',
+            children: [
+              {
+                value: 'lulumi',
+                label: 'About Lulumi',
+              },
+            ],
+          },
+        ],
       };
     },
     components: {
       Icon,
+      'el-cascader': Cascader,
     },
     computed: {
       page() {
@@ -110,6 +133,9 @@
       },
       createFilter(queryString) {
         return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
+      },
+      handleChange(val) {
+        this.$parent.onNewTab(`${config.lulumiPagesCustomProtocol}about/#/${val.pop()}`);
       },
     },
   };
@@ -167,5 +193,10 @@
   #browser-navbar a:last-child {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+  }
+
+  #dropdown {
+    width: 0px;
+    margin: 5px -5px 2px 30px;
   }
 </style>

@@ -188,9 +188,13 @@
         this.isSwipeOnEdge = true;
       },
       // tabHandlers
-      onNewTab() {
+      onNewTab(location) {
         this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab');
+        if (location) {
+          this.$store.dispatch('createTab', location);
+        } else {
+          this.$store.dispatch('createTab');
+        }
       },
       onTabClick(event, pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
@@ -486,30 +490,6 @@
         if (this.onScrollTouchEdge) {
           this.onScrollTouchEdge(event);
         }
-      });
-      ipc.on('get-search-engine-provider', () => {
-        ipc.send('give-search-engine-provider', {
-          searchEngine: this.$store.getters.searchEngine,
-          currentSearchEngine: this.$store.getters.currentSearchEngine,
-        });
-      });
-      ipc.on('set-search-engine-provider', (event, val) => {
-        this.$store.dispatch('setCurrentSearchEngineProvider', val);
-        ipc.send('give-search-engine-provider', {
-          searchEngine: this.$store.getters.searchEngine,
-          currentSearchEngine: this.$store.getters.currentSearchEngine,
-        });
-      });
-      ipc.on('get-homepage', () => {
-        ipc.send('give-homepage', {
-          homepage: this.$store.getters.homepage,
-        });
-      });
-      ipc.on('set-homepage', (event, val) => {
-        this.$store.dispatch('setHomepage', val);
-        ipc.send('give-homepage', {
-          homepage: this.$store.getters.homepage,
-        });
       });
     },
   };

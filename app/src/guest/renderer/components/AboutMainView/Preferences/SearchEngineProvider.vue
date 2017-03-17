@@ -35,7 +35,7 @@
       // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'searchEngineProvider');
       // eslint-disable-next-line no-undef
-      ipcRenderer.on('guest-here-your-data', (event, ret) => {
+      ipcRenderer.once('guest-here-your-data', (event, ret) => {
         this.tableData = [];
         ret.searchEngine.forEach((val) => {
           this.tableData.push({
@@ -45,12 +45,6 @@
           });
         });
       });
-    },
-    beforeDestroy() {
-      // eslint-disable-next-line no-undef
-      ipcRenderer.removeAllListeners([
-        'guest-here-your-data',
-      ]);
     },
   };
 </script>

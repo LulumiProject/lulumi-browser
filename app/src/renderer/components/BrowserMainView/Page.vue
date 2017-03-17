@@ -190,6 +190,35 @@
         }
       });
 
+      ipc.on('get-search-engine-provider', (event, data) => {
+        if (this.$refs.webview.getWebContents().getId() === data.webContentsId) {
+          ipc.send('give-search-engine-provider', {
+            searchEngine: this.$store.getters.searchEngine,
+            currentSearchEngine: this.$store.getters.currentSearchEngine,
+          });
+        }
+      });
+      ipc.on('set-search-engine-provider', (event, val) => {
+        this.$store.dispatch('setCurrentSearchEngineProvider', val);
+        ipc.send('give-search-engine-provider', {
+          searchEngine: this.$store.getters.searchEngine,
+          currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
+      });
+      ipc.on('get-homepage', (event, data) => {
+        if (this.$refs.webview.getWebContents().getId() === data.webContentsId) {
+          ipc.send('give-homepage', {
+            homepage: this.$store.getters.homepage,
+          });
+        }
+      });
+      ipc.on('set-homepage', (event, val) => {
+        this.$store.dispatch('setHomepage', val);
+        ipc.send('give-homepage', {
+          homepage: this.$store.getters.homepage,
+        });
+      });
+
       this.$nextTick(() => {
         // TODO: https://github.com/qazbnm456/lulumi-browser/issues/3
         setTimeout(() => this.navigateTo(this.$store.getters.pages[this.pageIndex].location), 100);
