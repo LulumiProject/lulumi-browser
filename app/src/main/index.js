@@ -148,7 +148,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       },
       {
         key: 'rev',
-        value: '13b0f20',
+        value: 'c50b4ee',
       },
       {
         key: 'Electron',
