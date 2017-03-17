@@ -37,5 +37,11 @@
         this.homepage = ret.homepage;
       });
     },
+    beforeDestroy() {		
+      // eslint-disable-next-line no-undef		
+      ipcRenderer.removeAllListeners([		
+        'guest-here-your-data',		
+      ]);		
+    },
   };
 </script>
