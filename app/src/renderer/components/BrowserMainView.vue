@@ -215,6 +215,15 @@
           homepage: this.$store.getters.homepage,
         });
       },
+      onGetTabConfig(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+        }
+      },
+      onSetTabConfig(event, pageIndex, val) {
+        this.$store.dispatch('setTabConfig', val);
+        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+      },
       // tabHandlers
       onNewTab(location) {
         this.$store.dispatch('incrementPid');

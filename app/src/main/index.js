@@ -184,6 +184,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     data.preferences = [
       ['Search Engine Provider', 'search'],
       ['Homepage', 'homepage'],
+      ['Tab', 'tab'],
       ['Downloads', 'downloads'],
       ['Extensions', 'extensions'],
     ];
@@ -211,6 +212,11 @@ ipcMain.on('guest-want-data', (event, val) => {
         webContentsId,
       });
       break;
+    case 'tabConfig':
+      mainWindow.webContents.send('get-tab-config', {
+        webContentsId,
+      });
+      break;
     case 'downloads':
       break;
     case 'extensions':
@@ -226,4 +232,8 @@ ipcMain.on('set-current-search-engine-provider', (event, val) => {
 
 ipcMain.on('set-homepage', (event, val) => {
   mainWindow.webContents.send('set-homepage', val);
+});
+
+ipcMain.on('set-tab-config', (event, val) => {
+  mainWindow.webContents.send('set-tab-config', val);
 });

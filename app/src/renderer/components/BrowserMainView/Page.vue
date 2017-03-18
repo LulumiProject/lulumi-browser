@@ -211,6 +211,16 @@
           this.$parent.onSetHomepage(event, this.pageIndex, val);
         }
       });
+      ipc.on('get-tab-config', (event, data) => {
+        if (this.$parent.onGetTabConfig) {
+          this.$parent.onGetTabConfig(event, this.pageIndex, data);
+        }
+      });
+      ipc.on('set-tab-config', (event, val) => {
+        if (this.$parent.onSetTabConfig) {
+          this.$parent.onSetTabConfig(event, this.pageIndex, val);
+        }
+      });
 
       this.$nextTick(() => {
         // TODO: https://github.com/qazbnm456/lulumi-browser/issues/3

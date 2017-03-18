@@ -24,6 +24,11 @@ export default [
         component: require('./components/AboutMainView/Preferences/Homepage'),
       },
       {
+        path: 'tab',
+        name: 'about-main-preferences-tab-config',
+        component: require('./components/AboutMainView/Preferences/TabConfig'),
+      },
+      {
         path: 'downloads',
         name: 'about-main-preferences-downloads',
         component: require('./components/AboutMainView/Preferences/Downloads'),

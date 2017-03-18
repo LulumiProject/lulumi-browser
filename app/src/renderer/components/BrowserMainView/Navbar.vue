@@ -102,15 +102,18 @@
       page() {
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
       },
+      currentSearchEngine() {
+        return this.$store.getters.currentSearchEngine;
+      },
     },
     methods: {
       onChange(val) {
         this.value = val;
       },
       onSelect(event) {
-        if (event.title === `${this.$store.getters.currentSearchEngine.name} Search`) {
+        if (event.title === `${this.currentSearchEngine.name} Search`) {
           this.$parent.onEnterLocation(
-            `${this.$store.getters.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
+            `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
         } else {
           this.$parent.onEnterLocation(event.value);
         }
@@ -120,7 +123,7 @@
         const results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
-          title: `${this.$store.getters.currentSearchEngine.name} Search`,
+          title: `${this.currentSearchEngine.name} Search`,
           value: this.value,
         });
         if (results.length === 1 && urlUtil.isURL(this.value)) {

@@ -2,10 +2,20 @@ import * as types from '../mutation-types';
 import config from '../../js/constants/config';
 import urlUtil from '../../js/lib/urlutil';
 
+const state = {
+  pid: 0,
+  pages: [],
+  currentPageIndex: 0,
+  searchEngine: config.searchEngine,
+  currentSearchEngine: config.currentSearchEngine,
+  homepage: config.homepage,
+  tabConfig: config.tabConfig,
+};
+
 function createPageObject(url) {
   return {
     pid: 0,
-    location: url || config.newtab.defaultUrl,
+    location: url || state.tabConfig.defaultUrl,
     statusText: false,
     favicon: false,
     title: null,
@@ -20,14 +30,7 @@ function createPageObject(url) {
   };
 }
 
-const state = {
-  pid: 0,
-  pages: [createPageObject()],
-  currentPageIndex: 0,
-  searchEngine: config.searchEngine,
-  currentSearchEngine: config.currentSearchEngine,
-  homepage: config.homepage,
-};
+state.pages.push(createPageObject());
 
 const mutations = {
   // global counter
@@ -111,10 +114,10 @@ const mutations = {
       }
       if (!state.pages[payload.pageIndex].favicon) {
         if (payload.pageIndex - 1 < 0) {
-          state.pages[payload.pageIndex].favicon = config.newtab.defaultFavicon;
+          state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
         } else {
           state.pages[payload.pageIndex].favicon
-            = state.pages[payload.pageIndex - 1].favicon || config.newtab.defaultFavicon;
+            = state.pages[payload.pageIndex - 1].favicon || config.tabConfig.defaultFavicon;
         }
       }
     }
@@ -158,6 +161,9 @@ const mutations = {
   },
   [types.SET_HOMEPAGE](state, val) {
     state.homepage = val.homepage;
+  },
+  [types.SET_TAB_CONFIG](state, val) {
+    state.tabConfig = val;
   },
 };
 

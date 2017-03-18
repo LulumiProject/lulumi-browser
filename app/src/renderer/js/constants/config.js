@@ -18,12 +18,14 @@ const searchEngine = [
 
 const homepage = 'https://github.com/qazbnm456/lulumi-browser';
 
+const tabConfig = {
+  defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
+  defaultFavicon: 'https://github.com/favicon.ico',
+};
+
 export default {
   lulumiPagesCustomProtocol: 'lulumi://',
-  newtab: {
-    defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
-    defaultFavicon: 'https://github.com/favicon.ico',
-  },
+  tabConfig,
   aboutPages: {
     about: 'List of about pages',
   },
