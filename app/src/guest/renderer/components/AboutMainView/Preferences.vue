@@ -5,7 +5,7 @@
       el-menu(theme="dark", class="el-menu-vertical-demo", :router="true")
         div(v-for="(data, index) in datas.preferences", :key="index")
           el-menu-item(:index="`${path}/${data[1]}`") {{ data[0] }}  
-    el-col(:span="20")
+    el-col(:span="18", :offset="1")
       router-view
 </template>
 

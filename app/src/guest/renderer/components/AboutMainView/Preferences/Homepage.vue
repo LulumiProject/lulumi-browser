@@ -3,11 +3,10 @@
     h1 Homepage
     el-input(
       placeholder="Input homepage you want",
-      icon="edit",
+      @change="setHomepage",
       v-model.trim="homepage",
       :autofocus="true",
       ref="input")
-    el-button(type="success", @click.prevent="setHomepage") Save
 </template>
 
 <script>
@@ -23,10 +22,6 @@
         ipcRenderer.send('set-homepage', {
           homepage: this.homepage,
         });
-        this.$message({
-          message: 'Saved successfully.',
-          type: 'success',
-        });
       },
     },
     mounted() {
@@ -37,11 +32,11 @@
         this.homepage = ret.homepage;
       });
     },
-    beforeDestroy() {		
-      // eslint-disable-next-line no-undef		
-      ipcRenderer.removeAllListeners([		
-        'guest-here-your-data',		
-      ]);		
+    beforeDestroy() {
+      // eslint-disable-next-line no-undef
+      ipcRenderer.removeAllListeners([
+        'guest-here-your-data',
+      ]);
     },
   };
 </script>
