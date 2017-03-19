@@ -7,6 +7,7 @@
       v-model.trim="homepage",
       :autofocus="true",
       ref="input")
+      template(slot="prepend") homepage
 </template>
 
 <script>

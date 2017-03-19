@@ -1,12 +1,24 @@
 <template lang="pug">
   div
     h1 Tab Config
-    el-input(
-      placeholder="Input default opening location you want",
-      @change="setTabConfig",
-      v-model.trim="defaultUrl",
-      :autofocus="true",
-      ref="input")
+    div
+      el-input(
+        placeholder="Input default opening location you want",
+        @change="setTabConfig",
+        v-model.trim="defaultUrl",
+        :autofocus="true",
+        ref="input")
+        template(slot="prepend") Opening Location
+    div(style="margin-top: 15px;")
+      el-input(
+        placeholder="Input default favicon location you want",
+        @change="setTabConfig",
+        v-model.trim="defaultFavicon",
+        :autofocus="true",
+        ref="input")
+        template(slot="prepend") Default Favicon
+        template(slot="append")
+          img.preview(:src="defaultFavicon")
 </template>
 
 <script>
@@ -43,3 +55,9 @@
     },
   };
 </script>
+
+<style scoped>
+  img.preview {
+    display: block;
+  }
+</style>
