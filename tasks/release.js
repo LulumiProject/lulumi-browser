@@ -7,7 +7,27 @@ const fs = require('fs')
 if (process.env.PLATFORM_TARGET === 'clean') {
   require('del').sync(['builds/*', '!.gitkeep'])
   console.log('\x1b[33m`builds` directory cleaned.\n\x1b[0m')
-} else pack()
+} else rev()
+
+/**
+ * Write rev info in production
+ */
+function rev() {
+  console.log('\x1b[34mWriting rev into app(s)...\n\x1b[0m')
+  const appConfig = require('path').resolve(__dirname ,'../app/src/renderer/js/constants/config.js')
+  fs.readFile(appConfig, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err)
+    } else {
+      const result = data.replace(/lulumiRev: ['a-z0-9]*,/, `lulumiRev: '${require('git-rev-sync').long()}',`)
+      fs.writeFile(appConfig, result, 'utf8', (err) => {
+        if (err) {
+          console.error(err)
+        } else pack()
+      });
+    }
+  })
+}
 
 /**
  * Build webpack in production
@@ -26,19 +46,6 @@ function pack () {
  */
 function build () {
   let options = require('../config').building
-
-  console.log('\x1b[34mWriting rev into app(s)...\n\x1b[0m')
-  const appConfig = require('path').resolve(__dirname ,'../app/src/renderer/js/constants/config.js')
-  fs.readFile(appConfig, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err)
-    } else {
-      const result = data.replace(/lulumiRev: ['a-z0-9]*,/, `lulumiRev: '${require('git-rev-sync').long()}',`)
-      fs.writeFile(appConfig, result, 'utf8', (err) => {
-        if (err) console.error(err)
-      });
-    }
-  })
 
   console.log('\x1b[34mBuilding electron app(s)...\n\x1b[0m')
   packager(options, (err, appPaths) => {
