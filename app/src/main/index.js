@@ -45,12 +45,10 @@ function createWindow() {
       });
     } else {
       const totalBytes = item.getTotalBytes();
-      const eTag = item.getETag();
       mainWindow.webContents.send('will-download-any-file', {
         webContentsId: webContents.getId(),
         name: item.getFilename(),
         url: item.getURL(),
-        eTag,
         totalBytes,
         isPaused: item.isPaused(),
         canResume: item.canResume(),
@@ -67,7 +65,7 @@ function createWindow() {
             console.log('Download is paused')
           } else {
             mainWindow.webContents.send('update-downloads-progress', {
-              eTag,
+              startTime: item.getStartTime(),
               getReceivedBytes: item.getReceivedBytes(),
             });
           }

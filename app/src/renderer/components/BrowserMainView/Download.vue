@@ -3,7 +3,7 @@
     #download-bar
       ul(class="download-list")
         li(v-for="(file, index) in $store.getters.downloads", :key="index", class="download-list__item")
-          a(class="download-list__item-name", src="file.url")
+          a(class="download-list__item-name", :href="`${file.url}`")
             i(class="el-icon-document") {{ file.name }}
           el-progress(type="circle", :percentage="file.percentage", :width="30", :stroke-width="3", class="download-list__item-progress")
 </template>

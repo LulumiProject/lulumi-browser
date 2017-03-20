@@ -173,7 +173,7 @@ const mutations = {
   },
   [types.UPDATE_DOWNLOADS_PROGRESS](state, file) {
     state.downloads.forEach((download) => {
-      if (download.eTag === file.eTag) {
+      if (download.startTime === file.startTime) {
         download.getReceivedBytes = file.getReceivedBytes;
         download.percentage
           = parseInt((download.getReceivedBytes / download.totalBytes) * 100, 10);

@@ -162,10 +162,10 @@
       },
       onWillDownloadAnyFile(event, pageIndex, data) {
         if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.showDownloadBar = true;
           this.$store.dispatch('createDownloadTask', {
             name: data.name,
             url: data.url,
-            eTag: data.eTag,
             totalBytes: data.totalBytes,
             isPaused: data.isPaused,
             canResume: data.canResume,
@@ -177,7 +177,7 @@
       onUpdateDownloadsProgress(event, pageIndex, data) {
         if (pageIndex === this.currentPageIndex) {
           this.$store.dispatch('updateDownloadsProgress', {
-            eTag: data.eTag,
+            startTime: data.startTime,
             getReceivedBytes: data.getReceivedBytes,
           });
         }
@@ -585,7 +585,7 @@
     bottom: 0;
     color: #555555;
     font-size: 13px;
-    left: 0;
+    float: left;
     width: auto;
     overflow-x: hidden;
     padding: 0.2em 0.5em;
