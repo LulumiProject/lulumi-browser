@@ -191,6 +191,12 @@
         }
       });
 
+      ipc.on('update-downloads-progress', (event, data) => {
+        if (this.$parent.onUpdateDownloadsProgress) {
+          this.$parent.onUpdateDownloadsProgress(event, this.pageIndex, data);
+        }
+      });
+
       ipc.on('get-search-engine-provider', (event, data) => {
         if (this.$parent.onGetSearchEngineProvider) {
           this.$parent.onGetSearchEngineProvider(event, this.pageIndex, data);

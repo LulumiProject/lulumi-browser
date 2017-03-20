@@ -44,8 +44,44 @@ function createWindow() {
         webContentsId: webContents.getId(),
       });
     } else {
+      const totalBytes = item.getTotalBytes();
+      const eTag = item.getETag();
       mainWindow.webContents.send('will-download-any-file', {
         webContentsId: webContents.getId(),
+        name: item.getFilename(),
+        url: item.getURL(),
+        eTag,
+        totalBytes,
+        isPaused: item.isPaused(),
+        canResume: item.canResume(),
+        startTime: item.getStartTime(),
+      });
+
+      item.on('updated', (event, state) => {
+        if (state === 'interrupted') {
+          // eslint-disable-next-line no-console
+          console.log('Download is interrupted but can be resumed');
+        } else if (state === 'progressing') {
+          if (item.isPaused()) {
+            // eslint-disable-next-line no-console
+            console.log('Download is paused')
+          } else {
+            mainWindow.webContents.send('update-downloads-progress', {
+              eTag,
+              getReceivedBytes: item.getReceivedBytes(),
+            });
+          }
+        }
+      });
+
+      item.on('done', (event, state) => {
+        if (state === 'completed') {
+          // eslint-disable-next-line no-console
+          console.log('Download successfully')
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(`Download failed: ${state}`)
+        }
       });
     }
   });

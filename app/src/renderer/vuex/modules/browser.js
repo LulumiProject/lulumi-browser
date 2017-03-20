@@ -10,6 +10,7 @@ const state = {
   currentSearchEngine: config.currentSearchEngine,
   homepage: config.homepage,
   tabConfig: config.tabConfig,
+  downloads: [],
 };
 
 function createPageObject(url) {
@@ -156,6 +157,7 @@ const mutations = {
     state.pages[state.currentPageIndex].location
       = decodeURIComponent(urlUtil.getLocationIfPDF(url));
   },
+  // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state, val) {
     state.currentSearchEngine = val;
   },
@@ -164,6 +166,19 @@ const mutations = {
   },
   [types.SET_TAB_CONFIG](state, val) {
     state.tabConfig = val;
+  },
+  // downloads handlers
+  [types.CREATE_DOWNLOAD_TASK](state, file) {
+    state.downloads.push(file);
+  },
+  [types.UPDATE_DOWNLOADS_PROGRESS](state, file) {
+    state.downloads.forEach((download) => {
+      if (download.eTag === file.eTag) {
+        download.getReceivedBytes = file.getReceivedBytes;
+        download.percentage
+          = parseInt((download.getReceivedBytes / download.totalBytes) * 100, 10);
+      }
+    });
   },
 };
 

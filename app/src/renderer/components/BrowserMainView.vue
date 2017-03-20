@@ -4,14 +4,17 @@
       tabs
       navbar
     page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
-    transition(name="extend")
-      .browser-page-status(v-show="page.statusText") {{ page.statusText }}
+    #footer  
+      transition(name="extend")
+        .browser-page-status(v-show="page.statusText") {{ page.statusText }}
+      download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar", @click.native="showDownloadBar = !showDownloadBar")
 </template>
 
 <script>
   import Tabs from './BrowserMainView/Tabs';
   import Navbar from './BrowserMainView/Navbar';
   import Page from './BrowserMainView/Page';
+  import Download from './BrowserMainView/Download';
 
   import urlUtil from '../js/lib/urlutil';
   import imageUtil from '../js/lib/imageutil';
@@ -27,12 +30,14 @@
         deltaY: 0,
         startTime: 0,
         time: 0,
+        showDownloadBar: true,
       };
     },
     components: {
       Tabs,
       Navbar,
       Page,
+      Download,
     },
     name: 'browser-main',
     computed: {
@@ -156,9 +161,25 @@
         }
       },
       onWillDownloadAnyFile(event, pageIndex, data) {
-        if ((this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId)
-          && (pageIndex !== this.currentPageIndex)) {
-          this.$store.dispatch('closeTab', pageIndex);
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.$store.dispatch('createDownloadTask', {
+            name: data.name,
+            url: data.url,
+            eTag: data.eTag,
+            totalBytes: data.totalBytes,
+            isPaused: data.isPaused,
+            canResume: data.canResume,
+            startTime: data.startTime,
+            percentage: 0,
+          });
+        }
+      },
+      onUpdateDownloadsProgress(event, pageIndex, data) {
+        if (pageIndex === this.currentPageIndex) {
+          this.$store.dispatch('updateDownloadsProgress', {
+            eTag: data.eTag,
+            getReceivedBytes: data.getReceivedBytes,
+          });
         }
       },
       onScrollTouchBegin(event, swipeGesture) {
@@ -550,7 +571,12 @@
     width: 100vw;
   }
 
-  .browser-page-status {
+  #footer {
+    bottom: 0;
+    position: absolute;
+  }
+
+  #footer > .browser-page-status {
     background: #F3F3F3;
     border-color: #d3d3d3;
     border-style: solid;
@@ -563,9 +589,9 @@
     width: auto;
     overflow-x: hidden;
     padding: 0.2em 0.5em;
-    position: absolute;
+    position: relative;
   }
-  .extend-enter-active {
+  #footer > .extend-enter-active {
     transition-property: text-overflow, white-space;
     transition-duration: 1s;
     text-overflow: ellipsis;

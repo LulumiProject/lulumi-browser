@@ -57,3 +57,9 @@ export const setHomepage = ({ commit }, val) => {
 export const setTabConfig = ({ commit }, val) => {
   commit(types.SET_TAB_CONFIG, val);
 };
+export const createDownloadTask = ({ commit }, file) => {
+  commit(types.CREATE_DOWNLOAD_TASK, file);
+};
+export const updateDownloadsProgress = ({ commit }, file) => {
+  commit(types.UPDATE_DOWNLOADS_PROGRESS, file);
+};
