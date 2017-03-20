@@ -325,8 +325,7 @@
             let location = el.value.slice(0, el.selectionStart);
             location += clipboard.readText();
             location += el.value.slice(el.selectionEnd);
-            this.$store.dispatch('updateLocation', location);
-            this.getPage().navigateTo(location);
+            this.onEnterLocation(location);
           },
         }));
 
