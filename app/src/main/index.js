@@ -62,7 +62,7 @@ function createWindow() {
         } else if (state === 'progressing') {
           if (item.isPaused()) {
             // eslint-disable-next-line no-console
-            console.log('Download is paused')
+            console.log('Download is paused');
           } else {
             mainWindow.webContents.send('update-downloads-progress', {
               startTime: item.getStartTime(),
@@ -75,10 +75,10 @@ function createWindow() {
       item.on('done', (event, state) => {
         if (state === 'completed') {
           // eslint-disable-next-line no-console
-          console.log('Download successfully')
+          console.log('Download successfully');
         } else {
           // eslint-disable-next-line no-console
-          console.log(`Download failed: ${state}`)
+          console.log(`Download failed: ${state}`);
         }
       });
     }

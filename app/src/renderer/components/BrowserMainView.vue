@@ -7,7 +7,7 @@
     #footer  
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}
-      download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar", @click.native="showDownloadBar = !showDownloadBar")
+      download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar", :showDownloadBar="showDownloadBar")
 </template>
 
 <script>
@@ -596,6 +596,6 @@
     transition-duration: 1s;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 40%;
+    max-width: 50vw;
   }
 </style>

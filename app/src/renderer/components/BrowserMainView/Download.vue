@@ -5,7 +5,8 @@
         li(v-for="(file, index) in $store.getters.downloads", :key="index", class="download-list__item")
           a(class="download-list__item-name", :href="`${file.url}`")
             i(class="el-icon-document") {{ file.name }}
-          el-progress(type="circle", :percentage="file.percentage", :width="30", :stroke-width="3", class="download-list__item-progress")
+          el-progress(type="circle", :percentage="file.percentage || 0", :width="30", :stroke-width="3", class="download-list__item-progress")
+      span#download-bar-close(class="el-icon-close", @click="$parent.showDownloadBar = !showDownloadBar")
 </template>
 
 <script>
@@ -14,6 +15,9 @@
   import '../../css/el-progress';
 
   export default {
+    props: [
+      'showDownloadBar',
+    ],
     components: {
       'el-progress': Progress,
     },
@@ -26,7 +30,6 @@
     border-color: #d3d3d3;
     border-style: solid;
     border-width: 1px 1px 0 0;
-    border-top-right-radius: 4px;
     bottom: 0;
     color: #555555;
     font-size: 18px;
@@ -35,6 +38,21 @@
     overflow-x: hidden;
     padding: 0.2em 0.5em;
     position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #download-bar-close {
+    font-size: 13px;
+    padding: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  #download-bar-close:before {
+    transform: scale(.7);
+  }
+  #download-bar-close:hover {
+    background: rgba(189, 189, 189, 0.57);
   }
   .download-bar-enter-active, .download-bar-leave-active {
     transition: opacity .5s;
