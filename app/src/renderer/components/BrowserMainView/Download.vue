@@ -2,24 +2,88 @@
   transition(name="download-bar")
     #download-bar
       ul(class="download-list")
-        li(v-for="(file, index) in $store.getters.downloads", :key="index", class="download-list__item")
-          a(class="download-list__item-name", :href="`${file.url}`")
-            i(class="el-icon-document") {{ file.name }}
-          el-progress(type="circle", :percentage="file.percentage || 0", :width="30", :stroke-width="3", class="download-list__item-progress")
-      span#download-bar-close(class="el-icon-close", @click="$parent.showDownloadBar = !showDownloadBar")
+        el-popover(placement="top-start", width="178", trigger="hover", popper-class="download-list__popper"
+          v-for="(file, index) in files", :key="index")
+          div {{ file.state }}
+          el-button-group(v-show="checkStateForButtonGroup(file.state)")
+            el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="mini", icon="caret-right", @click="resumeDownload(file.startTime)")
+            el-button(:disabled="file.state !== 'progressing'", v-else, :plain="true", type="warning", size="mini", icon="minus", @click="pauseDownload(file.startTime)")
+            el-button(:disabled="file.state !== 'progressing'", :plain="true", type="danger", size="mini", icon="circle-close", @click="cancelDownload(file.startTime)")
+            el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="mini", icon="document", @click="showItemInFolder(file.savePath)")
+          li(class="download-list__item", slot="reference")
+            a(class="download-list__item-name", :href="`${file.url}`")
+              i(class="el-icon-document") {{ file.name }}
+            el-progress(:status="checkStateForProgress(file.state)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
+      span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
 
 <script>
-  import { Progress } from 'element-ui';
+  import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
 
   import '../../css/el-progress';
+  import '../../css/el-popover';
 
   export default {
-    props: [
-      'showDownloadBar',
-    ],
     components: {
+      'el-button-group': ButtonGroup,
+      'el-button': Button,
       'el-progress': Progress,
+      'el-popover': Popover,
+    },
+    computed: {
+      files() {
+        // eslint-disable-next-line arrow-body-style
+        return this.$store.getters.downloads.filter((download) => {
+          return download.state !== 'hidden';
+        });
+      },
+    },
+    methods: {
+      percentage(file) {
+        return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
+      },
+      showItemInFolder(savePath) {
+        if (savePath) {
+          this.$electron.shell.showItemInFolder(savePath);
+        }
+      },
+      checkStateForButtonGroup(state) {
+        switch (state) {
+          case 'cancelled':
+          case 'interrupted':
+            return false;
+          case 'progressing':
+          case 'completed':
+          default:
+            return true;
+        }
+      },
+      checkStateForProgress(state) {
+        switch (state) {
+          case 'progressing':
+            return '';
+          case 'cancelled':
+          case 'interrupted':
+            return 'exception';
+          case 'completed':
+          default:
+            return 'success';
+        }
+      },
+      pauseDownload(startTime) {
+        this.$electron.ipcRenderer.send('pause-downloads-progress', startTime);
+      },
+      resumeDownload(startTime) {
+        this.$electron.ipcRenderer.send('resume-downloads-progress', startTime);
+      },
+      cancelDownload(startTime) {
+        this.$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
+      },
+      closeDownloadBar() {
+        if (this.$parent.onCloseDownloadBar) {
+          this.$parent.onCloseDownloadBar();
+        }
+      },
     },
   };
 </script>
@@ -53,6 +117,7 @@
   }
   #download-bar-close:hover {
     background: rgba(189, 189, 189, 0.57);
+    transform: rotate(10deg);
   }
   .download-bar-enter-active, .download-bar-leave-active {
     transition: opacity .5s;
@@ -78,15 +143,18 @@
     width: 200px;
     display: flex;
     align-items: center;
-    justify-content: space-around;;
+    justify-content: space-around;
   }
   .download-list__item-name {
     color: #48576a;
     padding-left: 4px;
     transition: color .3s;
-    width: 160px;
+  }
+  .download-list__item-name > i {
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
+    width: 160px;
   }
   .download-list__item-progress {
     right: 0;

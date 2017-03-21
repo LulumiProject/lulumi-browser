@@ -63,3 +63,9 @@ export const createDownloadTask = ({ commit }, file) => {
 export const updateDownloadsProgress = ({ commit }, file) => {
   commit(types.UPDATE_DOWNLOADS_PROGRESS, file);
 };
+export const completeDownloadsProgress = ({ commit }, file) => {
+  commit(types.COMPLETE_DOWNLOADS_PROGRESS, file);
+};
+export const closeDownloadBar = ({ commit }) => {
+  commit(types.CLOSE_DOWNLOAD_BAR);
+};

@@ -1,0 +1,5 @@
+.download-list__popper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}

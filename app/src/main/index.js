@@ -45,6 +45,7 @@ function createWindow() {
       });
     } else {
       const totalBytes = item.getTotalBytes();
+      const startTime = item.getStartTime();
       mainWindow.webContents.send('will-download-any-file', {
         webContentsId: webContents.getId(),
         name: item.getFilename(),
@@ -52,34 +53,48 @@ function createWindow() {
         totalBytes,
         isPaused: item.isPaused(),
         canResume: item.canResume(),
-        startTime: item.getStartTime(),
+        startTime,
+        state: 'init',
+      });
+
+      ipcMain.on('pause-downloads-progress', (event, remoteStartTime) => {
+        if (startTime === remoteStartTime) {
+          item.pause();
+        }
+      });
+      ipcMain.on('resume-downloads-progress', (event, remoteStartTime) => {
+        if (startTime === remoteStartTime) {
+          item.resume();
+        }
+      });
+      ipcMain.on('cancel-downloads-progress', (event, remoteStartTime) => {
+        if (startTime === remoteStartTime) {
+          item.cancel();
+        }
       });
 
       item.on('updated', (event, state) => {
-        if (state === 'interrupted') {
-          // eslint-disable-next-line no-console
-          console.log('Download is interrupted but can be resumed');
-        } else if (state === 'progressing') {
-          if (item.isPaused()) {
-            // eslint-disable-next-line no-console
-            console.log('Download is paused');
-          } else {
-            mainWindow.webContents.send('update-downloads-progress', {
-              startTime: item.getStartTime(),
-              getReceivedBytes: item.getReceivedBytes(),
-            });
-          }
-        }
+        mainWindow.webContents.send('update-downloads-progress', {
+          startTime: item.getStartTime(),
+          getReceivedBytes: item.getReceivedBytes(),
+          savePath: item.getSavePath(),
+          isPaused: item.isPaused(),
+          canResume: item.canResume(),
+          state,
+        });
       });
 
       item.on('done', (event, state) => {
-        if (state === 'completed') {
-          // eslint-disable-next-line no-console
-          console.log('Download successfully');
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(`Download failed: ${state}`);
-        }
+        ipcMain.removeAllListeners([
+          'pause-downloads-progress',
+          'resume-downloads-progress',
+          'cancel-downloads-progress',
+        ]);
+        mainWindow.webContents.send('complete-downloads-progress', {
+          name: item.getFilename(),
+          startTime: item.getStartTime(),
+          state,
+        });
       });
     }
   });

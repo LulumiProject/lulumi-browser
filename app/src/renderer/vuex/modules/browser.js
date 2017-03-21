@@ -175,9 +175,24 @@ const mutations = {
     state.downloads.forEach((download) => {
       if (download.startTime === file.startTime) {
         download.getReceivedBytes = file.getReceivedBytes;
-        download.percentage
-          = parseInt((download.getReceivedBytes / download.totalBytes) * 100, 10);
+        download.savePath = file.savePath;
+        download.isPaused = file.isPaused;
+        download.canResume = file.canResume;
+        download.state = file.state;
       }
+    });
+  },
+  [types.COMPLETE_DOWNLOADS_PROGRESS](state, file) {
+    state.downloads.forEach((download) => {
+      if (download.startTime === file.startTime) {
+        download.name = file.name;
+        download.state = file.state;
+      }
+    });
+  },
+  [types.CLOSE_DOWNLOAD_BAR](state) {
+    state.downloads.forEach((download) => {
+      download.state = 'hidden';
     });
   },
 };

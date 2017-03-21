@@ -7,7 +7,7 @@
     #footer  
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}
-      download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar", :showDownloadBar="showDownloadBar")
+      download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar")
 </template>
 
 <script>
@@ -170,7 +170,8 @@
             isPaused: data.isPaused,
             canResume: data.canResume,
             startTime: data.startTime,
-            percentage: 0,
+            getReceivedBytes: 0,
+            state: data.state,
           });
         }
       },
@@ -179,8 +180,44 @@
           this.$store.dispatch('updateDownloadsProgress', {
             startTime: data.startTime,
             getReceivedBytes: data.getReceivedBytes,
+            savePath: data.savePath,
+            isPaused: data.isPaused,
+            canResume: data.canResume,
+            state: data.state,
           });
         }
+      },
+      onCompleteDownloadsProgress(event, pageIndex, data) {
+        if (pageIndex === this.currentPageIndex) {
+          this.$store.dispatch('completeDownloadsProgress', {
+            name: data.name,
+            startTime: data.startTime,
+            state: data.state,
+          });
+          let option = null;
+          if (data.state === 'completed') {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          } else if (data.state === 'cancelled') {
+            option = {
+              title: 'Cancelled',
+              body: `${data.name} has been cancelled!`,
+            };
+          } else {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          }
+          /* eslint-disable no-new */
+          new Notification(option.title, option);
+        }
+      },
+      onCloseDownloadBar() {
+        this.showDownloadBar = false;
+        this.$store.dispatch('closeDownloadBar');
       },
       onScrollTouchBegin(event, swipeGesture) {
         if (swipeGesture) {

@@ -190,10 +190,14 @@
           this.$parent.onWillDownloadAnyFile(event, this.pageIndex, data);
         }
       });
-
       ipc.on('update-downloads-progress', (event, data) => {
         if (this.$parent.onUpdateDownloadsProgress) {
           this.$parent.onUpdateDownloadsProgress(event, this.pageIndex, data);
+        }
+      });
+      ipc.on('complete-downloads-progress', (event, data) => {
+        if (this.$parent.onCompleteDownloadsProgress) {
+          this.$parent.onCompleteDownloadsProgress(event, this.pageIndex, data);
         }
       });
 
