@@ -34,7 +34,7 @@
       files() {
         // eslint-disable-next-line arrow-body-style
         return this.$store.getters.downloads.filter((download) => {
-          return download.state !== 'hidden';
+          return download.style !== 'hidden';
         });
       },
     },
@@ -43,9 +43,7 @@
         return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
       },
       showItemInFolder(savePath) {
-        if (savePath) {
-          this.$electron.shell.showItemInFolder(savePath);
-        }
+        this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
       },
       checkStateForButtonGroup(state) {
         switch (state) {

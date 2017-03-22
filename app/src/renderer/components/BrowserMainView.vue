@@ -172,6 +172,7 @@
             startTime: data.startTime,
             getReceivedBytes: 0,
             state: data.state,
+            style: '',
           });
         }
       },
@@ -281,6 +282,11 @@
       onSetTabConfig(event, pageIndex, val) {
         this.$store.dispatch('setTabConfig', val);
         this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+      },
+      onGetDownloads(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
+        }
       },
       // tabHandlers
       onNewTab(location) {

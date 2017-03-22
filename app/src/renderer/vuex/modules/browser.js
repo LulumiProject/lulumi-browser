@@ -192,7 +192,7 @@ const mutations = {
   },
   [types.CLOSE_DOWNLOAD_BAR](state) {
     state.downloads.forEach((download) => {
-      download.state = 'hidden';
+      download.style = 'hidden';
     });
   },
 };

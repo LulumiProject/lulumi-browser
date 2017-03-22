@@ -1,5 +1,5 @@
 import os from 'os';
-import { app, BrowserWindow, systemPreferences, protocol, ipcMain } from 'electron';
+import { app, BrowserWindow, systemPreferences, protocol, ipcMain, shell } from 'electron';
 import menu from '../browser/menu';
 import config from '../renderer/js/constants/config';
 
@@ -184,6 +184,12 @@ app.on('activate', () => {
   }
 });
 
+ipcMain.on('show-item-in-folder', (event, path) => {
+  if (path) {
+    shell.showItemInFolder(path);
+  }
+});
+
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
   const data = {};
@@ -267,6 +273,9 @@ ipcMain.on('guest-want-data', (event, val) => {
       });
       break;
     case 'downloads':
+      mainWindow.webContents.send('get-downloads', {
+        webContentsId,
+      });
       break;
     case 'extensions':
       break;

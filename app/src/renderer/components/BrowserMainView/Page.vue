@@ -231,6 +231,11 @@
           this.$parent.onSetTabConfig(event, this.pageIndex, val);
         }
       });
+      ipc.on('get-downloads', (event, data) => {
+        if (this.$parent.onGetDownloads) {
+          this.$parent.onGetDownloads(event, this.pageIndex, data);
+        }
+      });
 
       this.$nextTick(() => {
         // TODO: https://github.com/qazbnm456/lulumi-browser/issues/3
