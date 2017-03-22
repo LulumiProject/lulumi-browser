@@ -1,8 +1,10 @@
 <template lang="pug">
   div
     h1 Downloads
+    el-button#downloads-clear(type="info", @click="setDownloads") Clear
     ul(class="download-list")
       li(v-for="(file, index) in files", :key="index", class="download-list__item")
+        span(class="el-icon-close", @click="setDownloads(index)")
         el-progress(:status="checkStateForProgress(file.state)", :text-inside="true", :percentage="percentage(file)", :stroke-width="18", class="download-list__item-progress")
         a(class="download-list__item-name", :href="`${file.url}`")
           i(class="el-icon-document") {{ file.name }}
@@ -33,6 +35,15 @@
       },
       percentage(file) {
         return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
+      },
+      setDownloads(index) {
+        if (index) {
+          this.files.splice(index, 1);
+        } else {
+          this.files = [];
+        }
+        // eslint-disable-next-line no-undef
+        ipcRenderer.send('set-downloads', this.files);
       },
       showItemInFolder(savePath) {
         // eslint-disable-next-line no-undef
@@ -99,11 +110,18 @@
     align-items: center;
     justify-content: space-around;
   }
+  a.download-list__item-name:link {
+    text-decoration: none;
+  }
+  a.download-list__item-name:hover {
+    color: green;
+    text-decoration: none;
+  }
   .download-list__item-name {
     color: #48576a;
     padding-left: 4px;
     transition: color .3s;
-    flex: 5
+    flex: 5;
   }
   .download-list__item-name > i {
     overflow: hidden;
@@ -114,5 +132,10 @@
   .download-list__item-progress {
     right: 0;
     flex: 1;
+  }
+  #downloads-clear {
+    top: 10px;
+    right: 50px;
+    position: absolute;
   }
 </style>

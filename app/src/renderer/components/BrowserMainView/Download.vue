@@ -11,8 +11,10 @@
             el-button(:disabled="file.state !== 'progressing'", :plain="true", type="danger", size="mini", icon="circle-close", @click="cancelDownload(file.startTime)")
             el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="mini", icon="document", @click="showItemInFolder(file.savePath)")
           li(class="download-list__item", slot="reference")
-            a(class="download-list__item-name", :href="`${file.url}`")
-              i(class="el-icon-document") {{ file.name }}
+            div(class="download-list__item-panel")
+              a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
+                i(class="el-icon-document") {{ file.name }}
+              span(class="download-list__item-description") {{ file.state === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: file.state }}
             el-progress(:status="checkStateForProgress(file.state)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
       span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
@@ -22,6 +24,7 @@
 
   import '../../css/el-progress';
   import '../../css/el-popover';
+  import prettySize from '../../js/lib/prettysize';
 
   export default {
     components: {
@@ -32,18 +35,31 @@
     },
     computed: {
       files() {
-        // eslint-disable-next-line arrow-body-style
-        return this.$store.getters.downloads.filter((download) => {
-          return download.style !== 'hidden';
-        });
+        let tmpFiles = [];
+        if (this.$store.getters.downloads.length !== 0) {
+          // eslint-disable-next-line arrow-body-style
+          tmpFiles = this.$store.getters.downloads.filter((download) => {
+            return download.style !== 'hidden';
+          });
+          tmpFiles.forEach((file) => {
+            file.totalSize = prettySize.process(file.totalBytes);
+          });
+        }
+        return tmpFiles;
       },
     },
     methods: {
+      prettyReceivedSize(size) {
+        return prettySize.process(size);
+      },
       percentage(file) {
         return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
       },
       showItemInFolder(savePath) {
         this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
+      },
+      openItem(savePath) {
+        this.$electron.ipcRenderer.send('open-item', savePath);
       },
       checkStateForButtonGroup(state) {
         switch (state) {
@@ -143,6 +159,10 @@
     align-items: center;
     justify-content: space-around;
   }
+  .download-list__item-panel {
+    display: flex;
+    flex-direction: column;
+  }
   .download-list__item-name {
     color: #48576a;
     padding-left: 4px;
@@ -153,6 +173,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 160px;
+  }
+  .download-list__item-description {
+    font-size: 13px;
   }
   .download-list__item-progress {
     right: 0;

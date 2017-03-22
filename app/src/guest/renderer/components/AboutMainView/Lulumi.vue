@@ -18,9 +18,3 @@
     },
   };
 </script>
-
-<style scoped>
-  html {
-    background-color: #eee;
-  }
-</style>

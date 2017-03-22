@@ -288,6 +288,10 @@
           this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
         }
       },
+      onSetDownloads(event, pageIndex, val) {
+        this.$store.dispatch('setDownloads', val);
+        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
+      },
       // tabHandlers
       onNewTab(location) {
         this.$store.dispatch('incrementPid');

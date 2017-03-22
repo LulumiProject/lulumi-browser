@@ -190,6 +190,12 @@ ipcMain.on('show-item-in-folder', (event, path) => {
   }
 });
 
+ipcMain.on('open-item', (event, path) => {
+  if (path) {
+    shell.openItem(path);
+  }
+});
+
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
   const data = {};
@@ -294,4 +300,8 @@ ipcMain.on('set-homepage', (event, val) => {
 
 ipcMain.on('set-tab-config', (event, val) => {
   mainWindow.webContents.send('set-tab-config', val);
+});
+
+ipcMain.on('set-downloads', (event, val) => {
+  mainWindow.webContents.send('set-downloads', val);
 });
