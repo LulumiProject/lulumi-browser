@@ -1,10 +1,10 @@
 <template lang="pug">
   div
     h1 Downloads
-    el-button#downloads-clear(type="info", @click="setDownloads") Clear
+    el-button#downloads-clear(type="info", @click="setDownloads(-1)") Clear
     ul(class="download-list")
       li(v-for="(file, index) in files", :key="index", class="download-list__item")
-        span(class="el-icon-close", @click="setDownloads(index)")
+        span(v-if="file.state !== 'progressing'", class="el-icon-close", @click="setDownloads(index)")
         el-progress(:status="checkStateForProgress(file.state)", :text-inside="true", :percentage="percentage(file)", :stroke-width="18", class="download-list__item-progress")
         a(class="download-list__item-name", :href="`${file.url}`")
           i(class="el-icon-document") {{ file.name }}
@@ -37,10 +37,13 @@
         return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
       },
       setDownloads(index) {
-        if (index) {
+        if (index !== -1) {
           this.files.splice(index, 1);
         } else {
-          this.files = [];
+          // eslint-disable-next-line arrow-body-style
+          this.files = this.files.filter((file) => {
+            return file.state === 'progressing';
+          });
         }
         // eslint-disable-next-line no-undef
         ipcRenderer.send('set-downloads', this.files);
