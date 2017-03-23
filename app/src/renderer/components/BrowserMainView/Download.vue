@@ -37,10 +37,7 @@
       files() {
         let tmpFiles = [];
         if (this.$store.getters.downloads.length !== 0) {
-          // eslint-disable-next-line arrow-body-style
-          tmpFiles = this.$store.getters.downloads.filter((download) => {
-            return download.style !== 'hidden';
-          });
+          tmpFiles = this.$store.getters.downloads.filter(download => download.style !== 'hidden');
           tmpFiles.forEach((file) => {
             file.totalSize = prettySize.process(file.totalBytes);
           });

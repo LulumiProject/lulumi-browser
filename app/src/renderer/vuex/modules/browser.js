@@ -1,6 +1,7 @@
 import * as types from '../mutation-types';
 import config from '../../js/constants/config';
 import urlUtil from '../../js/lib/urlutil';
+import timeUtil from '../../js/lib/timeutil';
 
 const state = {
   pid: 0,
@@ -125,17 +126,23 @@ const mutations = {
       if (state.history.length !== 0) {
         if (state.history[state.history.length - 1].url
           !== state.pages[payload.pageIndex].location) {
+          const date = timeUtil.getLocaleCurrentTime();
           state.history.push({
             title: state.pages[payload.pageIndex].title,
             url: state.pages[payload.pageIndex].location,
             favicon: state.pages[payload.pageIndex].favicon,
+            label: date.split(' ')[0],
+            time: date.split(' ')[1],
           });
         }
       } else {
+        const date = timeUtil.getLocaleCurrentTime();
         state.history.push({
           title: state.pages[payload.pageIndex].title,
           url: state.pages[payload.pageIndex].location,
           favicon: state.pages[payload.pageIndex].favicon,
+          label: date.split(' ')[0],
+          time: date.split(' ')[1],
         });
       }
     }
@@ -203,10 +210,8 @@ const mutations = {
         download.canResume = file.canResume;
         download.state = file.state;
         return false;
-      // eslint-disable-next-line no-else-return
-      } else {
-        return true;
       }
+      return true;
     });
   },
   [types.COMPLETE_DOWNLOADS_PROGRESS](state, file) {
@@ -219,10 +224,8 @@ const mutations = {
           download.state = file.state;
         }
         return false;
-      // eslint-disable-next-line no-else-return
-      } else {
-        return true;
       }
+      return true;
     });
   },
   [types.CLOSE_DOWNLOAD_BAR](state) {

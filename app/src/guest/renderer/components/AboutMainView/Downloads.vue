@@ -6,7 +6,7 @@
       li(v-for="(file, index) in files", :key="index", class="download-list__item")
         span(v-if="file.state !== 'progressing'", class="el-icon-close", @click="setDownloads(index)")
         el-progress(:status="checkStateForProgress(file.state)", :text-inside="true", :percentage="percentage(file)", :stroke-width="18", class="download-list__item-progress")
-        a(class="download-list__item-name", :href="`${file.url}`")
+        a(class="download-list__item-name download-list__item-link", :href="`${file.url}`")
           i(class="el-icon-document") {{ file.name }}
         el-button-group
           el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="small", icon="caret-right", @click="resumeDownload(file.startTime)")
@@ -40,10 +40,7 @@
         if (index !== -1) {
           this.files.splice(index, 1);
         } else {
-          // eslint-disable-next-line arrow-body-style
-          this.files = this.files.filter((file) => {
-            return file.state === 'progressing';
-          });
+          this.files = this.files.filter(file => file.state === 'progressing');
         }
         // eslint-disable-next-line no-undef
         ipcRenderer.send('set-downloads', this.files);
@@ -113,12 +110,11 @@
     align-items: center;
     justify-content: space-around;
   }
-  a.download-list__item-name:link {
+  a.download-list__item-link {
     text-decoration: none;
   }
-  a.download-list__item-name:hover {
+  a.download-list__item-link:hover {
     color: green;
-    text-decoration: none;
   }
   .download-list__item-name {
     color: #48576a;

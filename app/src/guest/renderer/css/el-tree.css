@@ -1,0 +1,4 @@
+.el-tree-node.is-expanded>.el-tree-node__children {
+  display: flex;
+  flex-direction: column;
+}
