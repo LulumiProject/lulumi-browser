@@ -123,9 +123,20 @@ const mutations = {
             = state.pages[payload.pageIndex - 1].favicon || config.tabConfig.defaultFavicon;
         }
       }
-      if (state.history.length !== 0) {
-        if (state.history[state.history.length - 1].url
-          !== state.pages[payload.pageIndex].location) {
+      if (state.pages[payload.pageIndex].title !== 'error') {
+        if (state.history.length !== 0) {
+          if (state.history[state.history.length - 1].url
+            !== state.pages[payload.pageIndex].location) {
+            const date = timeUtil.getLocaleCurrentTime();
+            state.history.push({
+              title: state.pages[payload.pageIndex].title,
+              url: state.pages[payload.pageIndex].location,
+              favicon: state.pages[payload.pageIndex].favicon,
+              label: date.split(' ')[0],
+              time: date.split(' ')[1],
+            });
+          }
+        } else {
           const date = timeUtil.getLocaleCurrentTime();
           state.history.push({
             title: state.pages[payload.pageIndex].title,
@@ -135,15 +146,6 @@ const mutations = {
             time: date.split(' ')[1],
           });
         }
-      } else {
-        const date = timeUtil.getLocaleCurrentTime();
-        state.history.push({
-          title: state.pages[payload.pageIndex].title,
-          url: state.pages[payload.pageIndex].location,
-          favicon: state.pages[payload.pageIndex].favicon,
-          label: date.split(' ')[0],
-          time: date.split(' ')[1],
-        });
       }
     }
     state.pages[payload.pageIndex].isLoading = false;

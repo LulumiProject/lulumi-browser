@@ -1,4 +1,8 @@
-.el-tree-node.is-expanded>.el-tree-node__children {
+.el-tree-node.is-expanded > .el-tree-node__children {
   display: flex;
   flex-direction: column;
+}
+.el-tree-node.is-expanded > .el-tree-node__content {
+  display: flex;
+  align-items: center;
 }

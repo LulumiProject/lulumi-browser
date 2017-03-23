@@ -1,11 +1,18 @@
 <template lang="pug">
   div
-    h1 History
-    el-button#history-clear(type="info", @click="setHistory(-1)") Clear
-    div {{ `History is ${sync === true ? 'syncing' : 'not syncing'}...&nbsp;` }}
-    el-switch(@change="toggleSync", v-model="sync", on-color="#13ce66", off-color="#ff4949")
-    el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", placeholder="Input keyword", v-model="filterText")
-    el-tree(ref="tree", empty-text="No data...", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
+    el-row(type="flex", align="middle")
+      el-col(:span="4")
+        h1 History
+      el-col(:span="4")
+        div {{ `History is ${sync === true ? 'syncing' : 'not syncing'}...&nbsp;` }}
+        el-switch(@change="toggleSync", v-model="sync", on-color="#13ce66", off-color="#ff4949")
+      el-col(:span="12")
+        el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", placeholder="Input keyword", v-model="filterText")
+      el-col(:span="2")
+        el-button(:disabled="sync", type="info", @click="setHistory") Clear
+    el-row
+      el-col(:span="24")
+        el-tree(ref="tree", empty-text="No data...", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
 </template>
 
 <script>
@@ -48,16 +55,16 @@
           this.clear();
         }
       },
-      setHistory(index) {
-        if (index !== -1) {
-          this.history.splice(index, 1);
+      setHistory() {
+        const checkedNodes = this.$refs.tree.getCheckedNodes();
+        if (checkedNodes.length) {
+          checkedNodes.forEach((element) => {
+            this.history[element.id].flag = true;
+          });
+          this.history = this.history.filter(element => element.flag === undefined);
+          // this.$message.error('Not implemented...');
         } else {
-          const checkedNodes = this.$refs.tree.getCheckedNodes();
-          if (checkedNodes.length) {
-            this.$message.error('Not implemented...');
-          } else {
-            this.history = [];
-          }
+          this.history = [];
         }
         // eslint-disable-next-line no-undef
         ipcRenderer.send('set-history', this.history);
@@ -82,7 +89,7 @@
           cur = history[i];
           curLabel = cur.label;
           if (!(curLabel in labels)) {
-            labels[curLabel] = { label: curLabel, children: [] };
+            labels[curLabel] = { label: curLabel, children: [], id: i };
             newArr.push(labels[curLabel]);
           }
           cur.id = i;
@@ -145,16 +152,5 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 60%;
-  }
-  #history-clear {
-    top: 10px;
-    right: 50px;
-    position: absolute;
-  }
-  #history-filter {
-    top: 10px;
-    right: 400px;
-    width: 350px;
-    position: absolute;
   }
 </style>
