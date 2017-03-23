@@ -246,13 +246,14 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       ['Search Engine Provider', 'search'],
       ['Homepage', 'homepage'],
       ['Tab', 'tab'],
-      ['Downloads', 'downloads'],
-      ['Extensions', 'extensions'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
       [`${config.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
       [`${config.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
+      [`${config.lulumiPagesCustomProtocol}about/#/downloads`, 'downloads'],
+      [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
+      [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
     global.sharedObject = {
       guestData: data,
@@ -283,6 +284,11 @@ ipcMain.on('guest-want-data', (event, val) => {
         webContentsId,
       });
       break;
+    case 'history':
+      mainWindow.webContents.send('get-history', {
+        webContentsId,
+      });
+      break;
     case 'extensions':
       break;
     default:
@@ -304,4 +310,8 @@ ipcMain.on('set-tab-config', (event, val) => {
 
 ipcMain.on('set-downloads', (event, val) => {
   mainWindow.webContents.send('set-downloads', val);
+});
+
+ipcMain.on('set-history', (event, val) => {
+  mainWindow.webContents.send('set-history', val);
 });

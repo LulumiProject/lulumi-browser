@@ -11,6 +11,7 @@ const state = {
   homepage: config.homepage,
   tabConfig: config.tabConfig,
   downloads: [],
+  history: [],
 };
 
 function createPageObject(url) {
@@ -121,6 +122,22 @@ const mutations = {
             = state.pages[payload.pageIndex - 1].favicon || config.tabConfig.defaultFavicon;
         }
       }
+      if (state.history.length !== 0) {
+        if (state.history[state.history.length - 1].url
+          !== state.pages[payload.pageIndex].location) {
+          state.history.push({
+            title: state.pages[payload.pageIndex].title,
+            url: state.pages[payload.pageIndex].location,
+            favicon: state.pages[payload.pageIndex].favicon,
+          });
+        }
+      } else {
+        state.history.push({
+          title: state.pages[payload.pageIndex].title,
+          url: state.pages[payload.pageIndex].location,
+          favicon: state.pages[payload.pageIndex].favicon,
+        });
+      }
     }
     state.pages[payload.pageIndex].isLoading = false;
   },
@@ -169,6 +186,9 @@ const mutations = {
   },
   [types.SET_DOWNLOADS](state, val) {
     state.downloads = val;
+  },
+  [types.SET_HISTORY](state, val) {
+    state.history = val;
   },
   // downloads handlers
   [types.CREATE_DOWNLOAD_TASK](state, file) {

@@ -5,3 +5,4 @@ export const currentSearchEngine = state => state.browser.currentSearchEngine;
 export const homepage = state => state.browser.homepage;
 export const tabConfig = state => state.browser.tabConfig;
 export const downloads = state => state.browser.downloads;
+export const history = state => state.browser.history;

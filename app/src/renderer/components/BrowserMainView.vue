@@ -292,6 +292,15 @@
         this.$store.dispatch('setDownloads', val);
         this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
       },
+      onGetHistory(event, pageIndex, data) {
+        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
+        }
+      },
+      onSetHistory(event, pageIndex, val) {
+        this.$store.dispatch('setHistory', val);
+        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
+      },
       // tabHandlers
       onNewTab(location) {
         this.$store.dispatch('incrementPid');
@@ -328,15 +337,17 @@
         this.getWebView().reload();
       },
       onEnterLocation(location) {
+        let newLocation = null;
         if (location.startsWith('about:')) {
-          const newLocation = urlResource.aboutUrls(location);
+          newLocation = urlResource.aboutUrls(location);
           this.getPage().navigateTo(newLocation);
         } else if (urlUtil.isNotURL(location)) {
-          const newLocation = `${this.$store.getters.currentSearchEngine.search}${location}`;
+          newLocation = `${this.$store.getters.currentSearchEngine.search}${location}`;
           this.$store.dispatch('updateLocation', newLocation);
           this.getPage().navigateTo(newLocation);
         } else {
-          this.getPage().navigateTo(location);
+          newLocation = location;
+          this.getPage().navigateTo(newLocation);
         }
       },
       // onTabContextMenu

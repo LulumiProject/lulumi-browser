@@ -241,6 +241,16 @@
           this.$parent.onSetDownloads(event, this.pageIndex, val);
         }
       });
+      ipc.on('get-history', (event, data) => {
+        if (this.$parent.onGetHistory) {
+          this.$parent.onGetHistory(event, this.pageIndex, data);
+        }
+      });
+      ipc.on('set-history', (event, val) => {
+        if (this.$parent.onSetHistory) {
+          this.$parent.onSetHistory(event, this.pageIndex, val);
+        }
+      });
 
       this.$nextTick(() => {
         // TODO: https://github.com/qazbnm456/lulumi-browser/issues/3

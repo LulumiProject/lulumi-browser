@@ -60,6 +60,9 @@ export const setTabConfig = ({ commit }, val) => {
 export const setDownloads = ({ commit }, val) => {
   commit(types.SET_DOWNLOADS, val);
 };
+export const setHistory = ({ commit }, val) => {
+  commit(types.SET_HISTORY, val);
+};
 export const createDownloadTask = ({ commit }, file) => {
   commit(types.CREATE_DOWNLOAD_TASK, file);
 };

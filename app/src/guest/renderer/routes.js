@@ -29,21 +29,26 @@ export default [
         component: require('./components/AboutMainView/Preferences/TabConfig'),
       },
       {
-        path: 'downloads',
-        name: 'about-main-preferences-downloads',
-        component: require('./components/AboutMainView/Preferences/Downloads'),
-      },
-      {
-        path: 'extensions',
-        name: 'about-main-preferences-extensions',
-        component: require('./components/AboutMainView/Preferences/Extensions'),
-      },
-      {
         path: '',
         name: 'about-main-preferences',
         redirect: 'search',
       },
     ],
+  },
+  {
+    path: '/downloads',
+    name: 'about-main-downloads',
+    component: require('./components/AboutMainView/Downloads'),
+  },
+  {
+    path: '/history',
+    name: 'about-main-history',
+    component: require('./components/AboutMainView/History'),
+  },
+  {
+    path: '/extensions',
+    name: 'about-main-extensions',
+    component: require('./components/AboutMainView/Extensions'),
   },
   {
     path: '*',

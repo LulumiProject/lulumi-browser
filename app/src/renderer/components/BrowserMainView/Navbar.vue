@@ -82,6 +82,18 @@
             label: 'Preferences',
           },
           {
+            value: 'downloads',
+            label: 'downloads',
+          },
+          {
+            value: 'history',
+            label: 'history',
+          },
+          {
+            value: 'extensions',
+            label: 'extensions',
+          },
+          {
             value: 'help',
             label: 'Help',
             children: [
