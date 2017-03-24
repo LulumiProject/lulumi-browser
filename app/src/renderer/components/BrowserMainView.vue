@@ -293,8 +293,6 @@
         this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
       },
       onGetHistory(event, pageIndex, data) {
-        // eslint-disable-next-line no-console
-        console.log(pageIndex);
         if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
           this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
         }
