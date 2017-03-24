@@ -1,9 +1,18 @@
+import fs from 'fs';
 import os from 'os';
+import path from 'path';
 import { app, BrowserWindow, systemPreferences, protocol, ipcMain, shell } from 'electron';
 import menu from '../browser/menu';
 import config from '../renderer/js/constants/config';
+import promisify from '../renderer/js/lib/promisify';
 
 let mainWindow;
+
+let shuttingDown = false;
+const storagePath = process.env.NODE_ENV === 'development'
+  ? path.join(process.env.HOME, '.lulumi-test-app-state')
+  : path.join(app.getPath('userData'), 'app-state');
+
 const isDarwin = process.platform === 'darwin';
 const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
 
@@ -121,6 +130,26 @@ function createWindow() {
     mainWindow = null;
   });
 
+  new Promise((resolve, reject) => {
+    let data = null;
+    try {
+      data = fs.readFileSync(storagePath, 'utf-8');
+    } catch(event) {}
+
+    try {
+      data = JSON.parse(data);
+      resolve(data);
+    } catch (event) {
+      if (data) {
+        console.log(`could not parse data: ${data}, ${event}`);
+      }
+    }
+  }).then((data) => {
+    setTimeout(() => {
+      mainWindow.webContents.send('set-app-state', data);
+    }, 3000);
+  });
+
   // eslint-disable-next-line no-console
   console.log('mainWindow opened');
 }
@@ -182,6 +211,29 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+app.on('before-quit', (event) => {
+  if (shuttingDown) {
+    return;
+  }
+  event.preventDefault();
+  mainWindow.webContents.send('request-app-state');
+});
+
+ipcMain.on('response-app-state', (event, data) => {
+  if (data.ready) {
+    promisify(fs.writeFile, storagePath, JSON.stringify(data.newState))
+      .then(() => {
+        shuttingDown = true;
+        app.quit();
+      });
+  } else {
+    app.exit(0);
+  }
+  setTimeout(() => {
+    app.exit(0);
+  }, 3000);
 });
 
 ipcMain.on('show-item-in-folder', (event, path) => {

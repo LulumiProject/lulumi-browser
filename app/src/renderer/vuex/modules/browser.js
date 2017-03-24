@@ -33,6 +33,7 @@ function createPageObject(url) {
   };
 }
 
+// eslint-disable-next-line no-console
 state.pages.push(createPageObject());
 
 const mutations = {
@@ -234,6 +235,18 @@ const mutations = {
     state.downloads.forEach((download) => {
       download.style = 'hidden';
     });
+  },
+  // app state
+  [types.SET_APP_STATE](state, newState) {
+    state.pid = newState.pid;
+    state.pages = newState.pages;
+    state.currentPageIndex = newState.currentPageIndex;
+    state.searchEngine = config.searchEngine;
+    state.currentSearchEngine = newState.currentSearchEngine;
+    state.homepage = newState.homepage;
+    state.tabConfig = newState.tabConfig;
+    state.downloads = newState.downloads;
+    state.history = newState.history;
   },
 };
 

@@ -173,6 +173,7 @@
           }
         }
       });
+
       ipc.on('startFindInPage', () => {
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
           findinpage.start();

@@ -293,6 +293,8 @@
         this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
       },
       onGetHistory(event, pageIndex, data) {
+        // eslint-disable-next-line no-console
+        console.log(pageIndex);
         if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
           this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
         }
@@ -570,6 +572,15 @@
         menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
     },
+    beforeMount() {
+      const ipc = this.$electron.ipcRenderer;
+
+      ipc.on('set-app-state', (event, newState) => {
+        if (Object.keys(newState).length !== 0) {
+          this.$store.dispatch('setAppState', newState);
+        }
+      });
+    },
     mounted() {
       const ipc = this.$electron.ipcRenderer;
 
@@ -590,6 +601,56 @@
       this.onWebviewContextMenu.bind(this);
       this.onScrollTouchBegin.bind(this);
       this.onScrollTouchEnd.bind(this);
+
+      ipc.on('request-app-state', () => {
+        this.pages.map((page, index) => {
+          page.id = index;
+          return true;
+        });
+        const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
+        if (downloads.length !== 0) {
+          this.$electron.remote.dialog.showMessageBox({
+            type: 'warning',
+            title: 'Warning',
+            message: 'You still have some files progressing.',
+            buttons: ['Abort and Leave', 'Cancel'],
+          }, (index) => {
+            if (index === 0) {
+              downloads.map((download) => {
+                this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
+                return true;
+              });
+              ipc.send('response-app-state', {
+                ready: true,
+                newState: {
+                  pid: this.pages.length - 1,
+                  pages: this.pages,
+                  currentPageIndex: this.currentPageIndex,
+                  currentSearchEngine: this.$store.getters.currentSearchEngine,
+                  homepage: this.$store.getters.homepage,
+                  tabConfig: this.$store.getters.tabConfig,
+                  downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
+                  history: this.$store.getters.history,
+                },
+              });
+            }
+          });
+        } else {
+          ipc.send('response-app-state', {
+            ready: true,
+            newState: {
+              pid: this.pages.length - 1,
+              pages: this.pages,
+              currentPageIndex: this.currentPageIndex,
+              currentSearchEngine: this.$store.getters.currentSearchEngine,
+              homepage: this.$store.getters.homepage,
+              tabConfig: this.$store.getters.tabConfig,
+              downloads: this.$store.getters.downloads,
+              history: this.$store.getters.history,
+            },
+          });
+        }
+      });
 
       ipc.on('scroll-touch-begin', (event, swipeGesture) => {
         if (this.onScrollTouchBegin) {
