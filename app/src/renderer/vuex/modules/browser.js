@@ -33,7 +33,6 @@ function createPageObject(url) {
   };
 }
 
-// eslint-disable-next-line no-console
 state.pages.push(createPageObject());
 
 const mutations = {

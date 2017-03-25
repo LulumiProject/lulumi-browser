@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     #nav
-      tabs
+      tabs(ref="tab")
       navbar
     page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
     #footer  
@@ -601,7 +601,23 @@
       this.onScrollTouchEnd.bind(this);
 
       ipc.on('request-app-state', () => {
+        const newPages = [];
         this.pages.map((page, index) => {
+          newPages[index] = page;
+          return true;
+        });
+        this.pages.map((page, index) => {
+          let tmp = null;
+          if (this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex) {
+            tmp = newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.newIndex];
+            newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.newIndex]
+              = newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex];
+            newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex]
+              = tmp;
+          }
+          return true;
+        });
+        newPages.map((page, index) => {
           page.id = index;
           return true;
         });
@@ -622,7 +638,7 @@
                 ready: true,
                 newState: {
                   pid: this.pages.length - 1,
-                  pages: this.pages,
+                  pages: newPages,
                   currentPageIndex: this.currentPageIndex,
                   currentSearchEngine: this.$store.getters.currentSearchEngine,
                   homepage: this.$store.getters.homepage,
@@ -638,7 +654,7 @@
             ready: true,
             newState: {
               pid: this.pages.length - 1,
-              pages: this.pages,
+              pages: newPages,
               currentPageIndex: this.currentPageIndex,
               currentSearchEngine: this.$store.getters.currentSearchEngine,
               homepage: this.$store.getters.homepage,

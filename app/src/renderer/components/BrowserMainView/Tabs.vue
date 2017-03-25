@@ -1,7 +1,7 @@
 <template lang="pug">
   #browser-tabs(v-sortable="", @dblclick="$electron.remote.getCurrentWindow().maximize()")
     .window-buttons
-    .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''")
+    .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''", :id="`${i}`", :ref="`tab-${i}`")
       <transition name="fade">
         div#tab-icons(@click="$parent.onToggleAudio($event, i, !page.isAudioMuted)")
           i.el-icon-loading(v-if="page.isLoading")
@@ -10,7 +10,7 @@
           icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted")
       </transition>
       el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
-        span(:id="`${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt($event.target.id))", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
+        span(:id="`span-${i}`", @mousemove.stop="onMouseMove", @mouseleave.stop="onMouseLeave", @click="$parent.onTabClick($event, parseInt(($event.target.id).split('-')[1]), 10)", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
           | {{ page.title || 'loading' }}
       a.close(@click="onClose")
         icon(name="times")
@@ -35,6 +35,13 @@
             draggable: '.browser-tab',
             animation: 150,
             ghostClass: 'ghost',
+            onUpdate(event) {
+              const item = event.item;
+              if (!item.dataset.oldIndex) {
+                item.dataset.oldIndex = event.oldIndex;
+              }
+              item.dataset.newIndex = event.newIndex;
+            },
           });
         },
       },
@@ -56,15 +63,15 @@
       onClose(event) {
         let id = null;
         try {
-          id = event.target.previousSibling.id;
+          id = parseInt((event.target.previousSibling.id).split('-')[1], 10);
         } catch (e) {
           try {
-            id = event.target.parentNode.previousSibling.id;
+            id = parseInt((event.target.parentNode.previousSibling.id).split('-')[1], 10);
           } catch (e) {
-            id = event.target.parentNode.parentNode.previousSibling.id;
+            id = parseInt((event.target.parentNode.parentNode.previousSibling.id).split('-')[1], 10);
           }
         }
-        this.$parent.onTabClose(event, parseInt(id, 10));
+        this.$parent.onTabClose(event, id);
       },
       onMouseMove(event) {
         const x = event.pageX - event.target.offsetLeft;
