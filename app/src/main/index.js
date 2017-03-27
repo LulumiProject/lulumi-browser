@@ -21,6 +21,10 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}`
   : `file://${__dirname}/index.html`;
 
+function appStateSave() {
+  mainWindow.webContents.send('request-app-state');
+}
+
 function createWindow() {
   /**
    * Initial window options
@@ -136,13 +140,16 @@ function createWindow() {
     let data = null;
     try {
       data = fs.readFileSync(storagePath, 'utf-8');
-    } catch(event) {}
+    // eslint-disable-next-line no-empty
+    } catch (event) {}
 
     try {
       data = JSON.parse(data);
       resolve(data);
     } catch (event) {
       if (data) {
+        reject();
+        // eslint-disable-next-line no-console
         console.log(`could not parse data: ${data}, ${event}`);
       }
     }
@@ -157,10 +164,6 @@ function createWindow() {
 
   // eslint-disable-next-line no-console
   console.log('mainWindow opened');
-}
-
-function appStateSave() {
-  mainWindow.webContents.send('request-app-state');
 }
 
 if (process.env.NODE_ENV === 'development') {
@@ -236,7 +239,7 @@ ipcMain.on('response-app-state', (event, data) => {
   if (data.ready) {
     promisify(fs.writeFile, storagePath, JSON.stringify(data.newState))
       .then(() => {
-        if (appStateSaveHandler == null) {
+        if (appStateSaveHandler === null) {
           shuttingDown = true;
           app.quit();
         }

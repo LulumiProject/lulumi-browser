@@ -676,7 +676,7 @@
         const newPages = [];
         const newIndex = Math.ceil(Math.random() * 10000);
         this.pages.map((page, index) => {
-          newPages[index] = page;
+          newPages[index] = Object.assign({}, page);
           return true;
         });
         this.pages.map((page, index) => {

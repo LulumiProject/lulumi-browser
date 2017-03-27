@@ -151,6 +151,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 60%;
+    width: 600px;
   }
 </style>

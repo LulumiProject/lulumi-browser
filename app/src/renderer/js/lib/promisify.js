@@ -1,7 +1,4 @@
-export default (func, ...promisifyArgs) => {
-  return new Promise((resolve, reject) => {
-    func(...promisifyArgs, (err, ...cbRest) => {
-      return err ? reject(err) : resolve(cbRest);
-    });
-  });
-};
+export default (func, ...promisifyArgs) => new Promise((resolve, reject) => {
+  // eslint-disable-next-line no-confusing-arrow
+  func(...promisifyArgs, (err, ...cbRest) => err ? reject(err) : resolve(cbRest));
+});
