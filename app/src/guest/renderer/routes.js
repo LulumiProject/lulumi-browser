@@ -24,6 +24,11 @@ export default [
         component: require('./components/AboutMainView/Preferences/Homepage'),
       },
       {
+        path: 'pdfViewer',
+        name: 'about-main-preferences-pdfViewer',
+        component: require('./components/AboutMainView/Preferences/PDFViewer'),
+      },
+      {
         path: 'tab',
         name: 'about-main-preferences-tab-config',
         component: require('./components/AboutMainView/Preferences/TabConfig'),

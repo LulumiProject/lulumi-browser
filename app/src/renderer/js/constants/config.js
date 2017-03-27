@@ -17,6 +17,7 @@ const searchEngine = [
 ];
 
 const homepage = 'https://github.com/qazbnm456/lulumi-browser';
+const pdfViewer = 'pdf-viewer';
 
 const tabConfig = {
   defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
@@ -32,8 +33,9 @@ export default {
   searchEngine,
   currentSearchEngine: searchEngine[0],
   homepage,
+  pdfViewer,
   lulumiPagesPath: `${lulumiAppPath}/pages/`,
   lulumiPDFJSPath: `${lulumiAppPath}/pdfjs/`,
   lulumiAppPath,
-  lulumiRev: '89b011b2bc8655e67c7a71eeffc897cbd702714c',
+  lulumiRev: '8ec00eb36d1d72ee38e395211bab52d2f9324631',
 };

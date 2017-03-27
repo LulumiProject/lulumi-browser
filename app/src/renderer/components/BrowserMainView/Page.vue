@@ -222,6 +222,16 @@
           this.$parent.onSetHomepage(event, this.pageIndex, val);
         }
       });
+      ipc.on('get-pdf-viewer', (event, data) => {
+        if (this.$parent.onGetPDFViewer) {
+          this.$parent.onGetPDFViewer(event, this.pageIndex, data);
+        }
+      });
+      ipc.on('set-pdf-viewer', (event, val) => {
+        if (this.$parent.onSetPDFViewer) {
+          this.$parent.onSetPDFViewer(event, this.pageIndex, val);
+        }
+      });
       ipc.on('get-tab-config', (event, data) => {
         if (this.$parent.onGetTabConfig) {
           this.$parent.onGetTabConfig(event, this.pageIndex, data);

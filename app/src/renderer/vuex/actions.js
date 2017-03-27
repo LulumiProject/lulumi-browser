@@ -54,6 +54,9 @@ export const setCurrentSearchEngineProvider = ({ commit }, val) => {
 export const setHomepage = ({ commit }, val) => {
   commit(types.SET_HOMEPAGE, val);
 };
+export const setPDFViewer = ({ commit }, val) => {
+  commit(types.SET_PDF_VIEWER, val);
+};
 export const setTabConfig = ({ commit }, val) => {
   commit(types.SET_TAB_CONFIG, val);
 };

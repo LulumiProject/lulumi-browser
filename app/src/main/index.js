@@ -44,7 +44,8 @@ function createWindow() {
     const itemURL = item.getURL();
     if (item.getMimeType() === 'application/pdf'
       && itemURL.indexOf('blob:') !== 0
-      && itemURL.indexOf('#pdfjs.action=download') === -1) {
+      && itemURL.indexOf('#pdfjs.action=download') === -1
+      && itemURL.indexOf('skip=true') === -1) {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
@@ -306,6 +307,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     data.preferences = [
       ['Search Engine Provider', 'search'],
       ['Homepage', 'homepage'],
+      ['PDFViewer', 'pdfViewer'],
       ['Tab', 'tab'],
     ];
     data.about = [
@@ -332,6 +334,11 @@ ipcMain.on('guest-want-data', (event, val) => {
       break;
     case 'homepage':
       mainWindow.webContents.send('get-homepage', {
+        webContentsId,
+      });
+      break;
+    case 'pdfViewer':
+      mainWindow.webContents.send('get-pdf-viewer', {
         webContentsId,
       });
       break;
@@ -363,6 +370,10 @@ ipcMain.on('set-current-search-engine-provider', (event, val) => {
 
 ipcMain.on('set-homepage', (event, val) => {
   mainWindow.webContents.send('set-homepage', val);
+});
+
+ipcMain.on('set-pdf-viewer', (event, val) => {
+  mainWindow.webContents.send('set-pdf-viewer', val);
 });
 
 ipcMain.on('set-tab-config', (event, val) => {

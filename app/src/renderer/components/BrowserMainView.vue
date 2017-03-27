@@ -11,6 +11,8 @@
 </template>
 
 <script>
+  import url from 'url';
+
   import Tabs from './BrowserMainView/Tabs';
   import Navbar from './BrowserMainView/Navbar';
   import Page from './BrowserMainView/Page';
@@ -53,6 +55,9 @@
       homepage() {
         return this.$store.getters.homepage;
       },
+      pdfViewer() {
+        return this.$store.getters.pdfViewer;
+      },
     },
     methods: {
       getWebView(i) {
@@ -73,10 +78,23 @@
       },
       onDomReady(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
-        this.$store.dispatch('domReady', {
-          pageIndex,
-          webview,
-        });
+        const location = webview.getURL();
+        const parsedURL = url.parse(location, true);
+        if (parsedURL.protocol === 'chrome:' && parsedURL.hostname === 'pdf-viewer') {
+          if (this.pdfViewer === 'pdf-viewer') {
+            this.$store.dispatch('domReady', {
+              pageIndex,
+              webview,
+            });
+          } else {
+            webview.downloadURL(parsedURL.query.src);
+          }
+        } else {
+          this.$store.dispatch('domReady', {
+            pageIndex,
+            webview,
+          });
+        }
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -157,7 +175,12 @@
       },
       onOpenPDF(event, pageIndex, data) {
         if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-          this.getPage(pageIndex).navigateTo(data.location);
+          if (this.pdfViewer === 'pdf-viewer') {
+            const parsedURL = url.parse(data.location, true);
+            this.getWebView(pageIndex).downloadURL(`${parsedURL.query.file}?skip=true`);
+          } else {
+            this.getPage(pageIndex).navigateTo(data.location);
+          }
         }
       },
       onWillDownloadAnyFile(event, pageIndex, data) {
@@ -247,59 +270,108 @@
         this.isSwipeOnEdge = true;
       },
       onGetSearchEngineProvider(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', {
+              searchEngine: this.$store.getters.searchEngine,
+              currentSearchEngine: this.$store.getters.currentSearchEngine,
+            });
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
+      },
+      onSetSearchEngineProvider(event, pageIndex, val) {
+        try {
+          this.$store.dispatch('setCurrentSearchEngineProvider', val);
           this.getWebView(pageIndex).send('guest-here-your-data', {
             searchEngine: this.$store.getters.searchEngine,
             currentSearchEngine: this.$store.getters.currentSearchEngine,
           });
-        }
-      },
-      onSetSearchEngineProvider(event, pageIndex, val) {
-        this.$store.dispatch('setCurrentSearchEngineProvider', val);
-        this.getWebView(pageIndex).send('guest-here-your-data', {
-          searchEngine: this.$store.getters.searchEngine,
-          currentSearchEngine: this.$store.getters.currentSearchEngine,
-        });
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onGetHomepage(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', {
+              homepage: this.$store.getters.homepage,
+            });
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
+      },
+      onSetHomepage(event, pageIndex, val) {
+        try {
+          this.$store.dispatch('setHomepage', val);
           this.getWebView(pageIndex).send('guest-here-your-data', {
             homepage: this.$store.getters.homepage,
           });
-        }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
-      onSetHomepage(event, pageIndex, val) {
-        this.$store.dispatch('setHomepage', val);
-        this.getWebView(pageIndex).send('guest-here-your-data', {
-          homepage: this.$store.getters.homepage,
-        });
+      onGetPDFViewer(event, pageIndex, data) {
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', {
+              pdfViewer: this.$store.getters.pdfViewer,
+            });
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
+      },
+      onSetPDFViewer(event, pageIndex, val) {
+        try {
+          this.$store.dispatch('setPDFViewer', val);
+          this.getWebView(pageIndex).send('guest-here-your-data', {
+            pdfViewer: this.$store.getters.pdfViewer,
+          });
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onGetTabConfig(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
-        }
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onSetTabConfig(event, pageIndex, val) {
-        this.$store.dispatch('setTabConfig', val);
-        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+        try {
+          this.$store.dispatch('setTabConfig', val);
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onGetDownloads(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
-        }
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onSetDownloads(event, pageIndex, val) {
-        this.$store.dispatch('setDownloads', val);
-        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
+        try {
+          this.$store.dispatch('setDownloads', val);
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onGetHistory(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
-        }
+        try {
+          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
+          }
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       onSetHistory(event, pageIndex, val) {
-        this.$store.dispatch('setHistory', val);
-        this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
+        try {
+          this.$store.dispatch('setHistory', val);
+          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
+        // eslint-disable-next-line no-empty
+        } catch (event) {}
       },
       // tabHandlers
       onNewTab(location) {
@@ -643,6 +715,7 @@
                   currentPageIndex: this.currentPageIndex,
                   currentSearchEngine: this.$store.getters.currentSearchEngine,
                   homepage: this.$store.getters.homepage,
+                  pdfViewer: this.$store.getters.pdfViewer,
                   tabConfig: this.$store.getters.tabConfig,
                   downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
                   history: this.$store.getters.history,
@@ -659,6 +732,7 @@
               currentPageIndex: this.currentPageIndex,
               currentSearchEngine: this.$store.getters.currentSearchEngine,
               homepage: this.$store.getters.homepage,
+              pdfViewer: this.$store.getters.pdfViewer,
               tabConfig: this.$store.getters.tabConfig,
               downloads: this.$store.getters.downloads,
               history: this.$store.getters.history,

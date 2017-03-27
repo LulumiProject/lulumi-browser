@@ -10,6 +10,7 @@ const state = {
   searchEngine: config.searchEngine,
   currentSearchEngine: config.currentSearchEngine,
   homepage: config.homepage,
+  pdfViewer: config.pdfViewer,
   tabConfig: config.tabConfig,
   downloads: [],
   history: [],
@@ -190,6 +191,9 @@ const mutations = {
   [types.SET_HOMEPAGE](state, val) {
     state.homepage = val.homepage;
   },
+  [types.SET_PDF_VIEWER](state, val) {
+    state.pdfViewer = val.pdfViewer;
+  },
   [types.SET_TAB_CONFIG](state, val) {
     state.tabConfig = val;
   },
@@ -243,6 +247,7 @@ const mutations = {
     state.searchEngine = config.searchEngine;
     state.currentSearchEngine = newState.currentSearchEngine;
     state.homepage = newState.homepage;
+    state.pdfViewer = newState.pdfViewer;
     state.tabConfig = newState.tabConfig;
     state.downloads = newState.downloads;
     state.history = newState.history;
