@@ -12,6 +12,7 @@ let shuttingDown = false;
 const storagePath = process.env.NODE_ENV === 'development'
   ? path.join(process.env.HOME, '.lulumi-test-app-state')
   : path.join(app.getPath('userData'), 'app-state');
+let appStateSaveHandler = null;
 
 const isDarwin = process.platform === 'darwin';
 const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
@@ -150,8 +151,15 @@ function createWindow() {
     }, 3000);
   });
 
+  // save app-state every 5 mins
+  appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
+
   // eslint-disable-next-line no-console
   console.log('mainWindow opened');
+}
+
+function appStateSave() {
+  mainWindow.webContents.send('request-app-state');
 }
 
 if (process.env.NODE_ENV === 'development') {
@@ -205,6 +213,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  clearInterval(appStateSaveHandler);
+  appStateSaveHandler = null;
+  appStateSave();
 });
 
 app.on('activate', () => {
@@ -218,22 +229,23 @@ app.on('before-quit', (event) => {
     return;
   }
   event.preventDefault();
-  mainWindow.webContents.send('request-app-state');
+  clearInterval(appStateSaveHandler);
+  appStateSaveHandler = null;
+  appStateSave();
 });
 
 ipcMain.on('response-app-state', (event, data) => {
   if (data.ready) {
     promisify(fs.writeFile, storagePath, JSON.stringify(data.newState))
       .then(() => {
-        shuttingDown = true;
-        app.quit();
+        if (appStateSaveHandler == null) {
+          shuttingDown = true;
+          app.quit();
+        }
       });
   } else {
     app.exit(0);
   }
-  setTimeout(() => {
-    app.exit(0);
-  }, 3000);
 });
 
 ipcMain.on('show-item-in-folder', (event, path) => {
