@@ -574,7 +574,7 @@
       const ipc = this.$electron.ipcRenderer;
 
       ipc.on('set-app-state', (event, newState) => {
-        if (Object.keys(newState).length !== 0) {
+        if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         }
       });
@@ -602,6 +602,7 @@
 
       ipc.on('request-app-state', () => {
         const newPages = [];
+        const newIndex = Math.ceil(Math.random() * 10000);
         this.pages.map((page, index) => {
           newPages[index] = page;
           return true;
@@ -618,7 +619,7 @@
           return true;
         });
         newPages.map((page, index) => {
-          page.id = index;
+          page.pid = newIndex + index;
           return true;
         });
         const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
@@ -637,7 +638,7 @@
               ipc.send('response-app-state', {
                 ready: true,
                 newState: {
-                  pid: this.pages.length - 1,
+                  pid: newIndex + (newPages.length - 1),
                   pages: newPages,
                   currentPageIndex: this.currentPageIndex,
                   currentSearchEngine: this.$store.getters.currentSearchEngine,
@@ -653,7 +654,7 @@
           ipc.send('response-app-state', {
             ready: true,
             newState: {
-              pid: this.pages.length - 1,
+              pid: newIndex + (newPages.length - 1),
               pages: newPages,
               currentPageIndex: this.currentPageIndex,
               currentSearchEngine: this.$store.getters.currentSearchEngine,

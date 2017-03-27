@@ -213,9 +213,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
-  clearInterval(appStateSaveHandler);
-  appStateSaveHandler = null;
-  appStateSave();
 });
 
 app.on('activate', () => {
