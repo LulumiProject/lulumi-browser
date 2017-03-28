@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  import urlUtil from '../../js/lib/urlutil';
+  import urlUtil from '../../js/lib/url-util';
 
   export default {
     data() {

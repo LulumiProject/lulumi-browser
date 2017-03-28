@@ -43,7 +43,7 @@
   import '../../css/el-input';
   import '../../css/el-cascader';
   import config from '../../js/constants/config';
-  import urlUtil from '../../js/lib/urlutil';
+  import urlUtil from '../../js/lib/url-util';
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {

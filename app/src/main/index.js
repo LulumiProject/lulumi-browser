@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { app, BrowserWindow, session, systemPreferences, protocol, ipcMain, shell } from 'electron';
-import menu from '../browser/menu';
+import menu from './js/lib/menu';
 import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
 

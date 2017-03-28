@@ -26,8 +26,8 @@
 
   import '../../css/el-progress';
   import '../../css/el-popover';
-  import prettySize from '../../js/lib/prettysize';
-  import imageUtil from '../../js/lib/imageutil';
+  import prettySize from '../../js/lib/pretty-size';
+  import imageUtil from '../../js/lib/image-util';
 
   export default {
     components: {

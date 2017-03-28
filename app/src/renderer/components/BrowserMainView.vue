@@ -18,9 +18,9 @@
   import Page from './BrowserMainView/Page';
   import Download from './BrowserMainView/Download';
 
-  import urlUtil from '../js/lib/urlutil';
-  import imageUtil from '../js/lib/imageutil';
-  import urlResource from '../js/lib/urlresource';
+  import urlUtil from '../js/lib/url-util';
+  import imageUtil from '../js/lib/image-util';
+  import urlResource from '../js/lib/url-resource';
 
   export default {
     data() {

@@ -1,7 +1,7 @@
 import * as types from '../mutation-types';
 import config from '../../js/constants/config';
-import urlUtil from '../../js/lib/urlutil';
-import timeUtil from '../../js/lib/timeutil';
+import urlUtil from '../../js/lib/url-util';
+import timeUtil from '../../js/lib/time-util';
 
 const state = {
   pid: 0,
