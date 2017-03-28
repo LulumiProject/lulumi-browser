@@ -672,7 +672,7 @@
       this.onScrollTouchBegin.bind(this);
       this.onScrollTouchEnd.bind(this);
 
-      ipc.on('request-app-state', () => {
+      ipc.on('request-app-state', (force) => {
         const newPages = [];
         const newIndex = Math.ceil(Math.random() * 10000);
         this.pages.map((page, index) => {
@@ -696,33 +696,50 @@
         });
         const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
         if (downloads.length !== 0) {
-          this.$electron.remote.dialog.showMessageBox({
-            type: 'warning',
-            title: 'Warning',
-            message: 'You still have some files progressing.',
-            buttons: ['Abort and Leave', 'Cancel'],
-          }, (index) => {
-            if (index === 0) {
-              downloads.map((download) => {
-                this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
-                return true;
-              });
-              ipc.send('response-app-state', {
-                ready: true,
-                newState: {
-                  pid: newIndex + (newPages.length - 1),
-                  pages: newPages,
-                  currentPageIndex: this.currentPageIndex,
-                  currentSearchEngine: this.$store.getters.currentSearchEngine,
-                  homepage: this.$store.getters.homepage,
-                  pdfViewer: this.$store.getters.pdfViewer,
-                  tabConfig: this.$store.getters.tabConfig,
-                  downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
-                  history: this.$store.getters.history,
-                },
-              });
-            }
-          });
+          if (force) {
+            ipc.send('response-app-state', {
+              ready: true,
+              newState: {
+                pid: newIndex + (newPages.length - 1),
+                pages: newPages,
+                currentPageIndex: this.currentPageIndex,
+                currentSearchEngine: this.$store.getters.currentSearchEngine,
+                homepage: this.$store.getters.homepage,
+                pdfViewer: this.$store.getters.pdfViewer,
+                tabConfig: this.$store.getters.tabConfig,
+                downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
+                history: this.$store.getters.history,
+              },
+            });
+          } else {
+            this.$electron.remote.dialog.showMessageBox({
+              type: 'warning',
+              title: 'Warning',
+              message: 'You still have some files progressing.',
+              buttons: ['Abort and Leave', 'Cancel'],
+            }, (index) => {
+              if (index === 0) {
+                downloads.map((download) => {
+                  this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
+                  return true;
+                });
+                ipc.send('response-app-state', {
+                  ready: true,
+                  newState: {
+                    pid: newIndex + (newPages.length - 1),
+                    pages: newPages,
+                    currentPageIndex: this.currentPageIndex,
+                    currentSearchEngine: this.$store.getters.currentSearchEngine,
+                    homepage: this.$store.getters.homepage,
+                    pdfViewer: this.$store.getters.pdfViewer,
+                    tabConfig: this.$store.getters.tabConfig,
+                    downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
+                    history: this.$store.getters.history,
+                  },
+                });
+              }
+            });
+          }
         } else {
           ipc.send('response-app-state', {
             ready: true,

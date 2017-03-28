@@ -12,8 +12,10 @@
             el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="mini", icon="document", @click="showItemInFolder(file.savePath)")
           li(class="download-list__item", slot="reference")
             div(class="download-list__item-panel")
-              a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
-                i(class="el-icon-document") {{ file.name }}
+              div(class="ellipsis")
+                img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
+                a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
+                  | {{ file.name }}
               span(class="download-list__item-description") {{ file.state === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: file.state }}
             el-progress(:status="checkStateForProgress(file.state)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
       span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
@@ -25,6 +27,7 @@
   import '../../css/el-progress';
   import '../../css/el-popover';
   import prettySize from '../../js/lib/prettysize';
+  import imageUtil from '../../js/lib/imageutil';
 
   export default {
     components: {
@@ -93,6 +96,13 @@
       closeDownloadBar() {
         if (this.$parent.onCloseDownloadBar) {
           this.$parent.onCloseDownloadBar();
+        }
+      },
+      getFileIcon(savePath, index) {
+        if (savePath) {
+          imageUtil.getBase64FromFileIcon(savePath, 'normal').then((dataURL) => {
+            document.getElementById(`icon-${index}`).setAttribute('src', dataURL);
+          });
         }
       },
     },
@@ -164,17 +174,38 @@
     color: #48576a;
     padding-left: 4px;
     transition: color .3s;
-  }
-  .download-list__item-name > i {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 160px;
+    font-size: 13px;
+    width: 120px;
   }
   .download-list__item-description {
     font-size: 13px;
   }
   .download-list__item-progress {
     right: 0;
+  }
+  .ellipsis {
+    display: block;
+    overflow: hidden;
+    width: 168px;
+    height: 32px;
+  }
+  .ellipsis:after {
+    content:"";
+    float: right;
+    position: relative;
+    top: -20px;
+    left: 70%;
+    width: 3px;
+    text-align: right;
+  }
+  .ellipsis > img {
+    float: left;
+    width: 32px;
+  }
+  .ellipsis > a {
+    width: 132px;
+    float: right;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 </style>

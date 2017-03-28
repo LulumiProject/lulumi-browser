@@ -21,9 +21,9 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}`
   : `file://${__dirname}/index.html`;
 
-function appStateSave() {
+function appStateSave(force) {
   if (mainWindow) {
-    mainWindow.webContents.send('request-app-state');
+    mainWindow.webContents.send('request-app-state', force);
   }
 }
 
