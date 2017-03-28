@@ -41,6 +41,7 @@
 
   import '../../css/el-autocomplete';
   import '../../css/el-input';
+  import '../../css/el-cascader';
   import config from '../../js/constants/config';
   import urlUtil from '../../js/lib/urlutil';
   import recommendTopSite from '../../js/data/RecommendTopSite';

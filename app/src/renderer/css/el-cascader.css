@@ -1,0 +1,9 @@
+#dropdown {
+  display: flex;
+}
+#dropdown > .el-input > .el-input__inner {
+  display: none;
+}
+#dropdown > .el-cascader__label {
+  display: none;
+}

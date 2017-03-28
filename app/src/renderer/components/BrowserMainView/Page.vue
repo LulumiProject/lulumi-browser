@@ -30,7 +30,9 @@
     },
     methods: {
       navigateTo(location) {
-        this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
+        if (this.$refs.webview) {
+          this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
+        }
       },
       webviewHandler(self, fnName) {
         return (event) => {

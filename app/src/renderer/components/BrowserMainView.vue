@@ -645,7 +645,7 @@
     beforeMount() {
       const ipc = this.$electron.ipcRenderer;
 
-      ipc.on('set-app-state', (event, newState) => {
+      ipc.once('set-app-state', (event, newState) => {
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         }
@@ -756,6 +756,8 @@
           this.onScrollTouchEdge(event);
         }
       });
+
+      ipc.send('request-app-state');
     },
   };
 </script>

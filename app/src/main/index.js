@@ -22,7 +22,9 @@ const winURL = process.env.NODE_ENV === 'development'
   : `file://${__dirname}/index.html`;
 
 function appStateSave() {
-  mainWindow.webContents.send('request-app-state');
+  if (mainWindow) {
+    mainWindow.webContents.send('request-app-state');
+  }
 }
 
 function createWindow() {
@@ -136,27 +138,27 @@ function createWindow() {
     mainWindow = null;
   });
 
-  new Promise((resolve, reject) => {
-    let data = null;
-    try {
-      data = fs.readFileSync(storagePath, 'utf-8');
-    // eslint-disable-next-line no-empty
-    } catch (event) {}
+  ipcMain.once('request-app-state', () => {
+    new Promise((resolve, reject) => {
+      let data = null;
+      try {
+        data = fs.readFileSync(storagePath, 'utf-8');
+      // eslint-disable-next-line no-empty
+      } catch (event) {}
 
-    try {
-      data = JSON.parse(data);
-      resolve(data);
-    } catch (event) {
-      if (data) {
-        reject();
-        // eslint-disable-next-line no-console
-        console.log(`could not parse data: ${data}, ${event}`);
+      try {
+        data = JSON.parse(data);
+        resolve(data);
+      } catch (event) {
+        if (data) {
+          reject();
+          // eslint-disable-next-line no-console
+          console.log(`could not parse data: ${data}, ${event}`);
+        }
       }
-    }
-  }).then((data) => {
-    setTimeout(() => {
+    }).then((data) => {
       mainWindow.webContents.send('set-app-state', data);
-    }, 3000);
+    });
   });
 
   // save app-state every 5 mins
