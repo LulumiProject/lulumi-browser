@@ -74,9 +74,9 @@
           return true;
         }
         if (data.children) {
-          return data.label.toLowerCase().indexOf(value) !== -1;
+          return data.label.toLowerCase().indexOf(value.toLowerCase()) !== -1;
         }
-        return data.title.toLowerCase().indexOf(value) !== -1;
+        return data.title.toLowerCase().indexOf(value.toLowerCase()) !== -1;
       },
       transformArr(history) {
         const newArr = [];

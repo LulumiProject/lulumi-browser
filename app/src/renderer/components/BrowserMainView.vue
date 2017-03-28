@@ -173,18 +173,19 @@
           this.time = (new Date()).getTime() - this.startTime;
         }
       },
-      onOpenPDF(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+      onOpenPDF(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
           if (this.pdfViewer === 'pdf-viewer') {
             const parsedURL = url.parse(data.location, true);
-            this.getWebView(pageIndex).downloadURL(`${parsedURL.query.file}?skip=true`);
+            webview.downloadURL(`${parsedURL.query.file}?skip=true`);
           } else {
-            this.getPage(pageIndex).navigateTo(data.location);
+            webview.loadURL(data.location);
           }
         }
       },
-      onWillDownloadAnyFile(event, pageIndex, data) {
-        if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
+      onWillDownloadAnyFile(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
           this.showDownloadBar = true;
           this.$store.dispatch('createDownloadTask', {
             name: data.name,
@@ -199,45 +200,41 @@
           });
         }
       },
-      onUpdateDownloadsProgress(event, pageIndex, data) {
-        if (pageIndex === this.currentPageIndex) {
-          this.$store.dispatch('updateDownloadsProgress', {
-            startTime: data.startTime,
-            getReceivedBytes: data.getReceivedBytes,
-            savePath: data.savePath,
-            isPaused: data.isPaused,
-            canResume: data.canResume,
-            state: data.state,
-          });
-        }
+      onUpdateDownloadsProgress(event, data) {
+        this.$store.dispatch('updateDownloadsProgress', {
+          startTime: data.startTime,
+          getReceivedBytes: data.getReceivedBytes,
+          savePath: data.savePath,
+          isPaused: data.isPaused,
+          canResume: data.canResume,
+          state: data.state,
+        });
       },
-      onCompleteDownloadsProgress(event, pageIndex, data) {
-        if (pageIndex === this.currentPageIndex) {
-          this.$store.dispatch('completeDownloadsProgress', {
-            name: data.name,
-            startTime: data.startTime,
-            state: data.state,
-          });
-          let option = null;
-          if (data.state === 'completed') {
-            option = {
-              title: 'Success',
-              body: `${data.name} download successfully!`,
-            };
-          } else if (data.state === 'cancelled') {
-            option = {
-              title: 'Cancelled',
-              body: `${data.name} has been cancelled!`,
-            };
-          } else {
-            option = {
-              title: 'Success',
-              body: `${data.name} download successfully!`,
-            };
-          }
-          /* eslint-disable no-new */
-          new Notification(option.title, option);
+      onCompleteDownloadsProgress(event, data) {
+        this.$store.dispatch('completeDownloadsProgress', {
+          name: data.name,
+          startTime: data.startTime,
+          state: data.state,
+        });
+        let option = null;
+        if (data.state === 'completed') {
+          option = {
+            title: 'Success',
+            body: `${data.name} download successfully!`,
+          };
+        } else if (data.state === 'cancelled') {
+          option = {
+            title: 'Cancelled',
+            body: `${data.name} has been cancelled!`,
+          };
+        } else {
+          option = {
+            title: 'Success',
+            body: `${data.name} download successfully!`,
+          };
         }
+        /* eslint-disable no-new */
+        new Notification(option.title, option);
       },
       onCloseDownloadBar() {
         this.showDownloadBar = false;
@@ -269,109 +266,85 @@
       onScrollTouchEdge() {
         this.isSwipeOnEdge = true;
       },
-      onGetSearchEngineProvider(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', {
-              searchEngine: this.$store.getters.searchEngine,
-              currentSearchEngine: this.$store.getters.currentSearchEngine,
-            });
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
-      },
-      onSetSearchEngineProvider(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setCurrentSearchEngineProvider', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', {
+      onGetSearchEngineProvider(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', {
             searchEngine: this.$store.getters.searchEngine,
             currentSearchEngine: this.$store.getters.currentSearchEngine,
           });
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+        }
       },
-      onGetHomepage(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', {
-              homepage: this.$store.getters.homepage,
-            });
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onSetSearchEngineProvider(event, data) {
+        this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', {
+          searchEngine: this.$store.getters.searchEngine,
+          currentSearchEngine: this.$store.getters.currentSearchEngine,
+        });
       },
-      onSetHomepage(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setHomepage', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', {
+      onGetHomepage(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', {
             homepage: this.$store.getters.homepage,
           });
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+        }
       },
-      onGetPDFViewer(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', {
-              pdfViewer: this.$store.getters.pdfViewer,
-            });
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onSetHomepage(event, data) {
+        this.$store.dispatch('setHomepage', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', {
+          homepage: this.$store.getters.homepage,
+        });
       },
-      onSetPDFViewer(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setPDFViewer', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', {
+      onGetPDFViewer(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', {
             pdfViewer: this.$store.getters.pdfViewer,
           });
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+        }
       },
-      onGetTabConfig(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onSetPDFViewer(event, data) {
+        this.$store.dispatch('setPDFViewer', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', {
+          pdfViewer: this.$store.getters.pdfViewer,
+        });
       },
-      onSetTabConfig(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setTabConfig', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.tabConfig);
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onGetTabConfig(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', this.$store.getters.tabConfig);
+        }
       },
-      onGetDownloads(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onSetTabConfig(event, data) {
+        this.$store.dispatch('setTabConfig', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', this.$store.getters.tabConfig);
       },
-      onSetDownloads(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setDownloads', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.downloads);
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onGetDownloads(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', this.$store.getters.downloads);
+        }
       },
-      onGetHistory(event, pageIndex, data) {
-        try {
-          if (this.getWebView(pageIndex).getWebContents().getId() === data.webContentsId) {
-            this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
-          }
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onSetDownloads(event, data) {
+        this.$store.dispatch('setDownloads', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', this.$store.getters.downloads);
       },
-      onSetHistory(event, pageIndex, val) {
-        try {
-          this.$store.dispatch('setHistory', val);
-          this.getWebView(pageIndex).send('guest-here-your-data', this.$store.getters.history);
-        // eslint-disable-next-line no-empty
-        } catch (event) {}
+      onGetHistory(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webview.send('guest-here-your-data', this.$store.getters.history);
+        }
+      },
+      onSetHistory(event, data) {
+        this.$store.dispatch('setHistory', data.val);
+        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webview.send('guest-here-your-data', this.$store.getters.history);
       },
       // tabHandlers
       onNewTab(location) {
@@ -672,7 +645,91 @@
       this.onScrollTouchBegin.bind(this);
       this.onScrollTouchEnd.bind(this);
 
-      ipc.on('request-app-state', (force) => {
+      ipc.on('open-pdf', (event, data) => {
+        if (this.onOpenPDF) {
+          this.onOpenPDF(event, data);
+        }
+      });
+
+      ipc.on('will-download-any-file', (event, data) => {
+        if (this.onWillDownloadAnyFile) {
+          this.onWillDownloadAnyFile(event, data);
+        }
+      });
+
+      ipc.on('update-downloads-progress', (event, data) => {
+        if (this.onUpdateDownloadsProgress) {
+          this.onUpdateDownloadsProgress(event, data);
+        }
+      });
+      ipc.on('complete-downloads-progress', (event, data) => {
+        if (this.onCompleteDownloadsProgress) {
+          this.onCompleteDownloadsProgress(event, data);
+        }
+      });
+
+      ipc.on('get-search-engine-provider', (event, data) => {
+        if (this.onGetSearchEngineProvider) {
+          this.onGetSearchEngineProvider(event, data);
+        }
+      });
+      ipc.on('set-search-engine-provider', (event, val) => {
+        if (this.onSetSearchEngineProvider) {
+          this.onSetSearchEngineProvider(event, val);
+        }
+      });
+      ipc.on('get-homepage', (event, data) => {
+        if (this.onGetHomepage) {
+          this.onGetHomepage(event, data);
+        }
+      });
+      ipc.on('set-homepage', (event, val) => {
+        if (this.onSetHomepage) {
+          this.onSetHomepage(event, val);
+        }
+      });
+      ipc.on('get-pdf-viewer', (event, data) => {
+        if (this.onGetPDFViewer) {
+          this.onGetPDFViewer(event, data);
+        }
+      });
+      ipc.on('set-pdf-viewer', (event, val) => {
+        if (this.onSetPDFViewer) {
+          this.onSetPDFViewer(event, val);
+        }
+      });
+      ipc.on('get-tab-config', (event, data) => {
+        if (this.onGetTabConfig) {
+          this.onGetTabConfig(event, data);
+        }
+      });
+      ipc.on('set-tab-config', (event, val) => {
+        if (this.onSetTabConfig) {
+          this.onSetTabConfig(event, val);
+        }
+      });
+      ipc.on('get-downloads', (event, data) => {
+        if (this.onGetDownloads) {
+          this.onGetDownloads(event, data);
+        }
+      });
+      ipc.on('set-downloads', (event, val) => {
+        if (this.onSetDownloads) {
+          this.onSetDownloads(event, val);
+        }
+      });
+      ipc.on('get-history', (event, data) => {
+        if (this.onGetHistory) {
+          this.onGetHistory(event, data);
+        }
+      });
+      ipc.on('set-history', (event, val) => {
+        if (this.onSetHistory) {
+          this.onSetHistory(event, val);
+        }
+      });
+
+      ipc.on('request-app-state', (event, force) => {
         const newPages = [];
         const newIndex = Math.ceil(Math.random() * 10000);
         this.pages.map((page, index) => {

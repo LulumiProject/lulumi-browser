@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { app, BrowserWindow, systemPreferences, protocol, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, session, systemPreferences, protocol, ipcMain, shell } from 'electron';
 import menu from '../browser/menu';
 import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
@@ -21,7 +21,7 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}`
   : `file://${__dirname}/index.html`;
 
-function appStateSave(force) {
+function appStateSave(force = false) {
   if (mainWindow) {
     mainWindow.webContents.send('request-app-state', force);
   }
@@ -45,8 +45,7 @@ function createWindow() {
 
   menu.init();
 
-  const ses = mainWindow.webContents.session;
-  ses.on('will-download', (event, item, webContents) => {
+  session.defaultSession.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
     if (item.getMimeType() === 'application/pdf'
       && itemURL.indexOf('blob:') !== 0
@@ -58,13 +57,13 @@ function createWindow() {
       const PDFViewerURL = `file://${config.lulumiPDFJSPath}/web/viewer.html`;
       mainWindow.webContents.send('open-pdf', {
         location: `${PDFViewerURL}?${param}`,
-        webContentsId: webContents.getId(),
+        webContentsId: webContents.id,
       });
     } else {
       const totalBytes = item.getTotalBytes();
       const startTime = item.getStartTime();
       mainWindow.webContents.send('will-download-any-file', {
-        webContentsId: webContents.getId(),
+        webContentsId: webContents.id,
         name: item.getFilename(),
         url: item.getURL(),
         totalBytes,
@@ -330,7 +329,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
 });
 
 ipcMain.on('guest-want-data', (event, val) => {
-  const webContentsId = event.sender.getId();
+  const webContentsId = event.sender.id;
   switch (val) {
     case 'searchEngineProvider':
       mainWindow.webContents.send('get-search-engine-provider', {
@@ -370,25 +369,43 @@ ipcMain.on('guest-want-data', (event, val) => {
 });
 
 ipcMain.on('set-current-search-engine-provider', (event, val) => {
-  mainWindow.webContents.send('set-search-engine-provider', val);
+  mainWindow.webContents.send('set-search-engine-provider', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
 
 ipcMain.on('set-homepage', (event, val) => {
-  mainWindow.webContents.send('set-homepage', val);
+  mainWindow.webContents.send('set-homepage', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
 
 ipcMain.on('set-pdf-viewer', (event, val) => {
-  mainWindow.webContents.send('set-pdf-viewer', val);
+  mainWindow.webContents.send('set-pdf-viewer', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
 
 ipcMain.on('set-tab-config', (event, val) => {
-  mainWindow.webContents.send('set-tab-config', val);
+  mainWindow.webContents.send('set-tab-config', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
 
 ipcMain.on('set-downloads', (event, val) => {
-  mainWindow.webContents.send('set-downloads', val);
+  mainWindow.webContents.send('set-downloads', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
 
 ipcMain.on('set-history', (event, val) => {
-  mainWindow.webContents.send('set-history', val);
+  mainWindow.webContents.send('set-history', {
+    val,
+    webContentsId: event.sender.id,
+  });
 });
