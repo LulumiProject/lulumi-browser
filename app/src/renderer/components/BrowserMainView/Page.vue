@@ -1,5 +1,8 @@
 <template lang="pug">
   div
+    transition(name="notification")
+      #notification(v-show="showNotification && isActive")
+        notification
     webview(element-loading-text="Loading...", ref="webview", :class="isActive ? 'active' : 'hidden'")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
@@ -10,6 +13,8 @@
 </template>
 
 <script>
+  import Notification from './Notification';
+
   import urlUtil from '../../js/lib/url-util';
 
   export default {
@@ -17,12 +22,16 @@
       return {
         hidden: true,
         requestId: null,
+        showNotification: false,
       };
     },
     props: [
       'isActive',
       'pageIndex',
     ],
+    components: {
+      Notification,
+    },
     computed: {
       page() {
         return this.$store.getters.pages[this.pageIndex];
@@ -188,6 +197,21 @@
 </script>
 
 <style scoped>
+  #notification {
+    width: 100vw;
+    height: 35px;
+    background: rgba(255, 193, 7, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notification-enter-active, .notification-leave-active {
+    transition: opacity .5s;
+  }
+  .notification-enter, .notification-leave-active {
+    opacity: 0
+  }
+
   webview {
     height: calc(100vh - 73px);
     width: 100vw;

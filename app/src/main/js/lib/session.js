@@ -72,11 +72,19 @@ export default {
       }
     });
   },
-  setPermissionRequestHandler() {
+  setPermissionRequestHandler(mainWindow) {
     session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-      // eslint-disable-next-line no-console
-      console.log(permission);
-      callback(true);
+      mainWindow.webContents.send('request-permission', {
+        webContentsId: webContents.id,
+        permission,
+      });
+      ipcMain.once(`response-permission-${webContents.id}`, (event, data) => {
+        if (data.accept) {
+          callback(true);
+        } else {
+          callback(false);
+        }
+      });
     });
   },
 };

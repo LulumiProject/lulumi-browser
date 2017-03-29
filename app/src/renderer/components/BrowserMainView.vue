@@ -691,7 +691,7 @@
     beforeMount() {
       const ipc = this.$electron.ipcRenderer;
 
-      ipc.once('set-app-state', (event, newState) => {
+      ipc.on('set-app-state', (event, newState) => {
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         } else {
@@ -926,6 +926,7 @@
     overflow: hidden;
     -webkit-user-select: none;
   }
+
   #nav {
     width: 100vw;
   }
@@ -934,7 +935,6 @@
     bottom: 0;
     position: absolute;
   }
-
   #footer > .browser-page-status {
     background: #F3F3F3;
     border-color: #d3d3d3;

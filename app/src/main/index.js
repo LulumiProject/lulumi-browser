@@ -47,7 +47,7 @@ function createWindow() {
   menu.init();
 
   session.onWillDownload(mainWindow, config);
-  session.setPermissionRequestHandler();
+  session.setPermissionRequestHandler(mainWindow);
 
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
     webPreferences.allowDisplayingInsecureContent = true;
@@ -71,7 +71,7 @@ function createWindow() {
     mainWindow = null;
   });
 
-  ipcMain.once('request-app-state', () => {
+  ipcMain.on('request-app-state', () => {
     new Promise((resolve, reject) => {
       let data = null;
       try {
