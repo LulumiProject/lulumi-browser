@@ -99,9 +99,9 @@ vue-resource@^1.2.1:
   dependencies:
     got "^6.7.1"
 
-vue-router@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.3.0.tgz#a25c8359e8ca989d22ce79f64322eb0ad0c8670f"
+vue-router@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.3.1.tgz#3135448cf57d4ca576906061a5a9d25fae0214d7"
 
 vue@^2.2.6:
   version "2.2.6"
