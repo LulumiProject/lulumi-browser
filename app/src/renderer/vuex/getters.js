@@ -7,3 +7,4 @@ export const pdfViewer = state => state.browser.pdfViewer;
 export const tabConfig = state => state.browser.tabConfig;
 export const downloads = state => state.browser.downloads;
 export const history = state => state.browser.history;
+export const permissions = state => state.browser.permissions;

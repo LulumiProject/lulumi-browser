@@ -78,6 +78,10 @@ export const completeDownloadsProgress = ({ commit }, file) => {
 export const closeDownloadBar = ({ commit }) => {
   commit(types.CLOSE_DOWNLOAD_BAR);
 };
+export const setPermissions = ({ commit }, scope) => {
+  commit(types.SET_PERMISSIONS, scope);
+};
+
 export const setAppState = ({ commit }, newState) => {
   commit(types.SET_APP_STATE, newState);
 };

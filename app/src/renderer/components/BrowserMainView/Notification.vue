@@ -1,6 +1,6 @@
 <template lang="pug">
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
-    el-col(:span="18") {{ `${scope} requests ${permission} permission.` }}
+    el-col(:span="18") {{ `${hostname} requests ${permission} permission.` }}
     el-col(:span="6")
       el-button(:plain="true", type="success", size="small", @click="onAllow") Allow
       el-button(:plain="true", type="danger", size="small", @click="onDeny") Deny
@@ -15,7 +15,7 @@
     data() {
       return {
         permission: null,
-        scope: '',
+        hostname: '',
         id: -1,
       };
     },
@@ -25,11 +25,21 @@
       'el-col': Col,
       'el-row': Row,
     },
+    computed: {
+      permissions() {
+        return this.$store.getters.permissions;
+      },
+    },
     methods: {
       onAllow() {
         const ipc = this.$electron.ipcRenderer;
 
         ipc.send(`response-permission-${this.id}`, {
+          accept: true,
+        });
+        this.$store.dispatch('setPermissions', {
+          hostname: this.hostname,
+          permission: this.permission,
           accept: true,
         });
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
@@ -39,6 +49,11 @@
         const ipc = this.$electron.ipcRenderer;
 
         ipc.send(`response-permission-${this.id}`, {
+          accept: false,
+        });
+        this.$store.dispatch('setPermissions', {
+          hostname: this.hostname,
+          permission: this.permission,
           accept: false,
         });
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
@@ -52,10 +67,25 @@
         if (this.$parent.$refs.webview.getWebContents().id === data.webContentsId) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
           this.id = data.webContentsId;
-          this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
-          this.$parent.showNotification = true;
+          this.hostname = urlUtil.getHostname(webContents.getURL());
           this.permission = data.permission;
-          this.scope = urlUtil.getHostname(webContents.getURL());
+          if (this.permissions[`${this.hostname}`]) {
+            if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
+              ipc.send(`response-permission-${this.id}`, {
+                accept: true,
+              });
+            } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
+              ipc.send(`response-permission-${this.id}`, {
+                accept: false,
+              });
+            } else {
+              this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
+              this.$parent.showNotification = true;
+            }
+          } else {
+            this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
+            this.$parent.showNotification = true;
+          }
         }
       });
     },

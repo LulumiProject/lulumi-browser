@@ -14,6 +14,7 @@ const state = {
   tabConfig: config.tabConfig,
   downloads: [],
   history: [],
+  permissions: {},
 };
 
 function createPageObject(url) {
@@ -236,6 +237,15 @@ const mutations = {
     state.downloads.forEach((download) => {
       download.style = 'hidden';
     });
+  },
+  // permissions
+  [types.SET_PERMISSIONS](state, scope) {
+    if (state.permissions[scope.hostname]) {
+      state.permissions[scope.hostname][scope.permission] = scope.accept;
+    } else {
+      state.permissions[scope.hostname] = {};
+      state.permissions[scope.hostname][scope.permission] = scope.accept;
+    }
   },
   // app state
   [types.SET_APP_STATE](state, newState) {
