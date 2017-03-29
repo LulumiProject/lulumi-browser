@@ -182,10 +182,7 @@
         }
       });
 
-      this.$nextTick(() => {
-        // TODO: https://github.com/qazbnm456/lulumi-browser/issues/3
-        setTimeout(() => this.navigateTo(this.page.location), 100);
-      });
+      this.navigateTo(this.page.location);
     },
   };
 </script>

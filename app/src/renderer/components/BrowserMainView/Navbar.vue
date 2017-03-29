@@ -114,6 +114,13 @@
     },
     computed: {
       page() {
+        if (this.$store.getters.pages.length === 0) {
+          return {
+            canGoBack: false,
+            canGoForward: false,
+            canRefresh: false,
+          };
+        }
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
       },
       currentSearchEngine() {

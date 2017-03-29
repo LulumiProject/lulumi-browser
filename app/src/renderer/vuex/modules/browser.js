@@ -34,8 +34,6 @@ function createPageObject(url) {
   };
 }
 
-state.pages.push(createPageObject());
-
 const mutations = {
   // global counter
   [types.INCREMENT_PID](state) {

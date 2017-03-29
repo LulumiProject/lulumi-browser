@@ -4,7 +4,7 @@
       tabs(ref="tab")
       navbar
     page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
-    #footer  
+    #footer
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}
       download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar")
@@ -32,7 +32,7 @@
         deltaY: 0,
         startTime: 0,
         time: 0,
-        showDownloadBar: true,
+        showDownloadBar: false,
       };
     },
     components: {
@@ -44,6 +44,9 @@
     name: 'browser-main',
     computed: {
       page() {
+        if (this.$store.getters.pages.length === 0) {
+          return { statusText: false };
+        }
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
       },
       pages() {
@@ -691,6 +694,8 @@
       ipc.once('set-app-state', (event, newState) => {
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
+        } else {
+          this.$store.dispatch('createTab');
         }
       });
     },
