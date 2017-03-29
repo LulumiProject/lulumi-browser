@@ -424,6 +424,76 @@
 
         menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
+      // onClickBackContextMenu
+      onClickBackContextMenu() {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const webview = this.getWebView();
+        const webContents = webview.getWebContents();
+        const navbar = document.getElementById('browser-navbar');
+        const goBack = document.getElementById('browser-navbar__goBack');
+
+        const current = webContents.getActiveIndex();
+        const history = webContents.history;
+
+        if (current === history.length - 1 && current !== 0) {
+          for (let i = current - 1; i >= 0; i--) {
+            menu.append(new MenuItem({
+              label: history[i],
+              click: () => webview.goToIndex(i),
+            }));
+          }
+
+          menu.append(new MenuItem({ type: 'separator' }));
+          menu.append(new MenuItem({
+            label: 'Show history',
+            click: () => {
+              this.$store.dispatch('createTab', 'lulumi://about/#/history');
+            },
+          }));
+
+          menu.popup(this.$electron.remote.getCurrentWindow(), {
+            async: true,
+            x: Math.floor(goBack.getBoundingClientRect().left),
+            y: Math.floor(navbar.getBoundingClientRect().bottom),
+          });
+        }
+      },
+      // onClickForwardContextMenu
+      onClickForwardContextMenu() {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const webview = this.getWebView();
+        const webContents = webview.getWebContents();
+        const navbar = document.getElementById('browser-navbar');
+        const goForward = document.getElementById('browser-navbar__goForward');
+
+        const current = webContents.getActiveIndex();
+        const history = webContents.history;
+
+        if (current < history.length - 1) {
+          for (let i = current + 1; i < history.length; i++) {
+            menu.append(new MenuItem({
+              label: history[i],
+              click: () => webview.goToIndex(i),
+            }));
+          }
+
+          menu.append(new MenuItem({ type: 'separator' }));
+          menu.append(new MenuItem({
+            label: 'Show history',
+            click: () => {
+              this.$store.dispatch('createTab', 'lulumi://about/#/history');
+            },
+          }));
+
+          menu.popup(this.$electron.remote.getCurrentWindow(), {
+            async: true,
+            x: Math.floor(goForward.getBoundingClientRect().left),
+            y: Math.floor(navbar.getBoundingClientRect().bottom),
+          });
+        }
+      },
       // onNavContextMenu
       onNavContextMenu(event) {
         const { Menu, MenuItem } = this.$electron.remote;

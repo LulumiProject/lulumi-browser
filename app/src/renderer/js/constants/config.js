@@ -37,5 +37,5 @@ export default {
   lulumiPagesPath: `${lulumiAppPath}/pages/`,
   lulumiPDFJSPath: `${lulumiAppPath}/pdfjs/`,
   lulumiAppPath,
-  lulumiRev: 'efa2df408cae5839a000aa8fee7c0021a9cd54e3',
+  lulumiRev: '679b8acace533a8f69e259cf3c16b8b2e9ab77e3',
 };

@@ -3,9 +3,9 @@
     .control-group
       a(@click="$parent.onClickHome")
         icon(name="angle-double-left")
-      a(@click="$parent.onClickBack", :class="page.canGoBack ? '' : 'disabled'")
+      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu.stop="$parent.onClickBackContextMenu()", @mousedown.stop="onGoBackMouseDown", @mouseup.stop="onGoBackMouseUp", :class="page.canGoBack ? '' : 'disabled'")
         icon(name="angle-left")
-      a(@click="$parent.onClickForward", :class="page.canGoForward ? '' : 'disabled'")
+      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu.stop="$parent.onClickForwardContextMenu()", @mousedown.stop="onGoForwardMouseDown", @mouseup.stop="onGoForwardMouseUp", :class="page.canGoForward ? '' : 'disabled'")
         icon(name="angle-right")
       a(v-if="page.isLoading" @click="$parent.onClickStop")
         icon(name="times")
@@ -73,6 +73,7 @@
     },
     data() {
       return {
+        handler: null,
         focused: false,
         value: '',
         suggestions: recommendTopSite,
@@ -120,6 +121,22 @@
       },
     },
     methods: {
+      onGoBackMouseDown() {
+        this.handler = setTimeout(() => this.$parent.onClickBackContextMenu(), 300);
+      },
+      onGoForwardMouseDown() {
+        this.handler = setTimeout(() => this.$parent.onClickForwardContextMenu(), 300);
+      },
+      onGoBackMouseUp() {
+        if (this.handler) {
+          clearTimeout(this.handler);
+        }
+      },
+      onGoForwardMouseUp() {
+        if (this.handler) {
+          clearTimeout(this.handler);
+        }
+      },
       onChange(val) {
         this.value = val;
       },
