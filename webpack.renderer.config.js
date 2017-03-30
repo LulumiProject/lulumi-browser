@@ -20,10 +20,14 @@ let rendererConfig = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(less|css)$/,
         use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
+          use: [{
+            loader: "css-loader"
+          }, {
+            loader: "less-loader"
+          }],
+          fallback: "style-loader"
         })
       },
       {
@@ -51,7 +55,8 @@ let rendererConfig = {
           options: {
             loaders: {
               sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader'
+              scss: 'vue-style-loader!css-loader!sass-loader',
+              less: 'vue-style-loader!css-loader!less-loader'
             },
           },
         },
@@ -103,7 +108,7 @@ let rendererConfig = {
       'components': path.join(__dirname, 'app/src/renderer/components'),
       'renderer': path.join(__dirname, 'app/src/renderer')
     },
-    extensions: ['.js', '.vue', '.json', '.css', '.pug'],
+    extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug'],
     modules: [
       path.join(__dirname, 'app/node_modules'),
       path.join(__dirname, 'node_modules')
@@ -122,10 +127,14 @@ let aboutConfig = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(less|css)$/,
         use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
+          use: [{
+            loader: "css-loader"
+          }, {
+            loader: "less-loader"
+          }],
+          fallback: "style-loader"
         })
       },
       {
@@ -152,8 +161,9 @@ let aboutConfig = {
           loader: 'vue-loader',
           options: {
             loaders: {
-              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader'
+              sass: 'vue-style-loader!css-loader!less-loader!sass-loader?indentedSyntax=1',
+              scss: 'vue-style-loader!css-loader!less-loader!sass-loader',
+              less: 'vue-style-loader!css-loader!less-loader'
             },
           },
         },
@@ -205,7 +215,7 @@ let aboutConfig = {
       'components': path.join(__dirname, 'app/src/guest/renderer/components'),
       'renderer': path.join(__dirname, 'app/src/guest/renderer')
     },
-    extensions: ['.js', '.vue', '.json', '.css', '.pug'],
+    extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug'],
     modules: [
       path.join(__dirname, 'app/node_modules'),
       path.join(__dirname, 'node_modules')
