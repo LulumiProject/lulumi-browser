@@ -1,6 +1,6 @@
 <template lang="pug">
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
-    el-col(:span="18") {{ `${hostname} requests ${permission} permission.` }}
+    el-col(:span="18") {{ `${template}` }}
     el-col(:span="6")
       el-button(:plain="true", type="success", size="small", @click="onAllow") Allow
       el-button(:plain="true", type="danger", size="small", @click="onDeny") Deny
@@ -14,6 +14,8 @@
   export default {
     data() {
       return {
+        type: null,
+        template: '',
         permission: null,
         hostname: '',
         id: -1,
@@ -40,14 +42,20 @@
       onAllow() {
         const ipc = this.$electron.ipcRenderer;
 
-        ipc.send(`response-permission-${this.id}`, {
-          accept: true,
-        });
-        this.$store.dispatch('setPermissions', {
-          hostname: this.hostname,
-          permission: this.permission,
-          accept: true,
-        });
+        if (this.type === 'permission') {
+          ipc.send(`response-permission-${this.id}`, {
+            accept: true,
+          });
+          this.$store.dispatch('setPermissions', {
+            hostname: this.hostname,
+            permission: this.permission,
+            accept: true,
+          });
+        } else {
+          ipc.send('quit-and-install', {
+            accept: true,
+          });
+        }
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
         this.$parent.showNotification = false;
 
@@ -58,14 +66,20 @@
       onDeny() {
         const ipc = this.$electron.ipcRenderer;
 
-        ipc.send(`response-permission-${this.id}`, {
-          accept: false,
-        });
-        this.$store.dispatch('setPermissions', {
-          hostname: this.hostname,
-          permission: this.permission,
-          accept: false,
-        });
+        if (this.type === 'permission') {
+          ipc.send(`response-permission-${this.id}`, {
+            accept: false,
+          });
+          this.$store.dispatch('setPermissions', {
+            hostname: this.hostname,
+            permission: this.permission,
+            accept: false,
+          });
+        } else {
+          ipc.send('quit-and-install', {
+            accept: false,
+          });
+        }
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
         this.$parent.showNotification = false;
 
@@ -77,9 +91,15 @@
     mounted() {
       const ipc = this.$electron.ipcRenderer;
 
-      // Every page would add a listenter to the request-permission event,
-      // so ignore the listenters warning.
+      // Every page would add a listenter to the request-permission and
+      // update-available event, so ignore the listenters warning.
       ipc.setMaxListeners(0);
+      ipc.on('update-available', (event, data) => {
+        this.type = 'update';
+        this.template = `Newer version, ${data.releaseName}, has been found. Quit and install?`;
+        this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
+        this.$parent.showNotification = true;
+      });
       ipc.on('request-permission', (event, data) => {
         if (this.$parent.$refs.webview.getWebContents().id === data.webContentsId) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
@@ -96,6 +116,8 @@
                 accept: false,
               });
             } else {
+              this.type = 'permission';
+              this.template = `${this.hostname} requests ${this.permission} permission.`;
               this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
               this.$parent.showNotification = true;
               this.handler = setTimeout(() => {
@@ -107,6 +129,8 @@
               }, 5000);
             }
           } else {
+            this.type = 'permission';
+            this.template = `${this.hostname} requests ${this.permission} permission.`;
             this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
             this.$parent.showNotification = true;
             this.handler = setTimeout(() => {
@@ -122,6 +146,9 @@
     },
     beforeDestroy() {
       const ipc = this.$electron.ipcRenderer;
+      ipc.removeAllListeners([
+        'update-available',
+      ]);
       ipc.removeAllListeners([
         'request-permission',
       ]);

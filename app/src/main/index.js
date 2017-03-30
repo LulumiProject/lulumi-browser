@@ -4,6 +4,7 @@ import path from 'path';
 import { app, BrowserWindow, systemPreferences, protocol, ipcMain, shell } from 'electron';
 import menu from './js/lib/menu';
 import session from './js/lib/session';
+import autoUpdater from './js/lib/auto-updater';
 import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
 
@@ -45,9 +46,12 @@ function createWindow() {
   mainWindow.loadURL(winURL);
 
   menu.init();
-
   session.onWillDownload(mainWindow, config);
   session.setPermissionRequestHandler(mainWindow);
+  if (process.env.NODE_ENV !== 'development') {
+    autoUpdater.init();
+    autoUpdater.listen(mainWindow);
+  }
 
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
     webPreferences.allowDisplayingInsecureContent = true;
