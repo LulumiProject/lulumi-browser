@@ -271,8 +271,8 @@
       },
       onGetSearchEngineProvider(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', {
             searchEngine: this.$store.getters.searchEngine,
             currentSearchEngine: this.$store.getters.currentSearchEngine,
           });
@@ -280,74 +280,74 @@
       },
       onSetSearchEngineProvider(event, data) {
         this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', {
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', {
           searchEngine: this.$store.getters.searchEngine,
           currentSearchEngine: this.$store.getters.currentSearchEngine,
         });
       },
       onGetHomepage(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', {
             homepage: this.$store.getters.homepage,
           });
         }
       },
       onSetHomepage(event, data) {
         this.$store.dispatch('setHomepage', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', {
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', {
           homepage: this.$store.getters.homepage,
         });
       },
       onGetPDFViewer(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', {
             pdfViewer: this.$store.getters.pdfViewer,
           });
         }
       },
       onSetPDFViewer(event, data) {
         this.$store.dispatch('setPDFViewer', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', {
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', {
           pdfViewer: this.$store.getters.pdfViewer,
         });
       },
       onGetTabConfig(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', this.$store.getters.tabConfig);
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
         }
       },
       onSetTabConfig(event, data) {
         this.$store.dispatch('setTabConfig', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', this.$store.getters.tabConfig);
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
       },
       onGetDownloads(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', this.$store.getters.downloads);
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', this.$store.getters.downloads);
         }
       },
       onSetDownloads(event, data) {
         this.$store.dispatch('setDownloads', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', this.$store.getters.downloads);
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', this.$store.getters.downloads);
       },
       onGetHistory(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-          webview.send('guest-here-your-data', this.$store.getters.history);
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', this.$store.getters.history);
         }
       },
       onSetHistory(event, data) {
         this.$store.dispatch('setHistory', data.val);
-        const webview = this.$electron.remote.webContents.fromId(data.webContentsId);
-        webview.send('guest-here-your-data', this.$store.getters.history);
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', this.$store.getters.history);
       },
       // tabHandlers
       onNewTab(location) {

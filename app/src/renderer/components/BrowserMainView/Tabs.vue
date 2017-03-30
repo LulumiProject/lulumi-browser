@@ -1,5 +1,5 @@
 <template lang="pug">
-  #browser-tabs(v-sortable="", @dblclick="$electron.remote.getCurrentWindow().maximize()")
+  #browser-tabs(v-sortable="", @dblclick="onDoubleClick")
     .window-buttons
     .browser-tab(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'active' : ''", :id="`${i}`", :ref="`tab-${i}`")
       <transition name="fade">
@@ -60,6 +60,14 @@
       },
     },
     methods: {
+      onDoubleClick() {
+        const mainWindow = this.$electron.remote.getCurrentWindow();
+        if (mainWindow.isMaximized()) {
+          mainWindow.unmaximize();
+        } else {
+          mainWindow.maximize();
+        }
+      },
       onClose(event) {
         let id = null;
         try {

@@ -17,6 +17,7 @@
         permission: null,
         hostname: '',
         id: -1,
+        handler: null,
       };
     },
     components: {
@@ -31,6 +32,11 @@
       },
     },
     methods: {
+      clear() {
+        if (this.handler) {
+          clearTimeout(this.handler);
+        }
+      },
       onAllow() {
         const ipc = this.$electron.ipcRenderer;
 
@@ -44,6 +50,10 @@
         });
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
         this.$parent.showNotification = false;
+
+        if (this.handler) {
+          clearTimeout(this.handler);
+        }
       },
       onDeny() {
         const ipc = this.$electron.ipcRenderer;
@@ -58,11 +68,18 @@
         });
         this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
         this.$parent.showNotification = false;
+
+        if (this.handler) {
+          clearTimeout(this.handler);
+        }
       },
     },
     mounted() {
       const ipc = this.$electron.ipcRenderer;
 
+      // Every page would add a listenter to the request-permission event,
+      // so ignore the listenters warning.
+      ipc.setMaxListeners(0);
       ipc.on('request-permission', (event, data) => {
         if (this.$parent.$refs.webview.getWebContents().id === data.webContentsId) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
@@ -81,10 +98,24 @@
             } else {
               this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
               this.$parent.showNotification = true;
+              this.handler = setTimeout(() => {
+                ipc.send(`response-permission-${this.id}`, {
+                  accept: false,
+                });
+                this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
+                this.$parent.showNotification = false;
+              }, 5000);
             }
           } else {
             this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
             this.$parent.showNotification = true;
+            this.handler = setTimeout(() => {
+              ipc.send(`response-permission-${this.id}`, {
+                accept: false,
+              });
+              this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
+              this.$parent.showNotification = false;
+            }, 5000);
           }
         }
       });
@@ -94,6 +125,8 @@
       ipc.removeAllListeners([
         'request-permission',
       ]);
+
+      this.clear();
     },
   };
 </script>

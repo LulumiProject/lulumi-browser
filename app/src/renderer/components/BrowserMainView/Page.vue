@@ -185,6 +185,9 @@
         }
       });
 
+      // Every page would add a listenter to the startFindInPage event,
+      // so ignore the listenters warning.
+      ipc.setMaxListeners(0);
       ipc.on('startFindInPage', () => {
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
           findinpage.start();
@@ -192,6 +195,12 @@
       });
 
       this.navigateTo(this.page.location);
+    },
+    beforeDestroy() {
+      const ipc = this.$electron.ipcRenderer;
+      ipc.removeAllListeners([
+        'startFindInPage',
+      ]);
     },
   };
 </script>
