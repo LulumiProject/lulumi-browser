@@ -9,7 +9,8 @@ const version = app.getVersion();
 export default {
   init() {
     autoUpdater.on('error', (err, msg) => {
-      console.error('Error fetching updates', msg + ' (' + err.stack + ')');
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching updates, ${msg} (${err.stack})`);
     });
 
     autoUpdater.setFeedURL(`${FEED_URL}/${version}`);
