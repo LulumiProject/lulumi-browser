@@ -12,7 +12,7 @@
   };
 </script>
 
-<style>
+<style lang="less">
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
   * {
@@ -20,8 +20,9 @@
     padding: 0;
   }
 
-  html,
-  body { height: 100%; }
+  html, body {
+    height: 100%;
+  }
 
   body {
     background:
@@ -35,5 +36,9 @@
     font-family: 'Source Code Pro', Courier, monospace;;
     justify-content: center;
     text-align: center;
+
+    &.darwin #chrome-tabs-shell {
+      -webkit-app-region: drag;
+    }
   }
 </style>

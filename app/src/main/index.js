@@ -40,7 +40,6 @@ function createWindow() {
     minHeight: 500,
     titleBarStyle: 'hidden-inset',
     autoHideMenuBar: true,
-    frame: true,
   });
 
   mainWindow.loadURL(winURL);

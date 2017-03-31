@@ -928,7 +928,6 @@
   html {
     position: relative;
     overflow: hidden;
-    -webkit-user-select: none;
   }
 
   #nav {

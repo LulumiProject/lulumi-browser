@@ -23,11 +23,19 @@
         :value="page.location",
         popper-class="my-autocomplete",
         custom-item="url-suggestion")
+        el-button(slot="prepend")
+          div.secure(v-if="secure")
+            icon(name="lock")
+            span Secure
+          div(v-else)
+            icon(name="info-circle")
+            span Normal
     el-cascader#dropdown(expand-trigger="hover", :options="options", v-model="selectedOptions", @change="handleChange")
 </template>
 
 <script>
   import Vue from 'vue';
+  import url from 'url';
   import { focus } from 'vue-focus';
 
   import Icon from 'vue-awesome/components/Icon';
@@ -36,8 +44,10 @@
   import 'vue-awesome/icons/angle-right';
   import 'vue-awesome/icons/refresh';
   import 'vue-awesome/icons/times';
+  import 'vue-awesome/icons/lock';
+  import 'vue-awesome/icons/info-circle';
 
-  import { Cascader } from 'element-ui';
+  import { Button, Cascader } from 'element-ui';
 
   import '../../css/el-autocomplete';
   import '../../css/el-input';
@@ -74,6 +84,9 @@
     data() {
       return {
         handler: null,
+        inputHandler: null,
+        blurHandler: null,
+        secure: false,
         focused: false,
         value: '',
         suggestions: recommendTopSite,
@@ -110,6 +123,7 @@
     },
     components: {
       Icon,
+      'el-button': Button,
       'el-cascader': Cascader,
     },
     computed: {
@@ -123,8 +137,53 @@
         }
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
       },
+      location() {
+        if (this.$store.getters.pages.length === 0) {
+          return '';
+        }
+        return this.$store.getters.pages[this.$store.getters.currentPageIndex].location;
+      },
       currentSearchEngine() {
         return this.$store.getters.currentSearchEngine;
+      },
+    },
+    watch: {
+      location(newLocation) {
+        const currentLocation = url.parse(newLocation, true);
+        const originalInput = document.getElementsByClassName('el-input__inner')[0];
+        const newElement = document.getElementsByClassName('security-location')[0];
+        if (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:') {
+          this.secure = true;
+          const newLocation
+            = `<div style="float: left; font-size: 14px; padding: 3px 0"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}`;
+          originalInput.style.display = 'none';
+
+          this.inputHandler = () => {
+            newElement.style.display = 'none';
+            originalInput.style.display = 'block';
+            originalInput.focus();
+          };
+          this.blurHandler = () => {
+            newElement.style.display = 'block';
+            originalInput.style.display = 'none';
+          };
+
+          newElement.innerHTML = newLocation;
+          newElement.style.display = 'block';
+
+          newElement.removeEventListener('click', this.inputHandler, false);
+          originalInput.removeEventListener('blur', this.blurHandler, false);
+          newElement.addEventListener('click', this.inputHandler);
+          originalInput.addEventListener('blur', this.blurHandler);
+        } else {
+          this.secure = false;
+
+          newElement.style.display = 'none';
+          originalInput.style.display = 'block';
+
+          newElement.removeEventListener('click', this.inputHandler, false);
+          originalInput.removeEventListener('blur', this.blurHandler, false);
+        }
       },
     },
     methods: {
@@ -178,6 +237,14 @@
         this.$parent.onNewTab(`${config.lulumiPagesCustomProtocol}about/#/${val.pop()}`);
       },
     },
+    mounted() {
+      const originalInput = document.getElementsByClassName('el-input__inner')[0];
+      const newElement = document.createElement('div');
+      newElement.classList = 'el-input__inner security-location';
+      newElement.innerHTML = '';
+      newElement.style.display = 'none';
+      originalInput.parentElement.append(newElement);
+    },
   };
 </script>
 
@@ -188,13 +255,12 @@
     padding: 0 5px;
     font-size: 15px;
     font-weight: 100;
-    background: linear-gradient(to bottom, #eee, #ddd);
     border-bottom: 1px solid #aaa;
   }
   #browser-navbar a {
     text-decoration: none;
     color: #777;
-    cursor: pointer;
+    cursor: default;
   }
   #browser-navbar a:hover {
     text-decoration: none;
