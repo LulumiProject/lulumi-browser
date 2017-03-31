@@ -6,11 +6,11 @@
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
-          div#tab-icons(@click="$parent.onToggleAudio($event, i, !page.isAudioMuted)", class="chrome-tab-favicon")
+          div#tab-icons(class="chrome-tab-favicon")
             i.el-icon-loading(v-if="page.isLoading")
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
-            icon(name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
-            icon(name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
+            icon(@click.native="$parent.onToggleAudio($event, i, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
+            icon(@click.native="$parent.onToggleAudio($event, i, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
           el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
             span(class="chrome-tab-title", :id="`span-${i}`", @click="$parent.onTabClick($event, parseInt(($event.target.id).split('-')[1]), 10)", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
               | {{ page.title || 'loading' }}
