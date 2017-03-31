@@ -158,11 +158,11 @@
         });
       },
       onEnterHtmlFullScreen() {
-        this.$el.querySelector('#nav').style.height = 0;
+        this.$el.querySelector('#nav').style.display = 'none';
         this.getWebView().style.height = '100vh';
       },
       onLeaveHtmlFullScreen() {
-        this.$el.querySelector('#nav').style.height = '73px';
+        this.$el.querySelector('#nav').style.display = 'block';
         this.getWebView().style.height = 'calc(100vh - 73px)';
       },
       onNewWindow(event) {
@@ -719,6 +719,10 @@
       this.onWebviewContextMenu.bind(this);
       this.onScrollTouchBegin.bind(this);
       this.onScrollTouchEnd.bind(this);
+
+      if (window.process.platform === 'darwin') {
+        document.body.classList.add('darwin');
+      }
 
       ipc.on('open-pdf', (event, data) => {
         if (this.onOpenPDF) {

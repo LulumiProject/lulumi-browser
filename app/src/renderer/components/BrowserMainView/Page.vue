@@ -225,7 +225,7 @@
     height: calc(100vh - 73px);
     width: 100vw;
     outline: none;
-    position: absolute;
+    position: relative;
   }
   webview[hidden] {
     flex: 0 1;
