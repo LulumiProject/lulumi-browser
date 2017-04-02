@@ -120,15 +120,12 @@
 <style lang="less" scoped>
   #chrome-tabs-shell {
     height: 38px;
-    position: relative;
-    padding: 0 18px 0 0px;
+    padding: 0 18px 0 0;
     border-bottom: 1px solid #999;
   }
 
   .chrome-tabs {
-    position: relative;
     display: flex;
-    font-size: 15px;
 
     * {
       -webkit-user-select: none;
@@ -143,11 +140,12 @@
       position: relative;
       margin: 0 -5px;
       top: 7px;
+      height: 30px;
       z-index: 1;
-      -webkit-app-region: no-drag;
       transition: .1s transform;
       border-bottom: 1px solid #999;
       text-align: start;
+      -webkit-app-region: no-drag;
 
       &:not(:last-child) {
         flex: 1;
@@ -155,8 +153,8 @@
 
       &:last-child {
         width: 45px;
-        z-index: 0;
         opacity: .7;
+        z-index: 0;
       }
 
       // tab decoration
@@ -197,7 +195,6 @@
         display: flex;
         align-items: center;
         left: 10px;
-        z-index: 3;
 
         img {
           width: 16px;
@@ -225,8 +222,6 @@
       }
 
       .chrome-tab-title {
-        position: relative;
-        flex: 1;
         color: #222222;
         padding: 17px 20px 0px 16px;
         height: 28px;
@@ -245,7 +240,6 @@
         top: 8px;
         width: 15px;
         height: 15px;
-        z-index: 2;
         border-radius: 8px;
 
         &:before {
@@ -286,16 +280,15 @@
       }
 
       &.chrome-tab-current {
+        border: 0;
         z-index: 2;
 
         svg {
-          height: 29px;
           .edge-bg {
             fill: #f5f5f5;
           }
         }
         .chrome-tab-bg {
-          height: 29px;
           background: #f5f5f5;
         }
       }
@@ -346,6 +339,5 @@
   // make room for the traffic lights
   .darwin:not(.fullscreen) .chrome-tabs {
     padding-left: 80px;
-    display: flex;
   }
 </style>
