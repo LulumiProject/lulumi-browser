@@ -151,11 +151,11 @@
       location(newLocation) {
         const currentLocation = url.parse(newLocation, true);
         const originalInput = document.getElementsByClassName('el-input__inner')[0];
-        const newElement = document.getElementsByClassName('security-location')[0];
+        const newElement = document.getElementById('securityLocation');
         if (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:') {
           this.secure = true;
           const newLocation
-            = `<div style="float: left; font-size: 14px; padding: 3px 0"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}`;
+            = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
           originalInput.style.display = 'none';
 
           this.inputHandler = () => {
@@ -240,7 +240,8 @@
     mounted() {
       const originalInput = document.getElementsByClassName('el-input__inner')[0];
       const newElement = document.createElement('div');
-      newElement.classList = 'el-input__inner security-location';
+      newElement.id = 'securityLocation';
+      newElement.classList = 'el-input__inner';
       newElement.innerHTML = '';
       newElement.style.display = 'none';
       originalInput.parentElement.append(newElement);

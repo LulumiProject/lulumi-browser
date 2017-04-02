@@ -54,6 +54,17 @@
     border: 1px solid #bbb;
     border-left: none;
     font-family: 'Source Code Pro', Courier, monospace;
+
+    .security-location {
+      float: left;
+      font-size: 14px;
+      padding: 3px 0;
+      position: absolute;
+      overflow: hidden;
+      white-space: nowrap;
+      // TODO: adjust the width correctly when text overflow happened
+      max-width: 75vw;
+    }
   }
 
   .el-input__inner {

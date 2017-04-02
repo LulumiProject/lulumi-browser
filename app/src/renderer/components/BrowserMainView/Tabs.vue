@@ -1,7 +1,7 @@
 <template lang="pug">
   #chrome-tabs-shell(@dblclick="onDoubleClick")
     .chrome-tabs(v-sortable="")
-      div(v-for="(page, i) in pages", :class="i == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${i}`", :ref="`tab-${i}`")
+      div(v-for="(page, index) in pages", @click="$parent.onTabClick($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
@@ -9,12 +9,12 @@
           div#tab-icons(class="chrome-tab-favicon")
             i.el-icon-loading(v-if="page.isLoading")
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
-            icon(@click.native="$parent.onToggleAudio($event, i, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
-            icon(@click.native="$parent.onToggleAudio($event, i, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
+            icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
+            icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
           el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
-            span(class="chrome-tab-title", :id="`span-${i}`", @click="$parent.onTabClick($event, parseInt(($event.target.id).split('-')[1]), 10)", @contextmenu.prevent="$parent.onTabContextMenu($event, i)")
+            span(class="chrome-tab-title", @contextmenu.prevent="$parent.onTabContextMenu($event, index)")
               | {{ page.title || 'loading' }}
-        a.close(@click="onClose", class="chrome-tab-close")
+        a.close(@click.stop="$parent.onTabClose($event, index)", class="chrome-tab-close")
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
@@ -78,9 +78,6 @@
         } else {
           mainWindow.maximize();
         }
-      },
-      onClose(event) {
-        this.$parent.onTabClose(event, parseInt(event.target.parentElement.id, 10));
       },
       onMouseMove(event) {
         const x = event.pageX - event.target.offsetLeft;
