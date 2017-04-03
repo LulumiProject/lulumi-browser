@@ -131,7 +131,7 @@ const mutations = {
           if (state.history[state.history.length - 1].url
             !== state.pages[payload.pageIndex].location) {
             const date = timeUtil.getLocaleCurrentTime();
-            state.history.push({
+            state.history.unshift({
               title: state.pages[payload.pageIndex].title,
               url: state.pages[payload.pageIndex].location,
               favicon: state.pages[payload.pageIndex].favicon,
@@ -141,7 +141,7 @@ const mutations = {
           }
         } else {
           const date = timeUtil.getLocaleCurrentTime();
-          state.history.push({
+          state.history.unshift({
             title: state.pages[payload.pageIndex].title,
             url: state.pages[payload.pageIndex].location,
             favicon: state.pages[payload.pageIndex].favicon,
