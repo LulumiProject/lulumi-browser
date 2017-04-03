@@ -66,6 +66,12 @@ export const setDownloads = ({ commit }, val) => {
 export const setHistory = ({ commit }, val) => {
   commit(types.SET_HISTORY, val);
 };
+export const setPages = ({ commit }, val) => {
+  commit(types.SET_PAGES, val);
+};
+export const setTabsOrder = ({ commit }, val) => {
+  commit(types.SET_TABS_ORDER, val);
+};
 export const createDownloadTask = ({ commit }, file) => {
   commit(types.CREATE_DOWNLOAD_TASK, file);
 };

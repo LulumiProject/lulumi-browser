@@ -1,7 +1,7 @@
 <template lang="pug">
   #chrome-tabs-shell(@dblclick="onDoubleClick")
     .chrome-tabs(v-sortable="")
-      div(v-for="(page, index) in pages", @click="$parent.onTabClick($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`")
+      div(v-for="(page, index) in pages", @click="$parent.onTabClick($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
@@ -41,17 +41,13 @@
   export default {
     directives: {
       sortable: {
-        update(el) {
+        update(el, binding, vnode) {
           Sortable.create(el, {
             draggable: '.chrome-tab-draggable',
             animation: 150,
             ghostClass: 'ghost',
-            onUpdate(event) {
-              const item = event.item;
-              if (!item.dataset.oldIndex) {
-                item.dataset.oldIndex = event.oldIndex;
-              }
-              item.dataset.newIndex = event.newIndex;
+            onUpdate() {
+              vnode.context.$store.dispatch('setTabsOrder', this.toArray());
             },
           });
         },

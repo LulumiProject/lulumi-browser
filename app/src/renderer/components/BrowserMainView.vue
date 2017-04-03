@@ -3,7 +3,7 @@
     #nav
       tabs(ref="tab")
       navbar
-    page(v-for="(page, i) in pages", :isActive="i == currentPageIndex", :pageIndex="i", :ref="`page-${i}`", :key="`page-${page.pid}`")
+    page(v-for="(page, index) in pages", :isActive="index == currentPageIndex", :pageIndex="index", :ref="`page-${index}`", :key="`page-${page.pid}`")
     #footer
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}
@@ -21,6 +21,7 @@
   import urlUtil from '../js/lib/url-util';
   import imageUtil from '../js/lib/image-util';
   import urlResource from '../js/lib/url-resource';
+  import tabsOrdering from '../js/lib/tabs-ordering';
 
   export default {
     data() {
@@ -51,6 +52,9 @@
       },
       pages() {
         return this.$store.getters.pages;
+      },
+      tabsOrder() {
+        return this.$store.getters.tabsOrder;
       },
       currentPageIndex() {
         return this.$store.getters.currentPageIndex;
@@ -362,7 +366,19 @@
         this.$store.dispatch('clickTab', pageIndex);
       },
       onTabClose(event, pageIndex) {
-        this.$store.dispatch('closeTab', pageIndex);
+        const newPages = tabsOrdering(this.pages, this.$refs.tab, 0, this.tabsOrder, true);
+        this.$store.dispatch('setPages', {
+          pid: this.$store.getters.pid,
+          pages: newPages,
+        });
+        this.$nextTick(() => {
+          if (this.tabsOrder.length === 0) {
+            this.$store.dispatch('closeTab', pageIndex);
+          } else {
+            this.$store.dispatch('closeTab', this.tabsOrder.findIndex(element => element === pageIndex));
+          }
+          this.$store.dispatch('setTabsOrder', []);
+        });
       },
       // navHandlers
       onClickHome() {
@@ -809,34 +825,15 @@
       });
 
       ipc.on('request-app-state', (event, force) => {
-        const newPages = [];
-        const newIndex = Math.ceil(Math.random() * 10000);
-        this.pages.map((page, index) => {
-          newPages[index] = Object.assign({}, page);
-          return true;
-        });
-        this.pages.map((page, index) => {
-          let tmp = null;
-          if (this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex) {
-            tmp = newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.newIndex];
-            newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.newIndex]
-              = newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex];
-            newPages[this.$refs.tab.$refs[`tab-${index}`][0].dataset.oldIndex]
-              = tmp;
-          }
-          return true;
-        });
-        newPages.map((page, index) => {
-          page.pid = newIndex + index;
-          return true;
-        });
+        const newStart = Math.ceil(Math.random() * 10000);
+        const newPages = tabsOrdering(this.pages, this.$refs.tab, newStart, this.tabsOrder);
         const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
         if (downloads.length !== 0) {
           if (force) {
             ipc.send('response-app-state', {
               ready: true,
               newState: {
-                pid: newIndex + (newPages.length - 1),
+                pid: newStart + (newPages.length - 1),
                 pages: newPages,
                 currentPageIndex: this.currentPageIndex,
                 currentSearchEngine: this.$store.getters.currentSearchEngine,
@@ -862,7 +859,7 @@
                 ipc.send('response-app-state', {
                   ready: true,
                   newState: {
-                    pid: newIndex + (newPages.length - 1),
+                    pid: newStart + (newPages.length - 1),
                     pages: newPages,
                     currentPageIndex: this.currentPageIndex,
                     currentSearchEngine: this.$store.getters.currentSearchEngine,
@@ -880,7 +877,7 @@
           ipc.send('response-app-state', {
             ready: true,
             newState: {
-              pid: newIndex + (newPages.length - 1),
+              pid: newStart + (newPages.length - 1),
               pages: newPages,
               currentPageIndex: this.currentPageIndex,
               currentSearchEngine: this.$store.getters.currentSearchEngine,

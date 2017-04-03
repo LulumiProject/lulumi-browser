@@ -3,9 +3,9 @@
     .control-group
       a(@click="$parent.onClickHome")
         icon(name="angle-double-left")
-      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu.stop="$parent.onClickBackContextMenu()", @mousedown.stop="onGoBackMouseDown", @mouseup.stop="onGoBackMouseUp", :class="page.canGoBack ? '' : 'disabled'")
+      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? '' : 'disabled'")
         icon(name="angle-left")
-      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu.stop="$parent.onClickForwardContextMenu()", @mousedown.stop="onGoForwardMouseDown", @mouseup.stop="onGoForwardMouseUp", :class="page.canGoForward ? '' : 'disabled'")
+      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? '' : 'disabled'")
         icon(name="angle-right")
       a(v-if="page.isLoading" @click="$parent.onClickStop")
         icon(name="times")

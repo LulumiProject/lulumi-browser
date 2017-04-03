@@ -6,6 +6,7 @@ import timeUtil from '../../js/lib/time-util';
 const state = {
   pid: 0,
   pages: [],
+  tabsOrder: [],
   currentPageIndex: 0,
   searchEngine: config.searchEngine,
   currentSearchEngine: config.currentSearchEngine,
@@ -61,13 +62,15 @@ const mutations = {
   },
   [types.CLOSE_TAB](state, pageIndex) {
     if (state.pages.length > pageIndex) {
-      if (state.pages.length === 1) {
-        state.pages = [createPageObject()];
+      state.pages.splice(pageIndex, 1);
+      if (state.pages.length === 0) {
         state.currentPageIndex = 0;
+        state.pid += 1;
+        state.pages.push(createPageObject());
+        state.pages[state.pages.length - 1].pid = state.pid;
       } else {
-        state.pages.splice(pageIndex, 1);
-
         // find the nearest adjacent page to make active
+        // eslint-disable-next-line no-lonely-if
         if (state.currentPageIndex >= pageIndex) {
           for (let i = pageIndex; i >= 0; i--) {
             if (state.pages[i]) {
@@ -201,6 +204,17 @@ const mutations = {
   },
   [types.SET_HISTORY](state, val) {
     state.history = val;
+  },
+  [types.SET_PAGES](state, val) {
+    state.pid = val.pid;
+    state.pages = val.pages;
+  },
+  [types.SET_TABS_ORDER](state, val) {
+    if (val.length === 0) {
+      state.tabsOrder = val;
+    } else {
+      state.tabsOrder = val.map(element => parseInt(element, 10));
+    }
   },
   // downloads handlers
   [types.CREATE_DOWNLOAD_TASK](state, file) {
