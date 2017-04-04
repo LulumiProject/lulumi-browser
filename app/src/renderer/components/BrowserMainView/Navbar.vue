@@ -37,6 +37,7 @@
   import Vue from 'vue';
   import url from 'url';
   import { focus } from 'vue-focus';
+  import fetchJsonp from 'fetch-jsonp';
 
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/angle-double-left';
@@ -228,6 +229,17 @@
             value: this.value,
           });
         }
+        fetchJsonp(`https://suggestqueries.google.com/complete/search?client=youtube&q=${this.value}`)
+          .then(response => response.json())
+          .then(data => data[1])
+          .then((entries) => {
+            entries.forEach((entry) => {
+              results.push({
+                title: entry[0],
+                value: entry[0],
+              });
+            });
+          });
         cb(results);
       },
       createFilter(queryString) {
