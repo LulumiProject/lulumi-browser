@@ -123,7 +123,6 @@
     * {
       -webkit-user-select: none;
       cursor: default;
-      font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
       font-size: 12px;
       line-height: 13px;
     }

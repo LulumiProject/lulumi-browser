@@ -37,7 +37,6 @@
   import Vue from 'vue';
   import url from 'url';
   import { focus } from 'vue-focus';
-  import fetchJsonp from 'fetch-jsonp';
 
   import Icon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/angle-double-left';
@@ -55,18 +54,29 @@
   import '../../css/el-cascader';
   import config from '../../js/constants/config';
   import urlUtil from '../../js/lib/url-util';
+  import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {
     functional: true,
     render(h, ctx) {
       const item = ctx.props.item;
-      return h('li', ctx.data, [
-        h('div', { attrs: { class: 'location' } }, [item.value,
-          h('span', { attrs: { class: 'name' } }, [
-            ' - ',
-            item.title || '',
+      if (item.title) {
+        return h('li', ctx.data, [
+          h('div', { attrs: { class: 'location' } }, [
+            h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
+            item.value,
+            h('span', { attrs: { class: 'name' } }, [
+              ' - ',
+              item.title || '',
+            ]),
           ]),
+        ]);
+      }
+      return h('li', ctx.data, [
+        h('div', { attrs: { class: 'location' } }, [
+          h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
+          item.value,
         ]),
       ]);
     },
@@ -217,29 +227,20 @@
       },
       querySearch(queryString, cb) {
         const suggestions = this.suggestions;
-        const results =
+        let results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
           title: `${this.currentSearchEngine.name} Search`,
           value: this.value,
+          icon: 'search',
         });
         if (results.length === 1 && urlUtil.isURL(this.value)) {
           results.unshift({
-            title: 'Page',
             value: this.value,
+            icon: 'document',
           });
         }
-        fetchJsonp(`https://suggestqueries.google.com/complete/search?client=youtube&q=${this.value}`)
-          .then(response => response.json())
-          .then(data => data[1])
-          .then((entries) => {
-            entries.forEach((entry) => {
-              results.push({
-                title: entry[0],
-                value: entry[0],
-              });
-            });
-          });
+        results = urlSuggestion(this.currentSearchEngine.name, `${this.currentSearchEngine.autocomplete}${this.value}`, results);
         cb(results);
       },
       createFilter(queryString) {

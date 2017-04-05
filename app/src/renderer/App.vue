@@ -13,7 +13,7 @@
 </script>
 
 <style lang="less">
-  @import url(https://fonts.googleapis.com/css?family=Lato:300);
+  @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
 
   * {
     margin: 0;

@@ -25,8 +25,9 @@
         if (obj) {
           // eslint-disable-next-line no-undef
           ipcRenderer.send('set-current-search-engine-provider', {
-            search: obj.search,
             name: obj.name,
+            search: obj.search,
+            autocomplete: obj.autocomplete,
           });
         }
       },
@@ -40,8 +41,9 @@
         ret.searchEngine.forEach((val) => {
           this.tableData.push({
             current: ret.currentSearchEngine.search === val.search ? 'Y' : 'N',
-            search: val.search,
             name: val.name,
+            search: val.search,
+            autocomplete: val.autocomplete,
           });
         });
       });
