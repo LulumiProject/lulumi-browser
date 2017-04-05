@@ -3,6 +3,7 @@
     #nav
       tabs(ref="tab")
       navbar
+    swipeArrow
     page(v-for="(page, index) in pages", :isActive="index == currentPageIndex", :pageIndex="index", :ref="`page-${index}`", :key="`page-${page.pid}`")
     #footer
       transition(name="extend")
@@ -15,6 +16,7 @@
 
   import Tabs from './BrowserMainView/Tabs';
   import Navbar from './BrowserMainView/Navbar';
+  import swipeArrow from './BrowserMainView/SwipeArrow';
   import Page from './BrowserMainView/Page';
   import Download from './BrowserMainView/Download';
 
@@ -31,14 +33,15 @@
         isSwipeOnEdge: false,
         deltaX: 0,
         deltaY: 0,
+        hnorm: 0,
         startTime: 0,
-        time: 0,
         showDownloadBar: false,
       };
     },
     components: {
       Tabs,
       Navbar,
+      swipeArrow,
       Page,
       Download,
     },
@@ -174,10 +177,48 @@
         this.$store.dispatch('createTab', event.url);
       },
       onWheel(event) {
+        const leftSwipeArrow = document.getElementById('left-swipe-arrow');
+        const rightSwipeArrow = document.getElementById('right-swipe-arrow');
+
+        const SWIPE_TRIGGER_DIST = 200;
+        const ARROW_OFF_DIST = 40;
+
         if (this.trackingFingers) {
-          this.deltaX = this.deltaX + event.deltaX;
-          this.deltaY = this.deltaY + event.deltaY;
-          this.time = (new Date()).getTime() - this.startTime;
+          this.deltaX += event.deltaX;
+          this.deltaY += event.deltaY;
+
+          if (Math.abs(this.deltaY) > Math.abs(this.deltaX)) {
+            this.hnorm = 0;
+          } else if ((this.deltaX < 0 && !this.getWebView().canGoBack())
+            || (this.deltaX > 0 && !this.getWebView().canGoForward())) {
+            this.hnorm = 0;
+            this.deltaX = 0;
+          } else {
+            this.hnorm = this.deltaX / SWIPE_TRIGGER_DIST;
+          }
+          this.hnorm = Math.min(1.0, Math.max(-1.0, this.hnorm));
+          // eslint-disable-next-line no-console
+          console.log(this.hnorm);
+
+          if (this.deltaX < 0) {
+            leftSwipeArrow.style.left = `${((-1 * ARROW_OFF_DIST) - (this.hnorm * ARROW_OFF_DIST))}px`;
+            rightSwipeArrow.style.right = `${(-1 * ARROW_OFF_DIST)}px`;
+          }
+          if (this.deltaX > 0) {
+            leftSwipeArrow.style.left = `${(-1 * ARROW_OFF_DIST)}px`;
+            rightSwipeArrow.style.right = `${((-1 * ARROW_OFF_DIST) + (this.hnorm * ARROW_OFF_DIST))}px`;
+          }
+
+          if (this.hnorm <= -1) {
+            leftSwipeArrow.classList.add('highlight');
+          } else {
+            leftSwipeArrow.classList.remove('highlight');
+          }
+          if (this.hnorm >= 1) {
+            rightSwipeArrow.classList.add('highlight');
+          } else {
+            rightSwipeArrow.classList.remove('highlight');
+          }
         }
       },
       onOpenPDF(event, data) {
@@ -251,24 +292,34 @@
         if (swipeGesture) {
           this.trackingFingers = true;
           this.isSwipeOnEdge = false;
-          this.startTime = (new Date()).getTime();
         }
       },
       onScrollTouchEnd() {
-        if (this.time > 50
-              && this.trackingFingers
-              && Math.abs(this.deltaY) < 50
-              && this.isSwipeOnEdge) {
-          if (this.deltaX > 70) {
-            this.getWebView().goForward();
-          } else if (this.deltaX < -70) {
+        const leftSwipeArrow = document.getElementById('left-swipe-arrow');
+        const rightSwipeArrow = document.getElementById('right-swipe-arrow');
+
+        const ARROW_OFF_DIST = 40;
+
+        if (this.trackingFingers && this.isSwipeOnEdge) {
+          if (this.hnorm <= -1) {
             this.getWebView().goBack();
           }
+          if (this.hnorm >= 1) {
+            this.getWebView().goForward();
+          }
         }
+        leftSwipeArrow.classList.add('returning');
+        leftSwipeArrow.classList.remove('highlight');
+        leftSwipeArrow.style.left = `${(-1 * ARROW_OFF_DIST)}px`;
+        rightSwipeArrow.classList.add('returning');
+        rightSwipeArrow.classList.remove('highlight');
+        rightSwipeArrow.style.right = `${(-1 * ARROW_OFF_DIST)}px`;
+
+
         this.trackingFingers = false;
         this.deltaX = 0;
         this.deltaY = 0;
-        this.startTime = 0;
+        this.hnorm = 0;
       },
       onScrollTouchEdge() {
         this.isSwipeOnEdge = true;

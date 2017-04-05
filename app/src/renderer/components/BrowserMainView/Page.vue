@@ -92,12 +92,6 @@
         this.$parent.onWebviewContextMenu(event);
       });
 
-      webview.addEventListener('wheel', (event) => {
-        if (this.$parent.onWheel) {
-          this.$parent.onWheel(event);
-        }
-      }, { passive: true });
-
       const ipc = this.$electron.ipcRenderer;
 
       const findinpage = {
