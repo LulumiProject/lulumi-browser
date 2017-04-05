@@ -89,7 +89,7 @@
           cur = history[i];
           curLabel = cur.label;
           if (!(curLabel in labels)) {
-            labels[curLabel] = { label: curLabel, children: [], id: i };
+            labels[curLabel] = { label: curLabel, time: cur.time, children: [], id: i };
             newArr.push(labels[curLabel]);
           }
           cur.id = i;
@@ -104,6 +104,7 @@
         }
         return h('span', { attrs: { class: 'history-list__item' } },
           [
+            h('span', { attrs: { class: 'history-list__item-time' } }, history.time),
             h('img', { attrs: { src: history.favicon, width: '20px' } }),
             h('span', { attrs: { class: 'history-list__item-name' } }, history.title),
             h('a', { attrs: { href: history.url, class: 'history-list__item-link' } }, history.url),
@@ -139,18 +140,22 @@
     background-size: 0;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: 30%;
+    width: 50%;
   }
   a.history-list__item-link:hover {
     color: green;
   }
+  .history-list__item-time {
+    color: gray;
+    padding-right: 30px;
+  }
   .history-list__item-name {
     color: #48576a;
-    padding-left: 4px;
+    padding: 0 4px;
     transition: color .3s;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 600px;
+    width: 300px;
   }
 </style>

@@ -95,7 +95,7 @@
     data() {
       return {
         handler: null,
-        inputHandler: null,
+        clickHandler: null,
         blurHandler: null,
         secure: false,
         focused: false,
@@ -169,22 +169,12 @@
             = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
           originalInput.style.display = 'none';
 
-          this.inputHandler = () => {
-            newElement.style.display = 'none';
-            originalInput.style.display = 'block';
-            originalInput.focus();
-          };
-          this.blurHandler = () => {
-            newElement.style.display = 'block';
-            originalInput.style.display = 'none';
-          };
-
           newElement.innerHTML = newLocation;
           newElement.style.display = 'block';
 
-          newElement.removeEventListener('click', this.inputHandler, false);
+          newElement.removeEventListener('click', this.clickHandler, false);
           originalInput.removeEventListener('blur', this.blurHandler, false);
-          newElement.addEventListener('click', this.inputHandler);
+          newElement.addEventListener('click', this.clickHandler);
           originalInput.addEventListener('blur', this.blurHandler);
         } else {
           this.secure = false;
@@ -192,7 +182,7 @@
           newElement.style.display = 'none';
           originalInput.style.display = 'block';
 
-          newElement.removeEventListener('click', this.inputHandler, false);
+          newElement.removeEventListener('click', this.clickHandler, false);
           originalInput.removeEventListener('blur', this.blurHandler, false);
         }
       },
@@ -258,6 +248,16 @@
       newElement.innerHTML = '';
       newElement.style.display = 'none';
       originalInput.parentElement.append(newElement);
+
+      this.clickHandler = () => {
+        newElement.style.display = 'none';
+        originalInput.style.display = 'block';
+        originalInput.focus();
+      };
+      this.blurHandler = () => {
+        newElement.style.display = 'block';
+        originalInput.style.display = 'none';
+      };
     },
   };
 </script>

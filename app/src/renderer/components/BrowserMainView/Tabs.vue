@@ -21,7 +21,7 @@
       div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab()")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-        .chrome-tab-bg
+        .chrome-tab-bg(style="padding-right: 10px;")
         .chrome-tab-favicon
           i(class="el-icon-plus")
         svg(width="15", height="30", class="right-edge")
@@ -177,6 +177,7 @@
         left: 14px;
         right: 14px;
         height: 29px;
+        padding-right: 20px;
         background: #ddd;
         border-top: 1px solid #808080;
         transition: .2s background;
@@ -215,10 +216,9 @@
 
       .chrome-tab-title {
         color: #222222;
-        padding: 17px 20px 0px 16px;
+        padding: 17px 0 0 16px;
         height: 28px;
         overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
       }
       &.chrome-tab-nofavicon .chrome-tab-title {

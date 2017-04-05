@@ -7,9 +7,10 @@
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", placeholder="Search in Page")
       span(ref="findinpageCount")
-      i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
-      i(ref="findinpageNextMatch", class="el-icon-arrow-down")
-      i(ref="findinpageEnd", class="el-icon-circle-close")
+      div
+        i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
+        i(ref="findinpageNextMatch", class="el-icon-arrow-down")
+        i(ref="findinpageEnd", class="el-icon-circle-close")
 </template>
 
 <script>
@@ -191,6 +192,7 @@
       ipc.on('startFindInPage', () => {
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
           findinpage.start();
+          findinpage.counter.textContent = '0 of 0 match';
         }
       });
 
@@ -205,7 +207,7 @@
   };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   #notification {
     width: 100vw;
     height: 35px;
@@ -222,41 +224,63 @@
   }
 
   webview {
-    height: calc(100vh - 73px);
+    height: calc(~'100vh - 73px');
     width: 100vw;
     outline: none;
     position: relative;
-  }
-  webview[hidden] {
-    flex: 0 1;
-    width: 0px;
-    height: 0px !important;
-  }
-  webview.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 99;
-  }
-  /* hack to work around display: none issues with webviews */
-  webview.hidden {
-    flex: 0 1;
-    width: 0px;
-    height: 0px !important;
+
+    &[hidden] {
+      flex: 0 1;
+      width: 0px;
+      height: 0px !important;
+    }
+
+    &.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99;
+    }
+
+    /* hack to work around display: none issues with webviews */
+    &.hidden {
+      flex: 0 1;
+      width: 0px;
+      height: 0px !important;
+    }
   }
 
   .findinpage-bar {
-    border-bottom: 1px solid rgb(236, 236, 236);
-    border-width: 1px 1px 0 0;
-    border-top-right-radius: 4px;
+    top: 73px;
+    right: 0px;
+    background: rgba(128, 128, 128, 0.6);
+    border-bottom-left-radius: 4px;
     display: flex;
-    font-size: 12px;
     align-items: center;
     justify-content: center;
-    padding: 5px 10px;
+    font-size: 12px;
+    padding: 5px 3px;
     animation: slideIn 25ms;
-    position: relative;
+    position: absolute;
+
+    *:nth-child(1) {
+      flex: 3;
+    }
+
+    *:nth-child(2) {
+      flex: 3;
+    }
+
+    div {
+      flex: 2;
+      i.el-icon-arrow-up, i.el-icon-arrow-down, i.el-icon-circle-close {
+        border: 1px solid transparent;
+        font-size: 16px;
+        margin: 0 2px;
+        opacity: 0.5;
+      }
+    }
   }
 </style>
