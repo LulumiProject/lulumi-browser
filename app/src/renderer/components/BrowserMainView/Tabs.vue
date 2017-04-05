@@ -1,7 +1,7 @@
 <template lang="pug">
   #chrome-tabs-shell(@dblclick="onDoubleClick")
     .chrome-tabs(v-sortable="")
-      div(v-for="(page, index) in pages", @click="$parent.onTabClick($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index")
+      div(v-for="(page, index) in pages", @click="$parent.onTabClick($event, index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
@@ -12,7 +12,7 @@
             icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
             icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
           el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
-            span(class="chrome-tab-title", @contextmenu.prevent="$parent.onTabContextMenu($event, index)")
+            span(class="chrome-tab-title")
               | {{ page.title || 'loading' }}
         a.close(@click.stop="$parent.onTabClose($event, index)", class="chrome-tab-close")
         svg(width="15", height="30", class="right-edge")
