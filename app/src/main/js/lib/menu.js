@@ -2,6 +2,21 @@ import { app, Menu, BrowserWindow } from 'electron';
 
 const template = [
   {
+    label: 'File',
+    submenu: [
+      {
+        label: 'New Tab',
+        accelerator: 'CmdOrCtrl+T',
+        click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
+      },
+      {
+        label: 'Close Tab',
+        accelerator: 'CmdOrCtrl+W',
+        click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
+      },
+    ],
+  },
+  {
     label: 'Edit',
     submenu: [
       {
@@ -124,7 +139,7 @@ if (process.platform === 'darwin') {
     ],
   });
   // Edit menu.
-  template[1].submenu.push(
+  template[2].submenu.push(
     {
       type: 'separator',
     },
@@ -146,7 +161,7 @@ if (process.platform === 'darwin') {
     },
   );
   // Window menu.
-  template[3].submenu = [
+  template[4].submenu = [
     {
       label: 'Close',
       accelerator: 'CmdOrCtrl+W',

@@ -106,6 +106,16 @@
           this.$parent.onClickRefresh();
         }
       });
+      ipc.on('new-tab', () => {
+        if (this.$parent.onNewTab) {
+          this.$parent.onNewTab();
+        }
+      });
+      ipc.on('tab-close', () => {
+        if (this.$parent.onTabClose) {
+          this.$parent.onTabClose();
+        }
+      });
     },
   };
 </script>

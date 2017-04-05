@@ -423,6 +423,9 @@
           pages: newPages,
         });
         this.$nextTick(() => {
+          if (!pageIndex) {
+            pageIndex = this.currentPageIndex;
+          }
           if (this.tabsOrder.length === 0) {
             this.$store.dispatch('closeTab', pageIndex);
           } else {
