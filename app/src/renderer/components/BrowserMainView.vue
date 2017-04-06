@@ -421,7 +421,7 @@
           pages: newPages,
         });
         this.$nextTick(() => {
-          if (!pageIndex) {
+          if (pageIndex === undefined) {
             pageIndex = this.currentPageIndex;
           }
           if (this.tabsOrder.length === 0) {

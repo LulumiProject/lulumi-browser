@@ -185,8 +185,13 @@
       ipc.setMaxListeners(0);
       ipc.on('startFindInPage', () => {
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
-          findinpage.start();
-          findinpage.counter.textContent = '0 of 0 match';
+          if (this.hidden) {
+            findinpage.start();
+            findinpage.counter.textContent = '0 of 0 match';
+          } else {
+            findinpage.input.focus();
+            findinpage.input.select();
+          }
         }
       });
 
