@@ -197,8 +197,6 @@
             this.hnorm = this.deltaX / SWIPE_TRIGGER_DIST;
           }
           this.hnorm = Math.min(1.0, Math.max(-1.0, this.hnorm));
-          // eslint-disable-next-line no-console
-          console.log(this.hnorm);
 
           if (this.deltaX < 0) {
             leftSwipeArrow.style.left = `${((-1 * ARROW_OFF_DIST) - (this.hnorm * ARROW_OFF_DIST))}px`;

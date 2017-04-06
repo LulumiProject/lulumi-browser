@@ -37,14 +37,33 @@ const template = [
       {
         role: 'paste',
       },
-      {
-        role: 'pasteandmatchstyle',
-      },
+      process.platform === 'darwin' ? {
+        role: 'pasteandmatchstyle'
+      } : {},
       {
         role: 'delete',
       },
       {
         role: 'selectall',
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Find',
+        accelerator: 'CmdOrCtrl+F',
+        click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
+      },
+      {
+        label: 'Speech',
+        submenu: [
+          {
+            role: 'startspeaking',
+          },
+          {
+            role: 'stopspeaking',
+          },
+        ],
       },
     ],
   },
@@ -91,6 +110,13 @@ const template = [
       {
         role: 'close',
       },
+      process.platform === 'darwin' ? {
+        type: 'separator'
+      } : {},
+      process.platform === 'darwin' ? {
+        label: 'Bring All to Front',
+        role: 'front'
+      } : {},
     ],
   },
   {
@@ -138,52 +164,6 @@ if (process.platform === 'darwin') {
       },
     ],
   });
-  // Edit menu.
-  template[2].submenu.push(
-    {
-      type: 'separator',
-    },
-    {
-      label: 'Find',
-      accelerator: 'CmdOrCtrl+F',
-      click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
-    },
-    {
-      label: 'Speech',
-      submenu: [
-        {
-          role: 'startspeaking',
-        },
-        {
-          role: 'stopspeaking',
-        },
-      ],
-    },
-  );
-  // Window menu.
-  template[4].submenu = [
-    {
-      label: 'Close',
-      accelerator: 'CmdOrCtrl+W',
-      role: 'close',
-    },
-    {
-      label: 'Minimize',
-      accelerator: 'CmdOrCtrl+M',
-      role: 'minimize',
-    },
-    {
-      label: 'Zoom',
-      role: 'zoom',
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: 'Bring All to Front',
-      role: 'front',
-    },
-  ];
 }
 
 const menu = Menu.buildFromTemplate(template);

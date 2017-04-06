@@ -260,15 +260,15 @@
     position: absolute;
 
     *:nth-child(1) {
-      flex: 3;
+      flex: 1;
     }
 
     *:nth-child(2) {
-      flex: 3;
+      flex: 1;
     }
 
     div {
-      flex: 2;
+      flex: 1;
       i.el-icon-arrow-up, i.el-icon-arrow-down, i.el-icon-circle-close {
         border: 1px solid transparent;
         font-size: 16px;
