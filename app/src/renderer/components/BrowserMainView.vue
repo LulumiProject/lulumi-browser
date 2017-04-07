@@ -25,6 +25,10 @@
   import urlResource from '../js/lib/url-resource';
   import tabsOrdering from '../js/lib/tabs-ordering';
 
+  import apiInjector from '../../api/api-injector';
+  import Event from '../../api/extensions/event';
+  import Tab from '../../api/extensions/tab';
+
   export default {
     data() {
       return {
@@ -36,6 +40,8 @@
         hnorm: 0,
         startTime: 0,
         showDownloadBar: false,
+        onCreatedEvent: new Event(),
+        onRemovedEvent: new Event(),
       };
     },
     components: {
@@ -112,6 +118,7 @@
           pageIndex,
           webview,
         });
+        require('../../api/test/extension-sample').default();
       },
       onDidFailLoad(event, pageIndex) {
         this.$store.dispatch('didFailLoad', pageIndex);
@@ -410,11 +417,13 @@
         } else {
           this.$store.dispatch('createTab');
         }
+        this.onCreatedEvent.emit(new Tab(this.currentPageIndex + 1, null));
       },
       onTabClick(event, pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
       },
       onTabClose(event, pageIndex) {
+        this.onRemovedEvent.emit(new Tab(pageIndex, this.getPage(pageIndex)));
         const newPages = tabsOrdering(this.pages, this.$refs.tab, 0, this.tabsOrder, true);
         this.$store.dispatch('setPages', {
           pid: this.$store.getters.pid,
@@ -959,6 +968,12 @@
         }
       });
 
+      apiInjector(this).then((restoreOriginalModuleLoader) => {
+        if (restoreOriginalModuleLoader) {
+          // eslint-disable-next-line no-console
+          console.log('Api injected!');
+        }
+      });
       ipc.send('request-app-state');
     },
   };

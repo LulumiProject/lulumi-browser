@@ -38,7 +38,7 @@ const template = [
         role: 'paste',
       },
       process.platform === 'darwin' ? {
-        role: 'pasteandmatchstyle'
+        role: 'pasteandmatchstyle',
       } : {},
       {
         role: 'delete',
@@ -111,11 +111,11 @@ const template = [
         role: 'close',
       },
       process.platform === 'darwin' ? {
-        type: 'separator'
+        type: 'separator',
       } : {},
       process.platform === 'darwin' ? {
         label: 'Bring All to Front',
-        role: 'front'
+        role: 'front',
       } : {},
     ],
   },

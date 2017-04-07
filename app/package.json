@@ -8,6 +8,7 @@
   "dependencies": {
     "babel-runtime": "^6.23.0",
     "fetch-jsonp": "^1.0.6",
+    "lulumi": "^0.0.1",
     "vue": "^2.2.6",
     "vue-electron": "^1.0.6",
     "vue-resource": "^1.2.1",
