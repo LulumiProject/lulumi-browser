@@ -7,6 +7,7 @@ import session from './js/lib/session';
 import autoUpdater from './js/lib/auto-updater';
 import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
+import * as chromeExtension from '../api/chrome-extension';
 
 let mainWindow;
 
@@ -74,6 +75,11 @@ function createWindow() {
     mainWindow = null;
   });
 
+  ipcMain.on('request-extension-manifest-maps', () => {
+    chromeExtension.getManifestFromPath(path.resolve(`${__dirname}/../api/test`));
+    mainWindow.webContents.send('response-extension-manifest-maps', chromeExtension.manifestMap, chromeExtension.manifestNameMap);
+  });
+
   ipcMain.on('request-app-state', () => {
     new Promise((resolve, reject) => {
       let data = null;
@@ -94,7 +100,7 @@ function createWindow() {
       }
     }).then((data) => {
       mainWindow.webContents.send('set-app-state', data);
-    });
+    }).catch(() => console.log('request-app-state error'));
   });
 
   // save app-state every 5 mins

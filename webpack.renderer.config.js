@@ -37,7 +37,7 @@ let rendererConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        include: [ path.resolve(__dirname, 'app/src/renderer'), path.resolve('node_modules/vue-awesome') ],
+        include: [ path.resolve(__dirname, 'app/src/renderer'), path.resolve(__dirname, 'app/src/api'), path.resolve('node_modules/vue-awesome') ],
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {

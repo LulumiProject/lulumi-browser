@@ -25,7 +25,7 @@
   import urlResource from '../js/lib/url-resource';
   import tabsOrdering from '../js/lib/tabs-ordering';
 
-  import apiInjector from '../../api/api-injector';
+  import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
   import Tab from '../../api/extensions/tab';
 
@@ -39,6 +39,7 @@
         deltaY: 0,
         hnorm: 0,
         startTime: 0,
+        extensionService: null,
         showDownloadBar: false,
         onCreatedEvent: new Event(),
         onRemovedEvent: new Event(),
@@ -118,7 +119,7 @@
           pageIndex,
           webview,
         });
-        require('../../api/test/extension-sample').default();
+        this.extensionService.activate();
       },
       onDidFailLoad(event, pageIndex) {
         this.$store.dispatch('didFailLoad', pageIndex);
@@ -968,12 +969,7 @@
         }
       });
 
-      apiInjector(this).then((restoreOriginalModuleLoader) => {
-        if (restoreOriginalModuleLoader) {
-          // eslint-disable-next-line no-console
-          console.log('Api injected!');
-        }
-      });
+      this.extensionService = new ExtensionService(this);
       ipc.send('request-app-state');
     },
   };
