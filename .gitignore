@@ -9,7 +9,7 @@ app/dist/renderer.js
 app/dist/about.js
 app/dist/renderer.css
 app/dist/about.css
-app/src/api/test/
+extensions/*
 builds/*
 dist/*
 coverage

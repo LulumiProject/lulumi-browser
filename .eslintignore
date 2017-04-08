@@ -2,6 +2,7 @@ app/node_modules/**
 app/dist/**
 app/pdfjs/**
 app/src/api/**
+extensions/**
 test/unit/coverage/**
 test/unit/*.js
 test/e2e/*.js

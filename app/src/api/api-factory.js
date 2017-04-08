@@ -11,6 +11,9 @@ export default (VueInstance) => {
   };
 
   const runtime = {
+    getManifest: () => {
+      return Promise.resolve(VueInstance.extensionService.manifestMap);
+    },
     getURL: () => {
       return Promise.resolve(VueInstance.getWebView().getURL());
     },

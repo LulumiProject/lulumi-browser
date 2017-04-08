@@ -75,8 +75,8 @@ function createWindow() {
     mainWindow = null;
   });
 
-  ipcMain.on('request-extension-manifest-maps', () => {
-    chromeExtension.getManifestFromPath(path.resolve(`${__dirname}/../api/test`));
+  ipcMain.on('request-extension-manifest-maps', (event, extensions) => {
+    extensions.forEach(extension => chromeExtension.getManifestFromPath(path.resolve(`${__dirname}/../../../extensions/${extension}`)));
     mainWindow.webContents.send('response-extension-manifest-maps', chromeExtension.manifestMap, chromeExtension.manifestNameMap);
   });
 

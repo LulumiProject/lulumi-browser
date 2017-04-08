@@ -112,6 +112,7 @@
             webview,
           });
         }
+        this.extensionService.activate();
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -119,7 +120,6 @@
           pageIndex,
           webview,
         });
-        this.extensionService.activate();
       },
       onDidFailLoad(event, pageIndex) {
         this.$store.dispatch('didFailLoad', pageIndex);
