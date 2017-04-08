@@ -24,10 +24,10 @@
 <script>
   import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
 
-  import '../../css/el-progress';
-  import '../../css/el-popover';
-  import prettySize from '../../js/lib/pretty-size';
-  import imageUtil from '../../js/lib/image-util';
+  import 'renderer/css/el-progress';
+  import 'renderer/css/el-popover';
+  import prettySize from 'renderer/js/lib/pretty-size';
+  import imageUtil from 'renderer/js/lib/image-util';
 
   export default {
     components: {

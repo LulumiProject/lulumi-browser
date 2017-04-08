@@ -14,9 +14,9 @@
 </template>
 
 <script>
-  import Notification from './Notification';
+  import urlUtil from 'renderer/js/lib/url-util';
 
-  import urlUtil from '../../js/lib/url-util';
+  import Notification from './Notification';
 
   export default {
     data() {

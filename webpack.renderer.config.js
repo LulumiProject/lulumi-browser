@@ -105,6 +105,7 @@ let rendererConfig = {
   },
   resolve: {
     alias: {
+      'src': path.join(__dirname, 'app/src'),
       'components': path.join(__dirname, 'app/src/renderer/components'),
       'renderer': path.join(__dirname, 'app/src/renderer'),
       'extensions': path.join(__dirname, 'extensions')

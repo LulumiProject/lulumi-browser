@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import '../../css/el-tree';
+  import 'renderer/css/el-tree';
 
   export default {
     data() {

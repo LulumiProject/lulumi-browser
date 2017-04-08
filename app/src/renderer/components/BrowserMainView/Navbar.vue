@@ -49,13 +49,13 @@
 
   import { Button, Cascader } from 'element-ui';
 
-  import '../../css/el-autocomplete';
-  import '../../css/el-input';
-  import '../../css/el-cascader';
-  import config from '../../js/constants/config';
-  import urlUtil from '../../js/lib/url-util';
-  import urlSuggestion from '../../js/lib/url-suggestion';
-  import recommendTopSite from '../../js/data/RecommendTopSite';
+  import 'renderer/css/el-autocomplete';
+  import 'renderer/css/el-input';
+  import 'renderer/css/el-cascader';
+  import config from 'renderer/js/constants/config';
+  import urlUtil from 'renderer/js/lib/url-util';
+  import urlSuggestion from 'renderer/js/lib/url-suggestion';
+  import recommendTopSite from 'renderer/js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {
     functional: true,

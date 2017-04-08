@@ -1,4 +1,4 @@
-import config from '../constants/config';
+import config from 'renderer/js/constants/config';
 
 function getLulumiExtUrl(relativeUrl) {
   return `${config.lulumiPagesCustomProtocol}${relativeUrl}`;
