@@ -112,7 +112,6 @@
             webview,
           });
         }
-        this.extensionService.activate();
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);

@@ -5,7 +5,6 @@ import apiFactory, { initializeExtensionApi } from './api-factory';
 
 export default class ExtHostExtensionService {
   constructor(VueInstance) {
-    this.cwd = path.resolve('./extensions');
     this.ready = false;
     VueInstance.$electron.ipcRenderer.once('response-extension-manifest-maps', (event, manifestMap, manifestNameMap) => {
       if (Object.keys(manifestMap) !== 0) {
@@ -18,17 +17,7 @@ export default class ExtHostExtensionService {
         });
       }
     });
-    this.extensions
-      = fs.readdirSync(this.cwd).filter((file) => file.startsWith('.') === false).filter((file) => fs.lstatSync(path.join(this.cwd, file)).isDirectory());
-    VueInstance.$electron.ipcRenderer.send('request-extension-manifest-maps', this.extensions);
-  }
-
-  activate() {
-    if (this.ready) {
-      this.extensions.forEach(extension => {
-        require(`extensions/${extension}/background`).activate();
-      });
-    }
+    VueInstance.$electron.ipcRenderer.send('request-extension-manifest-maps');
   }
 
   _triggerOnReady() {
