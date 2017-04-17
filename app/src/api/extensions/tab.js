@@ -1,7 +1,6 @@
 class Tab {
-  constructor (tabId, instance) {
+  constructor (tabId) {
     this.id = tabId;
-    this.instance = instance;
   }
 };
 

@@ -7,79 +7,63 @@ const tabArray = [];
 // VueInstance is an instance of BrowserMainView
 export default (VueInstance) => {
   const env = {
-    appName: () => Promise.resolve(VueInstance.$electron.remote.app.getName()),
-  };
-
-  const runtime = {
-    getManifest: () => {
-      return Promise.resolve(VueInstance.extensionService.manifestMap);
-    },
-    getURL: () => {
-      return Promise.resolve(VueInstance.getWebView().getURL());
-    },
+    appName: () => VueInstance.$electron.remote.app.getName(),
   };
 
   const tabs = {
-    getCurrent: (callback) => {
-      const tab = new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage());
+    getCurrent: () => {
+      const tab = new Tab(VueInstance.$store.getters.currentPageIndex);
       tabArray[tab.id] = tab;
 
-      if (callback) {
-        callback(tab);
-      } else {
-        return Promise.resolve(tab);
-      }
+      return tab;
     },
-    query: (queryInfo, callback) => {
+    query: (queryInfo) => {
       if (queryInfo.hasOwnProperty('active')) {
-        return Promise.resolve([new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage())]);
+        return [new Tab(VueInstance.$store.getters.currentPageIndex)];
       }
     },
-    update: (tabId, updateProperties = {}, callback) => {
-      const tab = (tabId === undefined)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage())
+    update: (tabId, updateProperties = {}) => {
+      const tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
       if (updateProperties.hasOwnProperty('url')) {
-        tab.instance.$refs.webview.loadURL(updateProperties.url);
+        VueInstance.getPage(tab.id).$refs.webview.loadURL(updateProperties.url);
       }
     },
-    reload: (tabId, reloadProperties = { bypassCache: false }, callback) => {
-      const tab = (tabId === undefined)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage())
+    reload: (tabId, reloadProperties = { bypassCache: false }) => {
+      const tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
       if (reloadProperties.bypassCache) {
-        tab.instance.$refs.webview.reloadIgnoringCache();
+        VueInstance.getPage(tab.id).$refs.webview.reloadIgnoringCache();
       } else {
-        tab.instance.$refs.webview.reload();
+        VueInstance.getPage(tab.id).$refs.webview.reload();
       }
     },
-    remove: (tabIds, callback) => {
+    remove: (tabIds) => {
       if (!Array.isArray(tabIds)) {
         tabIds = [tabIds];
       }
       tabIds.forEach(tabId => VueInstance.onTabClose(tabId));
     },
-    executeScript: (tabId, details = {}, callback = null) => {
-      const tab = (tabId === undefined)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage())
+    executeScript: (tabId, details = {}) => {
+      const tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
       if (details.hasOwnProperty('file')) {
-        tab.instance.$refs.webview.executeJavaScript(
+        VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(
           String(fs.readFileSync(path.join(manifest.srcDirectory, details.file))),
-          false, callback);
+          false);
       } else if (details.hasOwnProperty('code')) {
-        tab.instance.$refs.webview.executeJavaScript(details.code, false, callback);
+        VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(details.code, false);
       }
     },
-    insertCSS: (tabId, details = {}, callback) => {
-      const tab = (tabId === undefined)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, VueInstance.getPage())
+    insertCSS: (tabId, details = {}) => {
+      const tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
       if (details.hasOwnProperty('code')) {
-        tab.instance.$refs.webview.insertCSS(details.code);
-        if (callback) {
-          callback();
-        }
+        VueInstance.getPage(tab.id).$refs.webview.insertCSS(details.code);
       }
     },
     onUpdated: VueInstance.onUpdatedEvent,
@@ -89,7 +73,6 @@ export default (VueInstance) => {
 
   return {
     env,
-    runtime,
     tabs,
   };
 };

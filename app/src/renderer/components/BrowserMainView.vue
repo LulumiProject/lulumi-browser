@@ -969,6 +969,57 @@
       });
 
       this.extensionService = new ExtensionService(this);
+
+      ipc.on('lulumi-env-app-name', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-env-app-name-result', require('lulumi').env.appName());
+        }
+      });
+
+      ipc.on('lulumi-tabs-get-current', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-get-current-result', require('lulumi').tabs.getCurrent());
+        }
+      });
+      ipc.on('lulumi-tabs-query', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-query-result', require('lulumi').tabs.query(data.queryInfo));
+        }
+      });
+      ipc.on('lulumi-tabs-update', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-update-result', require('lulumi').tabs.update(data.tabId, data.updateProperties));
+        }
+      });
+      ipc.on('lulumi-tabs-reload', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-reload-result', require('lulumi').tabs.reload(data.tabId, data.reloadProperties));
+        }
+      });
+      ipc.on('lulumi-tabs-remove', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-remove-result', require('lulumi').tabs.remove(data.tabIds));
+        }
+      });
+      ipc.on('lulumi-tabs-execute-script', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-execute-script-result', require('lulumi').tabs.executeScript(data.tabId, data.details));
+        }
+      });
+      ipc.on('lulumi-tabs-insert-css', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-insert-css-result', require('lulumi').tabs.insertCSS(data.tabId, data.details));
+        }
+      });
+
       ipc.send('request-app-state');
     },
   };

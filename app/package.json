@@ -2,7 +2,7 @@
   "name": "lulumi-browser",
   "productName": "Lulumi-browser",
   "version": "1.2.1",
-  "electronVersion": "1.6.5",
+  "electronVersion": "1.6.6",
   "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "main": "./dist/main.js",
   "dependencies": {
@@ -11,9 +11,9 @@
     "lulumi": "^0.0.1",
     "vue": "^2.2.6",
     "vue-electron": "^1.0.6",
-    "vue-resource": "^1.2.1",
-    "vue-router": "^2.3.1",
-    "vuex": "^2.2.1"
+    "vue-resource": "^1.3.1",
+    "vue-router": "^2.4.0",
+    "vuex": "^2.3.0"
   },
   "devDependencies": {},
   "author": "Boik Su <boik@tdohacker.org>",

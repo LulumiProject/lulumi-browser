@@ -6,6 +6,7 @@ const state = {
     lulumi: [],
     preferences: [],
   },
+  extensions: {},
 };
 
 const mutations = {
@@ -16,6 +17,9 @@ const mutations = {
     if (data.path) {
       state.about.path = data.path;
     }
+  },
+  [types.UPDATE_EXTENSIONS](state, data) {
+    state.extensions = data;
   },
 };
 

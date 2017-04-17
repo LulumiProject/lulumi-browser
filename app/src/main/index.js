@@ -56,7 +56,7 @@ function createWindow() {
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
     webPreferences.allowDisplayingInsecureContent = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
-    webPreferences.preload = `${config.lulumiAppPath}/pages/preload.js`;
+    webPreferences.preload = `${config.lulumiAppPath}/pages/webview-preload.js`;
   });
 
   mainWindow.on('scroll-touch-begin', () => {
@@ -75,8 +75,12 @@ function createWindow() {
     mainWindow = null;
   });
 
-  ipcMain.on('request-extension-manifest-maps', () => {
-    mainWindow.webContents.send('response-extension-manifest-maps', chromeExtension.manifestMap, chromeExtension.manifestNameMap);
+  ipcMain.on('request-extension-objects', () => {
+    mainWindow.webContents.send('response-extension-objects',
+      chromeExtension.manifestMap,
+      chromeExtension.manifestNameMap,
+      chromeExtension.backgroundPages,
+    );
   });
 
   ipcMain.on('request-app-state', () => {
@@ -99,6 +103,7 @@ function createWindow() {
       }
     }).then((data) => {
       mainWindow.webContents.send('set-app-state', data);
+    // eslint-disable-next-line no-console
     }).catch(() => console.log('request-app-state error'));
   });
 
@@ -266,6 +271,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
     ];
     global.sharedObject = {
       guestData: data,
+      backgroundPages: chromeExtension.backgroundPages,
     };
   }
 });

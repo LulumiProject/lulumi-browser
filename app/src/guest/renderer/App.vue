@@ -10,11 +10,17 @@
   export default {
     store,
     mounted() {
-      if (window.data) {
-        this.$store.dispatch('updateAbout', window.data);
+      if (window.about) {
+        this.$store.dispatch('updateAbout', window.about);
       } else {
         // eslint-disable-next-line no-alert
-        alert('error');
+        alert('Error: window.about not found!');
+      }
+      if (window.extensions) {
+        this.$store.dispatch('updateExtensions', window.extensions);
+      } else {
+        // eslint-disable-next-line no-alert
+        alert('Error: window.extensions not found!');
       }
     },
   };

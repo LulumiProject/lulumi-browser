@@ -4,6 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 
+import config from '../renderer/js/constants/config';
+import './extensions/listeners';
+
 const objectValues = (object) => {
   return Object.keys(object).map(function (key) { return object[key] });
 };
@@ -90,8 +93,9 @@ const startBackgroundPages = (manifest) => {
     partition: 'persist:__chrome_extension',
     isBackgroundPage: true,
     commandLineSwitches: ['--background-page'],
+    preload: `${config.lulumiAppPath}/pages/extension-preload.js`,
   });
-  backgroundPages[manifest.extensionId] = { html, webContents: contents, name };
+  backgroundPages[manifest.extensionId] = { html, webContentsId: contents.id, name };
   contents.loadURL(url.format({
     protocol: 'lulumi-extension',
     slashes: true,
@@ -105,13 +109,13 @@ const removeBackgroundPages = (manifest) => {
     return;
   }
 
-  backgroundPages[manifest.extensionId].webContents.destroy();
+  webContents.fromId(backgroundPages[manifest.extensionId].webContentsId).destroy();
   delete backgroundPages[manifest.extensionId];
 };
 
 const sendToBackgroundPages = (...args) => {
   for (const page of objectValues(backgroundPages)) {
-    page.webContents.sendToAll(...args);
+    webContents.fromId(page.webContentsId).sendToAll(...args);
   }
 };
 
@@ -367,4 +371,5 @@ export function addDevToolsExtension (srcDirectory) {
 export {
   manifestMap,
   manifestNameMap,
+  backgroundPages,
 };
