@@ -1,5 +1,6 @@
 const { ipcRenderer, remote } = require('electron');
 const { runInThisContext } = require('vm');
+const { LocalStorage } = require('node-localstorage');
 
 // Check whether pattern matches.
 // https://developer.chrome.com/extensions/match_patterns
@@ -15,7 +16,7 @@ const matchesPattern = (pattern) => {
 // Run the code with lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
-  require('./inject-to').injectTo(extensionId, false, context);
+  require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
   const wrapper = `(function (lulumi) {\n${code}\n})`;
   const compiledWrapper = runInThisContext(wrapper, {
     filename: url,

@@ -1048,7 +1048,6 @@
       });
       ipc.on('lulumi-runtime-emit-on-message', (event, data) => {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
           require('lulumi').runtime.onMessage(data.webContentsId).emit(data.message, data.sender);
         }
       });

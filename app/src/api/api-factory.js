@@ -30,8 +30,14 @@ export default (VueInstance) => {
     },
     query: (queryInfo) => {
       if (queryInfo.hasOwnProperty('active')) {
-        return [new Tab(VueInstance.$store.getters.currentPageIndex)];
+        if (queryInfo.active) {
+          return [new Tab(VueInstance.$store.getters.currentPageIndex)];
+        }
       }
+      const pages = VueInstance.$store.getters.pages;
+      let tabs = [];
+      pages.forEach((page, index) => tabs.push(new Tab(index)));
+      return tabs;
     },
     update: (tabId, updateProperties = {}) => {
       let tab = (tabId === null)
