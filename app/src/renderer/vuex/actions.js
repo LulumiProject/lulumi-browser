@@ -88,6 +88,10 @@ export const setPermissions = ({ commit }, scope) => {
   commit(types.SET_PERMISSIONS, scope);
 };
 
+export const updateMappings = ({ commit }, webContentsId, pageIndex) => {
+  commit(types.UPDATE_MAPPINGS, webContentsId, pageIndex);
+};
+
 export const setAppState = ({ commit }, newState) => {
   commit(types.SET_APP_STATE, newState);
 };

@@ -36,6 +36,7 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       hostname: extensionId,
       pathname: path,
     }),
+    onMessage: new Event('runtime', 'on-message'),
   };
 
   lulumi.tabs = {
@@ -94,6 +95,14 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
         }
       });
       ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
+    },
+    sendMessage: (tabId, message, responseCallback) => {
+      ipcRenderer.once('lulumi-tabs-send-message-result', (event, result) => {
+        if (responseCallback) {
+          responseCallback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-tabs-send-message', tabId, message);
     },
     onUpdated: new Event('tabs', 'on-updated'),
     onCreated: new Event('tabs', 'on-created'),

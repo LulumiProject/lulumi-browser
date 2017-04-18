@@ -16,6 +16,7 @@ const state = {
   downloads: [],
   history: [],
   permissions: {},
+  mappings: [],
 };
 
 function createPageObject(url) {
@@ -260,6 +261,10 @@ const mutations = {
       state.permissions[scope.hostname] = {};
       state.permissions[scope.hostname][scope.permission] = scope.accept;
     }
+  },
+  // webContentsId => pageIndex mappings
+  [types.UPDATE_MAPPINGS](state, data) {
+    state.mappings[data.webContentsId] = data.pageIndex;
   },
   // app state
   [types.SET_APP_STATE](state, newState) {

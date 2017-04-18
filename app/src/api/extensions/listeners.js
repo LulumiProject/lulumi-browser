@@ -66,6 +66,39 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
   });
 });
 
+ipcMain.once('lulumi-runtime-on-message', (event) => {
+  ipcMain.on('lulumi-runtime-add-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-runtime-add-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-runtime-remove-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-runtime-remove-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-runtime-emit-on-message', (event, message) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-runtime-emit-on-message', {
+      message,
+      sender: event.sender,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+ipcMain.on('lulumi-tabs-send-message', (event, tabId, message) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-tabs-send-message', {
+    tabId,
+    message,
+    webContentsId: event.sender.id,
+  });
+});
+
 ipcMain.once('lulumi-tabs-on-updated', (event) => {
   ipcMain.on('lulumi-tabs-add-listener-on-updated', (event, digest) => {
     BrowserWindow.getAllWindows()[0]

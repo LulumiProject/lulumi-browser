@@ -113,6 +113,10 @@
             webview,
           });
         }
+        this.$store.dispatch('updateMappings', {
+          webContentsId: webview.getWebContents().id,
+          pageIndex,
+        });
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -1018,6 +1022,40 @@
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
           webContents.send('lulumi-tabs-insert-css-result', require('lulumi').tabs.insertCSS(data.tabId, data.details));
+        }
+      });
+      ipc.on('lulumi-runtime-add-listener-on-message', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-runtime-add-listener-on-message-result-${data.digest}`, args);
+          };
+          require('lulumi').runtime.onMessage(data.webContentsId).addListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-runtime-remove-listener-on-message', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-runtime-add-listener-on-message-result-${data.digest}`, args);
+          };
+          require('lulumi').runtime.onMessage(data.webContentsId).removeListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-runtime-emit-on-message', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          require('lulumi').runtime.onMessage(data.webContentsId).emit(data.message, data.sender);
+        }
+      });
+      ipc.on('lulumi-tabs-send-message', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('lulumi-tabs-send-message-result', require('lulumi').tabs.sendMessage(data.tabId, data.message));
         }
       });
       ipc.on('lulumi-tabs-add-listener-on-updated', (event, data) => {

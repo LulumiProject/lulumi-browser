@@ -15,6 +15,10 @@ let shuttingDown = false;
 const storagePath = process.env.NODE_ENV === 'development'
   ? path.join(app.getPath('temp'), '.lulumi-test-app-state')
   : path.join(app.getPath('userData'), 'app-state');
+if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line no-console
+  console.log(storagePath);
+}
 let appStateSaveHandler = null;
 
 const isDarwin = process.platform === 'darwin';

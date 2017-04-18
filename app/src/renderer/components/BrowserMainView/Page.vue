@@ -16,6 +16,8 @@
 <script>
   import urlUtil from 'renderer/js/lib/url-util';
 
+  import Event from 'src/api/extensions/event';
+
   import Notification from './Notification';
 
   export default {
@@ -24,6 +26,7 @@
         hidden: true,
         requestId: null,
         showNotification: false,
+        onMessageEvent: new Event(),
       };
     },
     props: [

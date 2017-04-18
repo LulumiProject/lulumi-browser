@@ -28,7 +28,7 @@ class Event {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
     ipcRenderer.on(`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`, (event, args) => {
-      callback(args);
+      callback(...args);
     });
     ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, digest);
   }

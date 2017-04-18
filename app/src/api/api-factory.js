@@ -11,6 +11,16 @@ export default (VueInstance) => {
     appName: () => VueInstance.$electron.remote.app.getName(),
   };
 
+  const runtime = {
+    onMessage: (webContentsId) => {
+      let id = VueInstance.$store.getters.mappings[webContentsId];
+      if (id === undefined) {
+        id = 0;
+      }
+      return VueInstance.getPage(id).onMessageEvent;
+    },
+  };
+
   const tabs = {
     getCurrent: () => {
       const tab = new Tab(VueInstance.$store.getters.currentPageIndex);
@@ -24,17 +34,23 @@ export default (VueInstance) => {
       }
     },
     update: (tabId, updateProperties = {}) => {
-      const tab = (tabId === null)
+      let tab = (tabId === null)
         ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+      }
       if (updateProperties.hasOwnProperty('url')) {
         VueInstance.getPage(tab.id).$refs.webview.loadURL(updateProperties.url);
       }
     },
     reload: (tabId, reloadProperties = { bypassCache: false }) => {
-      const tab = (tabId === null)
+      let tab = (tabId === null)
         ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+      }
       if (reloadProperties.bypassCache) {
         VueInstance.getPage(tab.id).$refs.webview.reloadIgnoringCache();
       } else {
@@ -48,9 +64,12 @@ export default (VueInstance) => {
       tabIds.forEach(tabId => VueInstance.onTabClose(tabId));
     },
     executeScript: (tabId, details = {}) => {
-      const tab = (tabId === null)
+      let tab = (tabId === null)
         ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+      }
       if (details.hasOwnProperty('file')) {
         VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(
           String(fs.readFileSync(path.join(manifest.srcDirectory, details.file))),
@@ -60,12 +79,24 @@ export default (VueInstance) => {
       }
     },
     insertCSS: (tabId, details = {}) => {
-      const tab = (tabId === null)
+      let tab = (tabId === null)
         ? new Tab(VueInstance.$store.getters.currentPageIndex)
         : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+      }
       if (details.hasOwnProperty('code')) {
         VueInstance.getPage(tab.id).$refs.webview.insertCSS(details.code);
       }
+    },
+    sendMessage: (tabId, message) => {
+      let tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+      }
+      VueInstance.getPage(tab.id).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },
     onUpdated: VueInstance.onUpdatedEvent,
     onCreated: VueInstance.onCreatedEvent,
@@ -78,6 +109,7 @@ export default (VueInstance) => {
 
   return {
     env,
+    runtime,
     tabs,
     storage,
   };
