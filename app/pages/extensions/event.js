@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-String.prototype.hashCode = () => {
+String.prototype.hashCode = function() {
   let hash = 0;
   let i;
   let chr;
@@ -17,19 +17,20 @@ String.prototype.hashCode = () => {
 };
 
 class Event {
-  constructor(handler) {
-    this.handler = handler;
-    ipcRenderer.send(`lulumi-tabs-${this.handler}`);
+  constructor(scope, event) {
+    this.scope = scope;
+    this.event = event;
+    ipcRenderer.send(`lulumi-${this.scope}-${this.event}`);
     this.listeners = [];
   }
 
   addListener(callback) {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
-    ipcRenderer.on(`lulumi-tabs-add-listener-${this.handler}-result-${digest}`, (event, args) => {
+    ipcRenderer.on(`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`, (event, args) => {
       callback(args);
     });
-    ipcRenderer.send(`lulumi-tabs-add-listener-${this.handler}`, digest);
+    ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, digest);
   }
 
   removeListener(callback) {
@@ -38,12 +39,12 @@ class Event {
     if (index !== -1) {
       this.listeners.splice(index, 1);
     }
-    ipcRenderer.removeAllListeners([`lulumi-tabs-add-listener-${this.handler}-result-${digest}`]);
-    ipcRenderer.send(`lulumi-tabs-remove-listener-${this.handler}`, digest);
+    ipcRenderer.removeAllListeners([`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`]);
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, digest);
   }
 
   emit(...args) {
-    ipcRenderer.send(`lulumi-tabs-emit-${this.handler}`, args);
+    ipcRenderer.send(`lulumi-${this.scope}-emit-${this.event}`, args);
   }
 }
 

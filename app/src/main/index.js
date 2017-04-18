@@ -13,7 +13,7 @@ let mainWindow;
 
 let shuttingDown = false;
 const storagePath = process.env.NODE_ENV === 'development'
-  ? path.join(process.env.HOME, '.lulumi-test-app-state')
+  ? path.join(app.getPath('temp'), '.lulumi-test-app-state')
   : path.join(app.getPath('userData'), 'app-state');
 let appStateSaveHandler = null;
 

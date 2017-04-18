@@ -2,10 +2,9 @@ const { remote } = require('electron');
 const { LocalStorage } = require('node-localstorage');
 
 process.once('loaded', () => {
-  global.LocalStorage = LocalStorage;
   const inject = (extensionId) => {
     const context = {};
-    require('./inject-to').injectTo(extensionId, false, context);
+    require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
     global.lulumi = context.lulumi;
   };
 

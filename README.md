@@ -46,7 +46,8 @@ $ yarn run test
   * env: `appName(callback)`
   * runtime: `id, getURL(path)`
   * tabs: `getCurrent(callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), onUpdated, onCreated, onRemoved`
+  * storage: `set(items, callback), get(keys, callback), onChanged`
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[42c1086](https://github.com/SimulatedGREG/electron-vue/commit/42c1086e61e30284913a3a2a1cc899cc5e7b5fcd) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[d4e52e7](https://github.com/SimulatedGREG/electron-vue/commit/d4e52e7596be6715f7e5e575c40066856ceeea0c) and developed by [@qazbnm456](https://github.com/qazbnm456).

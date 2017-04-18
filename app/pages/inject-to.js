@@ -1,14 +1,24 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, remote } = require('electron');
+const path = require('path');
 const url = require('url');
 
 const Event = require('./extensions/event');
 
-// eslint-disable-next-line no-undef
-const localStorage = new LocalStorage('./scratch');
-
-exports.injectTo = (extensionId, isBackgroundPage, context) => {
+exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
+  let storagePath;
+  let localStorage;
+
+  if (LocalStorage) {
+    storagePath = process.env.NODE_ENV === 'development'
+      ? path.join(remote.app.getPath('temp'), 'lulumi-local-storage')
+      : path.join(remote.app.getPath('userData'), 'lulumi-local-storage');
+
+    // eslint-disable-next-line no-undef
+    localStorage = new LocalStorage(storagePath);
+  }
+
   lulumi.env = {
     appName: (callback) => {
       ipcRenderer.once('lulumi-env-app-name-result', (event, result) => {
@@ -85,9 +95,9 @@ exports.injectTo = (extensionId, isBackgroundPage, context) => {
       });
       ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
     },
-    onUpdated: new Event('on-updated'),
-    onCreated: new Event('on-created'),
-    onRemoved: new Event('on-removed'),
+    onUpdated: new Event('tabs', 'on-updated'),
+    onCreated: new Event('tabs', 'on-created'),
+    onRemoved: new Event('tabs', 'on-removed'),
   };
 
   lulumi.storage = {
@@ -127,6 +137,11 @@ exports.injectTo = (extensionId, isBackgroundPage, context) => {
         callback(ret);
       }
     },
-    onChanged: new Event('on-changed'),
+    onChanged: new Event('storage', 'on-changed'),
+  };
+
+  lulumi.storage.sync = {
+    get: lulumi.storage.get,
+    set: lulumi.storage.set,
   };
 };
