@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+import Event from './extensions/event';
 import Tab from './extensions/tab';
 
 const tabArray = [];
@@ -71,9 +72,14 @@ export default (VueInstance) => {
     onRemoved: VueInstance.onRemovedEvent,
   };
 
+  const storage = {
+    onChanged: new Event(),
+  };
+
   return {
     env,
     tabs,
+    storage,
   };
 };
 

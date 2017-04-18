@@ -40,6 +40,13 @@ $ yarn run lint:fix
 $ yarn run test
 ```
 
+## API
+
+- lulumi
+  * env: `appName(callback)`
+  * runtime: `id, getURL(path)`
+  * tabs: `getCurrent(callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), onUpdated, onCreated, onRemoved`
+
 ---
 
 This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[42c1086](https://github.com/SimulatedGREG/electron-vue/commit/42c1086e61e30284913a3a2a1cc899cc5e7b5fcd) and developed by [@qazbnm456](https://github.com/qazbnm456).

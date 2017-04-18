@@ -41,6 +41,7 @@
         startTime: 0,
         extensionService: null,
         showDownloadBar: false,
+        onUpdatedEvent: new Event(),
         onCreatedEvent: new Event(),
         onRemovedEvent: new Event(),
       };
@@ -417,7 +418,7 @@
         } else {
           this.$store.dispatch('createTab');
         }
-        this.onCreatedEvent.emit(new Tab(this.currentPageIndex + 1, null));
+        this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
       onTabClick(event, pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
@@ -1017,6 +1018,115 @@
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
           webContents.send('lulumi-tabs-insert-css-result', require('lulumi').tabs.insertCSS(data.tabId, data.details));
+        }
+      });
+      ipc.on('lulumi-tabs-add-listener-on-updated', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-updated-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onUpdated.addListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-remove-listener-on-updated', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-updated-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onUpdated.removeListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-emit-on-updated', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          require('lulumi').tabs.onUpdated.emit(data.args);
+        }
+      });
+      ipc.on('lulumi-tabs-add-listener-on-created', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-created-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onCreated.addListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-remove-listener-on-created', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-created-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onCreated.removeListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-emit-on-created', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          require('lulumi').tabs.onCreated.emit(data.args);
+        }
+      });
+      ipc.on('lulumi-tabs-add-listener-on-removed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-removed-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onRemoved.addListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-remove-listener-on-removed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-tabs-add-listener-on-removed-result-${data.digest}`, args);
+          };
+          require('lulumi').tabs.onRemoved.removeListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-tabs-emit-on-removed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          require('lulumi').tabs.onRemoved.emit(data.args);
+        }
+      });
+
+      ipc.on('lulumi-storage-add-listener-on-changed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-storage-add-listener-on-changed-result-${data.digest}`, args);
+          };
+          require('lulumi').storage.onChanged.addListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-storage-remove-listener-on-changed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          // eslint-disable-next-line func-names
+          const wrapper = function (...args) {
+            // eslint-disable-next-line prefer-rest-params
+            webContents.send(`lulumi-storage-add-listener-on-changed-result-${data.digest}`, args);
+          };
+          require('lulumi').storage.onChanged.removeListener(wrapper);
+        }
+      });
+      ipc.on('lulumi-storage-emit-on-changed', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          require('lulumi').storage.onChanged.emit(data.args);
         }
       });
 

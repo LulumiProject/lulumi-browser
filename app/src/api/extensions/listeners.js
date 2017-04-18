@@ -65,3 +65,99 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
     webContentsId: event.sender.id,
   });
 });
+
+ipcMain.once('lulumi-tabs-on-updated', (event) => {
+  ipcMain.on('lulumi-tabs-add-listener-on-updated', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-add-listener-on-updated', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-remove-listener-on-updated', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-remove-listener-on-updated', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-emit-on-updated', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-emit-on-updated', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
+ipcMain.once('lulumi-tabs-on-created', (event) => {
+  ipcMain.on('lulumi-tabs-add-listener-on-created', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-add-listener-on-created', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-remove-listener-on-created', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-remove-listener-on-removed', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-emit-on-created', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-emit-on-created', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
+ipcMain.once('lulumi-tabs-on-removed', (event) => {
+  ipcMain.on('lulumi-tabs-add-listener-on-removed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-add-listener-on-removed', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-remove-listener-on-removed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-remove-listener-on-removed', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-emit-on-removed', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-tabs-emit-on-removed', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
+ipcMain.once('lulumi-storage-on-changed', (event) => {
+  ipcMain.on('lulumi-storage-add-listener-on-changed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-storage-add-listener-on-changed', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-storage-remove-listener-on-changed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-storage-remove-listener-on-changed', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-storage-emit-on-changed', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-storage-emit-on-changed', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});

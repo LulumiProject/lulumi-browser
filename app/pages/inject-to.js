@@ -1,6 +1,11 @@
 const { ipcRenderer } = require('electron');
 const url = require('url');
 
+const Event = require('./extensions/event');
+
+// eslint-disable-next-line no-undef
+const localStorage = new LocalStorage('./scratch');
+
 exports.injectTo = (extensionId, isBackgroundPage, context) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
@@ -80,5 +85,48 @@ exports.injectTo = (extensionId, isBackgroundPage, context) => {
       });
       ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
     },
+    onUpdated: new Event('on-updated'),
+    onCreated: new Event('on-created'),
+    onRemoved: new Event('on-removed'),
+  };
+
+  lulumi.storage = {
+    set: (items, callback) => {
+      Object.keys(items).forEach((item) => {
+        const oldValue = localStorage.getItem(item);
+        const newValue = items[item];
+        localStorage.setItem(item, JSON.stringify(newValue));
+
+        lulumi.storage.onChanged.emit([{
+          oldValue,
+          newValue,
+        }], 'local');
+      });
+
+      if (callback) {
+        callback();
+      }
+    },
+    get: (keys, callback) => {
+      let ks;
+      if (keys.constructor === Object) {
+        ks = keys;
+      } else if (keys.constructor === String) {
+        ks = [keys];
+      } else if (keys.constructor === Array) {
+        ks = keys;
+      }
+
+      const ret = {};
+      Object.keys(ks).forEach((key) => {
+        const tkey = ks[key];
+        ret[tkey] = JSON.parse(localStorage.getItem(tkey));
+      });
+
+      if (callback) {
+        callback(ret);
+      }
+    },
+    onChanged: new Event('on-changed'),
   };
 };
