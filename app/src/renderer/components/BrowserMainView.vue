@@ -1024,6 +1024,11 @@
           webContents.send('lulumi-tabs-insert-css-result', require('lulumi').tabs.insertCSS(data.tabId, data.details));
         }
       });
+      ipc.on('lulumi-runtime-send-message', (event, data) => {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          require('lulumi').runtime.sendMessage(data.extensionId, data.message, data.options);
+        }
+      });
       ipc.on('lulumi-runtime-add-listener-on-message', (event, data) => {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);

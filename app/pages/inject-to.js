@@ -2,6 +2,7 @@ const { ipcRenderer, remote } = require('electron');
 const path = require('path');
 const url = require('url');
 
+const IpcEvent = require('./extensions/ipc-event');
 const Event = require('./extensions/event');
 
 exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
@@ -36,7 +37,19 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       hostname: extensionId,
       pathname: path,
     }),
-    onMessage: new Event('runtime', 'on-message'),
+    sendMessage: (extensionId, message, options, responseCallback) => {
+      ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
+        if (responseCallback) {
+          responseCallback(result);
+        }
+      });
+      if (extensionId === null) {
+        ipcRenderer.send('lulumi-runtime-send-message', lulumi.runtime.id, message, options);
+      } else {
+        ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, options);
+      }
+    },
+    onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),
   };
 
   lulumi.tabs = {
@@ -104,9 +117,9 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-tabs-send-message', tabId, message);
     },
-    onUpdated: new Event('tabs', 'on-updated'),
-    onCreated: new Event('tabs', 'on-created'),
-    onRemoved: new Event('tabs', 'on-removed'),
+    onUpdated: new IpcEvent('tabs', 'on-updated'),
+    onCreated: new IpcEvent('tabs', 'on-created'),
+    onRemoved: new IpcEvent('tabs', 'on-removed'),
   };
 
   lulumi.storage = {
@@ -146,7 +159,12 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
         callback(ret);
       }
     },
-    onChanged: new Event('storage', 'on-changed'),
+    onChanged: new IpcEvent('storage', 'on-changed'),
+  };
+
+  lulumi.storage.local = {
+    get: lulumi.storage.get,
+    set: lulumi.storage.set,
   };
 
   lulumi.storage.sync = {

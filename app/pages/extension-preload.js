@@ -1,10 +1,10 @@
-const { remote } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 const { LocalStorage } = require('node-localstorage');
 
 process.once('loaded', () => {
   const inject = (extensionId) => {
     const context = {};
-    require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
+    require('./inject-to').injectTo(extensionId, true, context, LocalStorage);
     global.lulumi = context.lulumi;
   };
 
@@ -13,4 +13,8 @@ process.once('loaded', () => {
   if (preferences) {
     preferences.forEach(pref => inject(pref.extensionId));
   }
+
+  ipcRenderer.on('lulumi-runtime-send-message', (event, message, options) => {
+    global.lulumi.runtime.onMessage.emit(message, options);
+  });
 });

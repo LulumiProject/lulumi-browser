@@ -44,9 +44,9 @@ $ yarn run test
 
 - lulumi
   * env: `appName(callback)`
-  * runtime: `id, getURL(path)`
-  * tabs: `getCurrent(callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), onUpdated, onCreated, onRemoved`
-  * storage: `set(items, callback), get(keys, callback), onChanged`
+  * runtime: `id, getURL(path), sendMessage(extensionId, message, options, responseCallback), onMessage`
+  * tabs: `getCurrent(callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`
+  * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
 
 ---
 

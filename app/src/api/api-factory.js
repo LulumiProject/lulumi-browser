@@ -12,6 +12,12 @@ export default (VueInstance) => {
   };
 
   const runtime = {
+    sendMessage: (extensionId, message, options) => {
+      const backgroundPages = VueInstance.$electron.remote.getGlobal('sharedObject').backgroundPages;
+      const extension = backgroundPages[extensionId];
+      VueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
+        .send('lulumi-runtime-send-message', message, options);
+    },
     onMessage: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {

@@ -66,6 +66,15 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
   });
 });
 
+ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message, options) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-runtime-send-message', {
+    extensionId,
+    message,
+    options,
+    webContentsId: event.sender.id,
+  });
+});
 ipcMain.once('lulumi-runtime-on-message', (event) => {
   ipcMain.on('lulumi-runtime-add-listener-on-message', (event, digest) => {
     BrowserWindow.getAllWindows()[0]
