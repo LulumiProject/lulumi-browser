@@ -7,12 +7,12 @@ const template = [
       {
         label: 'New Tab',
         accelerator: 'CmdOrCtrl+T',
-        click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
+        click: () => BrowserWindow.getAllWindows()[0].webContents.send('new-tab'),
       },
       {
         label: 'Close Tab',
         accelerator: 'CmdOrCtrl+W',
-        click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
+        click: () => BrowserWindow.getAllWindows()[0].webContents.send('tab-close'),
       },
     ],
   },
@@ -52,7 +52,7 @@ const template = [
       {
         label: 'Find',
         accelerator: 'CmdOrCtrl+F',
-        click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
+        click: () => BrowserWindow.getAllWindows()[0].webContents.send('startFindInPage'),
       },
       {
         label: 'Speech',
@@ -73,7 +73,7 @@ const template = [
       {
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
-        click: () => BrowserWindow.getFocusedWindow().webContents.send('reload'),
+        click: () => BrowserWindow.getAllWindows()[0].webContents.send('reload'),
       },
       {
         role: 'forcereload',

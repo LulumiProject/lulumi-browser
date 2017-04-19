@@ -133,9 +133,9 @@ vue@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.2.6.tgz#451714b394dd6d4eae7b773c40c2034a59621aed"
 
-vuex@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vuex/-/vuex-2.3.0.tgz#600048bef1682d657a6f3b7b1ffb44898703f2b4"
+vuex@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-2.3.1.tgz#cde8e997c1f9957719bc7dea154f9aa691d981a6"
 
 write-file-atomic@^1.1.4:
   version "1.3.1"

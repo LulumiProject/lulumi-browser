@@ -1,4 +1,7 @@
+const ncp = require('ncp').ncp;
 const path = require('path');
+
+ncp.limit = 16;
 
 const config = {
   // Name of electron app
@@ -23,6 +26,15 @@ const config = {
     out: path.join(__dirname, 'builds'),
     overwrite: true,
     platform: process.env.PLATFORM_TARGET || 'all',
+    afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
+      ncp(path.join(__dirname, 'extensions'), path.join(buildPath, 'extensions'), (err) => {
+        if (err) {
+          return console.error(err);
+        }
+        console.log(`\nCopy\n"${path.join(__dirname, 'extensions')}"\nto\n"${path.join(buildPath, 'extensions')}"\nsuccessfully\n`);
+        callback();
+      });
+    }],
   },
 };
 

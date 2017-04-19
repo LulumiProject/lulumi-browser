@@ -113,48 +113,6 @@ const removeBackgroundPages = (manifest) => {
   delete backgroundPages[manifest.extensionId];
 };
 
-const sendToBackgroundPages = (...args) => {
-  for (const page of objectValues(backgroundPages)) {
-    webContents.fromId(page.webContentsId).sendToAll(...args);
-  }
-};
-
-// Dispatch web contents events to Chrome APIs
-const hookWebContentsEvents = (webContents) => {
-  const tabId = webContents.id;
-
-  sendToBackgroundPages('CHROME_TABS_ONCREATED');
-
-  webContents.on('will-navigate', (event, url) => {
-    sendToBackgroundPages('CHROME_WEBNAVIGATION_ONBEFORENAVIGATE', {
-      frameId: 0,
-      parentFrameId: -1,
-      processId: webContents.getProcessId(),
-      tabId,
-      timeStamp: Date.now(),
-      url,
-    });
-  });
-
-  webContents.on('did-navigate', (event, url) => {
-    sendToBackgroundPages('CHROME_WEBNAVIGATION_ONCOMPLETED', {
-      frameId: 0,
-      parentFrameId: -1,
-      processId: webContents.getProcessId(),
-      tabId,
-      timeStamp: Date.now(),
-      url,
-    });
-  });
-
-  webContents.once('destroyed', () => {
-    sendToBackgroundPages('CHROME_TABS_ONREMOVED', tabId);
-  });
-};
-
-// handle the lulumi.* API messages
-let nextId = 0;
-
 // transfer the content scripts to renderer
 const contentScripts = {};
 
@@ -233,7 +191,6 @@ app.on('web-contents-created', (event, webContents) => {
     return;
   }
 
-  hookWebContentsEvents(webContents);
   webContents.on('dom-ready', () => {
     loadLulumiExtensions(webContents, objectValues(manifestMap));
   });
@@ -304,7 +261,9 @@ app.on('will-quit', () => {
 // we can not use protocol or BrowserWindow until app is ready
 app.once('ready', () => {
   // load persisted extensions
-  loadedExtensionsPath = path.resolve('./extensions');
+  loadedExtensionsPath = process.env.NODE_ENV === 'development'
+    ? path.resolve('./extensions')
+    : path.join(config.lulumiAppPath, 'extensions');
   try {
     const loadedExtensions
       = fs.readdirSync(loadedExtensionsPath).filter((file) => file.startsWith('.') === false).filter((file) => fs.lstatSync(path.join(loadedExtensionsPath, file)).isDirectory());
@@ -355,13 +314,13 @@ app.once('ready', () => {
   */
 });
 
-export function addDevToolsExtension (srcDirectory) {
+export function addExtension (srcDirectory) {
   const manifest = getManifestFromPath(srcDirectory);
     if (manifest) {
       loadExtension(manifest);
       for (const webContents of webContents.getAllWebContents()) {
         if (isWindowOrWebView(webContents)) {
-          loadDevToolsExtensions(webContents, [manifest]);
+          loadLulumiExtensions(webContents, [manifest]);
         }
       }
       return manifest.name;
