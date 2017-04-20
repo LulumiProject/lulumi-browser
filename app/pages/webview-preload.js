@@ -97,6 +97,9 @@ process.once('loaded', () => {
     global.about = sharedObject.guestData;
     global.extensions = sharedObject.backgroundPages;
 
+    const renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
+    global.renderProcessPreferences = renderProcessPreferences;
+
     global.require = requireTmp;
     global.module = moduleTmp;
     global.ipcRenderer = ipcRenderer;

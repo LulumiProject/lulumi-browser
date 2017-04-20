@@ -7,9 +7,10 @@
       el-col(:span="24")
         ul(class="extensions-list")
           li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
-            a(class="extensions-list__item-name extensions-list__item-link")
-              i(class="el-icon-document") {{ extension }}
-            el-button(:plain="true", type="info", size="small", icon="more", @click="openDevTools(extensions[extension].webContentsId)")
+            img(:src="loadIcon(extension)", style="width: 32px;")
+            a(class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
+              | {{ extension }}
+              span(class="extensions-list__item-path") {{ ` - ${loadPath(extension)}` }}
 </template>
 
 <script>
@@ -20,6 +21,18 @@
       },
     },
     methods: {
+      loadIcon(extensionId) {
+        // eslint-disable-next-line no-undef
+        const id = window.renderProcessPreferences
+          .findIndex(element => element.extensionId === extensionId);
+        return window.renderProcessPreferences[id].icons['16'];
+      },
+      loadPath(extensionId) {
+        // eslint-disable-next-line no-undef
+        const id = window.renderProcessPreferences
+          .findIndex(element => element.extensionId === extensionId);
+        return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
+      },
       openDevTools(webContentsId) {
         // eslint-disable-next-line no-undef
         ipcRenderer.send('open-dev-tools', webContentsId);
@@ -47,8 +60,14 @@
     align-items: center;
     justify-content: space-around;
   }
+  .extensions-list__item-path {
+    font-size: 14px;
+    color: gray;
+  }
   a.extensions-list__item-link {
+    cursor: pointer;
     text-decoration: none;
+    background-image: none;
   }
   a.extensions-list__item-link:hover {
     color: green;
@@ -63,6 +82,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    height: 20px;
     width: 400px;
   }
   .extensions-list__item-progress {

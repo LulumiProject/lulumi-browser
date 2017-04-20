@@ -198,6 +198,8 @@
         }
       });
 
+      webview.style.height
+        = `calc(100vh - ${document.getElementById('nav').getBoundingClientRect().bottom}px)`;
       this.navigateTo(this.page.location);
     },
     beforeDestroy() {
@@ -226,7 +228,7 @@
   }
 
   webview {
-    height: calc(~'100vh - 73px');
+    height: 0px;
     width: 100vw;
     outline: none;
     position: relative;

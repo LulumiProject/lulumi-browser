@@ -1,4 +1,4 @@
-import { app, webContents } from 'electron';
+import { app, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import fs from 'fs';
 import path from 'path';
@@ -137,10 +137,20 @@ const injectContentScripts = (manifest) => {
     };
   };
 
+  const iconsToEntry = (icons) => {
+    const object = {};
+    Object.keys(icons).forEach((key) => {
+      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL('image/png');
+    });
+    return object;
+  };
+
   try {
     const entry = {
       extensionId: manifest.extensionId,
       contentScripts: manifest.content_scripts.map(contentScriptToEntry),
+      icons: iconsToEntry(manifest.icons),
+      srcDirectory: manifest.srcDirectory,
     };
     global.renderProcessPreferences.push(entry);
     contentScripts[manifest.name] = entry;

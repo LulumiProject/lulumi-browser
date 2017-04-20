@@ -29,28 +29,49 @@ export default (VueInstance) => {
 
   const tabs = {
     getCurrent: () => {
-      const tab = new Tab(VueInstance.$store.getters.currentPageIndex);
+      const tab = new Tab(VueInstance.$store.getters.currentPageIndex, true);
       tabArray[tab.id] = tab;
 
+      const object = VueInstance.getPageObject(tab.id);
+      tab.update(object.location, object.title, object.favicon);
       return tab;
     },
     query: (queryInfo) => {
       if (queryInfo.hasOwnProperty('active')) {
         if (queryInfo.active) {
-          return [new Tab(VueInstance.$store.getters.currentPageIndex)];
+          tabArray.forEach((tab) => {
+            if (tab.active) {
+              return tab;
+            }
+          });
+          const tab = new Tab(VueInstance.$store.getters.currentPageIndex, true);
+          tabArray[tab.id] = tab;
+
+          const object = VueInstance.getPageObject(tab.id);
+          tab.update(object.location, object.title, object.favicon);
+          return [tab];
         }
       }
       const pages = VueInstance.$store.getters.pages;
       let tabs = [];
-      pages.forEach((page, index) => tabs.push(new Tab(index)));
+      let object;
+      pages.forEach((page, index) => {
+        tabs.push(new Tab(index, (index === VueInstance.$store.getters.currentPageIndex)));
+
+        object = VueInstance.getPageObject(index);
+        tabs[tabs.length - 1].update(object.location, object.title, object.favicon);
+      });
       return tabs;
     },
     update: (tabId, updateProperties = {}) => {
       let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
         : tabArray[tabId];
       if (tab === undefined) {
-        tab = new Tab(tabId);
+        tab = new Tab(tabId, false);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
       }
       if (updateProperties.hasOwnProperty('url')) {
         VueInstance.getPage(tab.id).$refs.webview.loadURL(updateProperties.url);
@@ -58,10 +79,13 @@ export default (VueInstance) => {
     },
     reload: (tabId, reloadProperties = { bypassCache: false }) => {
       let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
         : tabArray[tabId];
       if (tab === undefined) {
         tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
       }
       if (reloadProperties.bypassCache) {
         VueInstance.getPage(tab.id).$refs.webview.reloadIgnoringCache();
@@ -77,10 +101,13 @@ export default (VueInstance) => {
     },
     executeScript: (tabId, details = {}) => {
       let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
         : tabArray[tabId];
       if (tab === undefined) {
         tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
       }
       if (details.hasOwnProperty('file')) {
         VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(
@@ -92,10 +119,13 @@ export default (VueInstance) => {
     },
     insertCSS: (tabId, details = {}) => {
       let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
         : tabArray[tabId];
       if (tab === undefined) {
         tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
       }
       if (details.hasOwnProperty('code')) {
         VueInstance.getPage(tab.id).$refs.webview.insertCSS(details.code);
@@ -103,10 +133,13 @@ export default (VueInstance) => {
     },
     sendMessage: (tabId, message) => {
       let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
         : tabArray[tabId];
       if (tab === undefined) {
         tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
       }
       VueInstance.getPage(tab.id).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },

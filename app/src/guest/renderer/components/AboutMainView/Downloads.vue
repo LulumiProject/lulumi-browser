@@ -131,6 +131,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    height: 20px;
     width: 400px;
   }
   .download-list__item-progress {
