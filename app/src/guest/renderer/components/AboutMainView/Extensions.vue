@@ -7,10 +7,12 @@
       el-col(:span="24")
         ul(class="extensions-list")
           li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
-            img(:src="loadIcon(extension)", style="width: 32px;")
             a(class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
+              img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
               | {{ extension }}
-              span(class="extensions-list__item-path") {{ ` - ${loadPath(extension)}` }}
+            div
+              | {{ "Path: " }}
+              span(class="extensions-list__item-path") {{ loadPath(extension) }}
 </template>
 
 <script>
@@ -57,6 +59,7 @@
     padding: 5px 10px;
     width: auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: space-around;
   }
@@ -65,6 +68,8 @@
     color: gray;
   }
   a.extensions-list__item-link {
+    font-size: 20px;
+    bottom: 10px;
     cursor: pointer;
     text-decoration: none;
     background-image: none;
@@ -74,7 +79,6 @@
   }
   .extensions-list__item-name {
     color: #48576a;
-    padding-left: 4px;
     transition: color .3s;
     flex: 5;
   }

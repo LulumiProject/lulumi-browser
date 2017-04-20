@@ -13,9 +13,23 @@ ipcMain.on('lulumi-env-app-name', (event) => {
   });
 });
 
+ipcMain.on('lulumi-tabs-get', (event, tabId) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-tabs-get', {
+    tabId,
+    webContentsId: event.sender.id,
+  });
+});
 ipcMain.on('lulumi-tabs-get-current', (event) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-tabs-get-current', {
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-tabs-duplicate', (event, tabId) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-tabs-duplicate', {
+    tabId,
     webContentsId: event.sender.id,
   });
 });

@@ -53,6 +53,14 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   };
 
   lulumi.tabs = {
+    get: (tabId, callback) => {
+      ipcRenderer.once('lulumi-tabs-get-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-tabs-get', tabId);
+    },
     getCurrent: (callback) => {
       ipcRenderer.once('lulumi-tabs-get-current-result', (event, result) => {
         if (callback) {
@@ -60,6 +68,14 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
         }
       });
       ipcRenderer.send('lulumi-tabs-get-current');
+    },
+    duplicate: (tabId, callback) => {
+      ipcRenderer.once('lulumi-tabs-duplicate-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-tabs-duplicate', tabId);
     },
     query: (queryInfo, callback) => {
       ipcRenderer.once('lulumi-tabs-query-result', (event, result) => {

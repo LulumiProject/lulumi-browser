@@ -424,10 +424,14 @@
         }
         this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
-      onTabClick(event, pageIndex) {
+      onTabDuplicate(pageIndex) {
+        this.$store.dispatch('incrementPid');
+        this.$store.dispatch('createTab', this.pages[pageIndex].location);
+      },
+      onTabClick(pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
       },
-      onTabClose(event, pageIndex) {
+      onTabClose(pageIndex) {
         this.onRemovedEvent.emit(new Tab(pageIndex, this.getPage(pageIndex)));
         const newPages = tabsOrdering(this.pages, this.$refs.tab, 0, this.tabsOrder, true);
         this.$store.dispatch('setPages', {
@@ -488,22 +492,20 @@
         menu.append(new MenuItem({
           label: 'New Tab',
           click: () => {
-            this.$store.dispatch('incrementPid');
-            this.$store.dispatch('createTab');
+            this.onNewTab();
           },
         }));
         menu.append(new MenuItem({
           label: 'Duplicate',
           click: () => {
-            this.$store.dispatch('incrementPid');
-            this.$store.dispatch('createTab', this.pages[pageIndex].location);
+            this.onTabDuplicate(pageIndex);
           },
         }));
         menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
           label: 'Close Tab',
           click: () => {
-            this.$store.dispatch('closeTab', pageIndex);
+            this.onTabClose(pageIndex);
           },
         }));
 
