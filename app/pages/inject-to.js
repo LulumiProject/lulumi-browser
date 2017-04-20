@@ -109,6 +109,14 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-tabs-remove', tabIds);
     },
+    detectLanguage: (tabId, callback) => {
+      ipcRenderer.once('lulumi-tabs-detect-language-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-tabs-detect-language', tabId);
+    },
     executeScript: (tabId, details = {}, callback) => {
       ipcRenderer.once('lulumi-tabs-execute-script-result', (event, result) => {
         if (callback) {

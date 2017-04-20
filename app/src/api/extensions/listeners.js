@@ -63,6 +63,20 @@ ipcMain.on('lulumi-tabs-remove', (event, tabIds) => {
     webContentsId: event.sender.id,
   });
 });
+ipcMain.on('lulumi-tabs-detect-language', (event, tabId) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-tabs-detect-language', {
+    tabId,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-tabs-detect-language-result', (event, value, webContentsId) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-tabs-detect-language-result', {
+    value,
+    webContentsId,
+  });
+});
 ipcMain.on('lulumi-tabs-execute-script', (event, tabId, details) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-tabs-execute-script', {

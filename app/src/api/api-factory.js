@@ -160,6 +160,25 @@ export default (VueInstance) => {
       }
       tabIds.forEach(tabId => VueInstance.onTabClose(tabId));
     },
+    detectLanguage: (tabId, webContentsId) => {
+      let tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
+        : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
+      } else {
+        tabArray.forEach((tab) => {
+          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
+        });
+      }
+
+      VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+        ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
+      `);
+    },
     executeScript: (tabId, details = {}) => {
       let tab = (tabId === null)
         ? new Tab(VueInstance.$store.getters.currentPageIndex, true)

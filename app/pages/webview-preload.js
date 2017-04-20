@@ -102,8 +102,9 @@ process.once('loaded', () => {
 
     global.require = requireTmp;
     global.module = moduleTmp;
-    global.ipcRenderer = ipcRenderer;
   }
+
+  global.ipcRenderer = ipcRenderer;
 
   ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
     ipcRenderer.send('lulumi-runtime-emit-on-message', message);

@@ -80,6 +80,17 @@ export default class ExtHostExtensionService {
         webContents.send('lulumi-tabs-remove-result', require('lulumi').tabs.remove(data.tabIds));
       }
     });
+    ipc.on('lulumi-tabs-detect-language', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').tabs.detectLanguage(data.tabId, data.webContentsId);
+      }
+    });
+    ipc.on('lulumi-tabs-detect-language-result', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-tabs-detect-language-result', data.value);
+      }
+    });
     ipc.on('lulumi-tabs-execute-script', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
