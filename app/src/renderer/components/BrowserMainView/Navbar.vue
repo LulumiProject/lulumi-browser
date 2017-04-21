@@ -54,7 +54,7 @@
   import 'renderer/css/el-cascader';
   import config from 'renderer/js/constants/config';
   import urlUtil from 'renderer/js/lib/url-util';
-  import urlSuggestion from 'renderer/js/lib/url-suggestion';
+  // import urlSuggestion from 'renderer/js/lib/url-suggestion';
   import recommendTopSite from 'renderer/js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {
@@ -217,7 +217,7 @@
       },
       querySearch(queryString, cb) {
         const suggestions = this.suggestions;
-        let results =
+        const results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
           title: `${this.currentSearchEngine.name} Search`,
@@ -230,7 +230,13 @@
             icon: 'document',
           });
         }
-        results = urlSuggestion(this.currentSearchEngine.name, `${this.currentSearchEngine.autocomplete}${this.value}`, results);
+        /*
+        results = urlSuggestion(
+          this.currentSearchEngine.name,
+          `${this.currentSearchEngine.autocomplete}${this.value}`,
+          results);
+        setTimeout(() => cb(results), 100);
+        */
         cb(results);
       },
       createFilter(queryString) {

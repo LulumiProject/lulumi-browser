@@ -20,6 +20,11 @@ if (process.env.NODE_ENV === 'production') {
 // Customize Autocomplete component to match out needs
 const CustomAutocomplete = Vue.extend(Autocomplete);
 const GoodCustomAutocomplete = CustomAutocomplete.extend({
+  data() {
+    return {
+      lastQueryString: '',
+    };
+  },
   computed: {
     suggestionVisible() {
       const suggestions = this.suggestions;
@@ -29,6 +34,21 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
     },
   },
   methods: {
+    setInputSelection(input, startPos, endPos) {
+      input.focus();
+      if (typeof input.selectionStart !== 'undefined') {
+        input.selectionStart = startPos;
+        input.selectionEnd = endPos;
+      } else if (document.selection && document.selection.createRange) {
+        // IE branch
+        input.select();
+        const range = document.selection.createRange();
+        range.collapse(true);
+        range.moveEnd('character', endPos);
+        range.moveStart('character', startPos);
+        range.select();
+      }
+    },
     getData(queryString) {
       this.loading = true;
       this.fetchSuggestions(queryString, (suggestions) => {
@@ -36,7 +56,18 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
         if (Array.isArray(suggestions)) {
           this.suggestions = suggestions;
           this.highlightedIndex = 0;
-          this.$refs.input.$refs.input.value = this.suggestions[this.highlightedIndex].value;
+
+          if (this.lastQueryString !== queryString) {
+            const startPos = queryString.length;
+            const endPos = this.suggestions[0].value.length;
+            this.$nextTick().then(() => {
+              this.$refs.input.$refs.input.value = this.suggestions[0].value;
+              this.setInputSelection(this.$refs.input.$el.querySelector('.el-input__inner'), startPos, endPos);
+              this.lastQueryString = queryString;
+            });
+          } else {
+            this.lastQueryString = this.lastQueryString.slice(0, -1);
+          }
         } else {
           // eslint-disable-next-line no-console
           console.error('autocomplete suggestions must be an array');
@@ -46,6 +77,7 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
     handleChange(value) {
       this.$emit('input', value);
       if (!this.triggerOnFocus && !value) {
+        this.lastQueryString = '';
         this.suggestions = [];
         return;
       }
@@ -93,7 +125,9 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
         suggestion.scrollTop -= highlightItem.scrollHeight;
       }
       this.highlightedIndex = index;
-      this.$refs.input.$refs.input.value = this.suggestions[this.highlightedIndex].value;
+      if (index >= 0) {
+        this.$refs.input.$refs.input.value = this.suggestions[this.highlightedIndex].value;
+      }
     },
   },
 });
