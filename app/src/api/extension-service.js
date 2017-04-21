@@ -37,6 +37,12 @@ export default class ExtHostExtensionService {
         webContents.send('lulumi-env-app-name-result', require('lulumi').env.appName());
       }
     });
+    ipc.on('lulumi-env-app-version', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-env-app-version-result', require('lulumi').env.appVersion());
+      }
+    });
 
     ipc.on('lulumi-tabs-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {

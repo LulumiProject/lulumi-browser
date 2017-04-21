@@ -12,6 +12,12 @@ ipcMain.on('lulumi-env-app-name', (event) => {
     webContentsId: event.sender.id,
   });
 });
+ipcMain.on('lulumi-env-app-version', (event) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-env-app-version', {
+    webContentsId: event.sender.id,
+  });
+});
 
 ipcMain.on('lulumi-tabs-get', (event, tabId) => {
   BrowserWindow.getAllWindows()[0]

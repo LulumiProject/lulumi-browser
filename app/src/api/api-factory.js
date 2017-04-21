@@ -9,6 +9,7 @@ const tabArray = [];
 export default (VueInstance) => {
   const env = {
     appName: () => VueInstance.$electron.remote.app.getName(),
+    appVersion: () => VueInstance.$electron.remote.app.getVersion(),
   };
 
   const runtime = {

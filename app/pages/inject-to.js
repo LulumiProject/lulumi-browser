@@ -27,6 +27,12 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-env-app-name');
     },
+    appVersion: (callback) => {
+      ipcRenderer.once('lulumi-env-app-version-result', (event, result) => {
+        callback(result);
+      });
+      ipcRenderer.send('lulumi-env-app-version');
+    },
   };
 
   lulumi.runtime = {
