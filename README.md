@@ -40,7 +40,7 @@ $ yarn run lint:fix
 $ yarn run test
 ```
 
-## API
+## API (experimental)
 
 - lulumi
   * env: `appName(callback), appVersion(callback)`
