@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { app, BrowserWindow, systemPreferences, protocol, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, protocol, shell, systemPreferences } from 'electron';
 import menu from './js/lib/menu';
 import session from './js/lib/session';
 import autoUpdater from './js/lib/auto-updater';
