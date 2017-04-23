@@ -12,6 +12,7 @@ app/dist/about.css
 extensions/*
 builds/*
 dist/*
+userData/*
 coverage
 node_modules/
 npm-debug.log

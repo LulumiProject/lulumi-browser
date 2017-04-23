@@ -1,8 +1,42 @@
-import { BrowserWindow, ipcMain, webContents } from 'electron';
+import { BrowserWindow, dialog, ipcMain, webContents } from 'electron';
+
+const isDarwin = process.platform === 'darwin';
 
 ipcMain.on('open-dev-tools', (event, webContentsId) => {
   if (webContentsId) {
     webContents.fromId(webContentsId).openDevTools();
+  }
+});
+ipcMain.on('add-extension', (event) => {
+  if (isDarwin) { // use "sheet" dialog when we are on macOS
+    const window = BrowserWindow.fromWebContents(event.sender)
+    dialog.showOpenDialog(window, {
+      properties: ['openDirectory'],
+    }, (dirs) => {
+      if (dirs) {
+        // an array of diretory paths chosen by the user will be returned, but we only want one path
+        BrowserWindow.addExtension(dirs[0]);
+        event.sender.send('add-extension-result', dirs[0]);
+      }
+    });
+  } else {
+    dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    }, (dirs) => {
+      if (dirs) {
+        // an array of diretory paths chosen by the user will be returned, but we only want one path
+        BrowserWindow.addExtension(dirs[0]);
+        event.sender.send('add-extension-result', dirs[0]);
+      }
+    });
+  }
+});
+ipcMain.on('remove-extension', (event, name) => {
+  try {
+    BrowserWindow.removeExtension(name);
+    event.sender.send('remove-extension-result', 'OK');
+  } catch (removeError) {
+    event.sender.send('remove-extension-result', removeError);
   }
 });
 

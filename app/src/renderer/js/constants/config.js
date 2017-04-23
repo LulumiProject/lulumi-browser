@@ -4,6 +4,7 @@ let lulumiAppPath = process.env.NODE_ENV === 'development'
   ? `${__dirname}/../../../../`
   : `${__dirname}/../`;
 lulumiAppPath = path.resolve(lulumiAppPath);
+const lulumiRootPath = path.resolve(`${lulumiAppPath}/../`);
 
 const searchEngine = [
   {
@@ -39,5 +40,7 @@ export default {
   lulumiPagesPath: `${lulumiAppPath}/pages/`,
   lulumiPDFJSPath: `${lulumiAppPath}/pdfjs/`,
   lulumiAppPath,
-  lulumiRev: '8b59339691b7fc405890ffb514f3c1e357b4c478',
+  lulumiRootPath,
+  devUserData: `${lulumiRootPath}/userData/`,
+  lulumiRev: '9862b77491f241ef4e31152893a882b6eb262dd0',
 };

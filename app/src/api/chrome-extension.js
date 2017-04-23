@@ -1,4 +1,4 @@
-import { app, nativeImage, webContents } from 'electron';
+import { app, BrowserWindow, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import fs from 'fs';
 import path from 'path';
@@ -53,15 +53,13 @@ const getManifestFromPath = (srcDirectory) => {
     Object.assign(manifest, {
       srcDirectory: srcDirectory,
       extensionId: extensionId,
-      // We can not use 'file://' directly because all resources in the extension
-      // will be treated as relative to the root in Chrome.
       startPage: url.format({
-        protocol: 'chrome-extension',
+        protocol: 'lulumi-extension',
         slashes: true,
         hostname: extensionId,
-        pathname: manifest.devtools_page
-      })
-    })
+        pathname: manifest.devtools_page,
+      }),
+    });
     return manifest;
   } else if (manifest && manifest.name) {
     console.warn(`Attempted to load extension "${manifest.name}" that has already been loaded.`);
@@ -151,6 +149,7 @@ const injectContentScripts = (manifest) => {
       contentScripts: manifest.content_scripts.map(contentScriptToEntry),
       icons: iconsToEntry(manifest.icons),
       srcDirectory: manifest.srcDirectory,
+      name: manifest.name,
     };
     global.renderProcessPreferences.push(entry);
     contentScripts[manifest.name] = entry;
@@ -168,8 +167,6 @@ const removeContentScripts = (manifest) => {
   delete contentScripts[manifest.name];
 }
 
-// Transfer the |manifest| to a format that can be recognized by the
-// |DevToolsAPI.addExtensions|.
 const manifestToExtensionInfo = (manifest) => {
   return {
     startPage: manifest.startPage,
@@ -193,7 +190,6 @@ const loadLulumiExtensions = (win, manifests) => {
   manifests.forEach(loadExtension);
 
   const extensionInfoArray = manifests.map(manifestToExtensionInfo);
-  // win.devToolsWebContents.executeJavaScript(`DevToolsAPI.addExtensions(${JSON.stringify(extensionInfoArray)})`);
 };
 
 app.on('web-contents-created', (event, webContents) => {
@@ -228,7 +224,7 @@ const lulumiExtensionHandler = (request, callback) => {
 
   fs.readFile(path.join(manifest.srcDirectory, parsed.path), (err, content) => {
     if (err) {
-      return callback(-6);  // FILE_NOT_FOUND
+      return callback(-6); // FILE_NOT_FOUND
     } else {
       return callback(content);
     }
@@ -246,7 +242,6 @@ app.on('session-created', (sess) => {
 // the persistent path of "Lulumi Extensions" preference file
 let loadedExtensionsPath = null;
 
-/*
 app.on('will-quit', () => {
   try {
     const loadedExtensions = objectValues(manifestMap).map((manifest) => {
@@ -266,66 +261,29 @@ app.on('will-quit', () => {
     // Ignore error
   }
 });
-*/
 
 // we can not use protocol or BrowserWindow until app is ready
 app.once('ready', () => {
   // load persisted extensions
   loadedExtensionsPath = process.env.NODE_ENV === 'development'
-    ? path.resolve('./extensions')
-    : path.join(config.lulumiAppPath, 'extensions');
+    ? path.join(config.devUserData, 'lulumi-extensions')
+    : path.join(app.getPath('userData'), 'lulumi-extensions');
   try {
-    const loadedExtensions
-      = fs.readdirSync(loadedExtensionsPath).filter((file) => file.startsWith('.') === false).filter((file) => fs.lstatSync(path.join(loadedExtensionsPath, file)).isDirectory());
+    const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath));
     if (Array.isArray(loadedExtensions)) {
-      for (const extension of loadedExtensions) {
-        // Start background pages and set content scripts.
-        const manifest = getManifestFromPath(path.join(loadedExtensionsPath, extension));
+      for (const srcDirectory of loadedExtensions) {
+        // start background pages and set content scripts
+        const manifest = getManifestFromPath(srcDirectory);
         loadExtension(manifest);
       }
     }
   } catch (error) {
-    // Ignore error
+    // ignore error
   }
 
   // the public API to add/remove extensions
-  /*
-  BrowserWindow.addDevToolsExtension = function (srcDirectory) {
-    const manifest = getManifestFromPath(srcDirectory)
-    if (manifest) {
-      loadExtension(manifest)
-      for (const webContents of getAllWebContents()) {
-        if (isWindowOrWebView(webContents)) {
-          loadDevToolsExtensions(webContents, [manifest])
-        }
-      }
-      return manifest.name
-    }
-  }
-
-  BrowserWindow.removeDevToolsExtension = function (name) {
-    const manifest = manifestNameMap[name]
-    if (!manifest) return
-
-    removeBackgroundPages(manifest)
-    removeContentScripts(manifest)
-    delete manifestMap[manifest.extensionId]
-    delete manifestNameMap[name]
-  }
-
-  BrowserWindow.getDevToolsExtensions = function () {
-    const extensions = {}
-    Object.keys(manifestNameMap).forEach(function (name) {
-      const manifest = manifestNameMap[name]
-      extensions[name] = {name: manifest.name, version: manifest.version}
-    })
-    return extensions
-  }
-  */
-});
-
-export function addExtension (srcDirectory) {
-  const manifest = getManifestFromPath(srcDirectory);
+  BrowserWindow.addExtension = (srcDirectory) => {
+    const manifest = getManifestFromPath(srcDirectory);
     if (manifest) {
       loadExtension(manifest);
       for (const webContents of webContents.getAllWebContents()) {
@@ -335,7 +293,29 @@ export function addExtension (srcDirectory) {
       }
       return manifest.name;
     }
-};
+  }
+
+  BrowserWindow.removeExtension = (name) => {
+    const manifest = manifestNameMap[name];
+    if (!manifest) {
+      return;
+    }
+
+    removeBackgroundPages(manifest);
+    removeContentScripts(manifest);
+    delete manifestMap[manifest.extensionId];
+    delete manifestNameMap[name];
+  }
+
+  BrowserWindow.getExtensions = () => {
+    const extensions = {};
+    Object.keys(manifestNameMap).forEach(function (name) {
+      const manifest = manifestNameMap[name];
+      extensions[name] = {name: manifest.name, version: manifest.version};
+    })
+    return extensions;
+  }
+});
 
 export {
   manifestMap,

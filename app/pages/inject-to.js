@@ -13,7 +13,7 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
 
   if (LocalStorage) {
     storagePath = process.env.NODE_ENV === 'development'
-      ? path.join(remote.app.getPath('temp'), 'lulumi-local-storage')
+      ? path.join(path.resolve('./userData'), 'lulumi-local-storage')
       : path.join(remote.app.getPath('userData'), 'lulumi-local-storage');
 
     // eslint-disable-next-line no-undef

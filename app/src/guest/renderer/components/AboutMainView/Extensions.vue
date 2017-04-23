@@ -3,13 +3,16 @@
     el-row(type="flex", align="middle")
       el-col(:span="12")
         h1 Extensions
+      el-col(:span="6", :offset="3")
+        el-button(type="info", @click="addExtension") Add
     el-row
       el-col(:span="24")
         ul(class="extensions-list")
           li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
+            el-button(:plain="true", type="danger", size="small", icon="circle-cross", @click="removeExtension(extension)")
             a(class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
               img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
-              | {{ extension }}
+              | {{ loadName(extension) }}
             div
               | {{ "Path: " }}
               span(class="extensions-list__item-path") {{ loadPath(extension) }}
@@ -23,6 +26,12 @@
       },
     },
     methods: {
+      loadName(extensionId) {
+        // eslint-disable-next-line no-undef
+        const id = window.renderProcessPreferences
+          .findIndex(element => element.extensionId === extensionId);
+        return window.renderProcessPreferences[id].name;
+      },
       loadIcon(extensionId) {
         // eslint-disable-next-line no-undef
         const id = window.renderProcessPreferences
@@ -38,6 +47,30 @@
       openDevTools(webContentsId) {
         // eslint-disable-next-line no-undef
         ipcRenderer.send('open-dev-tools', webContentsId);
+      },
+      addExtension() {
+        // eslint-disable-next-line no-undef
+        ipcRenderer.once('add-extension-result', () => {
+          window.location.reload();
+        });
+        // eslint-disable-next-line no-undef
+        ipcRenderer.send('add-extension');
+      },
+      removeExtension(extensionId) {
+        // eslint-disable-next-line no-undef
+        const id = window.renderProcessPreferences
+          .findIndex(element => element.extensionId === extensionId);
+        // eslint-disable-next-line no-undef
+        ipcRenderer.once('remove-extension-result', (event, result) => {
+          if (result === 'OK') {
+            window.location.reload();
+          } else {
+            // eslint-disable-next-line no-alert
+            alert(result);
+          }
+        });
+        // eslint-disable-next-line no-undef
+        ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);
       },
     },
   };
