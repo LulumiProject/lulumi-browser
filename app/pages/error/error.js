@@ -1,7 +1,21 @@
+const searchParams = new URLSearchParams(window.location.search.replace('?', ''));
+
+const h1 = document.getElementById('error-name');
+const h2 = document.getElementById('error-desc');
+const primaryButton = document.getElementById('primary-button');
+const secondaryButton = document.getElementById('secondary-button');
+
+const ec = searchParams.get('ec');
+let url = searchParams.get('url');
+
 const websiteNotFound = {
   name: 'Server not found',
   /* eslint-disable max-len */
-  message: "Lulumi-browser couldn't find this website. If you think there should be something here, you can <a id='archivesearch-link'>search on archive.org</a> for this page.",
+  message: "Lulumi-browser couldn't find this website.",
+  secondaryAction: {
+    title: 'Search on archive.org',
+    url: `https://web.archive.org/web/*/${url}`,
+  },
 };
 
 const sslError = {
@@ -65,39 +79,34 @@ const errorCodes = {
   '-806': dnsError,
 };
 
-const searchParams = new URLSearchParams(window.location.search.replace('?', ''));
-
 // show the error message and detail
 
-const h1 = document.getElementById('error-name');
-const h2 = document.getElementById('error-desc');
-const button = document.getElementById('ta-button');
-
-const ec = searchParams.get('ec');
-let url = searchParams.get('url');
-
-if (errorCodes[ec]) {
-  h1.innerHTML += errorCodes[ec].name || '';
-  h2.innerHTML += errorCodes[ec].message || '';
+const err = errorCodes[ec];
+if (err) {
+  h1.innerHTML += err.name || '';
+  h2.innerHTML += err.message || '';
 } else {
   h1.innerHTML += 'An error occured';
 }
 
-
-const link = document.getElementById('archivesearch-link');
-
-if (link) {
-  link.href = `https://web.archive.org/web/*/${url}`;
+if (err.secondaryAction) {
+  secondaryButton.hidden = false;
+  secondaryButton.textContent = err.secondaryAction.title;
+  secondaryButton.addEventListener('click', () => {
+    window.location = err.secondaryAction.url;
+  });
 }
 
 // if an ssl error occured, "try again" should go to the http:// version, which might work
 
-if (errorCodes[ec] === sslError) {
+if (err === sslError) {
   url = url.replace('https://', 'http://');
 }
 
 if (url) {
-  button.addEventListener('click', () => {
+  primaryButton.addEventListener('click', () => {
     window.location = url;
   });
 }
+
+primaryButton.focus();
