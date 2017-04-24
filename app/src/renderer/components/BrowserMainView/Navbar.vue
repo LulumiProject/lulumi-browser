@@ -30,11 +30,20 @@
           div(v-else)
             icon(name="info-circle")
             span Normal
+    .extensions-group(v-sortable="")
+      div(v-for="extension in extensions", :key="extension", style="padding-top: 3px;")
+        img.extension(v-if="extension !== undefined",
+                      :src="loadIcon(extension)", 
+                      :class="showOrNot(extension)",
+                      :title="showTitle(extension)",
+                      @click.prevent="sendIPC($event, extension)",
+                      @contextmenu.prevent="onContextmenu(extension)")
     el-cascader#dropdown(expand-trigger="hover", :options="options", v-model="selectedOptions", @change="handleChange")
 </template>
 
 <script>
   import Vue from 'vue';
+  import path from 'path';
   import url from 'url';
   import { focus } from 'vue-focus';
 
@@ -47,7 +56,11 @@
   import 'vue-awesome/icons/lock';
   import 'vue-awesome/icons/info-circle';
 
+  import Sortable from 'sortablejs';
+
   import { Button, Cascader } from 'element-ui';
+
+  import Event from 'src/api/extensions/event';
 
   import 'renderer/css/el-autocomplete';
   import 'renderer/css/el-input';
@@ -91,6 +104,14 @@
   export default {
     directives: {
       focus,
+      sortable: {
+        update(el) {
+          Sortable.create(el, {
+            draggable: '.extension',
+            animation: 150,
+          });
+        },
+      },
     },
     data() {
       return {
@@ -130,6 +151,8 @@
             ],
           },
         ],
+        extensions: {},
+        onClickedEvent: new Event(),
       };
     },
     components: {
@@ -144,9 +167,19 @@
             canGoBack: false,
             canGoForward: false,
             canRefresh: false,
+            pageActionMapping: {},
           };
         }
         return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+      },
+      currentPageIndex() {
+        return this.$store.getters.currentPageIndex;
+      },
+      pageActionMapping() {
+        if (this.$store.getters.pages.length === 0) {
+          return {};
+        }
+        return this.$store.getters.pages[this.$store.getters.currentPageIndex].pageActionMapping;
       },
       location() {
         if (this.$store.getters.pages.length === 0) {
@@ -245,6 +278,54 @@
       handleChange(val) {
         this.$parent.onNewTab(`${config.lulumiPagesCustomProtocol}about/#/${val.pop()}`);
       },
+      loadIcon(extension) {
+        return this.$electron.remote.nativeImage
+          .createFromPath(path.join(extension.srcDirectory, extension.icons['16'])).toDataURL('image/png');
+      },
+      showOrNot(extension) {
+        // eslint-disable-next-line no-prototype-builtins
+        const isPageAction = extension.hasOwnProperty('page_action');
+        if (isPageAction) {
+          if (this.pageActionMapping[extension.extensionId]) {
+            if (this.pageActionMapping[extension.extensionId].enabled) {
+              return 'enabled';
+            }
+          }
+          return 'disabled';
+        }
+        return 'enabled';
+      },
+      showTitle(extension) {
+        // eslint-disable-next-line no-prototype-builtins
+        const isPageAction = extension.hasOwnProperty('page_action');
+        if (isPageAction) {
+          return extension.page_action.default_title;
+        }
+        return 'browser_action';
+      },
+      sendIPC(event, extension) {
+        if (event.target.classList.contains('enabled')) {
+          this.$electron.remote.webContents.fromId(extension.webContentsId)
+            .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
+        }
+      },
+      removeExtension(name) {
+        const ipc = this.$electron.ipcRenderer;
+        ipc.send('remove-extension', name);
+      },
+      onContextmenu(extension) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+
+        menu.append(new MenuItem({
+          label: 'Remove extension',
+          click: () => {
+            this.removeExtension(extension.name);
+          },
+        }));
+
+        menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
+      },
     },
     mounted() {
       const originalInput = document.getElementsByClassName('el-input__inner')[0];
@@ -264,11 +345,27 @@
         newElement.style.display = 'block';
         originalInput.style.display = 'none';
       };
+
+      const ipc = this.$electron.ipcRenderer;
+
+      ipc.on('add-extension-result', () => {
+        this.$parent.extensionService.update();
+        this.$forceUpdate();
+      });
+      ipc.on('remove-extension-result', (event, result) => {
+        if (result === 'OK') {
+          this.$parent.extensionService.update();
+          this.$forceUpdate();
+        } else {
+          // eslint-disable-next-line no-alert
+          alert(result);
+        }
+      });
     },
   };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   #browser-navbar {
     display: flex;
     height: 35px;
@@ -276,53 +373,80 @@
     font-size: 15px;
     font-weight: 100;
     border-bottom: 1px solid #aaa;
-  }
-  #browser-navbar a {
-    text-decoration: none;
-    color: #777;
-    cursor: default;
-  }
-  #browser-navbar a:hover {
-    text-decoration: none;
-    color: blue;
-  }
-  #browser-navbar a.disabled {
-    color: #bbb;
-    cursor: default;
-  }
-  #browser-navbar a {
-    flex: 1;
-  }
-  #browser-navbar .control-group {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  }
-  #browser-navbar > .input-group {
-    flex: 9;
-    display: flex;
-    margin: 0 5px;
-  }
-  #url-input {
-    flex: 1;
-    display: flex;
-  }
-  #browser-navbar .input-group a {
-    border: 1px solid #bbb;
-    border-left: 0;
-    padding: 4px 0;
-    margin: 4px 0 3px;
-    flex: 0 0 30px;
-    text-align: center;
-  }
-  #browser-navbar a:last-child {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-  }
 
-  #dropdown {
-    width: 0px;
-    margin: 5px -5px 2px 30px;
+    a {
+      flex: 1;
+      text-decoration: none;
+      color: #777;
+      cursor: default;
+
+      &:hover {
+        text-decoration: none;
+        color: blue;
+      }
+
+      &:last-child {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+
+      .disabled {
+        color: #bbb;
+        cursor: default;
+      }
+    }
+
+    .control-group {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-group {
+      flex: 9;
+      display: flex;
+      margin: 0 5px;
+
+      a {
+        border: 1px solid #bbb;
+        border-left: 0;
+        padding: 4px 0;
+        margin: 4px 0 3px;
+        flex: 0 0 30px;
+        text-align: center;
+      }
+
+      #url-input {
+        flex: 1;
+        display: flex;
+      }
+    }
+
+    .extensions-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: auto;
+
+      .extension {
+        width: 16px;
+        padding: 5px;
+        border-radius: 2px;
+
+        &:hover {
+          background-color: rgb(200, 200, 200);
+        }
+
+        &.disabled {
+          opacity: 0.3;
+        }
+      }
+    }
+
+    #dropdown {
+      width: 0px;
+      margin: 5px -5px 2px 30px;
+    }
   }
 </style>

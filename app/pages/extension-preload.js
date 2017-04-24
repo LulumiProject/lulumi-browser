@@ -14,7 +14,10 @@ process.once('loaded', () => {
     preferences.forEach(pref => inject(pref.extensionId));
   }
 
-  ipcRenderer.on('lulumi-runtime-send-message', (event, message, options) => {
-    global.lulumi.runtime.onMessage.emit(message, options);
+  ipcRenderer.on('lulumi-runtime-send-message', (event, message, sender) => {
+    global.lulumi.runtime.onMessage.emit(message, sender);
+  });
+  ipcRenderer.on('lulumi-page-action-clicked', (event, tab) => {
+    global.lulumi.pageAction.onClicked.emit(tab);
   });
 });

@@ -72,6 +72,12 @@ export const setPages = ({ commit }, val) => {
 export const setTabsOrder = ({ commit }, val) => {
   commit(types.SET_TABS_ORDER, val);
 };
+export const setPageAction = ({ commit }, pageIndex, extensionId, enabled) => {
+  commit(types.SET_PAGE_ACTION, pageIndex, extensionId, enabled);
+};
+export const clearPageAction = ({ commit }, pageIndex) => {
+  commit(types.CLEAR_PAGE_ACTION, pageIndex);
+};
 export const createDownloadTask = ({ commit }, file) => {
   commit(types.CREATE_DOWNLOAD_TASK, file);
 };

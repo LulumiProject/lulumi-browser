@@ -34,6 +34,7 @@ function createPageObject(url) {
     error: false,
     hasMedia: false,
     isAudioMuted: false,
+    pageActionMapping: {},
   };
 }
 
@@ -216,6 +217,20 @@ const mutations = {
     } else {
       state.tabsOrder = val.map(element => parseInt(element, 10));
     }
+  },
+  [types.SET_PAGE_ACTION](state, payload) {
+    if (state.pages[payload.pageIndex].pageActionMapping[payload.extensionId]) {
+      state.pages[payload.pageIndex]
+        .pageActionMapping[payload.extensionId].enabled = payload.enabled;
+    } else {
+      state.pages[payload.pageIndex]
+        .pageActionMapping[payload.extensionId] = {};
+      state.pages[payload.pageIndex]
+        .pageActionMapping[payload.extensionId].enabled = payload.enabled;
+    }
+  },
+  [types.CLEAR_PAGE_ACTION](state, payload) {
+    state.pages[payload.pageIndex].pageActionMapping = {};
   },
   // downloads handlers
   [types.CREATE_DOWNLOAD_TASK](state, file) {

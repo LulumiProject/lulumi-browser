@@ -64,13 +64,11 @@
         ipcRenderer.once('remove-extension-result', (event, result) => {
           if (result === 'OK') {
             window.location.reload();
-          } else {
-            // eslint-disable-next-line no-alert
-            alert(result);
           }
         });
         // eslint-disable-next-line no-undef
         ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);
+        window.location.reload();
       },
     },
   };

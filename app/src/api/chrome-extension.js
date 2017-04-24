@@ -144,13 +144,9 @@ const injectContentScripts = (manifest) => {
   };
 
   try {
-    const entry = {
-      extensionId: manifest.extensionId,
-      contentScripts: manifest.content_scripts.map(contentScriptToEntry),
-      icons: iconsToEntry(manifest.icons),
-      srcDirectory: manifest.srcDirectory,
-      name: manifest.name,
-    };
+    let entry = manifestToExtensionInfo(manifest);
+    entry.contentScripts = manifest.content_scripts.map(contentScriptToEntry);
+    entry.icons = iconsToEntry(manifest.icons);
     global.renderProcessPreferences.push(entry);
     contentScripts[manifest.name] = entry;
   } catch (e) {
@@ -172,6 +168,7 @@ const manifestToExtensionInfo = (manifest) => {
     startPage: manifest.startPage,
     srcDirectory: manifest.srcDirectory,
     name: manifest.name,
+    extensionId: manifest.extensionId,
     exposeExperimentalAPIs: true,
   };
 };

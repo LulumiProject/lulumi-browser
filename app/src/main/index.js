@@ -76,10 +76,9 @@ function createWindow() {
   });
 
   ipcMain.on('request-extension-objects', () => {
+    global.backgroundPages = chromeExtension.backgroundPages;
     mainWindow.webContents.send('response-extension-objects',
       chromeExtension.manifestMap,
-      chromeExtension.manifestNameMap,
-      chromeExtension.backgroundPages,
     );
   });
 
@@ -269,10 +268,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
       [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
-    global.sharedObject = {
-      guestData: data,
-      backgroundPages: chromeExtension.backgroundPages,
-    };
+    global.guestData = data;
   }
 });
 

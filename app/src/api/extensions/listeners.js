@@ -1,41 +1,33 @@
 import { BrowserWindow, dialog, ipcMain, webContents } from 'electron';
 
-const isDarwin = process.platform === 'darwin';
-
 ipcMain.on('open-dev-tools', (event, webContentsId) => {
   if (webContentsId) {
     webContents.fromId(webContentsId).openDevTools();
   }
 });
 ipcMain.on('add-extension', (event) => {
-  if (isDarwin) { // use "sheet" dialog when we are on macOS
-    const window = BrowserWindow.fromWebContents(event.sender)
-    dialog.showOpenDialog(window, {
-      properties: ['openDirectory'],
-    }, (dirs) => {
-      if (dirs) {
-        // an array of diretory paths chosen by the user will be returned, but we only want one path
-        BrowserWindow.addExtension(dirs[0]);
-        event.sender.send('add-extension-result', dirs[0]);
-      }
-    });
-  } else {
-    dialog.showOpenDialog({
-      properties: ['openDirectory'],
-    }, (dirs) => {
-      if (dirs) {
-        // an array of diretory paths chosen by the user will be returned, but we only want one path
-        BrowserWindow.addExtension(dirs[0]);
-        event.sender.send('add-extension-result', dirs[0]);
-      }
-    });
-  }
+  const window = BrowserWindow.fromWebContents(event.sender)
+  dialog.showOpenDialog(window, {
+    properties: ['openDirectory'],
+  }, (dirs) => {
+    if (dirs) {
+      // an array of diretory paths chosen by the user will be returned, but we only want one path
+      BrowserWindow.addExtension(dirs[0]);
+      BrowserWindow.getAllWindows()[0]
+        .webContents.send('add-extension-result', dirs[0]);
+      event.sender.send('add-extension-result', dirs[0]);
+    }
+  });
 });
 ipcMain.on('remove-extension', (event, name) => {
   try {
     BrowserWindow.removeExtension(name);
+    BrowserWindow.getAllWindows()[0]
+    .webContents.send('remove-extension-result', 'OK');
     event.sender.send('remove-extension-result', 'OK');
   } catch (removeError) {
+    BrowserWindow.getAllWindows()[0]
+    .webContents.send('remove-extension-result', removeError);
     event.sender.send('remove-extension-result', removeError);
   }
 });
@@ -50,6 +42,49 @@ ipcMain.on('lulumi-env-app-version', (event) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-env-app-version', {
     webContentsId: event.sender.id,
+  });
+});
+
+ipcMain.on('lulumi-page-action-show', (event, tabId, extensionId, enabled) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-page-action-show', {
+    tabId,
+    extensionId,
+    enabled,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-page-action-hide', (event, tabId, extensionId, enabled) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-page-action-hide', {
+    tabId,
+    extensionId,
+    enabled,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.once('lulumi-page-action-on-message', (event) => {
+  ipcMain.on('lulumi-page-action-add-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-page-action-add-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-page-action-remove-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-page-action-remove-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-page-action-emit-on-message', (event, message) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-page-action-emit-on-message', {
+      message,
+      sender: event.sender,
+      webContentsId: event.sender.id,
+    });
   });
 });
 
@@ -134,12 +169,11 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
   });
 });
 
-ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message, options) => {
+ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-runtime-send-message', {
     extensionId,
     message,
-    options,
     webContentsId: event.sender.id,
   });
 });

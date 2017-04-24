@@ -93,12 +93,10 @@ const moduleTmp = module;
 process.once('loaded', () => {
   if (document.location.href.startsWith('lulumi://')) {
     ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
-    const sharedObject = remote.getGlobal('sharedObject');
-    global.about = sharedObject.guestData;
-    global.extensions = sharedObject.backgroundPages;
 
-    const renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
-    global.renderProcessPreferences = renderProcessPreferences;
+    global.about = remote.getGlobal('guestData');
+    global.extensions = remote.getGlobal('backgroundPages');
+    global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
 
     global.require = requireTmp;
     global.module = moduleTmp;

@@ -35,6 +35,16 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
     },
   };
 
+  lulumi.pageAction = {
+    show: (tabId) => {
+      ipcRenderer.send('lulumi-page-action-show', tabId, extensionId, true);
+    },
+    hide: (tabId) => {
+      ipcRenderer.send('lulumi-page-action-hide', tabId, extensionId, false);
+    },
+    onClicked: (isBackgroundPage === false) ? new IpcEvent('pageAction', 'on-clicked') : new Event(),
+  };
+
   lulumi.runtime = {
     id: extensionId,
     getURL: path => url.format({
@@ -43,16 +53,16 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       hostname: extensionId,
       pathname: path,
     }),
-    sendMessage: (extensionId, message, options, responseCallback) => {
+    sendMessage: (extensionId, message, responseCallback) => {
       ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
         }
       });
       if (extensionId === null) {
-        ipcRenderer.send('lulumi-runtime-send-message', lulumi.runtime.id, message, options);
+        ipcRenderer.send('lulumi-runtime-send-message', lulumi.runtime.id, message);
       } else {
-        ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, options);
+        ipcRenderer.send('lulumi-runtime-send-message', extensionId, message);
       }
     },
     onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),

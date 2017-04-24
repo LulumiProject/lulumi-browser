@@ -12,12 +12,39 @@ export default (VueInstance) => {
     appVersion: () => VueInstance.$electron.remote.app.getVersion(),
   };
 
+  const pageAction = {
+    onClicked: (webContentsId) => {
+      let id = VueInstance.$store.getters.mappings[webContentsId];
+      if (id === undefined) {
+        id = 0;
+      }
+      return VueInstance.$refs.navbar.$data.onClickedEvent;
+    },
+  }
+
   const runtime = {
-    sendMessage: (extensionId, message, options) => {
-      const backgroundPages = VueInstance.$electron.remote.getGlobal('sharedObject').backgroundPages;
+    sendMessage: (extensionId, message, webContentsId) => {
+      let tabId = VueInstance.$store.getters.mappings[webContentsId];
+      if (tabId === undefined) {
+        tabId = 0;
+      }
+      let tab = (tabId === null)
+        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
+        : tabArray[tabId];
+      if (tab === undefined) {
+        tab = new Tab(tabId);
+
+        const object = VueInstance.getPageObject(tabId);
+        tab.update(object.location, object.title, object.favicon);
+      } else {
+        tabArray.forEach((tab) => {
+          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
+        });
+      }
+      const backgroundPages = VueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       VueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
-        .send('lulumi-runtime-send-message', message, options);
+        .send('lulumi-runtime-send-message', message, { tab });
     },
     onMessage: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];

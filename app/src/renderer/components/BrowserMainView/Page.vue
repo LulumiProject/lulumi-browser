@@ -40,6 +40,9 @@
       page() {
         return this.$store.getters.pages[this.pageIndex];
       },
+      currentPageIndex() {
+        return this.$store.getters.currentPageIndex;
+      },
     },
     methods: {
       navigateTo(location) {
@@ -93,6 +96,12 @@
 
       webview.addEventListener('context-menu', (event) => {
         this.$parent.onWebviewContextMenu(event);
+      });
+
+      webview.addEventListener('will-navigate', () => {
+        this.$store.dispatch('clearPageAction', {
+          pageIndex: this.currentPageIndex,
+        });
       });
 
       const ipc = this.$electron.ipcRenderer;
