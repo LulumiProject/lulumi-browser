@@ -50,7 +50,10 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-browser-action-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').browserAction.onClicked(data.webContentsId).addListener(wrapper);
+        const onClickedEvent = require('lulumi').browserAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.addListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-browser-action-remove-listener-on-message', (event, data) => {
@@ -59,12 +62,18 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-browser-action-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').browserAction.onClicked(data.webContentsId).removeListener(wrapper);
+        const onClickedEvent = require('lulumi').browserAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.removeListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-browser-action-emit-on-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').browserAction.onClicked(data.webContentsId).emit(data.message, data.sender);
+        const onClickedEvent = require('lulumi').browserAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.emit(data.message, data.sender);
+        }
       }
     });
 
@@ -75,7 +84,7 @@ export default class ExtHostExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
-        vue.$refs.navbar.$forceUpdate();
+        vue.$nextTick(() => vue.$refs.navbar.$forceUpdate());
       }
     });
     ipc.on('lulumi-page-action-hide', (event, data) => {
@@ -85,7 +94,7 @@ export default class ExtHostExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
-        vue.$refs.navbar.$forceUpdate();
+        vue.$nextTick(() => vue.$refs.navbar.$forceUpdate());
       }
     });
     ipc.on('lulumi-page-action-add-listener-on-message', (event, data) => {
@@ -94,7 +103,10 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-page-action-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').pageAction.onClicked(data.webContentsId).addListener(wrapper);
+        const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.addListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-page-action-remove-listener-on-message', (event, data) => {
@@ -103,12 +115,18 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-page-action-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').pageAction.onClicked(data.webContentsId).removeListener(wrapper);
+        const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.removeListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-page-action-emit-on-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').pageAction.onClicked(data.webContentsId).emit(data.message, data.sender);
+        const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
+        if (onClickedEvent) {
+          onClickedEvent.emit(data.message, data.sender);
+        }
       }
     });
 
@@ -188,7 +206,10 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-runtime-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').runtime.onMessage(data.webContentsId).addListener(wrapper);
+        const onMessageEvent = require('lulumi').runtime.onMessage(data.webContentsId);
+        if (onMessageEvent) {
+          onMessageEvent.addListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-runtime-remove-listener-on-message', (event, data) => {
@@ -197,12 +218,18 @@ export default class ExtHostExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-runtime-add-listener-on-message-result-${data.digest}`, args);
         };
-        require('lulumi').runtime.onMessage(data.webContentsId).removeListener(wrapper);
+        const onMessageEvent = require('lulumi').runtime.onMessage(data.webContentsId);
+        if (onMessageEvent) {
+          onMessageEvent.removeListener(wrapper);
+        }
       }
     });
     ipc.on('lulumi-runtime-emit-on-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').runtime.onMessage(data.webContentsId).emit(data.message, data.sender);
+        const onMessageEvent = require('lulumi').runtime.onMessage(data.webContentsId);
+        if (onMessageEvent) {
+          onMessageEvent.emit(data.message, data.sender);
+        }
       }
     });
     ipc.on('lulumi-tabs-send-message', (event, data) => {

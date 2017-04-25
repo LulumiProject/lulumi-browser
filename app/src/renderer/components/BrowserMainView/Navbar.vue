@@ -432,6 +432,10 @@
       align-items: center;
       width: auto;
 
+      * {
+        -webkit-user-select: none;
+      }
+
       .extension {
         width: 16px;
         padding: 5px;

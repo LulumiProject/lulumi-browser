@@ -1,5 +1,5 @@
 <template lang="pug">
-  #chrome-tabs-shell(@dblclick="onDoubleClick")
+  #chrome-tabs-shell(@dblclick.self="onDoubleClick")
     .chrome-tabs(v-sortable="")
       div(v-for="(page, index) in pages", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index")
         svg(width="15", height="30", class="left-edge")
@@ -67,12 +67,14 @@
       },
     },
     methods: {
-      onDoubleClick() {
-        const mainWindow = this.$electron.remote.getCurrentWindow();
-        if (mainWindow.isMaximized()) {
-          mainWindow.unmaximize();
-        } else {
-          mainWindow.maximize();
+      onDoubleClick(event) {
+        if (event.target) {
+          const mainWindow = this.$electron.remote.getCurrentWindow();
+          if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+          } else {
+            mainWindow.maximize();
+          }
         }
       },
       onMouseMove(event) {
@@ -123,7 +125,7 @@
 <style lang="less" scoped>
   #chrome-tabs-shell {
     height: 38px;
-    padding: 0 18px 0 0;
+    padding-right: 18px;
     border-bottom: 1px solid #999;
   }
 

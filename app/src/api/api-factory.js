@@ -13,8 +13,10 @@ function findOrCreate(tabId, VueInstance) {
     tab = new Tab(tabId);
 
     const object = VueInstance.getPageObject(tabId);
-    tab.update(object.location, object.title, object.favicon);
-    tabArray[tab.id] = tab;
+    if (object) {
+      tab.update(object.location, object.title, object.favicon);
+      tabArray[tab.id] = tab;
+    }
   } else {
     tabArray.forEach((tab) => {
       tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
@@ -67,7 +69,12 @@ export default (VueInstance) => {
       if (id === undefined) {
         id = 0;
       }
-      return VueInstance.getPage(id).onMessageEvent;
+
+      const page = VueInstance.getPage(id);
+      if (page) {
+        return VueInstance.getPage(id).onMessageEvent;
+      }
+      return undefined;
     },
   };
 

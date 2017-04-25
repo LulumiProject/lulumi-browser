@@ -219,14 +219,16 @@ const mutations = {
     }
   },
   [types.SET_PAGE_ACTION](state, payload) {
-    if (state.pages[payload.pageIndex].pageActionMapping[payload.extensionId]) {
-      state.pages[payload.pageIndex]
-        .pageActionMapping[payload.extensionId].enabled = payload.enabled;
-    } else {
-      state.pages[payload.pageIndex]
-        .pageActionMapping[payload.extensionId] = {};
-      state.pages[payload.pageIndex]
-        .pageActionMapping[payload.extensionId].enabled = payload.enabled;
+    if (state.pages[payload.pageIndex]) {
+      if (state.pages[payload.pageIndex].pageActionMapping[payload.extensionId]) {
+        state.pages[payload.pageIndex]
+          .pageActionMapping[payload.extensionId].enabled = payload.enabled;
+      } else {
+        state.pages[payload.pageIndex]
+          .pageActionMapping[payload.extensionId] = {};
+        state.pages[payload.pageIndex]
+          .pageActionMapping[payload.extensionId].enabled = payload.enabled;
+      }
     }
   },
   [types.CLEAR_PAGE_ACTION](state, payload) {

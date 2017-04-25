@@ -92,7 +92,12 @@
       },
       // pageHandlers
       onDidStartLoading(event, pageIndex) {
+        const webview = this.getWebView(pageIndex);
         this.$store.dispatch('didStartLoading', pageIndex);
+        this.$store.dispatch('updateMappings', {
+          webContentsId: webview.getWebContents().id,
+          pageIndex,
+        });
       },
       onDomReady(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -113,10 +118,6 @@
             webview,
           });
         }
-        this.$store.dispatch('updateMappings', {
-          webContentsId: webview.getWebContents().id,
-          pageIndex,
-        });
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
