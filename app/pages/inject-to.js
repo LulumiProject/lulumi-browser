@@ -35,6 +35,10 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
     },
   };
 
+  lulumi.browserAction = {
+    onClicked: (isBackgroundPage === false) ? new IpcEvent('page-action', 'on-clicked') : new Event(),
+  };
+
   lulumi.pageAction = {
     show: (tabId) => {
       ipcRenderer.send('lulumi-page-action-show', tabId, extensionId, true);

@@ -45,6 +45,31 @@ ipcMain.on('lulumi-env-app-version', (event) => {
   });
 });
 
+ipcMain.once('lulumi-browser-action-on-message', (event) => {
+  ipcMain.on('lulumi-browser-action-add-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-browser-action-add-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-browser-action-remove-listener-on-message', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-browser-action-remove-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-browser-action-emit-on-message', (event, message) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-browser-action-emit-on-message', {
+      message,
+      sender: event.sender,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
 ipcMain.on('lulumi-page-action-show', (event, tabId, extensionId, enabled) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-page-action-show', {

@@ -15,8 +15,7 @@ export default class ExtHostExtensionService {
             this._triggerOnReady();
             this._register();
             this.manifestMap = manifestMap;
-            this.registerPageAction();
-            this.registerBrowserAction();
+            this.registerAction();
           }
         });
       }
@@ -41,6 +40,30 @@ export default class ExtHostExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('lulumi-env-app-version-result', require('lulumi').env.appVersion());
+      }
+    });
+
+    ipc.on('lulumi-browser-action-add-listener-on-message', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-browser-action-add-listener-on-message-result-${data.digest}`, args);
+        };
+        require('lulumi').browserAction.onClicked(data.webContentsId).addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-browser-action-remove-listener-on-message', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-browser-action-add-listener-on-message-result-${data.digest}`, args);
+        };
+        require('lulumi').browserAction.onClicked(data.webContentsId).removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-browser-action-emit-on-message', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').browserAction.onClicked(data.webContentsId).emit(data.message, data.sender);
       }
     });
 
@@ -283,28 +306,25 @@ export default class ExtHostExtensionService {
   update() {
     this.instance.$electron.ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
       this.manifestMap = manifestMap;
-      this.registerPageAction();
-      this.registerBrowserAction();
+      this.registerAction();
     });
     this.instance.$electron.ipcRenderer.send('request-extension-objects');
   }
 
-  registerPageAction() {
+  registerAction() {
     const vue = this.instance;
     const manifest = [];
     const remote = vue.$electron.remote;
     const backgroundPages = remote.getGlobal('backgroundPages');
 
-    Object.keys(this.manifestMap).forEach((extension) => {
-      let webContentsId = backgroundPages[extension].webContentsId;
-      this.manifestMap[extension].webContentsId = webContentsId;
-      manifest.push(this.manifestMap[extension]);
+    vue.$nextTick(() => {
+      Object.keys(this.manifestMap).forEach((extension) => {
+        let webContentsId = backgroundPages[extension].webContentsId;
+        this.manifestMap[extension].webContentsId = webContentsId;
+        manifest.push(this.manifestMap[extension]);
+      });
     });
 
-    vue.$refs.navbar.$data.extensions = manifest.filter(el => el.hasOwnProperty('page_action'));
-  }
-
-  registerBrowserAction() {
-    return;
+    vue.$refs.navbar.$data.extensions = manifest;
   }
 };

@@ -30,13 +30,23 @@ export default (VueInstance) => {
     appVersion: () => VueInstance.$electron.remote.app.getVersion(),
   };
 
+  const browserAction = {
+    onClicked: (webContentsId) => {
+      let id = VueInstance.$store.getters.mappings[webContentsId];
+      if (id === undefined) {
+        id = 0;
+      }
+      return VueInstance.$refs.navbar.$data.onbrowserActionClickedEvent;
+    },
+  }
+
   const pageAction = {
     onClicked: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {
         id = 0;
       }
-      return VueInstance.$refs.navbar.$data.onClickedEvent;
+      return VueInstance.$refs.navbar.$data.onpageActionClickedEvent;
     },
   }
 

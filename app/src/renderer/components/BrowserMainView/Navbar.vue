@@ -31,7 +31,9 @@
             icon(name="info-circle")
             span Normal
     .extensions-group(v-sortable="")
-      div(v-for="extension in extensions", :key="extension", style="padding-top: 3px;")
+      div(v-for="extension in extensions",
+          :key="extension",
+          style="padding-top: 3px;")
         img.extension(v-if="extension !== undefined",
                       :src="loadIcon(extension)", 
                       :class="showOrNot(extension)",
@@ -151,8 +153,9 @@
             ],
           },
         ],
-        extensions: {},
-        onClickedEvent: new Event(),
+        extensions: [],
+        onbrowserActionClickedEvent: new Event(),
+        onpageActionClickedEvent: new Event(),
       };
     },
     components: {
