@@ -16,8 +16,18 @@
         // eslint-disable-next-line no-alert
         alert('Error: window.about not found!');
       }
-      if (window.extensions) {
-        this.$store.dispatch('updateExtensions', window.extensions);
+      if (window.manifestMap) {
+        const backgroundPages = window.backgroundPages;
+        const manifestMap = window.manifestMap;
+        const extensions = {};
+        Object.keys(manifestMap).forEach((extension) => {
+          if (backgroundPages[extension]) {
+            extensions[extension] = backgroundPages[extension];
+          } else {
+            extensions[extension] = manifestMap[extension];
+          }
+        });
+        this.$store.dispatch('updateExtensions', extensions);
       } else {
         // eslint-disable-next-line no-alert
         alert('Error: window.extensions not found!');

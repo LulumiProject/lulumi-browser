@@ -77,6 +77,7 @@ function createWindow() {
 
   ipcMain.on('request-extension-objects', () => {
     global.backgroundPages = lulumiExtension.backgroundPages;
+    global.manifestMap = lulumiExtension.manifestMap;
     mainWindow.webContents.send('response-extension-objects',
       lulumiExtension.manifestMap,
     );

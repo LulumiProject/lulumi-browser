@@ -95,7 +95,8 @@ process.once('loaded', () => {
     ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
     global.about = remote.getGlobal('guestData');
-    global.extensions = remote.getGlobal('backgroundPages');
+    global.backgroundPages = remote.getGlobal('backgroundPages');
+    global.manifestMap = remote.getGlobal('manifestMap');
     global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
 
     global.require = requireTmp;

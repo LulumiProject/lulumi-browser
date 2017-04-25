@@ -10,7 +10,10 @@
         ul(class="extensions-list")
           li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
             el-button(:plain="true", type="danger", size="small", icon="circle-cross", @click="removeExtension(extension)")
-            a(class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
+            a(v-if="extensions[extension].webContentsId !== undefined", class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
+              img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
+              | {{ loadName(extension) }}
+            span(v-else, class="extensions-list__item-name")
               img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
               | {{ loadName(extension) }}
             div

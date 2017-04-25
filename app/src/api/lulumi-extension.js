@@ -2,6 +2,7 @@ import { app, BrowserWindow, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import fs from 'fs';
 import path from 'path';
+import punycode from 'punycode';
 import url from 'url';
 
 import config from '../renderer/js/constants/config';
@@ -18,7 +19,7 @@ const manifestMap = {};
 const manifestNameMap = {};
 
 const generateExtensionIdFromName = (name) => {
-  return name.replace(/[\W_]+/g, '-').toLowerCase();
+  return punycode.toASCII(name).replace(/[\W_]+/g, '-').toLowerCase();
 };
 
 const isWindowOrWebView = (webContents) => {
@@ -76,30 +77,32 @@ const startBackgroundPages = (manifest) => {
 
   let html;
   let name;
-  if (manifest.background.page) {
-    name = manifest.background.page;
-    html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page));
-  } else {
-    name = '_generated_background_page.html'
-    const scripts = manifest.background.scripts.map((name) => {
-      return `<script src="${name}"></script>`
-    }).join('');
-    html = new Buffer(`<html><body>${scripts}</body></html>`);
-  }
+  if (manifest.background) {
+    if (manifest.background.page) {
+      name = manifest.background.page;
+      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page));
+    } else {
+      name = '_generated_background_page.html'
+      const scripts = manifest.background.scripts.map((name) => {
+        return `<script src="${name}"></script>`
+      }).join('');
+      html = new Buffer(`<html><body>${scripts}</body></html>`);
+    }
 
-  const contents = webContents.create({
-    partition: 'persist:__chrome_extension',
-    isBackgroundPage: true,
-    commandLineSwitches: ['--background-page'],
-    preload: `${config.lulumiAppPath}/pages/extension-preload.js`,
-  });
-  backgroundPages[manifest.extensionId] = { html, webContentsId: contents.id, name };
-  contents.loadURL(url.format({
-    protocol: 'lulumi-extension',
-    slashes: true,
-    hostname: manifest.extensionId,
-    pathname: name,
-  }));
+    const contents = webContents.create({
+      partition: 'persist:__chrome_extension',
+      isBackgroundPage: true,
+      commandLineSwitches: ['--background-page'],
+      preload: `${config.lulumiAppPath}/pages/extension-preload.js`,
+    });
+    backgroundPages[manifest.extensionId] = { html, webContentsId: contents.id, name };
+    contents.loadURL(url.format({
+      protocol: 'lulumi-extension',
+      slashes: true,
+      hostname: manifest.extensionId,
+      pathname: name,
+    }));
+  }
 };
 
 const removeBackgroundPages = (manifest) => {

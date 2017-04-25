@@ -7,6 +7,7 @@ import apiFactory, { initializeExtensionApi } from './api-factory';
 export default class ExtHostExtensionService {
   constructor(VueInstance) {
     this.ready = false;
+    this.manifestMap = {};
     this.instance = VueInstance;
     this.instance.$electron.ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
       if (Object.keys(manifestMap) !== 0) {
@@ -74,6 +75,7 @@ export default class ExtHostExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
+        vue.$refs.navbar.$forceUpdate();
       }
     });
     ipc.on('lulumi-page-action-hide', (event, data) => {
@@ -83,6 +85,7 @@ export default class ExtHostExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
+        vue.$refs.navbar.$forceUpdate();
       }
     });
     ipc.on('lulumi-page-action-add-listener-on-message', (event, data) => {
@@ -319,9 +322,13 @@ export default class ExtHostExtensionService {
 
     vue.$nextTick(() => {
       Object.keys(this.manifestMap).forEach((extension) => {
-        let webContentsId = backgroundPages[extension].webContentsId;
-        this.manifestMap[extension].webContentsId = webContentsId;
-        manifest.push(this.manifestMap[extension]);
+        if (backgroundPages[extension]) {
+          let webContentsId = backgroundPages[extension].webContentsId;
+          this.manifestMap[extension].webContentsId = webContentsId;
+          manifest.push(this.manifestMap[extension]);
+        } else {
+          manifest.push(this.manifestMap[extension]);
+        }
       });
     });
 

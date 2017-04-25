@@ -304,7 +304,7 @@
         if (isPageAction) {
           return extension.page_action.default_title;
         }
-        return 'browser_action';
+        return extension.browser_action.default_title;
       },
       sendIPC(event, extension) {
         if (event.target.classList.contains('enabled')) {
