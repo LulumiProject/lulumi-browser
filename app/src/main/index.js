@@ -7,7 +7,7 @@ import session from './js/lib/session';
 import autoUpdater from './js/lib/auto-updater';
 import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
-import * as chromeExtension from '../api/chrome-extension';
+import * as lulumiExtension from '../api/lulumi-extension';
 
 let mainWindow;
 
@@ -76,9 +76,9 @@ function createWindow() {
   });
 
   ipcMain.on('request-extension-objects', () => {
-    global.backgroundPages = chromeExtension.backgroundPages;
+    global.backgroundPages = lulumiExtension.backgroundPages;
     mainWindow.webContents.send('response-extension-objects',
-      chromeExtension.manifestMap,
+      lulumiExtension.manifestMap,
     );
   });
 

@@ -18,6 +18,6 @@ process.once('loaded', () => {
     global.lulumi.runtime.onMessage.emit(message, sender);
   });
   ipcRenderer.on('lulumi-page-action-clicked', (event, tab) => {
-    global.lulumi.pageAction.onClicked.emit(tab);
+    global.lulumi.tabs.get(tab.id, tab => global.lulumi.pageAction.onClicked.emit(tab));
   });
 });

@@ -42,7 +42,7 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
     hide: (tabId) => {
       ipcRenderer.send('lulumi-page-action-hide', tabId, extensionId, false);
     },
-    onClicked: (isBackgroundPage === false) ? new IpcEvent('pageAction', 'on-clicked') : new Event(),
+    onClicked: (isBackgroundPage === false) ? new IpcEvent('page-action', 'on-clicked') : new Event(),
   };
 
   lulumi.runtime = {

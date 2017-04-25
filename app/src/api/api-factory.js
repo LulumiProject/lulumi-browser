@@ -5,6 +5,24 @@ import Tab from './extensions/tab';
 
 const tabArray = [];
 
+function findOrCreate(tabId, VueInstance) {
+  let tab = (tabId === null)
+    ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
+    : tabArray[tabId];
+  if (tab === undefined) {
+    tab = new Tab(tabId);
+
+    const object = VueInstance.getPageObject(tabId);
+    tab.update(object.location, object.title, object.favicon);
+    tabArray[tab.id] = tab;
+  } else {
+    tabArray.forEach((tab) => {
+      tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
+    });
+  }
+  return tab;
+}
+
 // VueInstance is an instance of BrowserMainView
 export default (VueInstance) => {
   const env = {
@@ -28,19 +46,7 @@ export default (VueInstance) => {
       if (tabId === undefined) {
         tabId = 0;
       }
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       const backgroundPages = VueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       VueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
@@ -57,19 +63,7 @@ export default (VueInstance) => {
 
   const tabs = {
     get: (tabId) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       return tab;
     },
     getCurrent: () => {
@@ -81,26 +75,15 @@ export default (VueInstance) => {
       return tab;
     },
     duplicate: (tabId) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       VueInstance.onTabDuplicate(tab.id);
 
-      tab = new Tab(VueInstance.$store.getters.pages.length - 1, false);
+      duplicateTab = new Tab(VueInstance.$store.getters.pages.length - 1, false);
 
-      const object = VueInstance.getPageObject(tab.id);
-      tab.update(object.location, object.title, object.favicon);
-      return tab;
+      const object = VueInstance.getPageObject(duplicateTab.id);
+      duplicateTab.update(object.location, object.title, object.favicon);
+      tabArray[duplicateTab.id] = duplicateTab;
+      return duplicateTab;
     },
     query: (queryInfo) => {
       if (queryInfo.hasOwnProperty('active')) {
@@ -115,6 +98,7 @@ export default (VueInstance) => {
 
           const object = VueInstance.getPageObject(tab.id);
           tab.update(object.location, object.title, object.favicon);
+          tabArray[tab.id] = tab;
           return [tab];
         }
       }
@@ -130,19 +114,7 @@ export default (VueInstance) => {
       return tabs;
     },
     update: (tabId, updateProperties = {}) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId, false);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       if (updateProperties.hasOwnProperty('url')) {
         VueInstance.getPage(tab.id).$refs.webview.loadURL(updateProperties.url);
       }
@@ -163,19 +135,7 @@ export default (VueInstance) => {
       return tab;
     },
     reload: (tabId, reloadProperties = { bypassCache: false }) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       if (reloadProperties.bypassCache) {
         VueInstance.getPage(tab.id).$refs.webview.reloadIgnoringCache();
       } else {
@@ -189,38 +149,13 @@ export default (VueInstance) => {
       tabIds.forEach(tabId => VueInstance.onTabClose(tabId));
     },
     detectLanguage: (tabId, webContentsId) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
-
+      const tab = findOrCreate(tabId, VueInstance);
       VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
         ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
       `);
     },
     executeScript: (tabId, details = {}) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       if (details.hasOwnProperty('file')) {
         VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(
           String(fs.readFileSync(path.join(manifest.srcDirectory, details.file))),
@@ -230,37 +165,13 @@ export default (VueInstance) => {
       }
     },
     insertCSS: (tabId, details = {}) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       if (details.hasOwnProperty('code')) {
         VueInstance.getPage(tab.id).$refs.webview.insertCSS(details.code);
       }
     },
     sendMessage: (tabId, message) => {
-      let tab = (tabId === null)
-        ? new Tab(VueInstance.$store.getters.currentPageIndex, true)
-        : tabArray[tabId];
-      if (tab === undefined) {
-        tab = new Tab(tabId);
-
-        const object = VueInstance.getPageObject(tabId);
-        tab.update(object.location, object.title, object.favicon);
-      } else {
-        tabArray.forEach((tab) => {
-          tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
-        });
-      }
+      const tab = findOrCreate(tabId, VueInstance);
       VueInstance.getPage(tab.id).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },
     onUpdated: VueInstance.onUpdatedEvent,
