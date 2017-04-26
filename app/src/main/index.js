@@ -53,10 +53,14 @@ function createWindow() {
     autoUpdater.listen(mainWindow);
   }
 
-  mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
+  mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     webPreferences.allowDisplayingInsecureContent = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
-    webPreferences.preload = `${config.lulumiAppPath}/pages/webview-preload.js`;
+    if (params.src.startsWith('lulumi-extension://')) {
+      webPreferences.preload = `${config.lulumiAppPath}/pages/extension-preload.js`;
+    } else {
+      webPreferences.preload = `${config.lulumiAppPath}/pages/webview-preload.js`;
+    }
   });
 
   mainWindow.on('scroll-touch-begin', () => {

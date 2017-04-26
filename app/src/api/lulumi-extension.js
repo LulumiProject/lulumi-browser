@@ -117,9 +117,9 @@ const removeBackgroundPages = (manifest) => {
 // transfer the content scripts to renderer
 const contentScripts = {};
 
-const injectContentScripts = (manifest) => {
+const injectContentScripts = (manifest, entry) => {
   if (contentScripts[manifest.name] || !manifest.content_scripts) {
-    return;
+    return entry;
   }
 
   const readArrayOfFiles = (relativePath) => {
@@ -138,23 +138,13 @@ const injectContentScripts = (manifest) => {
     };
   };
 
-  const iconsToEntry = (icons) => {
-    const object = {};
-    Object.keys(icons).forEach((key) => {
-      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL('image/png');
-    });
-    return object;
-  };
-
   try {
-    let entry = manifestToExtensionInfo(manifest);
     entry.contentScripts = manifest.content_scripts.map(contentScriptToEntry);
-    entry.icons = iconsToEntry(manifest.icons);
-    global.renderProcessPreferences.push(entry);
     contentScripts[manifest.name] = entry;
   } catch (e) {
     console.error('Failed to read content scripts', e);
   }
+  return entry;  
 };
 
 const removeContentScripts = (manifest) => {
@@ -165,6 +155,30 @@ const removeContentScripts = (manifest) => {
   global.renderProcessPreferences = global.renderProcessPreferences.filter((el) => el.extensionId !== contentScripts[manifest.name].extensionId);
   delete contentScripts[manifest.name];
 }
+
+const loadIcons = (manifest, entry) => {
+  const readArrayOfFiles = (relativePath) => {
+    return {
+      url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
+      code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
+    };
+  };
+
+  const iconsToEntry = (icons) => {
+    const object = {};
+    Object.keys(icons).forEach((key) => {
+      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL('image/png');
+    });
+    return object;
+  };
+
+  try {
+    entry.icons = iconsToEntry(manifest.icons);
+  } catch (e) {
+    console.error('Failed to load icons', e);
+  }
+  return entry;
+};
 
 const manifestToExtensionInfo = (manifest) => {
   return {
@@ -178,8 +192,11 @@ const manifestToExtensionInfo = (manifest) => {
 
 // load the extensions for the window
 const loadExtension = (manifest) => {
+  let entry = manifestToExtensionInfo(manifest);
   startBackgroundPages(manifest);
-  injectContentScripts(manifest);
+  entry = injectContentScripts(manifest, entry);
+  entry = loadIcons(manifest, entry);
+  global.renderProcessPreferences.push(entry);
 };
 
 const loadLulumiExtensions = (win, manifests) => {

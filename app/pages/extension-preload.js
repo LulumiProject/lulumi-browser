@@ -14,6 +14,8 @@ process.once('loaded', () => {
     preferences.forEach(pref => inject(pref.extensionId));
   }
 
+  global.ipcRenderer = ipcRenderer;
+
   ipcRenderer.on('lulumi-runtime-send-message', (event, message, sender) => {
     global.lulumi.runtime.onMessage.emit(message, sender);
   });

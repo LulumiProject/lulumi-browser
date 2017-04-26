@@ -31,15 +31,18 @@
             icon(name="info-circle")
             span Normal
     .extensions-group(v-sortable="")
-      div(v-for="extension in extensions",
+      div.block(v-for="extension in extensions",
           :key="extension",
-          style="padding-top: 3px;")
-        img.extension(v-if="extension !== undefined",
-                      :src="loadIcon(extension)", 
-                      :class="showOrNot(extension)",
-                      :title="showTitle(extension)",
-                      @click.prevent="sendIPC($event, extension)",
-                      @contextmenu.prevent="onContextmenu(extension)")
+          style="padding-top: 3px;",)
+        el-popover(placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
+          img.extension(v-if="extension !== undefined",
+                        :src="loadIcon(extension)",
+                        :class="showOrNot(extension)",
+                        :title="showTitle(extension)",
+                        @click.prevent="sendIPC($event, extension)",
+                        @contextmenu.prevent="onContextmenu(extension)",
+                        slot="reference")
+          webview(:ref="`webview-${extension.extensionId}`")
     el-cascader#dropdown(expand-trigger="hover", :options="options", v-model="selectedOptions", @change="handleChange")
 </template>
 
@@ -60,7 +63,7 @@
 
   import Sortable from 'sortablejs';
 
-  import { Button, Cascader } from 'element-ui';
+  import { Button, Cascader, Popover } from 'element-ui';
 
   import Event from 'src/api/extensions/event';
 
@@ -109,7 +112,7 @@
       sortable: {
         update(el) {
           Sortable.create(el, {
-            draggable: '.extension',
+            draggable: '.block',
             animation: 150,
           });
         },
@@ -162,6 +165,7 @@
       Icon,
       'el-button': Button,
       'el-cascader': Cascader,
+      'el-popover': Popover,
     },
     computed: {
       page() {
@@ -298,6 +302,28 @@
         }
         return 'enabled';
       },
+      showPopupOrNot(extension) {
+        // eslint-disable-next-line no-prototype-builtins
+        const isPageAction = extension.hasOwnProperty('page_action');
+        // eslint-disable-next-line no-prototype-builtins
+        const isBrowserAction = extension.hasOwnProperty('browser_action');
+        if (isPageAction) {
+          if (this.pageActionMapping[extension.extensionId]) {
+            if (this.pageActionMapping[extension.extensionId].enabled) {
+              if (extension.page_action.default_popup) {
+                return false;
+              }
+            }
+          }
+          return true;
+        } else if (isBrowserAction) {
+          if (extension.browser_action.default_popup) {
+            return false;
+          }
+          return true;
+        }
+        return true;
+      },
       showTitle(extension) {
         // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
@@ -307,9 +333,74 @@
         return extension.browser_action.default_title;
       },
       sendIPC(event, extension) {
-        if (event.target.classList.contains('enabled')) {
-          this.$electron.remote.webContents.fromId(extension.webContentsId)
-            .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
+        // eslint-disable-next-line no-prototype-builtins
+        const isPageAction = extension.hasOwnProperty('page_action');
+        // eslint-disable-next-line no-prototype-builtins
+        const isBrowserAction = extension.hasOwnProperty('browser_action');
+        if (isPageAction || isBrowserAction) {
+          const webview = this.$refs[`webview-${extension.extensionId}`][0];
+          webview.addEventListener('context-menu', (event) => {
+            const { Menu, MenuItem } = this.$electron.remote;
+            const menu = new Menu();
+
+            menu.append(new MenuItem({
+              label: 'Inspect Element',
+              click: () => {
+                webview.inspectElement(event.params.x, event.params.y);
+              },
+            }));
+
+            menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
+          });
+          webview.addEventListener('ipc-message', (event) => {
+            if (event.channel === 'resize') {
+              const size = event.args[0];
+              webview.style.height = `calc(${size.height + 30}px)`;
+              webview.style.width = `calc(${size.width + 20}px)`;
+              webview.style.overflow = 'hidden';
+            }
+          });
+          webview.addEventListener('dom-ready', () => {
+            webview.executeJavaScript(`
+              var height = document.body.clientHeight;
+              var width = document.body.clientWidth;
+              ipcRenderer.sendToHost('resize', {
+                height,
+                width,
+              });
+            `);
+          });
+          if (isPageAction) {
+            if (event.target.classList.contains('enabled')) {
+              if (extension.page_action.default_popup) {
+                webview.setAttribute('src', `${url.format({
+                  protocol: 'lulumi-extension',
+                  slashes: true,
+                  hostname: extension.extensionId,
+                  pathname: extension.page_action.default_popup,
+                })}`);
+                return;
+              }
+              if (extension.webContentsId) {
+                this.$electron.remote.webContents.fromId(extension.webContentsId)
+                  .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
+              }
+            }
+          } else if (isBrowserAction) {
+            if (extension.browser_action.default_popup) {
+              webview.setAttribute('src', `${url.format({
+                protocol: 'lulumi-extension',
+                slashes: true,
+                hostname: extension.extensionId,
+                pathname: extension.browser_action.default_popup,
+              })}`);
+              return;
+            }
+            if (extension.webContentsId) {
+              this.$electron.remote.webContents.fromId(extension.webContentsId)
+                .send('lulumi-browser-action-clicked', { id: this.currentPageIndex });
+            }
+          }
         }
       },
       removeExtension(name) {
