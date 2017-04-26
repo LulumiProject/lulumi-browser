@@ -173,7 +173,9 @@ const loadIcons = (manifest, entry) => {
   };
 
   try {
-    entry.icons = iconsToEntry(manifest.icons);
+    if (manifest.icons) {
+      entry.icons = iconsToEntry(manifest.icons);
+    }
   } catch (e) {
     console.error('Failed to load icons', e);
   }

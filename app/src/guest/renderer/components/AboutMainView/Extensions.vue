@@ -14,7 +14,8 @@
               img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
               | {{ loadName(extension) }}
             span(v-else, class="extensions-list__item-name")
-              img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
+              img(v-if="loadIcon(extension) !== undefined", :src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
+              span(v-else)
               | {{ loadName(extension) }}
             div
               | {{ "Path: " }}
@@ -29,22 +30,24 @@
       },
     },
     methods: {
-      loadName(extensionId) {
+      findId(extensionId) {
         // eslint-disable-next-line no-undef
-        const id = window.renderProcessPreferences
+        return window.renderProcessPreferences
           .findIndex(element => element.extensionId === extensionId);
+      },
+      loadName(extensionId) {
+        const id = this.findId(extensionId);
         return window.renderProcessPreferences[id].name;
       },
       loadIcon(extensionId) {
-        // eslint-disable-next-line no-undef
-        const id = window.renderProcessPreferences
-          .findIndex(element => element.extensionId === extensionId);
-        return window.renderProcessPreferences[id].icons['16'];
+        const id = this.findId(extensionId);
+        if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
+          return window.renderProcessPreferences[id].icons['16'];
+        }
+        return undefined;
       },
       loadPath(extensionId) {
-        // eslint-disable-next-line no-undef
-        const id = window.renderProcessPreferences
-          .findIndex(element => element.extensionId === extensionId);
+        const id = this.findId(extensionId);
         return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
       },
       openDevTools(webContentsId) {
@@ -60,9 +63,7 @@
         ipcRenderer.send('add-extension');
       },
       removeExtension(extensionId) {
-        // eslint-disable-next-line no-undef
-        const id = window.renderProcessPreferences
-          .findIndex(element => element.extensionId === extensionId);
+        const id = this.findId(extensionId);
         // eslint-disable-next-line no-undef
         ipcRenderer.once('remove-extension-result', (event, result) => {
           if (result === 'OK') {

@@ -286,8 +286,22 @@
         this.$parent.onNewTab(`${config.lulumiPagesCustomProtocol}about/#/${val.pop()}`);
       },
       loadIcon(extension) {
+        // eslint-disable-next-line no-prototype-builtins
+        const isPageAction = extension.hasOwnProperty('page_action');
+        // eslint-disable-next-line no-prototype-builtins
+        const isBrowserAction = extension.hasOwnProperty('browser_action');
+        let icons;
+        if (isPageAction) {
+          icons = extension.page_action.default_icon;
+        } else if (isBrowserAction) {
+          icons = extension.browser_action.default_icon;
+        }
+        if (typeof icons === 'string') {
+          return this.$electron.remote.nativeImage
+            .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
+        }
         return this.$electron.remote.nativeImage
-          .createFromPath(path.join(extension.srcDirectory, extension.icons['16'])).toDataURL('image/png');
+          .createFromPath(path.join(extension.srcDirectory, icons['16'])).toDataURL('image/png');
       },
       showOrNot(extension) {
         // eslint-disable-next-line no-prototype-builtins
@@ -327,10 +341,14 @@
       showTitle(extension) {
         // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
+        // eslint-disable-next-line no-prototype-builtins
+        const isBrowserAction = extension.hasOwnProperty('browser_action');
         if (isPageAction) {
           return extension.page_action.default_title;
+        } else if (isBrowserAction) {
+          return extension.browser_action.default_title;
         }
-        return extension.browser_action.default_title;
+        return '';
       },
       sendIPC(event, extension) {
         // eslint-disable-next-line no-prototype-builtins
