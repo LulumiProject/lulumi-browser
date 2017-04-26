@@ -85,6 +85,9 @@ function createWindow() {
     mainWindow.webContents.send('response-extension-objects',
       lulumiExtension.manifestMap,
     );
+    Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
+      lulumiExtension.loadCommands(mainWindow, lulumiExtension.manifestMap[manifest]);
+    });
   });
 
   ipcMain.on('request-app-state', () => {

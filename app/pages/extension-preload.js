@@ -22,4 +22,7 @@ process.once('loaded', () => {
   ipcRenderer.on('lulumi-page-action-clicked', (event, tab) => {
     global.lulumi.tabs.get(tab.id, tab => global.lulumi.pageAction.onClicked.emit(tab));
   });
+  ipcRenderer.on('lulumi-commands-triggered', (event, command) => {
+    global.lulumi.commands.onCommand.emit(command);
+  });
 });

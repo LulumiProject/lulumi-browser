@@ -34,7 +34,7 @@
       div.block(v-for="extension in extensions",
           :key="extension",
           style="padding-top: 3px;",)
-        el-popover(placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
+        el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
           img.extension(v-if="extension !== undefined",
                         :src="loadIcon(extension)",
                         :class="showOrNot(extension)",
@@ -459,6 +459,15 @@
       };
 
       const ipc = this.$electron.ipcRenderer;
+
+      ipc.on('lulumi-commands-execute-page-action', (event, extensionId) => {
+        const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
+        extension.click();
+      });
+      ipc.on('lulumi-commands-execute-browser-action', (event, extensionId) => {
+        const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
+        extension.click();
+      });
 
       ipc.on('add-extension-result', () => {
         this.$parent.extensionService.update();

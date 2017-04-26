@@ -1,5 +1,6 @@
 import { app, BrowserWindow, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
+import localshortcut from 'electron-localshortcut';
 import fs from 'fs';
 import path from 'path';
 import punycode from 'punycode';
@@ -114,11 +115,31 @@ const removeBackgroundPages = (manifest) => {
   delete backgroundPages[manifest.extensionId];
 };
 
-// transfer the content scripts to renderer
-const contentScripts = {};
+exports.loadCommands = (mainWindow, manifest) => {
+  const commands = manifest.commands;
+  if (commands) {
+    Object.keys(commands).forEach((command) => {
+      const suggested_key = commands[command].suggested_key;
+      localshortcut.register(mainWindow, suggested_key.default, () => {
+        if (commands[command].suggested_key) {
+          if (command === '_execute_page_action') {
+            BrowserWindow.getAllWindows()[0]
+              .webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+          } else if (command === '_execute_browser_action') {
+            BrowserWindow.getAllWindows()[0]
+              .webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+          } else {
+            webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
+              .send('lulumi-commands-triggered', command);
+          }
+        }
+      });
+    });
+  }
+};
 
 const injectContentScripts = (manifest, entry) => {
-  if (contentScripts[manifest.name] || !manifest.content_scripts) {
+  if (!manifest.content_scripts) {
     return entry;
   }
 
@@ -140,20 +161,14 @@ const injectContentScripts = (manifest, entry) => {
 
   try {
     entry.contentScripts = manifest.content_scripts.map(contentScriptToEntry);
-    contentScripts[manifest.name] = entry;
   } catch (e) {
     console.error('Failed to read content scripts', e);
   }
   return entry;  
 };
 
-const removeContentScripts = (manifest) => {
-  if (!contentScripts[manifest.name]) {
-    return;
-  }
-
-  global.renderProcessPreferences = global.renderProcessPreferences.filter((el) => el.extensionId !== contentScripts[manifest.name].extensionId);
-  delete contentScripts[manifest.name];
+const removeRenderProcessPreferences = (manifest) => {
+  global.renderProcessPreferences = global.renderProcessPreferences.filter((el) => el.extensionId !== manifest.extensionId);
 }
 
 const loadIcons = (manifest, entry) => {
@@ -305,11 +320,6 @@ app.once('ready', () => {
     const manifest = getManifestFromPath(srcDirectory);
     if (manifest) {
       loadExtension(manifest);
-      for (const webContents of webContents.getAllWebContents()) {
-        if (isWindowOrWebView(webContents)) {
-          loadLulumiExtensions(webContents, [manifest]);
-        }
-      }
       return manifest.name;
     }
   }
@@ -321,7 +331,7 @@ app.once('ready', () => {
     }
 
     removeBackgroundPages(manifest);
-    removeContentScripts(manifest);
+    removeRenderProcessPreferences(manifest);
     delete manifestMap[manifest.extensionId];
     delete manifestNameMap[name];
   }
