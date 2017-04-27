@@ -2,17 +2,17 @@
   div
     el-row(type="flex", align="middle")
       el-col(:span="4")
-        h1 History
+        h1 {{ $t('about.preferencesPage.historyPage.title') }}
       el-col(:span="4")
-        div {{ `History is ${sync === true ? 'syncing' : 'not syncing'}...&nbsp;` }}
+        div {{ `${$t('about.preferencesPage.historyPage.sync')} ${syncStatus()}` }}
         el-switch(@change="toggleSync", v-model="sync", on-color="#13ce66", off-color="#ff4949")
       el-col(:span="12")
-        el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", placeholder="Input keyword", v-model="filterText")
+        el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.preferencesPage.historyPage.placeholder')", v-model="filterText")
       el-col(:span="2")
-        el-button(:disabled="sync", type="info", @click="setHistory") Clear
+        el-button(:disabled="sync", type="info", @click="setHistory") {{ $t('about.preferencesPage.historyPage.clear') }}
     el-row
       el-col(:span="24")
-        el-tree(ref="tree", empty-text="No data...", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
+        el-tree(ref="tree", :empty-text="$t('about.preferencesPage.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
 </template>
 
 <script>
@@ -54,6 +54,12 @@
         } else {
           this.clear();
         }
+      },
+      syncStatus() {
+        if (this.sync) {
+          return this.$t('about.preferencesPage.historyPage.syncStatus.syncing');
+        }
+        return this.$t('about.preferencesPage.historyPage.syncStatus.notSyncing');
       },
       setHistory() {
         const checkedNodes = this.$refs.tree.getCheckedNodes();

@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h1 PDFViewer
+    h1 {{ $t('about.preferencesPage.pdfViewerPage.title') }}
     el-select(
       :placeholder="pdfViewer",
       v-model.trim="pdfViewer",

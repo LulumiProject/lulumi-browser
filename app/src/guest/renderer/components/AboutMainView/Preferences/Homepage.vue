@@ -1,13 +1,13 @@
 <template lang="pug">
   div
-    h1 Homepage
+    h1 {{ $t('about.preferencesPage.homePage.title') }}
     el-input(
       placeholder="Input homepage you want",
       @change="setHomepage",
       v-model.trim="homepage",
       :autofocus="true",
       ref="input")
-      template(slot="prepend") homepage
+      template(slot="prepend") {{ $t('about.preferencesPage.homePage.homepage') }}
 </template>
 
 <script>

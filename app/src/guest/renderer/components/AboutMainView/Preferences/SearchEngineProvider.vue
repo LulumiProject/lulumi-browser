@@ -1,10 +1,10 @@
 <template lang="pug">
   div
-    h1 Search Engine Provider Page
+    h1 {{ $t('about.preferencesPage.searchEngineProviderPage.title') }}
     el-table(:data="tableData", :default-sort = "{prop: 'name', order: 'descending'}", :row-class-name="currentSearchEngine", @current-change="handleCurrentChange")
-      el-table-column(prop="current", label="Current", width="180", align="center")
-      el-table-column(prop="search", label="Search Engine", align="center")
-      el-table-column(prop="name", label="Name", width="180", align="center")
+      el-table-column(prop="current", :label="$t('about.preferencesPage.searchEngineProviderPage.current')", width="180", align="center")
+      el-table-column(prop="search", :label="$t('about.preferencesPage.searchEngineProviderPage.searchEngine')", align="center")
+      el-table-column(prop="name", :label="$t('about.preferencesPage.searchEngineProviderPage.name')", width="180", align="center")
 </template>
 
 <script>

@@ -2,9 +2,9 @@
   div
     el-row(type="flex", align="middle")
       el-col(:span="12")
-        h1 Downloads
+        h1 {{ $t('about.downloadsPage.title') }}
       el-col(:span="6", :offset="3")
-        el-button(type="info", @click="setDownloads(-1)") Clear
+        el-button(type="info", @click="setDownloads(-1)") {{ $t('about.downloadsPage.clear') }}
     el-row
       el-col(:span="24")
         ul(class="download-list")

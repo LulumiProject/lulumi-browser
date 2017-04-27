@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h1 Tab Config
+    h1 {{ $t('about.preferencesPage.tabConfigPage.title') }}
     div
       el-input(
         placeholder="Input default opening location you want",
@@ -8,7 +8,7 @@
         v-model.trim="defaultUrl",
         :autofocus="true",
         ref="input")
-        template(slot="prepend") Opening Location
+        template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.location') }}
     div(style="margin-top: 15px;")
       el-input(
         placeholder="Input default favicon location you want",
@@ -16,7 +16,7 @@
         v-model.trim="defaultFavicon",
         :autofocus="true",
         ref="input")
-        template(slot="prepend") Default Favicon
+        template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.favicon') }}
         template(slot="append")
           img.preview(:src="defaultFavicon")
 </template>
