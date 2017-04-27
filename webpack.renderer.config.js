@@ -108,6 +108,7 @@ let rendererConfig = {
       'src': path.join(__dirname, 'app/src'),
       'components': path.join(__dirname, 'app/src/renderer/components'),
       'renderer': path.join(__dirname, 'app/src/renderer'),
+      'i18n': path.join(__dirname, 'app/i18n'),
       'extensions': path.join(__dirname, 'extensions')
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug'],
@@ -215,7 +216,8 @@ let aboutConfig = {
   resolve: {
     alias: {
       'components': path.join(__dirname, 'app/src/guest/renderer/components'),
-      'renderer': path.join(__dirname, 'app/src/guest/renderer')
+      'renderer': path.join(__dirname, 'app/src/guest/renderer'),
+      'i18n': path.join(__dirname, 'app/i18n'),
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug'],
     modules: [

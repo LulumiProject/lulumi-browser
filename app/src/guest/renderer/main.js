@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-default/index.css';
 
 import App from './App';
 import routes from './routes';
+import i18n from './i18n';
 
 Vue.use(Resource);
 Vue.use(Router);
@@ -24,6 +25,7 @@ const router = new Router({
 
 /* eslint-disable no-new */
 new Vue({
+  i18n,
   router,
   ...App,
 }).$mount('#app');
