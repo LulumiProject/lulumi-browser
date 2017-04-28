@@ -113,6 +113,65 @@ ipcMain.once('lulumi-page-action-on-message', (event) => {
   });
 });
 
+ipcMain.on('lulumi-alarms-get', (event, name) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-alarms-get', {
+    name,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-alarms-get-all', (event) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-alarms-get-all', {
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-alarms-clear', (event, name) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-alarms-clear', {
+    name,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-alarms-clear-all', (event) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-alarms-clear-all', {
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-alarms-create', (event, name, alarmInfo) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-alarms-create', {
+    name,
+    alarmInfo,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.once('lulumi-alarms-on-alarm', (event) => {
+  ipcMain.on('lulumi-alarms-add-listener-on-alarm', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-alarms-add-listener-on-alarm', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-alarms-remove-listener-on-alarm', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-alarms-remove-listener-on-alarm', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-alarms-emit-on-alarm', (event, alarm) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-alarms-emit-on-alarm', {
+      alarm,
+      sender: event.sender,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
 ipcMain.on('lulumi-tabs-get', (event, tabId) => {
   BrowserWindow.getAllWindows()[0]
     .webContents.send('lulumi-tabs-get', {

@@ -40,7 +40,7 @@ export default (VueInstance) => {
       }
       return VueInstance.$refs.navbar.$data.onbrowserActionClickedEvent;
     },
-  }
+  };
 
   const pageAction = {
     onClicked: (webContentsId) => {
@@ -50,7 +50,7 @@ export default (VueInstance) => {
       }
       return VueInstance.$refs.navbar.$data.onpageActionClickedEvent;
     },
-  }
+  };
 
   const runtime = {
     sendMessage: (extensionId, message, webContentsId) => {

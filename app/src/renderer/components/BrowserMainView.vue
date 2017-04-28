@@ -39,11 +39,13 @@
         deltaY: 0,
         hnorm: 0,
         startTime: 0,
-        extensionService: null,
         showDownloadBar: false,
+        extensionService: null,
         onUpdatedEvent: new Event(),
         onCreatedEvent: new Event(),
         onRemovedEvent: new Event(),
+        alarms: {},
+        onAlarmEvent: new Event(),
       };
     },
     components: {
@@ -89,6 +91,50 @@
       getPageObject(i) {
         i = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
         return this.$store.getters.pages[i];
+      },
+      // lulumi.alarms
+      getAlarm(name) {
+        return this.alarms[name];
+      },
+      getAllAlarm() {
+        return this.alarms;
+      },
+      clearAlarm(name) {
+        if (this.alarms[name] && this.alarms[name].handler) {
+          if (this.alarms[name].periodInMinutes) {
+            clearInterval(this.alarms[name].handler);
+          }
+        }
+        return delete this.alarms[name];
+      },
+      clearAllAlarm() {
+        Object.values(this.alarms).forEach((alarm) => {
+          if (alarm.handler) {
+            if (alarm.periodInMinutes) {
+              clearInterval(alarm.handler);
+            } else {
+              clearTimeout(alarm.handler);
+            }
+          }
+        });
+        this.alarms = {};
+      },
+      createAlarm(name, alarmInfo) {
+        this.clearAlarm(name);
+        let timeout;
+        this.alarms[name] = alarmInfo;
+        if (alarmInfo.when) {
+          timeout = alarmInfo.when - Date.now();
+        } else if (alarmInfo.delayInMinutes) {
+          timeout = alarmInfo.delayInMinutes * 60 * 1000;
+        }
+        if (alarmInfo.periodInMinutes) {
+          this.alarms[name].handler
+            = setInterval(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
+        } else {
+          this.alarms[name].handler
+            = setTimeout(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
+        }
       },
       // pageHandlers
       onDidStartLoading(event, pageIndex) {
@@ -750,9 +796,10 @@
                 this.getWebView().showDefinitionForSelection();
               },
             }));
-            menu.append(new MenuItem({ type: 'separator' }));
           }
         }
+
+        menu.append(new MenuItem({ type: 'separator' }));
         const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
         if (sourceLocation !== null) {
           menu.append(new MenuItem({

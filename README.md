@@ -46,6 +46,7 @@ $ yarn run test
   * env: `appName(callback), appVersion(callback)`
   * browserAction: `onClicked`
   * pageAction: `show(tabId), hide(tabId), onClicked`
+  * alarms: `get(name, callback), getAll(callback), clear(name, callback), clearAll(callback), create(name, alarmInfo), onAlarm`
   * commands: `onCommand`
   * runtime: `id, getURL(path), sendMessage(extensionId, message, options, responseCallback), onMessage`
   * tabs: `get(tabId, callback), getCurrent(callback), duplicate(tabId, callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), detectLanguage(tabId, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`

@@ -23,13 +23,17 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   lulumi.env = {
     appName: (callback) => {
       ipcRenderer.once('lulumi-env-app-name-result', (event, result) => {
-        callback(result);
+        if (callback) {
+          callback(result);
+        }
       });
       ipcRenderer.send('lulumi-env-app-name');
     },
     appVersion: (callback) => {
       ipcRenderer.once('lulumi-env-app-version-result', (event, result) => {
-        callback(result);
+        if (callback) {
+          callback(result);
+        }
       });
       ipcRenderer.send('lulumi-env-app-version');
     },
@@ -54,6 +58,45 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       onCommand: new Event(),
     };
   }
+
+  lulumi.alarms = {
+    get: (name, callback) => {
+      ipcRenderer.once('lulumi-alarms-get-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-alarms-get', name);
+    },
+    getAll: (callback) => {
+      ipcRenderer.once('lulumi-alarms-get-all-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-alarms-get-all');
+    },
+    clear: (name, callback) => {
+      ipcRenderer.once('lulumi-alarms-clear-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-alarms-clear', name);
+    },
+    clearAll: (callback) => {
+      ipcRenderer.once('lulumi-alarms-clear-all-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-alarms-clear-all');
+    },
+    create: (name, alarmInfo) => {
+      ipcRenderer.send('lulumi-alarms-create', name, alarmInfo);
+    },
+    onAlarm: new IpcEvent('alarms', 'on-alarm'),
+  };
 
   lulumi.runtime = {
     id: extensionId,

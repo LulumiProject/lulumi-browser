@@ -35,7 +35,7 @@
           :key="extension",
           style="padding-top: 3px;",)
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
-          img.extension(v-if="extension !== undefined",
+          img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                         :src="loadIcon(extension)",
                         :class="showOrNot(extension)",
                         :title="showTitle(extension)",
@@ -291,18 +291,21 @@
           const isPageAction = extension.hasOwnProperty('page_action');
           // eslint-disable-next-line no-prototype-builtins
           const isBrowserAction = extension.hasOwnProperty('browser_action');
-          let icons;
-          if (isPageAction) {
-            icons = extension.page_action.default_icon;
-          } else if (isBrowserAction) {
-            icons = extension.browser_action.default_icon;
-          }
-          if (typeof icons === 'string') {
+          if (isPageAction || isBrowserAction) {
+            let icons;
+            if (isPageAction) {
+              icons = extension.page_action.default_icon;
+            } else if (isBrowserAction) {
+              icons = extension.browser_action.default_icon;
+            }
+            if (typeof icons === 'string') {
+              return this.$electron.remote.nativeImage
+                .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
+            }
             return this.$electron.remote.nativeImage
-              .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
+              .createFromPath(path.join(extension.srcDirectory, icons['16'])).toDataURL('image/png');
           }
-          return this.$electron.remote.nativeImage
-            .createFromPath(path.join(extension.srcDirectory, icons['16'])).toDataURL('image/png');
+          return undefined;
         } catch (event) {
           return this.$electron.remote.nativeImage
             .createFromPath(path.join(extension.srcDirectory, extension.icons['16'])).toDataURL('image/png');

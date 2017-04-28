@@ -130,6 +130,68 @@ export default class ExtHostExtensionService {
       }
     });
 
+    ipc.on('lulumi-alarms-get', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-alarms-get-result', vue.getAlarm(data.name));
+      }
+    });
+    ipc.on('lulumi-alarms-get-all', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-alarms-get-all-result', vue.getAllAlarm());
+      }
+    });
+    ipc.on('lulumi-alarms-clear', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-alarms-clear-result', vue.clearAlarm(data.name));
+      }
+    });
+    ipc.on('lulumi-alarms-clear-all', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-alarms-clear-all-result', vue.clearAllAlarm());
+      }
+    });
+    ipc.on('lulumi-alarms-create', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        vue.createAlarm(data.name, data.alarmInfo);
+      }
+    });
+    ipc.on('lulumi-alarms-add-listener-on-alarm', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-alarms-add-listener-on-alarm-result-${data.digest}`, args);
+        };
+        const onAlarmEvent = vue.onAlarmEvent;
+        if (onAlarmEvent) {
+          onAlarmEvent.addListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-alarms-remove-listener-on-alarm', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-alarms-add-listener-on-alarm-result-${data.digest}`, args);
+        };
+        const onAlarmEvent = vue.onAlarmEvent;
+        if (onAlarmEvent) {
+          onAlarmEvent.removeListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-alarms-emit-on-alarm', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const onAlarmEvent = vue.onAlarmEvent;
+        if (onAlarmEvent) {
+          onAlarmEvent.emit(data.alarm, data.sender);
+        }
+      }
+    });
+
     ipc.on('lulumi-tabs-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
@@ -359,6 +421,6 @@ export default class ExtHostExtensionService {
       });
     });
 
-    vue.$refs.navbar.$data.extensions = manifest;
+    vue.$refs.navbar.extensions = manifest;
   }
 };
