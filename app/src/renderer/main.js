@@ -7,6 +7,7 @@ import 'element-ui/lib/theme-default/index';
 
 import App from './App';
 import routes from './routes';
+import i18n from './i18n';
 
 Vue.use(Electron);
 Vue.use(Resource);
@@ -141,6 +142,7 @@ const router = new Router({
 
 /* eslint-disable no-new */
 new Vue({
+  i18n,
   router,
   ...App,
 }).$mount('#app');

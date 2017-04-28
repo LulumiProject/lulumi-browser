@@ -3,9 +3,9 @@
     transition(name="notification")
       #notification(v-show="showNotification && isActive")
         notification
-    webview(element-loading-text="Loading...", ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(:element-loading-text="$t('page.loading')", ref="webview", :class="isActive ? 'active' : 'hidden'")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
-      input(ref="findinpageInput", placeholder="Search in Page")
+      input(ref="findinpageInput", :placeholder="$t('page.findInPage.placeholder')")
       span(ref="findinpageCount")
       div
         i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
@@ -179,15 +179,17 @@
 
       webview.addEventListener('found-in-page', (event) => {
         if (event.result.requestId === this.requestId) {
-          let text = '';
+          // for this.$tc pluralization
+          let match;
           if (event.result.matches !== undefined) {
-            if (event.result.matches === 1) {
-              text = ' match';
+            if (event.result.matches === 0) {
+              match = 1;
             } else {
-              text = ' matches';
+              match = 2;
             }
-            findinpage.counter.textContent
-              = `${event.result.activeMatchOrdinal} of ${event.result.matches}${text}`;
+            findinpage.counter.textContent = `
+              ${this.$t('page.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('page.findInPage.match', match)}
+            `;
           }
         }
       });
@@ -199,7 +201,9 @@
         if (this.pageIndex === this.$store.getters.currentPageIndex) {
           if (this.hidden) {
             findinpage.start();
-            findinpage.counter.textContent = '0 of 0 match';
+            findinpage.counter.textContent = `
+              ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
+            `;
           } else {
             findinpage.input.focus();
             findinpage.input.select();

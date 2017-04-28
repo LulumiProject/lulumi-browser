@@ -49,4 +49,53 @@ export const guest = {
   },
 };
 
-export default {};
+export default {
+  downloads: {
+    state: {
+      progressing: 'progressing',
+      cancelled: 'cancelled',
+    },
+  },
+  navbar: {
+    placeholder: 'Enter a URL or search a term',
+    search: 'Search',
+    indicator: {
+      secure: 'Secure',
+      insecure: 'Normal',
+    },
+    cascader: {
+      options: {
+        preferences: 'Preferences',
+        downloads: 'Downloads',
+        history: 'History',
+        extensions: 'Extensions',
+        help: 'Help',
+        lulumi: 'About Lulumi',
+      },
+    },
+  },
+  notification: {
+    update: {
+      updateAvailable: 'Newer version, %{releaseName}, has been found. Quit and install?',
+    },
+    permission: {
+      request: {
+        info: '%{hostname} requests %{permission} permission.',
+        allow: 'Allow',
+        deny: 'Deny',
+      },
+    },
+  },
+  page: {
+    loading: 'Loading',
+    findInPage: {
+      placeholder: 'Search in Page',
+      of: 'of',
+      match: 'match | matches',
+      status: '%{activeMatch} @:page.findInPage.of %{matches}',
+    },
+  },
+  tabs: {
+    loading: 'loading',
+  },
+};

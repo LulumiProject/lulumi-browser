@@ -49,4 +49,53 @@ export const guest = {
   },
 };
 
-export default {};
+export default {
+  downloads: {
+    state: {
+      progressing: '下載中',
+      cancelled: '已取消',
+    },
+  },
+  navbar: {
+    placeholder: '輸入 URL 搜尋',
+    search: '搜尋',
+    indicator: {
+      secure: '安全',
+      insecure: '一般',
+    },
+    cascader: {
+      options: {
+        preferences: '設定',
+        downloads: '下載',
+        history: '紀錄',
+        extensions: '擴充功能',
+        help: '說明',
+        lulumi: '關於 Lulumi',
+      },
+    },
+  },
+  notification: {
+    update: {
+      updateAvailable: '新版本，%{releaseName}，已經下載完畢。重新啟動以進行安裝？',
+    },
+    permission: {
+      request: {
+        info: '%{hostname} 要求 %{permission} 權限.',
+        allow: '允許',
+        deny: '拒絕',
+      },
+    },
+  },
+  page: {
+    loading: '載入中',
+    findInPage: {
+      placeholder: '在頁面中尋找',
+      of: '/',
+      match: '匹配',
+      status: '%{activeMatch} @:page.findInPage.of %{matches}',
+    },
+  },
+  tabs: {
+    loading: '載入中',
+  },
+};

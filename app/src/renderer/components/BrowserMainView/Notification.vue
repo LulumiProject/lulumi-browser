@@ -2,8 +2,8 @@
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
     el-col(:span="18") {{ `${template}` }}
     el-col(:span="6")
-      el-button(:plain="true", type="success", size="small", @click="onAllow") Allow
-      el-button(:plain="true", type="danger", size="small", @click="onDeny") Deny
+      el-button(:plain="true", type="success", size="small", @click="onAllow") {{ $t('notification.permission.request.allow') }}
+      el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
 </template>
 
 <script>
@@ -96,7 +96,7 @@
       ipc.setMaxListeners(0);
       ipc.on('update-available', (event, data) => {
         this.type = 'update';
-        this.template = `Newer version, ${data.releaseName}, has been found. Quit and install?`;
+        this.template = this.$t('notification.update.updateAvailable', { releaseName: data.releaseName });
         this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
         this.$parent.showNotification = true;
       });
@@ -117,7 +117,7 @@
               });
             } else {
               this.type = 'permission';
-              this.template = `${this.hostname} requests ${this.permission} permission.`;
+              this.template = this.$t('notification.permission.request.info', { hostname: this.hostname, permission: this.permission });
               this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
               this.$parent.showNotification = true;
               this.handler = setTimeout(() => {
@@ -130,7 +130,7 @@
             }
           } else {
             this.type = 'permission';
-            this.template = `${this.hostname} requests ${this.permission} permission.`;
+            this.template = this.$t('notification.permission.request.info', { hostname: this.hostname, permission: this.permission });
             this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
             this.$parent.showNotification = true;
             this.handler = setTimeout(() => {

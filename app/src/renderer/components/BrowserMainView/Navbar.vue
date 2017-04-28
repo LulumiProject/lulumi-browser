@@ -17,7 +17,7 @@
         @select="onSelect",
         icon="search",
         :trigger-on-focus="false",
-        placeholder="Enter a URL or search a term",
+        :placeholder="$t('navbar.placeholder')",
         :fetch-suggestions="querySearch",
         v-focus="focused",
         :value="page.location",
@@ -26,10 +26,10 @@
         el-button(slot="prepend")
           div.secure(v-if="secure")
             icon(name="lock")
-            span Secure
+            span {{ $t('navbar.indicator.secure') }}
           div(v-else)
             icon(name="info-circle")
-            span Normal
+            span {{ $t('navbar.indicator.insecure') }}
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
           :key="extension",
@@ -131,27 +131,27 @@
         options: [
           {
             value: 'preferences',
-            label: 'Preferences',
+            label: this.$t('navbar.cascader.options.preferences'),
           },
           {
             value: 'downloads',
-            label: 'downloads',
+            label: this.$t('navbar.cascader.options.downloads'),
           },
           {
             value: 'history',
-            label: 'history',
+            label: this.$t('navbar.cascader.options.history'),
           },
           {
             value: 'extensions',
-            label: 'extensions',
+            label: this.$t('navbar.cascader.options.extensions'),
           },
           {
             value: 'help',
-            label: 'Help',
+            label: this.$t('navbar.cascader.options.help'),
             children: [
               {
                 value: 'lulumi',
-                label: 'About Lulumi',
+                label: this.$t('navbar.cascader.options.lulumi'),
               },
             ],
           },
@@ -260,7 +260,7 @@
         const results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
-          title: `${this.currentSearchEngine.name} Search`,
+          title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
           value: this.value,
           icon: 'search',
         });

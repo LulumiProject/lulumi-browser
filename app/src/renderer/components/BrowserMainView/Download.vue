@@ -4,7 +4,7 @@
       ul(class="download-list")
         el-popover(placement="top-start", width="178", trigger="hover", popper-class="download-list__popper"
           v-for="(file, index) in files", :key="index")
-          div {{ file.state }}
+          div {{ showState(file.state) }}
           el-button-group(v-show="checkStateForButtonGroup(file.state)")
             el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="mini", icon="caret-right", @click="resumeDownload(file.startTime)")
             el-button(:disabled="file.state !== 'progressing'", v-else, :plain="true", type="warning", size="mini", icon="minus", @click="pauseDownload(file.startTime)")
@@ -16,7 +16,7 @@
                 img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
                 a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
                   | {{ file.name }}
-              span(class="download-list__item-description") {{ file.state === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: file.state }}
+              span(class="download-list__item-description") {{ file.state === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: showState(file.state) }}
             el-progress(:status="checkStateForProgress(file.state)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
       span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
@@ -49,6 +49,9 @@
       },
     },
     methods: {
+      showState(state) {
+        return this.$t(`downloads.state.${state}`);
+      },
       prettyReceivedSize(size) {
         return prettySize.process(size);
       },

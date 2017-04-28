@@ -11,9 +11,9 @@
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
             icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
             icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
-          el-tooltip(:content="page.title || 'loading'", placement="bottom", :openDelay="1000")
+          el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1000")
             span(class="chrome-tab-title")
-              | {{ page.title || 'loading' }}
+              | {{ page.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")

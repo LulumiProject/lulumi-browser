@@ -49,4 +49,53 @@ export const guest = {
   },
 };
 
-export default {};
+export default {
+  downloads: {
+    state: {
+      progressing: '下载中',
+      cancelled: '已取消',
+    },
+  },
+  navbar: {
+    placeholder: '键入 URL 搜寻',
+    search: '搜寻',
+    indicator: {
+      secure: '安全',
+      insecure: '一般',
+    },
+    cascader: {
+      options: {
+        preferences: '设定',
+        downloads: '下载',
+        history: '纪录',
+        extensions: '扩充功能',
+        help: '帮助',
+        lulumi: '关于 Lulumi',
+      },
+    },
+  },
+  notification: {
+    update: {
+      updateAvailable: '新版本，%{releaseName}，已经下载完毕。重启后进行安装？',
+    },
+    permission: {
+      request: {
+        info: '%{hostname} 要求 %{permission} 权限.',
+        allow: '允许',
+        deny: '拒绝',
+      },
+    },
+  },
+  page: {
+    loading: '载入中',
+    findInPage: {
+      placeholder: '在页面中找寻',
+      of: '/',
+      match: '符合',
+      status: '%{activeMatch} @:page.findInPage.of %{matches}',
+    },
+  },
+  tabs: {
+    loading: '载入中',
+  },
+};
