@@ -5,7 +5,7 @@ const url = require('url');
 const IpcEvent = require('./extensions/ipc-event');
 const Event = require('./extensions/event');
 
-String.prototype.hashCode = function() {
+String.prototype.hashCode = function () {
   let hash = 0;
   let i;
   let chr;
@@ -32,7 +32,6 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       ? path.join(path.resolve('./userData'), 'lulumi-local-storage')
       : path.join(remote.app.getPath('userData'), 'lulumi-local-storage');
 
-    // eslint-disable-next-line no-undef
     localStorage = new LocalStorage(storagePath);
   }
 
@@ -284,7 +283,7 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   lulumi.contextMenus = {
     menuItems: [],
     menuItemsIPC: [],
-    contextMenusIPC: (id, onclick, digest) => {      
+    contextMenusIPC: (id, onclick, digest) => {
       lulumi.contextMenus.menuItemsIPC.push(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`);
       ipcRenderer.on(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`, (event, params, tabId, menuItem, BrowserWindow) => {
         const info = {
@@ -302,7 +301,7 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       });
     },
     handleMenuItems: (createProperties) => {
-      let digest = undefined;
+      let digest;
       if (createProperties.type !== 'separator') {
         digest = createProperties.onclick.toString().hashCode();
       }

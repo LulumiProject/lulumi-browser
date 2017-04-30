@@ -3,6 +3,7 @@ app/dist/**
 app/pdfjs/**
 app/src/api/**
 app/pages/extensions/**
+app/pages/inject-to.js
 extensions/**
 test/unit/coverage/**
 test/unit/*.js
