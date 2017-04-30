@@ -5,6 +5,22 @@ const url = require('url');
 const IpcEvent = require('./extensions/ipc-event');
 const Event = require('./extensions/event');
 
+String.prototype.hashCode = function() {
+  let hash = 0;
+  let i;
+  let chr;
+
+  if (this.length === 0) {
+    return hash;
+  }
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // convert to 32bit integer
+  }
+  return hash;
+};
+
 exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
@@ -263,5 +279,91 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   lulumi.storage.sync = {
     get: lulumi.storage.get,
     set: lulumi.storage.set,
+  };
+
+  lulumi.contextMenus = {
+    menuItems: [],
+    menuItemsIPC: [],
+    contextMenusIPC: (id, onclick, digest) => {      
+      lulumi.contextMenus.menuItemsIPC.push(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`);
+      ipcRenderer.on(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`, (event, params, tabId, menuItem, BrowserWindow) => {
+        const info = {
+          menuItemId: id,
+          mediaType: params.mediaType,
+          linkUrl: params.linkURL,
+          srcUrl: params.srcURL,
+          pageUrl: params.pageURL,
+          frameUrl: params.frameURL,
+          selectionText: params.selectionText,
+          editable: params.isEditable,
+          checked: menuItem.checked,
+        };
+        lulumi.tabs.get(tabId, tab => onclick(info, tab));
+      });
+    },
+    handleMenuItems: (createProperties) => {
+      let digest = undefined;
+      if (createProperties.type !== 'separator') {
+        digest = createProperties.onclick.toString().hashCode();
+      }
+      let flag = true;
+      lulumi.contextMenus.menuItems.forEach((menuItem) => {
+        if (menuItem.id === createProperties.parentId) {
+          menuItem.type = 'submenu';
+          if (menuItem.submenu) {
+            menuItem.submenu.push({
+              label: createProperties.title,
+              id: createProperties.id,
+              type: createProperties.type,
+              checked: createProperties.checked,
+              digest,
+              extensionId: lulumi.runtime.id,
+            });
+          } else {
+            menuItem.submenu = [{
+              label: createProperties.title,
+              id: createProperties.id,
+              type: createProperties.type,
+              checked: createProperties.checked,
+              digest,
+              extensionId: lulumi.runtime.id,
+            }];
+          }
+          if (createProperties.type !== 'separator' && createProperties.onclick) {
+            lulumi.contextMenus.contextMenusIPC(createProperties.id, createProperties.onclick, digest);
+          }
+          flag = false;
+        }
+      });
+      if (flag) {
+        lulumi.contextMenus.menuItems.push({
+          label: createProperties.title,
+          id: createProperties.id,
+          type: createProperties.type,
+          checked: createProperties.checked,
+          digest,
+          extensionId: lulumi.runtime.id,
+        });
+        if (createProperties.type !== 'separator' && createProperties.onclick) {
+          lulumi.contextMenus.contextMenusIPC(createProperties.id, createProperties.onclick, digest);
+        }
+      }
+    },
+    create: (createProperties, callback) => {
+      let id = `${lulumi.runtime.id}-${Date.now()}`;
+      if (createProperties.id) {
+        id = createProperties.id;
+      } else {
+        createProperties.id = id;
+      }
+      ipcRenderer.once('lulumi-context-menus-create-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      lulumi.contextMenus.handleMenuItems(createProperties);
+      ipcRenderer.send('lulumi-context-menus-create', lulumi.contextMenus.menuItems);
+      return id;
+    },
   };
 };

@@ -389,3 +389,11 @@ ipcMain.once('lulumi-storage-on-changed', (event) => {
     });
   });
 });
+
+ipcMain.on('lulumi-context-menus-create', (event, menuItems) => {
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send('lulumi-context-menus-create', {
+    menuItems,
+    webContentsId: event.sender.id,
+  });
+});

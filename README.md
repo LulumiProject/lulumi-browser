@@ -51,6 +51,7 @@ $ yarn run test
   * runtime: `id, getURL(path), sendMessage(extensionId, message, options, responseCallback), onMessage`
   * tabs: `get(tabId, callback), getCurrent(callback), duplicate(tabId, callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), detectLanguage(tabId, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`
   * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
+  * contextMenus: `create(createProperties, callback)`
 
 ---
 

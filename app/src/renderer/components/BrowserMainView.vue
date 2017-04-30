@@ -41,6 +41,7 @@
         startTime: 0,
         showDownloadBar: false,
         extensionService: null,
+        contextMenus: {},
         onUpdatedEvent: new Event(),
         onCreatedEvent: new Event(),
         onRemovedEvent: new Event(),
@@ -135,6 +136,9 @@
           this.alarms[name].handler
             = setTimeout(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
         }
+      },
+      addContextMenus(menuItems, webContentsId) {
+        this.contextMenus[`'${webContentsId}'`] = [menuItems];
       },
       // pageHandlers
       onDidStartLoading(event, pageIndex) {
@@ -665,6 +669,48 @@
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
 
+        const registerExtensionContextMenus = (menu) => {
+          const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
+          if (contextMenus.length !== 0) {
+            menu.append(new MenuItem({ type: 'separator' }));
+          }
+          Object.keys(contextMenus).forEach((webContentsIdInString) => {
+            contextMenus[webContentsIdInString].forEach((menuItems) => {
+              menuItems.forEach((menuItem) => {
+                if (menuItem.type !== 'separator') {
+                  menuItem.label = menuItem.label.replace('%s', event.params.selectionText);
+                  menuItem.click = (menuItem, BrowserWindow) => {
+                    this.$electron.remote.webContents.fromId(menuItem.webContentsId)
+                      .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}-${menuItem.digest}`,
+                      event.params,
+                      this.currentPageIndex,
+                      menuItem,
+                      BrowserWindow,
+                    );
+                  };
+                  const submenu = menuItem.submenu;
+                  if (submenu) {
+                    submenu.forEach((sub) => {
+                      sub.label.replace('%s', event.params.selectionText);
+                      sub.click = (menuItem, BrowserWindow) => {
+                        this.$electron.remote.webContents.fromId(sub.webContentsId)
+                          .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}-${sub.digest}`,
+                          event.params,
+                          this.currentPageIndex,
+                          menuItem,
+                          BrowserWindow,
+                        );
+                      };
+                    });
+                  }
+                }
+              });
+              Menu.buildFromTemplate(menuItems).items
+                .forEach(menuItem => menu.append(menuItem));
+            });
+          });
+        };
+
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
             label: 'Undo',
@@ -798,6 +844,9 @@
             }));
           }
         }
+
+        // lulumi.contextMenus
+        registerExtensionContextMenus(menu);
 
         menu.append(new MenuItem({ type: 'separator' }));
         const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);

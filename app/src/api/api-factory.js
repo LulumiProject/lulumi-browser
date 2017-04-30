@@ -200,11 +200,27 @@ export default (VueInstance) => {
     onChanged: new Event(),
   };
 
+  const contextMenus = {
+    create: (menuItems, webContentsId) => {
+      menuItems.forEach((menuItem) => {
+        menuItem.webContentsId = webContentsId;
+        const submenu = menuItem.submenu;
+        if (submenu) {
+          submenu.forEach((sub) => {
+            sub.webContentsId = webContentsId;
+          });
+        }
+      });
+      VueInstance.addContextMenus(menuItems, webContentsId);
+    },
+  };
+
   return {
     env,
     runtime,
     tabs,
     storage,
+    contextMenus,
   };
 };
 
