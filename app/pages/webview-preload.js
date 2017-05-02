@@ -1,6 +1,7 @@
 const { ipcRenderer, remote } = require('electron');
 const { runInThisContext } = require('vm');
 const { LocalStorage } = require('node-localstorage');
+const stripCssComments = require('strip-css-comments');
 
 // Check whether pattern matches.
 // https://developer.chrome.com/extensions/match_patterns
@@ -23,7 +24,8 @@ const runContentScript = (extensionId, url, code) => {
     lineOffset: 1,
     displayErrors: true,
   });
-  return compiledWrapper.call(this, context.lulumi);
+  // TODO: `this` show be global.window due to L#67, but it's not. Wired!
+  return compiledWrapper.call(window, context.lulumi);
 };
 
 // Run the code with lulumi API integrated.
@@ -32,7 +34,7 @@ const runStylesheet = (extensionId, url, code) => {
     function init() {
       var styleElement = document.createElement('style');
       styleElement.setAttribute('type', 'text/css');
-      styleElement.textContent = \`${code}\`;
+      styleElement.textContent = \`${stripCssComments(code, { preserve: false })}\`;
       document.querySelector('head').append(styleElement);
     }
     document.addEventListener('DOMContentLoaded', init);\n})`;
@@ -47,11 +49,18 @@ const runStylesheet = (extensionId, url, code) => {
 // run injected scripts
 // https://developer.chrome.com/extensions/content_scripts
 const injectContentScript = (extensionId, script) => {
+  let flag = false;
   // eslint-disable-next-line no-restricted-syntax
   for (const match of script.matches) {
-    if (!matchesPattern(match)) {
-      return;
+    if (matchesPattern(match)) {
+      flag = false;
+      break;
     }
+    flag = true;
+  }
+
+  if (flag) {
+    return;
   }
 
   script.js.forEach((js) => {

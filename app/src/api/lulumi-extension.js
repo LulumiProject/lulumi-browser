@@ -91,7 +91,7 @@ const startBackgroundPages = (manifest) => {
     }
 
     const contents = webContents.create({
-      partition: 'persist:__chrome_extension',
+      partition: 'persist:__lulumi_extension',
       isBackgroundPage: true,
       commandLineSwitches: ['--background-page'],
       preload: `${config.lulumiAppPath}/pages/extension-preload.js`,

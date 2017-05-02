@@ -300,4 +300,4 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = [
   Object.assign({} , rendererConfig),
   Object.assign({} , aboutConfig)
-]  
+]
