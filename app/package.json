@@ -2,7 +2,7 @@
   "name": "lulumi-browser",
   "productName": "Lulumi-browser",
   "version": "1.3.0",
-  "electronVersion": "1.6.7",
+  "electronVersion": "1.6.8",
   "description": "Lulumi-browser is a light weight browser coded with vue and electron",
   "main": "./dist/main.js",
   "dependencies": {
@@ -13,11 +13,11 @@
     "node-localstorage": "^1.3.0",
     "punycode": "^2.1.0",
     "strip-css-comments": "^3.0.0",
-    "vue": "^2.3.0",
+    "vue": "^2.3.2",
     "vue-electron": "^1.0.6",
     "vue-i18n": "^6.1.1",
     "vue-resource": "^1.3.1",
-    "vue-router": "^2.5.2",
+    "vue-router": "^2.5.3",
     "vuex": "^2.3.1"
   },
   "devDependencies": {},
