@@ -2243,9 +2243,9 @@ electron@^1.6.8:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
-element-ui@^1.3.0-beta.2:
-  version "1.3.0-beta.2"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.0-beta.2.tgz#cc1fae3061b16ac18eb972abaac65e158c4ae07b"
+element-ui@^1.3.0-beta.3:
+  version "1.3.0-beta.3"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.0-beta.3.tgz#aa4a1d13571d0c9ba50d4fee6787877c1b6af219"
   dependencies:
     async-validator "^1.6.9"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -6635,9 +6635,9 @@ void-elements@^2.0.0, void-elements@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
 
-vue-awesome@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vue-awesome/-/vue-awesome-2.3.0.tgz#4e4105ca654e8203e421e85db0903e9b284ee4b5"
+vue-awesome@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/vue-awesome/-/vue-awesome-2.3.1.tgz#edd8f54a62af322df81f06ddf25c1ec2ae995b05"
 
 vue-focus@^2.1.0:
   version "2.1.0"

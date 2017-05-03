@@ -115,7 +115,7 @@ const removeBackgroundPages = (manifest) => {
   delete backgroundPages[manifest.extensionId];
 };
 
-exports.loadCommands = (mainWindow, manifest) => {
+const loadCommands = (mainWindow, manifest) => {
   const commands = manifest.commands;
   if (commands) {
     Object.keys(commands).forEach((command) => {
@@ -350,4 +350,5 @@ export {
   manifestMap,
   manifestNameMap,
   backgroundPages,
+  loadCommands,
 };

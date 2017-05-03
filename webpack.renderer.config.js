@@ -94,7 +94,7 @@ let rendererConfig = {
       template: './app/index.pug',
       appModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, 'app/node_modules')
-        : false,
+        : false
     }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
@@ -204,7 +204,7 @@ let aboutConfig = {
       template: './app/src/guest/index.pug',
       appModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, 'app/node_modules')
-        : false,
+        : false
     }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
