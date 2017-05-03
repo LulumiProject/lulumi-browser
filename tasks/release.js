@@ -34,7 +34,7 @@ function rev() {
  */
 function pack () {
   console.log('\x1b[33mBuilding webpack in production mode...\n\x1b[0m')
-  let pack = exec('yarn run pack')
+  let pack = exec('yarn run pack', { maxBuffer: 500*1024 }) // default is 200*1024
 
   pack.stdout.on('data', data => console.log(data))
   pack.stderr.on('data', data => console.error(data))
