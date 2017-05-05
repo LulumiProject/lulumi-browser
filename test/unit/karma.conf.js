@@ -4,10 +4,13 @@ const path = require('path')
 const merge = require('webpack-merge')
 const webpack = require('webpack')
 
-const baseConfig = require('../../webpack.renderer.config')
+const baseConfig = require('../../.electron-vue/webpack.renderer.config')
 let webpackConfigs = new Array(baseConfig.length === undefined ? 1 : baseConfig.length)
 webpackConfigs.fill('object');
-const projectRoot = path.resolve(__dirname, '../../app')
+const projectRoot = path.resolve(__dirname, '../../src/renderer')
+
+// Set BABEL_ENV to use proper preset config
+process.env.BABEL_ENV = 'test'
 
 webpackConfigs.forEach((_, index) => {
   webpackConfigs[index] = merge(baseConfig[index], {

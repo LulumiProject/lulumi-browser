@@ -30,7 +30,7 @@ $ yarn run build:linux  # Linux
 $ yarn run build:mas    # Mac AppStore
 $ yarn run build:win32  # Windows
 
-# lint all JS/Vue component files in `app/src`
+# lint all JS/Vue component files in `src`
 $ yarn run lint
 
 # lint and fix
@@ -55,4 +55,4 @@ $ yarn run test
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[d4e52e7](https://github.com/SimulatedGREG/electron-vue/commit/d4e52e7596be6715f7e5e575c40066856ceeea0c) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[a88a69e](https://github.com/SimulatedGREG/electron-vue/commit/a88a69e06c43abe3aa480f38df4bb16f8c38b495) and developed by [@qazbnm456](https://github.com/qazbnm456).

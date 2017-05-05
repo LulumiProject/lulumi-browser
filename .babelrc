@@ -1,19 +1,32 @@
 {
   "comments": false,
   "env": {
-    "testing-unit": {
-      "presets": ["es2015", "stage-0"],
+    "test": {
+      "presets": [
+        ["env", {
+          "useBuiltIns": true,
+          "targets": { "node": 7 }
+        }],
+        "stage-0"
+      ],
       "plugins": ["istanbul"]
     },
-    "testing-e2e": {
-      "presets": ["es2015", "stage-0"]
-    },
     "main": {
-      "presets": ["es2015", "stage-0"]
+      "presets": [
+        ["env", {
+          "useBuiltIns": true,
+          "targets": { "node": 7 }
+        }],
+        "stage-0"
+      ]
     },
     "renderer": {
       "presets": [
-        ["es2015", { "modules": false }],
+        ["env", {
+          "modules": false,
+          "targets": { "node": 7 },
+          "useBuiltIns": true
+        }],
         "stage-0"
       ]
     }

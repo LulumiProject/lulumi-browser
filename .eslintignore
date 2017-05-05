@@ -1,9 +1,8 @@
-app/node_modules/**
-app/dist/**
-app/pdfjs/**
-app/src/api/**
-app/pages/extensions/**
-app/pages/inject-to.js
+dist/**
+helper/pdfjs/**
+helper/pages/extensions/**
+helper/pages/inject-to.js
+src/api/**
 extensions/**
 test/unit/coverage/**
 test/unit/*.js
