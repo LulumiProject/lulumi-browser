@@ -53,6 +53,7 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
       }
     },
     getData(queryString) {
+      const el = this.$refs.input.$el.querySelector('.el-input__inner');
       this.loading = true;
       this.fetchSuggestions(queryString, (suggestions) => {
         this.loading = false;
@@ -60,22 +61,32 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
           this.suggestions = suggestions;
           this.highlightedIndex = 0;
 
-          if (this.lastQueryString !== queryString) {
-            const startPos = queryString.length;
-            const endPos = this.suggestions[0].value.length;
-            this.$nextTick().then(() => {
-              this.$refs.input.$refs.input.value = this.suggestions[0].value;
-              this.setInputSelection(this.$refs.input.$el.querySelector('.el-input__inner'), startPos, endPos);
-              this.lastQueryString = queryString;
-            });
-          } else {
-            this.lastQueryString = this.lastQueryString.slice(0, -1);
+          if (el.selectionStart === queryString.length) {
+            if (this.lastQueryString !== queryString) {
+              const startPos = queryString.length;
+              const endPos = this.suggestions[0].value.length;
+              this.$nextTick().then(() => {
+                this.$refs.input.$refs.input.value = this.suggestions[0].value;
+                this.setInputSelection(el, startPos, endPos);
+                this.lastQueryString = queryString;
+              });
+            } else {
+              this.lastQueryString = this.lastQueryString.slice(0, -1);
+            }
           }
         } else {
           // eslint-disable-next-line no-console
           console.error('autocomplete suggestions must be an array');
         }
       });
+    },
+    handleComposition(event) {
+      if (event.type === 'compositionend') {
+        this.isOnComposition = false;
+        this.handleChange(event.value);
+      } else {
+        this.isOnComposition = true;
+      }
     },
     handleChange(value) {
       this.$emit('input', value);

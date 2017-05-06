@@ -2441,9 +2441,9 @@ electron@^1.6.8:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
-element-ui@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.0.tgz#ca8e2783f10dfbeded90f09b0a25e65a0d856519"
+element-ui@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.1.tgz#d1fccf8bde776323d734134ff5814a26b333c0f7"
   dependencies:
     async-validator "^1.6.9"
     babel-helper-vue-jsx-merge-props "^2.0.0"
