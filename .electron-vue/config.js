@@ -1,7 +1,4 @@
-const ncp = require('ncp').ncp;
 const path = require('path');
-
-ncp.limit = 16;
 
 const config = {
   // Name of electron app
@@ -22,10 +19,10 @@ const config = {
     asar: true,
     dir: path.join(__dirname, '../'),
     icon: path.join(__dirname, '../build/icons/icon'),
-    ignore: /\b(src|test|build|electron-vue|gitignore|README|yarn)\b/,
+    ignore: /^\/(src|test|build|extensions|userData|\.\w+|README|yarn)/,
     out: path.join(__dirname, '../builds'),
     overwrite: true,
-    platform: process.env.PLATFORM_TARGET || 'all',
+    platform: process.env.BUILD_TARGET || 'all',
   },
 };
 
