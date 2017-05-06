@@ -6,6 +6,7 @@ process.once('loaded', () => {
     const context = {};
     require('./inject-to').injectTo(extensionId, true, context, LocalStorage);
     global.lulumi = context.lulumi;
+    global.chrome = global.lulumi;
   };
 
   // read the renderer process preferences to see if we need to inject scripts

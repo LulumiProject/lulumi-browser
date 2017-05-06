@@ -18,7 +18,10 @@ const matchesPattern = (pattern) => {
 const runContentScript = (extensionId, url, code) => {
   const context = {};
   require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
-  const wrapper = `(function (lulumi) {\n${code}\n})`;
+  const wrapper = `(function (lulumi) {\n
+    var chrome = lulumi;
+    ${code}
+    \n})`;
   const compiledWrapper = runInThisContext(wrapper, {
     filename: url,
     lineOffset: 1,

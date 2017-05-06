@@ -261,6 +261,9 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
       Object.keys(ks).forEach((key) => {
         const tkey = ks[key];
         ret[tkey] = JSON.parse(localStorage.getItem(tkey));
+        if (ret[tkey] === null) {
+          ret[tkey] = undefined;
+        }
       });
 
       if (callback) {
