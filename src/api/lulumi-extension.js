@@ -144,8 +144,8 @@ const injectContentScripts = (manifest, entry) => {
 
   const contentScriptToEntry = script => ({
     matches: script.matches,
-    js: script.js.map(readArrayOfFiles),
-    css: script.css.map(readArrayOfFiles),
+    js: script.js === undefined ? undefined : script.js.map(readArrayOfFiles),
+    css: script.css === undefined ? undefined : script.css.map(readArrayOfFiles),
     runAt: script.run_at || 'document_idle',
   });
 

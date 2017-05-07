@@ -18,17 +18,18 @@ const matchesPattern = (pattern) => {
 const runContentScript = (extensionId, url, code) => {
   const context = {};
   require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
-  const wrapper = `(function (lulumi) {\n
+  global.lulumi = context.lulumi;
+  const wrapper = `\n
     var chrome = lulumi;
     ${code}
-    \n})`;
-  const compiledWrapper = runInThisContext(wrapper, {
+    \n`;
+  runInThisContext(wrapper, {
     filename: url,
     lineOffset: 1,
     displayErrors: true,
   });
   // TODO: `this` show be global.window due to L#67, but it's not. Wired!
-  return compiledWrapper.call(window, context.lulumi);
+  // return compiledWrapper.call(window, context.lulumi);
 };
 
 // Run the code with lulumi API integrated.
@@ -66,27 +67,31 @@ const injectContentScript = (extensionId, script) => {
     return;
   }
 
-  script.js.forEach((js) => {
-    const fire = runContentScript.bind(window, extensionId, js.url, js.code);
-    if (script.runAt === 'document_start') {
-      process.once('document-start', fire);
-    } else if (script.runAt === 'document_end') {
-      process.once('document-end', fire);
-    } else if (script.runAt === 'document_idle') {
-      document.addEventListener('DOMContentLoaded', fire);
-    }
-  });
+  if (script.js !== undefined) {
+    script.js.forEach((js) => {
+      const fire = runContentScript.bind(window, extensionId, js.url, js.code);
+      if (script.runAt === 'document_start') {
+        process.once('document-start', fire);
+      } else if (script.runAt === 'document_end') {
+        process.once('document-end', fire);
+      } else if (script.runAt === 'document_idle') {
+        document.addEventListener('DOMContentLoaded', fire);
+      }
+    });
+  }
 
-  script.css.forEach((css) => {
-    const fire = runStylesheet.bind(window, extensionId, css.url, css.code);
-    if (script.runAt === 'document_start') {
-      process.once('document-start', fire);
-    } else if (script.runAt === 'document_end') {
-      process.once('document-end', fire);
-    } else if (script.runAt === 'document_idle') {
-      document.addEventListener('DOMContentLoaded', fire);
-    }
-  });
+  if (script.css !== undefined) {
+    script.css.forEach((css) => {
+      const fire = runStylesheet.bind(window, extensionId, css.url, css.code);
+      if (script.runAt === 'document_start') {
+        process.once('document-start', fire);
+      } else if (script.runAt === 'document_end') {
+        process.once('document-end', fire);
+      } else if (script.runAt === 'document_idle') {
+        document.addEventListener('DOMContentLoaded', fire);
+      }
+    });
+  }
 };
 
 // read the renderer process preferences to see if we need to inject scripts

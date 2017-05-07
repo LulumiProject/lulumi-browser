@@ -21,7 +21,7 @@ String.prototype.hashCode = function () {
   return hash;
 };
 
-exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
+exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
   let storagePath;
@@ -114,26 +114,36 @@ exports.injectTo = (extensionId, isBackgroundPage, context, LocalStorage) => {
   };
 
   lulumi.runtime = {
-    id: extensionId,
+    id: thisExtensionId,
     getURL: path => url.format({
       protocol: 'lulumi-extension',
       slashes: true,
-      hostname: extensionId,
+      hostname: thisExtensionId,
       pathname: path,
     }),
     sendMessage: (extensionId, message, responseCallback) => {
+      if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
+        && (typeof message === 'function')
+        && (typeof responseCallback !== 'function')) {
+        lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
+        return;
+      } else if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
+        && (message === undefined)) {
+        lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
+        return;
+      }
       ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
         }
       });
-      if (extensionId === null) {
-        ipcRenderer.send('lulumi-runtime-send-message', lulumi.runtime.id, message);
-      } else {
-        ipcRenderer.send('lulumi-runtime-send-message', extensionId, message);
-      }
+      ipcRenderer.send('lulumi-runtime-send-message', thisExtensionId, message);
     },
     onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),
+  };
+
+  lulumi.extension = {
+    getURL: lulumi.runtime.getURL,
   };
 
   lulumi.tabs = {
