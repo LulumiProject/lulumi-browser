@@ -3,6 +3,7 @@ const path = require('path');
 const url = require('url');
 
 const IpcEvent = require('./extensions/ipc-event');
+const webRequestEvent = require('./extensions/web-request-event');
 const Event = require('./extensions/event');
 
 String.prototype.hashCode = function () {
@@ -60,10 +61,10 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
 
   lulumi.pageAction = {
     show: (tabId) => {
-      ipcRenderer.send('lulumi-page-action-show', tabId, extensionId, true);
+      ipcRenderer.send('lulumi-page-action-show', tabId, thisExtensionId, true);
     },
     hide: (tabId) => {
-      ipcRenderer.send('lulumi-page-action-hide', tabId, extensionId, false);
+      ipcRenderer.send('lulumi-page-action-hide', tabId, thisExtensionId, false);
     },
     onClicked: (isBackgroundPage === false) ? new IpcEvent('page-action', 'on-clicked') : new Event(),
   };
@@ -132,6 +133,9 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
         lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
         return;
       }
+      // lulumi-runtime-send-message-result event will be set multiple times
+      // if we have multiple lulumi.runtime.sendMessage, so ignore the listenters warning.
+      ipcRenderer.setMaxListeners(0);
       ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
@@ -329,7 +333,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
               type: createProperties.type,
               checked: createProperties.checked,
               digest,
-              extensionId: lulumi.runtime.id,
+              extensionId: thisExtensionId,
             });
           } else {
             menuItem.submenu = [{
@@ -338,7 +342,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
               type: createProperties.type,
               checked: createProperties.checked,
               digest,
-              extensionId: lulumi.runtime.id,
+              extensionId: thisExtensionId,
             }];
           }
           if (createProperties.type !== 'separator' && createProperties.onclick) {
@@ -354,7 +358,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
           type: createProperties.type,
           checked: createProperties.checked,
           digest,
-          extensionId: lulumi.runtime.id,
+          extensionId: thisExtensionId,
         });
         if (createProperties.type !== 'separator' && createProperties.onclick) {
           lulumi.contextMenus.contextMenusIPC(createProperties.id, createProperties.onclick, digest);
@@ -377,5 +381,16 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       ipcRenderer.send('lulumi-context-menus-create', lulumi.contextMenus.menuItems);
       return id;
     },
+  };
+
+  lulumi.webRequest = {
+    onBeforeRequest: new webRequestEvent('web-request', 'on-before-request'),
+    onBeforeSendHeaders: new webRequestEvent('web-request', 'on-before-send-headers'),
+    onSendHeaders: new webRequestEvent('web-request', 'on-send-headers'),
+    onHeadersReceived: new webRequestEvent('web-request', 'on-headers-received'),
+    onResponseStarted: new webRequestEvent('web-request', 'on-response-started'),
+    onBeforeRedirect: new webRequestEvent('web-request', 'on-before-redirect'),
+    onCompleted: new webRequestEvent('web-request', 'on-completed'),
+    onErrorOccurred: new webRequestEvent('web-request', 'on-error-occurred'),
   };
 };

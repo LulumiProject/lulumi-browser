@@ -67,6 +67,9 @@ const injectContentScript = (extensionId, script) => {
     return;
   }
 
+  // process will listen on multiple document_* events
+  // if we have multiple extensions
+  process.setMaxListeners(0);
   if (script.js !== undefined) {
     script.js.forEach((js) => {
       const fire = runContentScript.bind(window, extensionId, js.url, js.code);

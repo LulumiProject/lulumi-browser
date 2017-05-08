@@ -39,5 +39,5 @@ export default {
   lulumiHelperPath,
   lulumiRootPath,
   devUserData: `${lulumiRootPath}/userData/`,
-  lulumiRev: 'c947d195d2ee006eedcbf09b8143b2d0ad0c422a',
+  lulumiRev: '5a02bdff3ef7c0bbf078362fc3819103ccfc8394',
 };

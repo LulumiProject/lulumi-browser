@@ -1,6 +1,82 @@
 import { ipcMain, session } from 'electron';
+import { runInNewContext } from 'vm';
+
+const webRequestMapping = {
+  onBeforeRequest: {},
+  onBeforeSendHeaders: {},
+  onSendHeaders: {},
+  onHeadersReceived: {},
+  onResponseStarted: {},
+  onBeforeRedirect: {},
+  onCompleted: {},
+  onErrorOccurred: {},
+};
+
+
+const register = (eventName, digest, filter, func) => {
+  webRequestMapping[eventName][digest] = runInNewContext(`eval(${func})`, {});
+  session.defaultSession.webRequest[eventName](filter, (details, callback) => {
+    callback(webRequestMapping[eventName][digest](details));
+  });
+};
+
+const unregister = (eventName) => {
+  session.defaultSession.webRequest[eventName]({}, null);
+};
+
+const webRequest = () => {
+  ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event, digest, filter, func) => {
+    register('onBeforeRequest', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-request', () => {
+    unregister('onBeforeRequest');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-before-send-headers', (event, digest, filter, func) => {
+    register('onBeforeSendHeaders', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-send-headers', () => {
+    unregister('onBeforeSendHeaders');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-send-headers', (event, digest, filter, func) => {
+    register('onSendHeaders', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-send-headers', () => {
+    unregister('onSendHeaders');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-headers-received', (event, digest, filter, func) => {
+    register('onHeadersReceived', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-headers-received', () => {
+    unregister('onHeadersReceived');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-response-started', (event, digest, filter, func) => {
+    register('onResponseStarted', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-response-started', () => {
+    unregister('onResponseStarted');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-before-redirect', (event, digest, filter, func) => {
+    register('onBeforeRedirect', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-redirect', () => {
+    unregister('onBeforeRedirect');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-completed', (event, digest, filter, func) => {
+    register('onCompleted', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-completed', () => {
+    unregister('onCompleted');
+  });
+  ipcMain.on('lulumi-web-request-add-listener-on-error-occurred', (event, digest, filter, func) => {
+    register('onErrorOccurred', digest, filter, func);
+  });
+  ipcMain.on('lulumi-web-request-remove-listener-on-error-occurred', () => {
+    unregister('onErrorOccurred');
+  });
+};
 
 export default {
+  webRequest,
   onWillDownload(mainWindow, config) {
     session.defaultSession.on('will-download', (event, item, webContents) => {
       const itemURL = item.getURL();

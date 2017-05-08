@@ -53,6 +53,7 @@ $ yarn run test
   * tabs: `get(tabId, callback), getCurrent(callback), duplicate(tabId, callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), detectLanguage(tabId, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`
   * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
   * contextMenus: `create(createProperties, callback)`
+  * webRequest: `onBeforeRequest(callback, filter, opt_extraInfoSpec), onBeforeSendHeaders(callback, filter, opt_extraInfoSpec), onSendHeaders(callback, filter, opt_extraInfoSpec), onHeadersReceived(callback, filter, opt_extraInfoSpec), onResponseStarted(callback, filter, opt_extraInfoSpec), onBeforeRedirect(callback, filter, opt_extraInfoSpec), onCompleted(callback, filter, opt_extraInfoSpec), onErrorOccurred(callback, filter, opt_extraInfoSpec)`
 
 ---
 

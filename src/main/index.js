@@ -46,6 +46,7 @@ function createWindow() {
   mainWindow.loadURL(winURL);
 
   menu.init();
+  session.webRequest();
   session.onWillDownload(mainWindow, config);
   session.setPermissionRequestHandler(mainWindow);
   if (process.env.NODE_ENV !== 'development') {
