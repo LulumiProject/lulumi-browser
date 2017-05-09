@@ -4,10 +4,10 @@ describe('Launch', function () {
   beforeEach(utils.beforeEach);
   afterEach(utils.afterEach);
 
-  it('has two windows. One main window and one default webview page', function () {
+  it('has at least two windows. One main window and one default webview page', function () {
     return this.app.client.getWindowCount()
       .then((count) => {
-        expect(count).to.equal(2);
+        expect(count).to.least(2);
       });
   });
 

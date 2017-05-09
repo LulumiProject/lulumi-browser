@@ -400,6 +400,53 @@ export default class ExtHostExtensionService {
         webContents.send('lulumi-context-menus-create-result', require('lulumi').contextMenus.create(data.menuItems, data.webContentsId));
       }
     });
+
+    ipc.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-before-navigate-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onBeforeNavigate.addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-remove-listener-on-before-navigate', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-before-navigate-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onBeforeNavigate.removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-emit-on-before-navigate', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.onBeforeNavigate.emit(data.args);
+      }
+    });
+    ipc.on('lulumi-web-navigation-add-listener-on-completed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-completed-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCompleted.addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-remove-listener-on-completed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-completed-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCompleted.removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-emit-on-completed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.onCompleted.emit(data.args);
+      }
+    });
   }
 
   update() {

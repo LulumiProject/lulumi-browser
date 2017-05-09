@@ -393,4 +393,9 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
     onCompleted: new webRequestEvent('web-request', 'on-completed'),
     onErrorOccurred: new webRequestEvent('web-request', 'on-error-occurred'),
   };
+
+  lulumi.webNavigation = {
+    onBeforeNavigate: new IpcEvent('web-navigation', 'on-before-navigate'),
+    onCompleted: new IpcEvent('web-navigation', 'on-completed'),
+  };
 };

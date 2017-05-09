@@ -397,3 +397,50 @@ ipcMain.on('lulumi-context-menus-create', (event, menuItems) => {
       webContentsId: event.sender.id,
     });
 });
+
+ipcMain.once('lulumi-web-navigation-on-before-navigate', (event) => {
+  ipcMain.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-add-listener-on-before-navigate', {
+        digest,
+        webContentsId: event.sender.id,
+      });
+  });
+  ipcMain.on('lulumi-web-navigation-remove-listener-on-before-navigate', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-remove-listener-on-before-navigate', {
+        digest,
+        webContentsId: event.sender.id,
+      });
+  });
+  ipcMain.on('lulumi-web-navigation-emit-on-before-navigate', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-emit-on-before-navigate', {
+        args,
+        webContentsId: event.sender.id,
+      });
+  });
+});
+ipcMain.once('lulumi-web-navigation-on-completed', (event) => {
+  ipcMain.on('lulumi-web-navigation-add-listener-on-completed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-add-listener-on-completed', {
+        digest,
+        webContentsId: event.sender.id,
+      });
+  });
+  ipcMain.on('lulumi-web-navigation-remove-listener-on-completed', (event, digest) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-remove-listener-on-completed', {
+        digest,
+        webContentsId: event.sender.id,
+      });
+  });
+  ipcMain.on('lulumi-web-navigation-emit-on-completed', (event, args) => {
+    BrowserWindow.getAllWindows()[0]
+      .webContents.send('lulumi-web-navigation-emit-on-completed', {
+        args,
+        webContentsId: event.sender.id,
+      });
+  });
+});

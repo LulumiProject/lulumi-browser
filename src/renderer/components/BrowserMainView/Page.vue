@@ -88,20 +88,13 @@
         'new-window': 'onNewWindow',
         'scroll-touch-begin': 'onScrollTouchBegin',
         'scroll-touch-end': 'onScrollTouchEnd',
+        'context-menu': 'onContextMenu',
+        'will-navigate': 'onWillNavigate',
+        'did-navigate': 'onDidNavigate',
       };
 
       Object.keys(webviewEvents).forEach((key) => {
         webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
-      });
-
-      webview.addEventListener('context-menu', (event) => {
-        this.$parent.onWebviewContextMenu(event);
-      });
-
-      webview.addEventListener('will-navigate', () => {
-        this.$store.dispatch('clearPageAction', {
-          pageIndex: this.currentPageIndex,
-        });
       });
 
       const ipc = this.$electron.ipcRenderer;

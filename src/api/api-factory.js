@@ -215,12 +215,18 @@ export default (VueInstance) => {
     },
   };
 
+  const webNavigation = {
+    onBeforeNavigate: VueInstance.onBeforeNavigate,
+    onCompleted: VueInstance.onCompleted,
+  };
+
   return {
     env,
     runtime,
     tabs,
     storage,
     contextMenus,
+    webNavigation,
   };
 };
 

@@ -47,6 +47,8 @@
         onRemovedEvent: new Event(),
         alarms: {},
         onAlarmEvent: new Event(),
+        onBeforeNavigate: new Event(),
+        onCompleted: new Event(),
       };
     },
     components: {
@@ -384,6 +386,32 @@
       },
       onScrollTouchEdge() {
         this.isSwipeOnEdge = true;
+      },
+      onContextMenu(event) {
+        this.onWebviewContextMenu(event);
+      },
+      onWillNavigate(event, pageIndex) {
+        this.$store.dispatch('clearPageAction', {
+          pageIndex,
+        });
+        this.onBeforeNavigate.emit({
+          frameId: 0,
+          parentFrameId: -1,
+          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          tabId: pageIndex,
+          timeStamp: Date.now(),
+          url: event.url,
+        });
+      },
+      onDidNavigate(event, pageIndex) {
+        this.onCompleted.emit({
+          frameId: 0,
+          parentFrameId: -1,
+          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          tabId: this.pageIndex,
+          timeStamp: Date.now(),
+          url: event.url,
+        });
       },
       onGetSearchEngineProvider(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
@@ -884,24 +912,6 @@
     },
     mounted() {
       const ipc = this.$electron.ipcRenderer;
-
-      this.onDidStartLoading.bind(this);
-      this.onDomReady.bind(this);
-      this.onDidStopLoading.bind(this);
-      this.onDidFailLoad.bind(this);
-      this.onPageTitleSet.bind(this);
-      this.onUpdateTargetUrl.bind(this);
-      this.onMediaStartedPlaying.bind(this);
-      this.onMediaPaused.bind(this);
-      this.onToggleAudio.bind(this);
-      this.onPageFaviconUpdated.bind(this);
-      this.onNewTab.bind(this);
-      this.onTabClick.bind(this);
-      this.onTabClose.bind(this);
-      this.onTabContextMenu.bind(this);
-      this.onWebviewContextMenu.bind(this);
-      this.onScrollTouchBegin.bind(this);
-      this.onScrollTouchEnd.bind(this);
 
       if (window.process.platform === 'darwin') {
         document.body.classList.add('darwin');

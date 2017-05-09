@@ -54,6 +54,7 @@ $ yarn run test
   * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
   * contextMenus: `create(createProperties, callback)`
   * webRequest: `onBeforeRequest(callback, filter, opt_extraInfoSpec), onBeforeSendHeaders(callback, filter, opt_extraInfoSpec), onSendHeaders(callback, filter, opt_extraInfoSpec), onHeadersReceived(callback, filter, opt_extraInfoSpec), onResponseStarted(callback, filter, opt_extraInfoSpec), onBeforeRedirect(callback, filter, opt_extraInfoSpec), onCompleted(callback, filter, opt_extraInfoSpec), onErrorOccurred(callback, filter, opt_extraInfoSpec)`
+  * webNavigation: `onBeforeNavigate(callback), onCompleted(callback)`
 
 ---
 
