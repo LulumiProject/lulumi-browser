@@ -395,7 +395,26 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   lulumi.webNavigation = {
+    getFrame: (details, callback) => {
+      ipcRenderer.once('lulumi-web-navigation-get-frame-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-web-navigation-get-frame', details);
+    },
+    getAllFrames: (details, callback) => {
+      ipcRenderer.once('lulumi-web-navigation-get-all-frames-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-web-navigation-get-all-frames', details);
+    },
     onBeforeNavigate: new IpcEvent('web-navigation', 'on-before-navigate'),
+    onCommitted: new IpcEvent('web-navigation', 'on-committed'),
+    onDOMContentLoaded: new IpcEvent('web-navigation', 'on-dom-content-loaded'),
     onCompleted: new IpcEvent('web-navigation', 'on-completed'),
+    onCreatedNavigationTarget: new IpcEvent('web-navigation', 'on-created-navigation-target'),
   };
 };

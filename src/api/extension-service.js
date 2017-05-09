@@ -401,6 +401,28 @@ export default class ExtHostExtensionService {
       }
     });
 
+    ipc.on('lulumi-web-navigation-get-frame', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.getFrame(data.details, data.webContentsId);
+      }
+    });
+    ipc.on('lulumi-web-navigation-get-frame-result', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-web-navigation-get-frame-result', data.details);
+      }
+    });
+    ipc.on('lulumi-web-navigation-get-all-frames', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.getAllFrames(data.details, data.webContentsId);
+      }
+    });
+    ipc.on('lulumi-web-navigation-get-all-frames-result', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-web-navigation-get-all-frames-result', data.details);
+      }
+    });
     ipc.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
@@ -424,6 +446,52 @@ export default class ExtHostExtensionService {
         require('lulumi').webNavigation.onBeforeNavigate.emit(data.args);
       }
     });
+    ipc.on('lulumi-web-navigation-add-listener-on-committed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-committed-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCommitted.addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-remove-listener-on-committed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-committed-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCommitted.removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-emit-on-committed', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.onCommitted.emit(data.args);
+      }
+    });
+    ipc.on('lulumi-web-navigation-add-listener-on-dom-content-loaded', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-dom-content-loaded-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onDOMContentLoaded.addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-remove-listener-on-dom-content-loaded', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-dom-content-loaded-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onDOMContentLoaded.removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-emit-on-dom-content-loaded', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.onDOMContentLoaded.emit(data.args);
+      }
+    });
     ipc.on('lulumi-web-navigation-add-listener-on-completed', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
@@ -445,6 +513,29 @@ export default class ExtHostExtensionService {
     ipc.on('lulumi-web-navigation-emit-on-completed', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         require('lulumi').webNavigation.onCompleted.emit(data.args);
+      }
+    });
+    ipc.on('lulumi-web-navigation-add-listener-on-created-navigation-target', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-created-navigation-target-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCreatedNavigationTarget.addListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-remove-listener-on-created-navigation-target', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-web-navigation-add-listener-on-created-navigation-target-result-${data.digest}`, args);
+        };
+        require('lulumi').webNavigation.onCreatedNavigationTarget.removeListener(wrapper);
+      }
+    });
+    ipc.on('lulumi-web-navigation-emit-on-created-navigation-target', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        require('lulumi').webNavigation.onCreatedNavigationTarget.emit(data.args);
       }
     });
   }

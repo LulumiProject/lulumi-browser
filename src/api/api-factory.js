@@ -216,8 +216,97 @@ export default (VueInstance) => {
   };
 
   const webNavigation = {
+    getFrame: (details, webContentsId) => {
+      const tab = findOrCreate(details.tabId, VueInstance);
+      const processId = VueInstance.getWebView(tab.id).getWebContents().getProcessId();
+      if (details.processId === processId) {
+        VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+          String.prototype.hashCode = function() {
+            var hash = 0, i, chr;
+            if (this.length === 0) return hash;
+            for (i = 0; i < this.length; i++) {
+              chr   = this.charCodeAt(i);
+              hash  = ((hash << 5) - hash) + chr;
+              hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
+          };
+
+          var frame = null;
+          var frames = window.frames;
+          var flag = true;
+
+          for (i = 0; i < frames.length; i++) {
+            if (frames[i].location.href.hashCode() === '${details.frameId}') {
+              frame = {
+                errorOccurred: false,
+                processId: ${processId},
+                frameId: frames[i].location.href.hashCode(),
+                parentFrameId: 0,
+                url: frames[i].location.href,
+              };
+              flag = false;
+              ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
+              break;
+            }
+          }
+          if (flag) {
+            if (${details.frameId} === 0) {
+              frame = {
+                errorOccurred: false,
+                processId: ${processId},
+                frameId: 0,
+                parentFrameId: -1,
+                url: document.location.href,
+              };
+            }
+            ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
+          }
+        `);
+      }
+    },
+    getAllFrames: (details, webContentsId) => {
+      const tab = findOrCreate(details.tabId, VueInstance);
+      const processId = VueInstance.getWebView(tab.id).getWebContents().getProcessId();
+      VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+        String.prototype.hashCode = function() {
+          var hash = 0, i, chr;
+          if (this.length === 0) return hash;
+          for (i = 0; i < this.length; i++) {
+            chr   = this.charCodeAt(i);
+            hash  = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+          }
+          return hash;
+        };
+
+        var framesArray = [];
+        var frames = window.frames;
+
+        for (i = 0; i < frames.length; i++) {
+          framesArray.push({
+            errorOccurred: false,
+            processId: ${processId},
+            frameId: frames[i].location.href.hashCode(),
+            parentFrameId: 0,
+            url: frames[i].location.href,
+          });
+        }
+        framesArray.unshift({
+          errorOccurred: false,
+          processId: ${processId},
+          frameId: 0,
+          parentFrameId: -1,
+          url: document.location.href,
+        });
+        ipcRenderer.send('lulumi-web-navigation-get-all-frames-result', framesArray, ${webContentsId});
+      `);
+    },
     onBeforeNavigate: VueInstance.onBeforeNavigate,
+    onCommitted: VueInstance.onCommitted,
+    onDOMContentLoaded: VueInstance.onDOMContentLoaded,
     onCompleted: VueInstance.onCompleted,
+    onCreatedNavigationTarget: VueInstance.onCreatedNavigationTarget,
   };
 
   return {

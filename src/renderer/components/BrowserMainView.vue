@@ -48,7 +48,10 @@
         alarms: {},
         onAlarmEvent: new Event(),
         onBeforeNavigate: new Event(),
+        onCommitted: new Event(),
+        onDOMContentLoaded: new Event(),
         onCompleted: new Event(),
+        onCreatedNavigationTarget: new Event(),
       };
     },
     components: {
@@ -150,6 +153,14 @@
           webContentsId: webview.getWebContents().id,
           pageIndex,
         });
+        this.onCommitted.emit({
+          frameId: 0,
+          parentFrameId: -1,
+          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          tabId: pageIndex,
+          timeStamp: Date.now(),
+          url: webview.getURL(),
+        });
       },
       onDomReady(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -170,6 +181,14 @@
             webview,
           });
         }
+        this.onDOMContentLoaded.emit({
+          frameId: 0,
+          parentFrameId: -1,
+          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          tabId: pageIndex,
+          timeStamp: Date.now(),
+          url: location,
+        });
       },
       onDidStopLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
@@ -237,9 +256,19 @@
         this.$el.querySelector('#nav').style.display = 'block';
         this.getWebView().style.height = 'calc(100vh - 73px)';
       },
-      onNewWindow(event) {
+      onNewWindow(event, pageIndex) {
         this.$store.dispatch('incrementPid');
         this.$store.dispatch('createTab', event.url);
+        if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
+          this.onCreatedNavigationTarget.emit({
+            sourceFrameId: 0,
+            parentFrameId: -1,
+            sourceProcessId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+            timeStamp: Date.now(),
+            url: event.url,
+            tabId: this.pages.length - 1,
+          });
+        }
       },
       onWheel(event) {
         const leftSwipeArrow = document.getElementById('left-swipe-arrow');
