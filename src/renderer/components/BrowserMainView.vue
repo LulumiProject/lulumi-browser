@@ -423,6 +423,7 @@
         this.$store.dispatch('clearPageAction', {
           pageIndex,
         });
+        this.getPage(pageIndex).onMessageEvent.listeners = [];
         this.onBeforeNavigate.emit({
           frameId: 0,
           parentFrameId: -1,

@@ -519,7 +519,7 @@
         border-bottom-right-radius: 3px;
       }
 
-      .disabled {
+      &.disabled {
         color: #bbb;
         cursor: default;
       }

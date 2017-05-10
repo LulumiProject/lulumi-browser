@@ -117,7 +117,7 @@ let rendererConfig = {
       'renderer': path.join(__dirname, '../src/renderer'),
       'i18n': path.join(__dirname, '../helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.runtime.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
   },
@@ -227,7 +227,7 @@ let aboutConfig = {
       'components': path.join(__dirname, '../src/guest/renderer/components'),
       'renderer': path.join(__dirname, '../src/guest/renderer'),
       'i18n': path.join(__dirname, '../helper/i18n'),
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.runtime.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
   },
