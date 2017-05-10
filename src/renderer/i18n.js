@@ -9,11 +9,13 @@ import en from 'i18n/en';
 import zh from 'i18n/zh-CN';
 import zhTW from 'i18n/zh-TW';
 
+const lang = require('electron').ipcRenderer.sendSync('request-lang');
+
 Vue.use(VueI18n);
 
 // eslint-disable-next-line camelcase
 export default new VueI18n({
-  locale: 'en',
+  locale: lang,
   messages: {
     en: Object.assign(enElement, en),
     'zh-CN': Object.assign(zhElement, zh),

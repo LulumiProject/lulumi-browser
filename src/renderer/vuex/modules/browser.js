@@ -13,6 +13,7 @@ const state = {
   homepage: config.homepage,
   pdfViewer: config.pdfViewer,
   tabConfig: config.tabConfig,
+  lang: 'en',
   downloads: [],
   history: [],
   permissions: {},
@@ -201,6 +202,9 @@ const mutations = {
   [types.SET_TAB_CONFIG](state, val) {
     state.tabConfig = val;
   },
+  [types.SET_LANG](state, val) {
+    state.lang = val.lang;
+  },
   [types.SET_DOWNLOADS](state, val) {
     state.downloads = val;
   },
@@ -293,6 +297,7 @@ const mutations = {
     state.homepage = newState.homepage;
     state.pdfViewer = newState.pdfViewer;
     state.tabConfig = newState.tabConfig;
+    state.lang = newState.lang;
     state.downloads = newState.downloads;
     state.history = newState.history;
   },

@@ -60,6 +60,9 @@ export const setPDFViewer = ({ commit }, val) => {
 export const setTabConfig = ({ commit }, val) => {
   commit(types.SET_TAB_CONFIG, val);
 };
+export const setLang = ({ commit }, val) => {
+  commit(types.SET_LANG, val);
+};
 export const setDownloads = ({ commit }, val) => {
   commit(types.SET_DOWNLOADS, val);
 };

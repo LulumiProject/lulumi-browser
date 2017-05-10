@@ -29,6 +29,9 @@ export const guest = {
         location: 'Opening Location',
         favicon: 'Default Favicon',
       },
+      LanguagePage: {
+        title: 'Language',
+      },
       historyPage: {
         title: 'History',
         clear: 'Clear',
@@ -80,7 +83,8 @@ export default {
     },
     permission: {
       request: {
-        info: '%{hostname} requests %{permission} permission.',
+        normal: '%{hostname} requests %{permission} permission.',
+        setLanguage: '%{hostname} want to change language to %{lang} (restart is needed)',
         allow: 'Allow',
         deny: 'Deny',
       },

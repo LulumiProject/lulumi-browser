@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
 import { app, BrowserWindow, ipcMain, protocol, shell, systemPreferences } from 'electron';
@@ -16,6 +16,11 @@ const storagePath = process.env.NODE_ENV === 'development'
   ? path.join(config.devUserData, 'lulumi-app-state')
   : path.join(app.getPath('userData'), 'app-state');
 let appStateSaveHandler = null;
+
+let setLanguage = false;
+const langPath = process.env.NODE_ENV === 'development'
+  ? path.join(config.devUserData, 'lulumi-lang')
+  : path.join(app.getPath('userData'), 'lang');
 
 const isDarwin = process.platform === 'darwin';
 const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
@@ -78,6 +83,21 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    if (setLanguage) {
+      createWindow();
+      setLanguage = false;
+    }
+  });
+
+  ipcMain.on('request-lang', (event) => {
+    let lang = null;
+    try {
+      lang = readFileSync(langPath, 'utf-8');
+    // eslint-disable-next-line no-empty
+    } catch (event) {
+      lang = '"en"';
+    }
+    event.returnValue = JSON.parse(lang);
   });
 
   ipcMain.on('request-extension-objects', () => {
@@ -95,7 +115,7 @@ function createWindow() {
     new Promise((resolve, reject) => {
       let data = null;
       try {
-        data = fs.readFileSync(storagePath, 'utf-8');
+        data = readFileSync(storagePath, 'utf-8');
       // eslint-disable-next-line no-empty
       } catch (event) {}
 
@@ -180,6 +200,12 @@ app.on('activate', () => {
 
 app.on('before-quit', (event) => {
   if (shuttingDown) {
+    if (setLanguage) {
+      event.preventDefault();
+      shuttingDown = false;
+      mainWindow.close();
+      return;
+    }
     return;
   }
   event.preventDefault();
@@ -190,7 +216,7 @@ app.on('before-quit', (event) => {
 
 ipcMain.on('response-app-state', (event, data) => {
   if (data.ready) {
-    promisify(fs.writeFile, storagePath, JSON.stringify(data.newState))
+    promisify(writeFile, storagePath, JSON.stringify(data.newState))
       .then(() => {
         if (appStateSaveHandler === null) {
           shuttingDown = true;
@@ -265,6 +291,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       ['Homepage', 'homepage'],
       ['PDFViewer', 'pdfViewer'],
       ['Tab', 'tab'],
+      ['Language', 'language'],
     ];
     data.about = [
       [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
@@ -301,6 +328,11 @@ ipcMain.on('guest-want-data', (event, val) => {
         webContentsId,
       });
       break;
+    case 'lang':
+      mainWindow.webContents.send('get-lang', {
+        webContentsId,
+      });
+      break;
     case 'downloads':
       mainWindow.webContents.send('get-downloads', {
         webContentsId,
@@ -324,35 +356,50 @@ ipcMain.on('set-current-search-engine-provider', (event, val) => {
     webContentsId: event.sender.id,
   });
 });
-
 ipcMain.on('set-homepage', (event, val) => {
   mainWindow.webContents.send('set-homepage', {
     val,
     webContentsId: event.sender.id,
   });
 });
-
 ipcMain.on('set-pdf-viewer', (event, val) => {
   mainWindow.webContents.send('set-pdf-viewer', {
     val,
     webContentsId: event.sender.id,
   });
 });
-
 ipcMain.on('set-tab-config', (event, val) => {
   mainWindow.webContents.send('set-tab-config', {
     val,
     webContentsId: event.sender.id,
   });
 });
-
+ipcMain.on('set-lang', (event, val) => {
+  mainWindow.webContents.send('set-lang', {
+    val,
+    webContentsId: event.sender.id,
+  });
+  mainWindow.webContents.send('request-permission', {
+    webContentsId: event.sender.id,
+    permission: 'setLanguage',
+    lang: val.lang,
+  });
+  ipcMain.once(`response-permission-${event.sender.id}`, (event, data) => {
+    if (data.accept) {
+      promisify(writeFile, langPath, JSON.stringify(val.lang))
+        .then(() => {
+          setLanguage = true;
+          app.quit();
+        });
+    }
+  });
+});
 ipcMain.on('set-downloads', (event, val) => {
   mainWindow.webContents.send('set-downloads', {
     val,
     webContentsId: event.sender.id,
   });
 });
-
 ipcMain.on('set-history', (event, val) => {
   mainWindow.webContents.send('set-history', {
     val,

@@ -9,11 +9,14 @@ import * as en from 'i18n/en';
 import * as zh from 'i18n/zh-CN';
 import * as zhTW from 'i18n/zh-TW';
 
+// eslint-disable-next-line no-undef
+const lang = ipcRenderer.sendSync('request-lang');
+
 Vue.use(VueI18n);
 
 // eslint-disable-next-line camelcase
 export default new VueI18n({
-  locale: 'en',
+  locale: lang,
   messages: {
     en: Object.assign(enElement, en.guest),
     'zh-CN': Object.assign(zhElement, zh.guest),

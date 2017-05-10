@@ -501,6 +501,21 @@
         const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
       },
+      onGetLang(event, data) {
+        if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
+          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+          webContents.send('guest-here-your-data', {
+            lang: this.$store.getters.lang,
+          });
+        }
+      },
+      onSetLang(event, data) {
+        this.$store.dispatch('setLang', data.val);
+        const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('guest-here-your-data', {
+          lang: this.$store.getters.lang,
+        });
+      },
       onGetDownloads(event, data) {
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
           const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
@@ -1010,6 +1025,16 @@
           this.onSetTabConfig(event, val);
         }
       });
+      ipc.on('get-lang', (event, data) => {
+        if (this.onGetLang) {
+          this.onGetLang(event, data);
+        }
+      });
+      ipc.on('set-lang', (event, val) => {
+        if (this.onSetLang) {
+          this.onSetLang(event, val);
+        }
+      });
       ipc.on('get-downloads', (event, data) => {
         if (this.onGetDownloads) {
           this.onGetDownloads(event, data);
@@ -1047,6 +1072,7 @@
                 homepage: this.$store.getters.homepage,
                 pdfViewer: this.$store.getters.pdfViewer,
                 tabConfig: this.$store.getters.tabConfig,
+                lang: this.$store.getters.lang,
                 downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
                 history: this.$store.getters.history,
               },
@@ -1073,6 +1099,7 @@
                     homepage: this.$store.getters.homepage,
                     pdfViewer: this.$store.getters.pdfViewer,
                     tabConfig: this.$store.getters.tabConfig,
+                    lang: this.$store.getters.lang,
                     downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
                     history: this.$store.getters.history,
                   },
@@ -1091,6 +1118,7 @@
               homepage: this.$store.getters.homepage,
               pdfViewer: this.$store.getters.pdfViewer,
               tabConfig: this.$store.getters.tabConfig,
+              lang: this.$store.getters.lang,
               downloads: this.$store.getters.downloads,
               history: this.$store.getters.history,
             },

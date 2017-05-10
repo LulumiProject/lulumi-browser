@@ -34,6 +34,11 @@ export default [
         component: require('./components/AboutMainView/Preferences/TabConfig'),
       },
       {
+        path: 'language',
+        name: 'about-main-preferences-language',
+        component: require('./components/AboutMainView/Preferences/Language'),
+      },
+      {
         path: '',
         name: 'about-main-preferences',
         redirect: 'search',

@@ -29,6 +29,9 @@ export const guest = {
         location: '預設開啟',
         favicon: '預設圖示',
       },
+      LanguagePage: {
+        title: '語言',
+      },
       historyPage: {
         title: '歷史紀錄',
         clear: '清除',
@@ -80,7 +83,8 @@ export default {
     },
     permission: {
       request: {
-        info: '%{hostname} 要求 %{permission} 權限.',
+        normal: '%{hostname} 要求 %{permission} 權限.',
+        setLanguage: '%{hostname} 想要更改語言至 %{lang}（需重啟）',
         allow: '允許',
         deny: '拒絕',
       },

@@ -106,18 +106,32 @@
           this.id = data.webContentsId;
           this.hostname = urlUtil.getHostname(webContents.getURL());
           this.permission = data.permission;
-          if (this.permissions[`${this.hostname}`]) {
-            if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
-              ipc.send(`response-permission-${this.id}`, {
-                accept: true,
-              });
-            } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
-              ipc.send(`response-permission-${this.id}`, {
-                accept: false,
-              });
+          if (this.permission !== 'setLanguage') {
+            if (this.permissions[`${this.hostname}`]) {
+              if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
+                ipc.send(`response-permission-${this.id}`, {
+                  accept: true,
+                });
+              } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
+                ipc.send(`response-permission-${this.id}`, {
+                  accept: false,
+                });
+              } else {
+                this.type = 'permission';
+                this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
+                this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
+                this.$parent.showNotification = true;
+                this.handler = setTimeout(() => {
+                  ipc.send(`response-permission-${this.id}`, {
+                    accept: false,
+                  });
+                  this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
+                  this.$parent.showNotification = false;
+                }, 5000);
+              }
             } else {
               this.type = 'permission';
-              this.template = this.$t('notification.permission.request.info', { hostname: this.hostname, permission: this.permission });
+              this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
               this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
               this.$parent.showNotification = true;
               this.handler = setTimeout(() => {
@@ -130,7 +144,7 @@
             }
           } else {
             this.type = 'permission';
-            this.template = this.$t('notification.permission.request.info', { hostname: this.hostname, permission: this.permission });
+            this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
             this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
             this.$parent.showNotification = true;
             this.handler = setTimeout(() => {
@@ -139,7 +153,7 @@
               });
               this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
               this.$parent.showNotification = false;
-            }, 5000);
+            }, 10000);
           }
         }
       });
