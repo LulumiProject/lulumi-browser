@@ -49,7 +49,7 @@ $ yarn run test
   * alarms: `get(name, callback), getAll(callback), clear(name, callback), clearAll(callback), create(name, alarmInfo), onAlarm`
   * commands: `onCommand`
   * runtime: `id, getURL(path), sendMessage(extensionId, message, options, responseCallback), onMessage`
-  * extension: `getURL(path)`
+  * extension: `getURL(path), getBackgroundPage()`
   * tabs: `get(tabId, callback), getCurrent(callback), duplicate(tabId, callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), detectLanguage(tabId, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`
   * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
   * contextMenus: `create(createProperties, callback)`
@@ -58,4 +58,4 @@ $ yarn run test
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[736ba39](https://github.com/SimulatedGREG/electron-vue/commit/736ba397f6e7a248130f7e893357ed9412c618f9) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[6c2b7d2](https://github.com/SimulatedGREG/electron-vue/commit/6c2b7d217575add48c7c2090e412174f4a44d16c) and developed by [@qazbnm456](https://github.com/qazbnm456).

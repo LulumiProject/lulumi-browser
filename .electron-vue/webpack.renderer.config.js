@@ -43,6 +43,10 @@ let rendererConfig = {
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {
+        test: /\.pug$/,
+        use: 'pug-html-loader'
+      },
+      {
         test: /\.json$/,
         use: 'json-loader'
       },
@@ -56,16 +60,13 @@ let rendererConfig = {
           loader: 'vue-loader',
           options: {
             loaders: {
+              pug: 'pug-html-loader',
               sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
               scss: 'vue-style-loader!css-loader!sass-loader',
               less: 'vue-style-loader!css-loader!less-loader'
             },
           },
         },
-      },
-      {
-        test: /\.pug$/,
-        loader: 'pug-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -96,7 +97,7 @@ let rendererConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.pug'),
+      template: path.resolve(__dirname, '../src/index.ejs'),
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, '../node_modules')
         : false
@@ -154,6 +155,10 @@ let aboutConfig = {
         exclude: /node_modules(?![\\/]vue-awesome[\\/])/
       },
       {
+        test: /\.pug$/,
+        use: 'pug-html-loader'
+      },
+      {
         test: /\.json$/,
         use: 'json-loader'
       },
@@ -167,16 +172,13 @@ let aboutConfig = {
           loader: 'vue-loader',
           options: {
             loaders: {
+              pug: 'pug-html-loader',
               sass: 'vue-style-loader!css-loader!less-loader!sass-loader?indentedSyntax=1',
               scss: 'vue-style-loader!css-loader!less-loader!sass-loader',
               less: 'vue-style-loader!css-loader!less-loader'
             },
           },
         },
-      },
-      {
-        test: /\.pug$/,
-        loader: 'pug-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -207,7 +209,7 @@ let aboutConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'about.html',
-      template: path.resolve(__dirname, '../src/guest/index.pug'),
+      template: path.resolve(__dirname, '../src/guest/index.ejs'),
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, '../node_modules')
         : false

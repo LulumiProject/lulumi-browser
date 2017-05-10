@@ -148,6 +148,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
 
   lulumi.extension = {
     getURL: lulumi.runtime.getURL,
+    getBackgroundPage: () => global,
   };
 
   lulumi.tabs = {

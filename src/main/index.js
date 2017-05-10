@@ -117,9 +117,6 @@ function createWindow() {
 
   // save app-state every 5 mins
   appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
-
-  // eslint-disable-next-line no-console
-  console.log('mainWindow opened');
 }
 
 if (process.env.NODE_ENV === 'development') {

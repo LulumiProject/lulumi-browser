@@ -44,7 +44,7 @@ function startRenderer () {
     const server = new WebpackDevServer(
       compiler,
       {
-        contentBase: path.join(__dirname, '../dist/static'),
+        contentBase: path.join(__dirname, '../'),
         quiet: true,
         stats: { colors: true },
         setup (app, ctx) {
@@ -73,13 +73,14 @@ function startMain () {
         return
       }
 
-      let log = '\n' + chalk.bgMagenta.white('  Begin Main Process  ') + '\n\n'
+      let log = '\n' + chalk.yellow.bold('┏ Main Process -----------') + '\n\n'
       stats.toString({
-        colors: require('supports-color')
+        colors: require('supports-color'),
+        chunks: false
       }).split(/\r?\n/).forEach(line => {
         log += '  ' + line + '\n'
       })
-      log += '\n' + chalk.bgMagenta.white('  End Main Process  ') + '\n'
+      log += '\n' + chalk.yellow.bold('┗ ------------------------') + '\n'
 
       console.log(log)
 
@@ -93,16 +94,34 @@ function startMain () {
   })
 }
 
+function repeat (str, times) {
+  return (new Array(times + 1)).join(str)
+}
+
 let electronProcess = null
 function startElectron() {
   electronProcess = spawn(electron, [path.join(__dirname, '../dist/main.js')])
   electronProcess.stdout.on('data', data => {
-    if (Array.from(data).length > 0)
-      console.log(chalk.black.bgBlue(' ELECTRON ') + '  ' + data.toString().trim())
+    let log = ''
+
+    data = data.toString().split(/\r?\n/)
+    data.forEach(line => {
+      log += '  ' + line + '\n'
+    })
+
+    if (/[0-9A-z]+/.test(data[0])) {
+      console.log(
+        chalk.blue.bold('┏ Electron ---------------') +
+        '\n\n' +
+        log +
+        chalk.blue.bold('┗ ------------------------') +
+        '\n'
+      )
+    }
   })
 
   electronProcess.on('exit', (code, signal) => {
-    if (code !== 0) process.exit()
+    if (signal !== 'SIGTERM') process.exit()
   })
 }
 
