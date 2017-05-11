@@ -2420,16 +2420,16 @@ electron-to-chromium@^1.2.5:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.6.tgz#f38ad51d1919b06bc07275c62629db803ddca05a"
 
-electron@^1.6.8:
-  version "1.6.8"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.6.8.tgz#41cbbe7272ccd93339c040f856c0d6372a4ddb07"
+electron@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.0.tgz#307a5a00a521e679c2cd829706bffdb6d34da186"
   dependencies:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
-element-ui@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.1.tgz#d1fccf8bde776323d734134ff5814a26b333c0f7"
+element-ui@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.2.tgz#0d417268c6bea69a1f69e99bb4b338774a282211"
   dependencies:
     async-validator "^1.6.9"
     babel-helper-vue-jsx-merge-props "^2.0.0"
