@@ -2,15 +2,15 @@
   #browser-navbar
     .control-group
       a(@click="$parent.onClickHome")
-        icon(name="angle-double-left")
+        iview-icon(type="ios-home", size="16")
       a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? '' : 'disabled'")
-        icon(name="angle-left")
+        iview-icon(type="arrow-left-c", size="16")
       a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? '' : 'disabled'")
-        icon(name="angle-right")
+        iview-icon(type="arrow-right-c", size="16")
       a(v-if="page.isLoading" @click="$parent.onClickStop")
-        icon(name="times")
+        iview-icon(type="close", size="16")
       a(v-else @click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
-        icon(name="refresh")
+        iview-icon(type="android-refresh", size="16")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
         @input="onChange",
@@ -25,10 +25,10 @@
         custom-item="url-suggestion")
         el-button(slot="prepend")
           div.secure(v-if="secure")
-            icon(name="lock")
+            awesome-icon(name="lock")
             span {{ $t('navbar.indicator.secure') }}
           div(v-else)
-            icon(name="info-circle")
+            awesome-icon(name="info-circle")
             span {{ $t('navbar.indicator.insecure') }}
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
@@ -52,7 +52,7 @@
   import url from 'url';
   import { focus } from 'vue-focus';
 
-  import Icon from 'vue-awesome/components/Icon';
+  import AwesomeIcon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/angle-double-left';
   import 'vue-awesome/icons/angle-left';
   import 'vue-awesome/icons/angle-right';
@@ -64,6 +64,7 @@
   import Sortable from 'sortablejs';
 
   import { Button, Cascader, Popover } from 'element-ui';
+  import IViewIcon from 'iview/src/components/icon';
 
   import Event from 'src/api/extensions/event';
 
@@ -162,10 +163,11 @@
       };
     },
     components: {
-      Icon,
+      'awesome-icon': AwesomeIcon,
       'el-button': Button,
       'el-cascader': Cascader,
       'el-popover': Popover,
+      'iview-icon': IViewIcon,
     },
     computed: {
       page() {

@@ -375,10 +375,6 @@ ipcMain.on('set-tab-config', (event, val) => {
   });
 });
 ipcMain.on('set-lang', (event, val) => {
-  mainWindow.webContents.send('set-lang', {
-    val,
-    webContentsId: event.sender.id,
-  });
   mainWindow.webContents.send('request-permission', {
     webContentsId: event.sender.id,
     permission: 'setLanguage',
@@ -386,6 +382,10 @@ ipcMain.on('set-lang', (event, val) => {
   });
   ipcMain.once(`response-permission-${event.sender.id}`, (event, data) => {
     if (data.accept) {
+      mainWindow.webContents.send('set-lang', {
+        val,
+        webContentsId: event.sender.id,
+      });
       promisify(writeFile, langPath, JSON.stringify(val.lang))
         .then(() => {
           setLanguage = true;

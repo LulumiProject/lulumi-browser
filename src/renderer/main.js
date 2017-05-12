@@ -4,6 +4,7 @@ import Electron from 'vue-electron';
 import Router from 'vue-router';
 import { Autocomplete, Scrollbar } from 'element-ui';
 import 'element-ui/lib/theme-default/index';
+import 'iview/dist/styles/iview.css';
 
 import App from './App';
 import routes from './routes';

@@ -86,6 +86,7 @@
     "karma-webpack": "^2.0.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
+    "iview": "^2.0.0-rc.12",
     "mocha": "^3.3.0",
     "multispinner": "^0.2.1",
     "ora": "^1.2.0",

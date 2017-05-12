@@ -18,6 +18,7 @@
   * {
     margin: 0;
     padding: 0;
+    box-sizing: initial;
   }
 
   html, body {

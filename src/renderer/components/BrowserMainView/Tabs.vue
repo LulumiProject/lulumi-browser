@@ -9,8 +9,8 @@
           div#tab-icons(class="chrome-tab-favicon")
             i.el-icon-loading(v-if="page.isLoading")
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
-            icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
-            icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
           el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1000")
             span(class="chrome-tab-title")
               | {{ page.title || $t('tabs.loading') }}
@@ -23,14 +23,13 @@
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
         .chrome-tab-bg(style="padding-right: 10px;")
         .chrome-tab-favicon
-          i(class="el-icon-plus")
+          i.el-icon-plus
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
 </template>
 
 <script>
-  import Icon from 'vue-awesome/components/Icon';
-  import 'vue-awesome/icons/times';
+  import AwesomeIcon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
 
@@ -54,7 +53,7 @@
       },
     },
     components: {
-      Icon,
+      'awesome-icon': AwesomeIcon,
       'el-button': Button,
       'el-tooltip': Tooltip,
     },
