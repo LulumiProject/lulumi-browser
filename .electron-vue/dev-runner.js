@@ -2,8 +2,8 @@
 
 const chalk = require('chalk')
 const electron = require('electron')
-const ora = require('ora')
 const path = require('path')
+const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
@@ -12,7 +12,30 @@ const webpackHotMiddleware = require('webpack-hot-middleware')
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
 
+let electronProcess = null
 let hotMiddleware
+
+function logStats (proc, data) {
+  let log = ''
+
+  log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
+  log += '\n\n'
+
+  if (typeof data === 'object') {
+    data.toString({
+      colors: true,
+      chunks: false
+    }).split(/\r?\n/).forEach(line => {
+      log += '  ' + line + '\n'
+    })
+  } else {
+    log += `  ${data}\n`
+  }
+
+  log += '\n' + chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
+
+  console.log(log)
+}
 
 function startRenderer () {
   return new Promise((resolve, reject) => {
@@ -23,22 +46,17 @@ function startRenderer () {
     })
 
     const compiler = webpack(Configs)
-    hotMiddleware = webpackHotMiddleware(compiler, {
-      // log: (msg) => {
-      //   let fn = console.log.bind(console)
-      //   let args = [].slice.call(arguments)
-      //   args.unshift('\n\n' + chalk.bgBlue.white('  Begin Renderer Process  ') + '\n')
-      //   if (msg) args.push(msg)
-      //   args.push('\n' + chalk.bgBlue.white('  End Renderer Process  ') + '\n')
-      //   return console.log.apply(console, args)
-      // }
-      log: false
-    })
+    hotMiddleware = webpackHotMiddleware(compiler, { log: false })
+
     compiler.plugin('compilation', compilation => {
       compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
         hotMiddleware.publish({ action: 'reload' })
         cb()
       })
+    })
+
+    compiler.plugin('done', stats => {
+      logStats('Renderer', stats)
     })
 
     const server = new WebpackDevServer(
@@ -67,22 +85,19 @@ function startMain () {
 
     const compiler = webpack(mainConfig)
 
+    compiler.plugin('watch-run', (compilation, done) => {
+      logStats('Main', chalk.white.bold('compiling...'))
+      hotMiddleware.publish({ action: 'compiling' })
+      done()
+    })
+
     compiler.watch({}, (err, stats) => {
       if (err) {
         console.log(err)
         return
       }
 
-      let log = '\n' + chalk.yellow.bold('┏ Main Process -----------') + '\n\n'
-      stats.toString({
-        colors: require('supports-color'),
-        chunks: false
-      }).split(/\r?\n/).forEach(line => {
-        log += '  ' + line + '\n'
-      })
-      log += '\n' + chalk.yellow.bold('┗ ------------------------') + '\n'
-
-      console.log(log)
+      logStats('Main', stats)
 
       if (electronProcess && electronProcess.kill) {
         electronProcess.kill()
@@ -94,11 +109,6 @@ function startMain () {
   })
 }
 
-function repeat (str, times) {
-  return (new Array(times + 1)).join(str)
-}
-
-let electronProcess = null
 function startElectron() {
   electronProcess = spawn(electron, [path.join(__dirname, '../dist/main.js')])
   electronProcess.stdout.on('data', data => {
@@ -111,10 +121,10 @@ function startElectron() {
 
     if (/[0-9A-z]+/.test(data[0])) {
       console.log(
-        chalk.blue.bold('┏ Electron ---------------') +
+        chalk.blue.bold('┏ Electron -------------------') +
         '\n\n' +
         log +
-        chalk.blue.bold('┗ ------------------------') +
+        chalk.blue.bold('┗ ----------------------------') +
         '\n'
       )
     }
@@ -126,16 +136,15 @@ function startElectron() {
 }
 
 function init () {
-  const spinner = ora({
-    spinner: 'triangle',
-    text: chalk.cyan('getting ready')
+  say('lulumi', {
+    font: 'simple3d',
+    colors: ['yellow'],
+    space: false
   })
-
-  spinner.start()
+  console.log(chalk.blue('  getting ready...') + '\n')
 
   Promise.all([startRenderer(), startMain()])
     .then(() => {
-      spinner.stop()
       startElectron()
     })
     .catch(err => {

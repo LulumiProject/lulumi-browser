@@ -1,18 +1,10 @@
 import utils from '../utils';
 
 describe('Launch', function () {
-  beforeEach(utils.beforeEach);
-  afterEach(utils.afterEach);
-
-  it('has at least two windows. One main window and one default webview page', function () {
-    return this.app.client.getWindowCount()
-      .then((count) => {
-        expect(count).to.least(2);
-      });
-  });
+  utils.beforeAll(this);
 
   it('has everything set up', function () {
-    return this.app.client.waitUntilWindowLoaded()
+    return this.app.client.waitForBrowserWindow()
       .browserWindow.isMinimized()
         .then((min) => {
           expect(min).to.equal(false);

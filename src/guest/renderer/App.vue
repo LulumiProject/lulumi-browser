@@ -5,10 +5,8 @@
 </template>
 
 <script>
-  import store from './vuex/store';
-
   export default {
-    store,
+    name: 'lulumi-browser',
     mounted() {
       if (window.about) {
         this.$store.dispatch('updateAbout', window.about);

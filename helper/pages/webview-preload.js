@@ -111,6 +111,10 @@ const requireTmp = require;
 const moduleTmp = module;
 
 process.once('loaded', () => {
+  if (process.env.BABEL_ENV === 'test') {
+    global.require = requireTmp;
+  }
+
   if (document.location.href.startsWith('lulumi://')) {
     ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 

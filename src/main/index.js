@@ -11,7 +11,7 @@ import * as lulumiExtension from '../api/lulumi-extension';
 
 let mainWindow;
 
-let shuttingDown = false;
+let shuttingDown = process.env.BABEL_ENV === 'test';
 const storagePath = process.env.NODE_ENV === 'development'
   ? path.join(config.devUserData, 'lulumi-app-state')
   : path.join(app.getPath('userData'), 'app-state');

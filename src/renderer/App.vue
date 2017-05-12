@@ -5,10 +5,8 @@
 </template>
 
 <script>
-  import store from 'renderer/vuex/store';
-
   export default {
-    store,
+    name: 'lulumi-browser',
   };
 </script>
 

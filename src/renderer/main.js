@@ -1,20 +1,18 @@
 import Vue from 'vue';
-import axios from 'axios';
 import Electron from 'vue-electron';
-import Router from 'vue-router';
+import axios from 'axios';
 import { Autocomplete, Scrollbar } from 'element-ui';
 import 'element-ui/lib/theme-default/index';
 import 'iview/dist/styles/iview.css';
 
 import App from './App';
-import routes from './routes';
+import router from './router';
+import store from './store';
 import i18n from './i18n';
 
+Vue.use(Electron);
 Vue.prototype.$http = axios;
 Vue.http = Vue.prototype.$http;
-
-Vue.use(Electron);
-Vue.use(Router);
 
 if (process.env.NODE_ENV === 'production') {
   Vue.config.productionTip = false;
@@ -149,14 +147,11 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
 Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
 Vue.component('el-scrollbar', Scrollbar);
 
-const router = new Router({
-  scrollBehavior: () => ({ y: 0 }),
-  routes,
-});
-
 /* eslint-disable no-new */
 new Vue({
+  components: { App },
   i18n,
   router,
-  ...App,
+  store,
+  template: '<App/>',
 }).$mount('#app');

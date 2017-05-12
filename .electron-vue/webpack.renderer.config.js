@@ -9,18 +9,38 @@ const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+/**
+ * List of node_modules to include in webpack bundle
+ *
+ * Require for specific packages like Vue UI libraries
+ * that provide pure *.vue files that need compiling
+ */
+let whiteListedModules = ['vue']
 
 let rendererConfig = {
   name: 'renderer',
-  devtool: '#eval-source-map',
+  devtool: '#cheap-module-eval-source-map',
   entry: {
     renderer: path.join(__dirname, '../src/renderer/main.js')
   },
-  externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue'].includes(d)),
+  externals: [
+    ...Object.keys(pkg.dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }
+      },
       {
         test: /\.(less|css)$/,
         use: ExtractTextPlugin.extract({
@@ -92,9 +112,6 @@ let rendererConfig = {
   },
   plugins: [
     new ExtractTextPlugin('[name].css'),
-    new FriendlyErrorsPlugin({
-      clearConsole: false
-    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),
@@ -117,7 +134,7 @@ let rendererConfig = {
       'renderer': path.join(__dirname, '../src/renderer'),
       'i18n': path.join(__dirname, '../helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
-      'vue$': 'vue/dist/vue.runtime.esm.js'
+      'vue$': 'vue/dist/vue.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
   },
@@ -126,13 +143,26 @@ let rendererConfig = {
 
 let aboutConfig = {
   name: 'about',
-  devtool: '#eval-source-map',
+  devtool: '#cheap-module-eval-source-map',
   entry: {
     about: path.join(__dirname, '../src/guest/renderer/main.js')
   },
-  externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue'].includes(d)),
+  externals: [
+    ...Object.keys(pkg.dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }
+      },
       {
         test: /\.(less|css)$/,
         use: ExtractTextPlugin.extract({
@@ -204,9 +234,6 @@ let aboutConfig = {
   },
   plugins: [
     new ExtractTextPlugin('[name].css'),
-    new FriendlyErrorsPlugin({
-      clearConsole: false
-    }),
     new HtmlWebpackPlugin({
       filename: 'about.html',
       template: path.resolve(__dirname, '../src/guest/index.ejs'),
@@ -227,45 +254,11 @@ let aboutConfig = {
       'components': path.join(__dirname, '../src/guest/renderer/components'),
       'renderer': path.join(__dirname, '../src/guest/renderer'),
       'i18n': path.join(__dirname, '../helper/i18n'),
-      'vue$': 'vue/dist/vue.runtime.esm.js'
+      'vue$': 'vue/dist/vue.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
   },
   target: 'web'
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  /**
-   * Apply ESLint
-   */
-  if (settings.eslint) {
-    rendererConfig.module.rules.push(
-      {
-        test: /\.(js|vue)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
-      }
-    )
-    aboutConfig.module.rules.push(
-      {
-        test: /\.(js|vue)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
-      }
-    )
-  }
 }
 
 /**

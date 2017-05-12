@@ -1,15 +1,16 @@
 import utils from '../utils';
 
-describe('Protocol', function () {
-  beforeEach(utils.beforeEach);
-  afterEach(utils.afterEach);
+describe('Custom Protocol', function () {
+  utils.beforeAll(this);
 
-  it('has lulumi: and lulumi-extension: protocols', function () {
-    return this.app.client.waitForUrl('lulumi://about/#/')
-      .waitForBrowserWindow()
-      .getText('#about-name')
-      .then((text) => {
-        expect(text).to.equal('About Page');
+  it('has lulumi: protocol', function () {
+    return this.app.client.waitForBrowserWindow()
+      .tabByIndex(0)
+      .loadUrl('lulumi://about/#/')
+      .waitForVisible('#app')
+      .getUrl()
+      .then((url) => {
+        expect(url).to.equal('lulumi://about/#/');
       });
   });
 });
