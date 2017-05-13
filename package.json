@@ -13,7 +13,7 @@
     "build:mas": "cross-env BUILD_TARGET=mas node .electron-vue/build.js",
     "build:win32": "cross-env BUILD_TARGET=win32 node .electron-vue/build.js",
     "dev": "node .electron-vue/dev-runner.js",
-    "e2e": "yarn run pack && mocha test/e2e",
+    "e2e": "yarn run pack && ava",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
     "pack": "yarn run pack:main && yarn run pack:renderer",
@@ -41,6 +41,7 @@
     "vuex": "^2.3.1"
   },
   "devDependencies": {
+    "ava": "^0.19.1",
     "babel": "^6.23.0",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
@@ -108,5 +109,16 @@
     "webpack-dev-server": "^2.4.5",
     "webpack-hot-middleware": "^2.18.0",
     "webpack-merge": "^4.1.0"
+  },
+  "ava": {
+    "files": [
+      "test/e2e/index.js"
+    ],
+    "concurrency": 5,
+    "failWithoutAssertions": false,
+    "powerAssert": false,
+    "require": [
+      "babel-register"
+    ]
   }
 }

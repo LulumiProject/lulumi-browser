@@ -1,16 +1,12 @@
-import utils from '../utils';
+import test from 'ava';
 
-describe('Custom Protocol', function () {
-  utils.beforeAll(this);
+test('has lulumi: protocol', async (t) => {
+  const app = t.context.app;
+  await app.client.waitForBrowserWindow();
 
-  it('has lulumi: protocol', function () {
-    return this.app.client.waitForBrowserWindow()
-      .tabByIndex(0)
-      .loadUrl('lulumi://about/#/')
-      .waitForVisible('#app')
-      .getUrl()
-      .then((url) => {
-        expect(url).to.equal('lulumi://about/#/');
-      });
-  });
+  expect(await app.client
+    .tabByIndex(0)
+    .loadUrl('lulumi://about/#/')
+    .waitForVisible('#app')
+    .getUrl()).to.equal('lulumi://about/#/');
 });

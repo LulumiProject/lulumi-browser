@@ -1,26 +1,16 @@
-import utils from '../utils';
+import test from 'ava';
 
-describe('Launch', function () {
-  utils.beforeAll(this);
+test('has everything set up', async (t) => {
+  const app = t.context.app;
+  await app.client.waitForBrowserWindow();
 
-  it('has everything set up', function () {
-    return this.app.client.waitForBrowserWindow()
-      .browserWindow.isMinimized()
-        .then((min) => {
-          expect(min).to.equal(false);
-        })
-      .browserWindow.isDevToolsOpened()
-        .then((opened) => {
-          expect(opened).to.equal(false);
-        })
-      .browserWindow.isVisible()
-        .then((visible) => {
-          expect(visible).to.equal(true);
-        }).browserWindow.isFocused().then((focused) => {
-          expect(focused).to.equal(true);
-        }).browserWindow.getBounds().then((bounds) => {
-          expect(bounds.width).to.above(0);
-          expect(bounds.height).to.above(0);
-        });
-  });
+  const win = app.browserWindow;
+  expect(await app.client.getWindowCount()).to.equal(1);
+  expect(await win.isMinimized()).to.equal(false);
+  expect(await win.isDevToolsOpened()).to.equal(false);
+  expect(await win.isVisible()).to.equal(true);
+
+  const { width, height } = await win.getBounds();
+  expect(width).to.above(0);
+  expect(height).to.above(0);
 });

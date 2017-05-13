@@ -1,7 +1,15 @@
 import electron from 'electron';
+import path from 'path';
 import { Application } from 'spectron';
 
-const lululmiWindowUrl = 'file:///Users/boik/Documents/lulumi-browser/dist/index.html#/';
+const lululmiWindowUrl = `file://${path.resolve(__dirname, '../../')}/dist/index.html#/`;
+
+const logVerboseEnabled = process.env.LULUMI_TEST_VERBOSE;
+const logVerbose = (string, ...rest) => {
+  if (logVerboseEnabled) {
+    console.log(string, ...rest);
+  }
+};
 
 const promiseMapSeries = (array, iterator) => {
   var length = array.length;
@@ -28,11 +36,7 @@ function startApp() {
 };
 
 function stopApp() {
-  this.timeout(10000);
-
-  if (this.app && this.app.isRunning()) {
-    return this.app.stop();
-  }
+  return this.app.stop();
 };
 
 function addCommands() {
@@ -76,7 +80,7 @@ function addCommands() {
   }
 
   app.client.addCommand('tabHandles', () => {
-    console.log('tabHandles()');
+    logVerbose('tabHandles()');
     return windowHandlesOrig.apply(client)
       .then((response) => {
         const handles = response.value;
@@ -100,41 +104,41 @@ function addCommands() {
   });
 
   app.client.addCommand('tabByIndex', (index) => {
-    console.log('tabByIndex(' + index + ')');
+    logVerbose('tabByIndex(' + index + ')');
     return client.tabHandles().then((response) => response.value).then((handles) => {
-      console.log('tabHandles() => handles.length = ' + handles.length + '; handles[' + index + '] = "' + handles[index] + '";');
+      logVerbose('tabHandles() => handles.length = ' + handles.length + '; handles[' + index + '] = "' + handles[index] + '";');
       return client.window(handles[index]);
     });
   });
 
   app.client.addCommand('getTabCount', () => {
-    console.log('getTabCount()');
+    logVerbose('getTabCount()');
     return client.tabHandles().then((response) => response.value).then((handles) => {
-      console.log('getTabCount() => ' + handles.length);
+      logVerbose('getTabCount() => ' + handles.length);
       return handles.length;
     });
   });
 
   app.client.addCommand('waitForBrowserWindow', () => {
-    console.log('waitForBrowserWindow()');
+    logVerbose('waitForBrowserWindow()');
     return client.waitUntil(() => {
       return client.windowByUrl(lululmiWindowUrl).then((response) => {
-        console.log('waitForBrowserWindow() => ' + JSON.stringify(response));
+        logVerbose('waitForBrowserWindow() => ' + JSON.stringify(response));
         return response;
       }, () => {
-        console.log('waitForBrowserWindow() => false');
+        logVerbose('waitForBrowserWindow() => false');
         return false;
       })
-    }, 500, null, 100);
+    }, 5000, null, 100);
   });
 
   app.client.addCommand('windowByUrl', (url) => {
-    console.log('windowByUrl("' + url + '")');
+    logVerbose('windowByUrl("' + url + '")');
     return client.windowHandles().then((response) => response.value).then((handles) => {
       return promiseMapSeries(handles, (handle) => {
         return client.window(handle).getUrl();
       }).then((response) => {
-        console.log('windowByUrl("' + url + '") => ' + JSON.stringify(response));
+        logVerbose('windowByUrl("' + url + '") => ' + JSON.stringify(response));
         const index = response.indexOf(url);
         if (index !== -1) {
           return client.window(handles[index]);
@@ -146,30 +150,30 @@ function addCommands() {
   });
 
   app.client.addCommand('loadUrl', (url) => {
-    console.log('loadUrl("' + url + '")');
+    logVerbose('loadUrl("' + url + '")');
 
     return client.url(url).then((response) => {
-      console.log('loadUrl.url() => ' + JSON.stringify(response));
+      logVerbose('loadUrl.url() => ' + JSON.stringify(response));
     }, (error) => {
-      console.log('loadUrl.url() => ERROR: ' + JSON.stringify(error));
+      logVerbose('loadUrl.url() => ERROR: ' + JSON.stringify(error));
     }).waitForUrl(url);
   });
 
   app.client.addCommand('waitForUrl', (url) => {
-    console.log('waitForUrl("' + url + '")');
+    logVerbose('waitForUrl("' + url + '")');
     return client.waitUntil(() => {
       return client.tabByUrl(url).then((response) => {
-        console.log('tabByUrl("' + url + '") => ' + JSON.stringify(response));
+        logVerbose('tabByUrl("' + url + '") => ' + JSON.stringify(response));
         return response;
       }, () => {
-        console.log('tabByUrl("' + url + '") => false');
+        logVerbose('tabByUrl("' + url + '") => false');
         return false;
       });
     }, 5000, null, 100);
   });
 
   app.client.addCommand('tabByUrl', (url) => {
-    console.log('tabByUrl("' + url + '")');
+    logVerbose('tabByUrl("' + url + '")');
     return client.tabHandles().then((response) => response.value).then((handles) => {
       return promiseMapSeries(handles, (handle) => {
         return client.window(handle).getUrl();
@@ -186,34 +190,17 @@ function addCommands() {
 };
 
 export default {
-  beforeAll(context) {
-    context.timeout(30000)
-
-    context.beforeAll(function () {
-      return startApp.call(this);
+  beforeEach(ava) {
+    ava.beforeEach(async t => {
+      await startApp.call(t.context);
     });
 
-    context.beforeAll(function () {
-      addCommands.call(this);
+    ava.beforeEach(t => {
+      addCommands.call(t.context);
     });
 
-    context.afterAll(function () {
-      return stopApp.call(this);
-    });
-  },
-  beforeEach(context) {
-    context.timeout(30000)
-
-    context.beforeEach(function () {
-      return startApp.call(this);
-    });
-
-    context.beforeEach(function () {
-      addCommands.call(this);
-    });
-
-    context.afterEach(function () {
-      return stopApp.call(this);
+    ava.afterEach.always(async t => {
+      await stopApp.call(t.context);
     });
   },
 }
