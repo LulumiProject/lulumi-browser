@@ -1,19 +1,19 @@
 <template lang="pug">
   div
     #left-swipe-arrow
-      icon(name="arrow-left")
+      awesome-icon(name="arrow-left")
     #right-swipe-arrow
-      icon(name="arrow-right")
+      awesome-icon(name="arrow-right")
 </template>
 
 <script>
-  import Icon from 'vue-awesome/components/Icon';
+  import AwesomeIcon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/arrow-left';
   import 'vue-awesome/icons/arrow-right';
 
   export default {
     components: {
-      Icon,
+      'awesome-icon': AwesomeIcon,
     },
     mounted() {
       window.addEventListener('wheel', (event) => {
@@ -45,9 +45,19 @@
     }
   }
   #left-swipe-arrow {
-    left: -40px;
+    left: -200px;
+
+    .fa-icon {
+      width: auto;
+      height: 3em; /* or any other relative font sizes */
+    }
   }
   #right-swipe-arrow {
-    right: -40px;
+    right: -200px;
+
+    .fa-icon {
+      width: auto;
+      height: 3em; /* or any other relative font sizes */
+    }
   }
 </style>

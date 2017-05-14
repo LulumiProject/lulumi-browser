@@ -57,6 +57,7 @@ export default {
     state: {
       progressing: 'progressing',
       cancelled: 'cancelled',
+      completed: 'completed',
     },
   },
   navbar: {

@@ -57,6 +57,7 @@ export default {
     state: {
       progressing: '下載中',
       cancelled: '已取消',
+      completed: '已完成',
     },
   },
   navbar: {

@@ -275,7 +275,7 @@
         const rightSwipeArrow = document.getElementById('right-swipe-arrow');
 
         const SWIPE_TRIGGER_DIST = 200;
-        const ARROW_OFF_DIST = 40;
+        const ARROW_OFF_DIST = 200;
 
         if (this.trackingFingers) {
           this.deltaX += event.deltaX;
@@ -390,7 +390,7 @@
         const leftSwipeArrow = document.getElementById('left-swipe-arrow');
         const rightSwipeArrow = document.getElementById('right-swipe-arrow');
 
-        const ARROW_OFF_DIST = 40;
+        const ARROW_OFF_DIST = 200;
 
         if (this.trackingFingers && this.isSwipeOnEdge) {
           if (this.hnorm <= -1) {
