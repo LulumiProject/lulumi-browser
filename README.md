@@ -3,8 +3,8 @@
 > Lulumi-browser is a light weight browser coded with Vue.js 2 and Electron.
 
 <p align="center">
-  <a href="http://i.imgur.com/bvmh77u.png" target="_blank">
-    <img src="http://i.imgur.com/bvmh77u.png" width="700px">
+  <a href="http://i.imgur.com/9xLPLFK.png" target="_blank">
+    <img src="http://i.imgur.com/9xLPLFK.png" width="700px">
   </a>
 </p>
 
@@ -58,4 +58,4 @@ $ yarn run test
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[3e27476](https://github.com/SimulatedGREG/electron-vue/commit/3e2747641ecfbcdbfd182ee098ca4344cf25adcc) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[bc72420](https://github.com/SimulatedGREG/electron-vue/commit/bc7242091e884c94df6eef6d2e5a424c2a93c8fa) and developed by [@qazbnm456](https://github.com/qazbnm456).

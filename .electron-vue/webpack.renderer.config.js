@@ -3,7 +3,7 @@
 process.env.BABEL_ENV = 'renderer'
 
 const path = require('path')
-const pkg = require('../package.json')
+const { dependencies } = require('../package.json')
 const settings = require('./config.js')
 const webpack = require('webpack')
 
@@ -26,7 +26,7 @@ let rendererConfig = {
     renderer: path.join(__dirname, '../src/renderer/main.js')
   },
   externals: [
-    ...Object.keys(pkg.dependencies || {}).filter(d => !whiteListedModules.includes(d))
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
   ],
   module: {
     rules: [
@@ -148,7 +148,7 @@ let aboutConfig = {
     about: path.join(__dirname, '../src/guest/renderer/main.js')
   },
   externals: [
-    ...Object.keys(pkg.dependencies || {}).filter(d => !whiteListedModules.includes(d))
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
   ],
   module: {
     rules: [

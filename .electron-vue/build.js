@@ -2,6 +2,7 @@
 
 process.env.NODE_ENV = 'production'
 
+const { say } = require('cfonts')
 const chalk = require('chalk')
 const del = require('del')
 const fs = require('fs')
@@ -47,6 +48,13 @@ function rev() {
 }
 
 function build () {
+  say('lets-build', {
+    font: 'simple3d',
+    colors: ['yellow'],
+    space: false
+  })
+  console.log()
+
   del.sync(['dist/*', '!.gitkeep'])
 
   const tasks = ['main', 'renderer']
@@ -98,9 +106,9 @@ function bundleApp () {
   packager(buildConfig, (err, appPaths) => {
     if (err) {
       console.log(`\n${errorLog}${chalk.yellow('`electron-packager`')} says...\n`)
-      console.log(err)
+      console.log(err + '\n')
     } else {
-      console.log(`${doneLog}build(s) complete\n`)
+      console.log(`${doneLog}building complete (builds/)\n`)
       console.log(appPaths)
 
       console.log('\n\x1b[34mDONE\n\x1b[0m')

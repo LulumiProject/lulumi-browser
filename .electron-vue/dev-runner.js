@@ -10,7 +10,7 @@ const WebpackDevServer = require('webpack-dev-server')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
 const mainConfig = require('./webpack.main.config')
-const rendererConfig = require('./webpack.renderer.config')
+const Configs = require('./webpack.renderer.config')
 
 let electronProcess = null
 let hotMiddleware
@@ -39,8 +39,6 @@ function logStats (proc, data) {
 
 function startRenderer () {
   return new Promise((resolve, reject) => {
-    let Configs = require('./webpack.renderer.config')
-
     Configs.forEach((config) => {
       Object.keys(config.entry).forEach(key => config.entry[key] = [path.join(__dirname, `dev-client-${key}`)].concat(config.entry[key]));
     })
@@ -80,7 +78,6 @@ function startRenderer () {
 
 function startMain () {
   return new Promise((resolve, reject) => {
-    let mainConfig = require('./webpack.main.config')
     mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main)
 
     const compiler = webpack(mainConfig)
@@ -109,7 +106,7 @@ function startMain () {
   })
 }
 
-function startElectron() {
+function startElectron () {
   electronProcess = spawn(electron, [path.join(__dirname, '../dist/main.js')])
   electronProcess.stdout.on('data', data => {
     let log = ''
