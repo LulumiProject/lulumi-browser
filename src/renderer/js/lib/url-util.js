@@ -1,3 +1,5 @@
+import config from 'renderer/js/constants/config';
+
 // characters, then : with optional //
 const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
 const defaultScheme = 'http://';
@@ -242,11 +244,38 @@ const urlUtil = {
    * @return {string}
    */
   getLocationIfPDF(url) {
-    const PDFViewerURL = '/pdfjs/web/viewer.html';
-    if (url && url.includes(PDFViewerURL)) {
-      return url.replace(/^file:.+\/pdfjs\/web\/viewer.html\?file=(\w+:\/\/.+)/, '$1');
+    const PDFViewerWithPDFJS = '/pdfjs/web/viewer.html';
+    const PDFViewerForChrome = 'chrome://pdf-viewer/index.html?src=';
+    if (url) {
+      if (url.includes(PDFViewerWithPDFJS)) {
+        return url.replace(/^file:.+\/pdfjs\/web\/viewer.html\?file=(\w+:\/\/.+)/, '$1');
+      } else if (url.includes(PDFViewerForChrome)) {
+        return url.replace(/^chrome:\/\/pdf-viewer\/index\.html\?src=/, '');
+      }
+      return url;
     }
-    return url;
+    return '';
+  },
+
+  /**
+   * Gets about location from a lulumi scheme
+   * @param {string} url
+   * @return {string}
+   */
+  getLocationIfAbout(url) {
+    if (url.startsWith(config.lulumiPagesCustomProtocol)) {
+      const guestUrl = require('url').parse(url);
+      const guestHash = guestUrl.hash.substr(2);
+      const item = `${guestUrl.host}:${guestHash === '' ? 'about' : guestHash}`;
+      return {
+        title: item,
+        url: item,
+      };
+    }
+    return {
+      title: undefined,
+      url,
+    };
   },
 
   /**
