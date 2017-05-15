@@ -866,12 +866,11 @@
                           extensions: ['jpg', 'jpeg', 'png', 'gif'],
                         },
                       ],
-                    }, (filename) => {
+                    }, async (filename) => {
                       if (filename) {
-                        imageUtil.getBase64FromImageUrl(event.params.srcURL).then((dataURL) => {
-                          fs.writeFileSync(filename,
-                            electron.nativeImage.createFromDataURL(dataURL).toPNG());
-                        });
+                        const dataURL = await imageUtil.getBase64FromImageUrl(event.params.srcURL);
+                        fs.writeFileSync(
+                          filename, electron.nativeImage.createFromDataURL(dataURL).toPNG());
                       }
                     },
                   );

@@ -22,6 +22,5 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
     'no-plusplus': ["error", { "allowForLoopAfterthoughts": true }],
     'import/extensions': 0,
-    'import/prefer-default-export': 0,
   }
 }

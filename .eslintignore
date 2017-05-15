@@ -1,9 +1,7 @@
-dist/**
+src/api/**
 helper/pdfjs/**
 helper/pages/extensions/**
 helper/pages/inject-to.js
-src/api/**
-extensions/**
 test/unit/coverage/**
 test/unit/*.js
 test/e2e/*.js

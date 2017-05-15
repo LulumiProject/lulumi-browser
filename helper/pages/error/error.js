@@ -10,7 +10,6 @@ let url = searchParams.get('url');
 
 const websiteNotFound = {
   name: 'Server not found',
-  /* eslint-disable max-len */
   message: "Lulumi-browser couldn't find this website.",
   secondaryAction: {
     title: 'Search on archive.org',
@@ -43,7 +42,6 @@ const errorCodes = {
   '-106': offlineError,
   '-107': sslError,
   '-109': websiteNotFound,
-  /* eslint-disable max-len */
   '-110': sslError, // this is actually the error code for "server requested a client certificate", but we don't support that yet,
   '-112': sslError,
   '-113': sslError,
@@ -52,7 +50,6 @@ const errorCodes = {
   '-200': sslError,
   '-201': {
     name: 'This website is not available',
-    /* eslint-disable max-len */
     message: "Lulumi-browser couldn't connect securely to this website. Please make sure your computer's clock is set correctly.",
   },
   '-202': sslError,

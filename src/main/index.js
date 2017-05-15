@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
@@ -125,13 +126,11 @@ function createWindow() {
       } catch (event) {
         if (data) {
           reject();
-          // eslint-disable-next-line no-console
           console.log(`could not parse data: ${data}, ${event}`);
         }
       }
     }).then((data) => {
       mainWindow.webContents.send('set-app-state', data);
-    // eslint-disable-next-line no-console
     }).catch(() => console.log('request-app-state error'));
   });
 
@@ -156,7 +155,6 @@ if (process.env.NODE_ENV === 'development') {
       }
     }, (error) => {
       if (error) {
-        // eslint-disable-next-line no-console
         console.error('Failed to register protocol');
       }
     });
@@ -178,7 +176,6 @@ if (process.env.NODE_ENV === 'development') {
       }
     }, (error) => {
       if (error) {
-        // eslint-disable-next-line no-console
         console.error('Failed to register protocol');
       }
     });

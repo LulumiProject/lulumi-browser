@@ -1,17 +1,16 @@
+/* eslint-disable no-new */
 /**
  * A simple class for fetching images from URLs or files.
  * @class imageUtil
  */
 const imageUtil = {
-
   /**
    * Extracts the image from a valid URL.
    * @param {String} input The input value.
    * @returns {String} The found image encoded by base64.
    */
   getBase64FromImageUrl(input) {
-    /* eslint-disable no-new */
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const img = new window.Image();
       img.setAttribute('crossOrigin', 'anonymous');
       img.onerror = () => {
@@ -36,7 +35,6 @@ const imageUtil = {
    * @returns {String} The found image encoded by base64.
    */
   getBase64FromFileIcon(path, size = 'normal') {
-    /* eslint-disable no-new */
     return new Promise((resolve, reject) => {
       require('electron').remote.app.getFileIcon(path, { size }, (err, icon) => {
         if (icon) {
