@@ -1,4 +1,5 @@
 const { ipcRenderer, remote } = require('electron');
+const specs = require('lulumi').specs;
 const path = require('path');
 const url = require('url');
 
@@ -20,6 +21,37 @@ String.prototype.hashCode = function () {
     hash |= 0; // convert to 32bit integer
   }
   return hash;
+};
+
+// Returns a string representing the defined signature of the API function.
+// Example return value for chrome.windows.getCurrent:
+// "windows.getCurrent(optional object populate, function callback)"
+function getParameterSignatureString(namespace, name) {
+  const api = specs[namespace][name];
+  var typeNames = Object.keys(api.args).map((arg) => {
+    let types = api.args[arg];
+    if (types.length > 1) {
+      return `${types.join('||')} ${arg}`;
+    }
+    return `${types[0]} ${arg}`;
+  });
+  return `${name}(${typeNames.join(', ')})`;
+};
+
+// Returns a string representing a call to an API function.
+// Example return value for call: chrome.windows.get(1, callback) is:
+// "windows.get(int, function)"
+function getArgumentSignatureString(namespace, name, args) {
+  const api = specs[namespace][name];
+  var typeNames = args.map((arg) => {
+    arg = arg.trim();
+    let allowed = api.args[arg];
+    if (allowed.length > 1) {
+      return allowed.join('||');
+    }
+    return api.args[arg][0];
+  });
+  return `${name}(${typeNames.join(', ')})`;
 };
 
 exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
@@ -418,4 +450,23 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
     onCompleted: new IpcEvent('web-navigation', 'on-completed'),
     onCreatedNavigationTarget: new IpcEvent('web-navigation', 'on-created-navigation-target'),
   };
+
+  // wrapper
+  Object.keys(lulumi).forEach((key) => {
+    Object.keys(lulumi[key]).forEach((member) => {
+      if (typeof lulumi[key][member] === 'function') {
+        try {
+          let cached = lulumi[key][member];
+          lulumi[key][member] = (function() {
+            return function() {
+              console.log(`Signature: ${key}.${getParameterSignatureString(
+                key,
+                member)}`);
+              cached.apply(this, arguments);
+            };
+          })();
+        } catch (event) {};
+      }
+    });
+  });
 };
