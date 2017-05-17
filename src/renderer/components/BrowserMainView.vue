@@ -156,7 +156,7 @@
         this.onCommitted.emit({
           frameId: 0,
           parentFrameId: -1,
-          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
           tabId: pageIndex,
           timeStamp: Date.now(),
           url: webview.getURL(),
@@ -184,7 +184,7 @@
         this.onDOMContentLoaded.emit({
           frameId: 0,
           parentFrameId: -1,
-          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
           tabId: pageIndex,
           timeStamp: Date.now(),
           url: location,
@@ -263,7 +263,7 @@
           this.onCreatedNavigationTarget.emit({
             sourceFrameId: 0,
             parentFrameId: -1,
-            sourceProcessId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+            sourceProcessId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
             timeStamp: Date.now(),
             url: event.url,
             tabId: this.pages.length - 1,
@@ -427,7 +427,7 @@
         this.onBeforeNavigate.emit({
           frameId: 0,
           parentFrameId: -1,
-          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
           tabId: pageIndex,
           timeStamp: Date.now(),
           url: event.url,
@@ -437,7 +437,7 @@
         this.onCompleted.emit({
           frameId: 0,
           parentFrameId: -1,
-          processId: this.getWebView(pageIndex).getWebContents().getProcessId(),
+          processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
           tabId: this.pageIndex,
           timeStamp: Date.now(),
           url: event.url,

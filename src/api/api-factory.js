@@ -218,7 +218,7 @@ export default (VueInstance) => {
   const webNavigation = {
     getFrame: (details, webContentsId) => {
       const tab = findOrCreate(details.tabId, VueInstance);
-      const processId = VueInstance.getWebView(tab.id).getWebContents().getProcessId();
+      const processId = VueInstance.getWebView(tab.id).getWebContents().getOSProcessId();
       if (details.processId === processId) {
         VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
           String.prototype.hashCode = function() {
@@ -267,7 +267,7 @@ export default (VueInstance) => {
     },
     getAllFrames: (details, webContentsId) => {
       const tab = findOrCreate(details.tabId, VueInstance);
-      const processId = VueInstance.getWebView(tab.id).getWebContents().getProcessId();
+      const processId = VueInstance.getWebView(tab.id).getWebContents().getOSProcessId();
       VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
         String.prototype.hashCode = function() {
           var hash = 0, i, chr;

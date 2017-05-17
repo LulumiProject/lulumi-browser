@@ -41,6 +41,10 @@
     ansi-styles "^2.2.1"
     esutils "^2.0.2"
 
+"@types/node@^7.0.18":
+  version "7.0.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.18.tgz#cd67f27d3dc0cfb746f0bdd5e086c4c5d55be173"
+
 abbrev@1, abbrev@1.0.x:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -2797,10 +2801,11 @@ electron-to-chromium@^1.2.5:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.6.tgz#f38ad51d1919b06bc07275c62629db803ddca05a"
 
-electron@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.0.tgz#307a5a00a521e679c2cd829706bffdb6d34da186"
+electron@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.1.tgz#a93b8abd1fd6df794839d8602903aacbce74d388"
   dependencies:
+    "@types/node" "^7.0.18"
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
@@ -5175,9 +5180,9 @@ lru-cache@^4.0.0, lru-cache@^4.0.1:
     pseudomap "^1.0.1"
     yallist "^2.0.0"
 
-lulumi@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.4.tgz#d993bf50dcf088bb754f20055010a86d2d20bcd0"
+lulumi@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.5.tgz#39e25311c356ad3dda145c97d6824cbcce688bfb"
 
 macaddress@^0.2.8:
   version "0.2.8"

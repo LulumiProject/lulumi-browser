@@ -23,15 +23,63 @@ String.prototype.hashCode = function () {
   return hash;
 };
 
+// Generate all possible signatures for a given API function.
+function getSignatures(ParameterSignatureString) {
+  // First match everything inside the function argument parens.
+  let args = ParameterSignatureString.match(/.*?\(([^)]*)\)/)[1];
+ 
+  // Split the arguments string into an array comma delimited.
+  args = args.split(',').map(function(arg) {
+    // Ensure no inline comments are parsed and trim the whitespace.
+    return arg.replace(/\/\*.*\*\//, '').trim();
+  }).filter(function(arg) {
+    // Ensure no undefined values are added.
+    return arg;
+  });
+
+  return [args];
+};
+
+// Validate arguments.
+function resolveSignature(namespace, name, args) {
+  const definedSignature = getParameterSignatureString(namespace, name);
+  const candidateSignatures = getSignatures(definedSignature);
+  let message = '';
+  let solved = true;
+
+  args = Array.prototype.slice.call(args);
+  candidateSignatures.forEach((candidateSignature) => {
+    if (args.length > candidateSignature.length) {
+      message = 'Too many arguments.';
+      solved = false;
+    }
+    const typeNames = candidateSignature.map((signature, index) => {
+      let types = signature.split(' ')[0].split('||');
+      if (types.indexOf(typeof args[index]) === -1) {
+        message = 'Wrong type(s).';
+        solved = false;
+      }
+    });
+  });
+  return solved;
+}
+
 // Returns a string representing the defined signature of the API function.
 // Example return value for chrome.windows.getCurrent:
 // "windows.getCurrent(optional object populate, function callback)"
 function getParameterSignatureString(namespace, name) {
   const api = specs[namespace][name];
-  var typeNames = Object.keys(api.args).map((arg) => {
-    let types = api.args[arg];
+  const typeNames = Object.keys(api.args).map((arg) => {
+    const types = api.args[arg].types;
+    const optional = api.args[arg].optional;
     if (types.length > 1) {
+      if (optional) {
+        return `optional ${types.join('||')} ${arg}`;
+      }
       return `${types.join('||')} ${arg}`;
+    }
+    if (optional) {
+      return `optional ${types[0]} ${arg}`;
     }
     return `${types[0]} ${arg}`;
   });
@@ -41,18 +89,23 @@ function getParameterSignatureString(namespace, name) {
 // Returns a string representing a call to an API function.
 // Example return value for call: chrome.windows.get(1, callback) is:
 // "windows.get(int, function)"
-function getArgumentSignatureString(namespace, name, args) {
-  const api = specs[namespace][name];
-  var typeNames = args.map((arg) => {
-    arg = arg.trim();
-    let allowed = api.args[arg];
-    if (allowed.length > 1) {
-      return allowed.join('||');
-    }
-    return api.args[arg][0];
-  });
+function getArgumentSignatureString(name, args) {
+  args = Array.prototype.slice.call(args);
+  const typeNames = args.map(arg => typeof arg);
   return `${name}(${typeNames.join(', ')})`;
 };
+
+// Finds the correct signature for the given arguments, then validates the
+// arguments against that signature. Returns a 'normalized' arguments list
+// where nulls are inserted where optional parameters were omitted.
+// |args| is expected to be an array.
+function normalizeArgumentsAndValidate(namespace, name, args) {
+  args = Array.prototype.slice.call(args);
+  if (!resolveSignature(namespace, name, args)) {
+    throw new Error(
+      `Invocation of form ${namespace}.${getArgumentSignatureString(name, args)} doesn't match definition ${namespace}.${getParameterSignatureString(namespace, name)}`);
+  }
+}
 
 exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
@@ -459,9 +512,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
           let cached = lulumi[key][member];
           lulumi[key][member] = (function() {
             return function() {
-              console.log(`Signature: ${key}.${getParameterSignatureString(
-                key,
-                member)}`);
+              normalizeArgumentsAndValidate(key, member, arguments);
               cached.apply(this, arguments);
             };
           })();
