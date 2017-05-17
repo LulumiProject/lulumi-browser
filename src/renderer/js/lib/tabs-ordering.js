@@ -1,3 +1,5 @@
+import urlResource from './url-resource';
+
 export default (oldPages, tabRefs, newStart, newOrder, immutable = false) => {
   const newPages = [];
   oldPages.map((page, index) => {
@@ -11,6 +13,9 @@ export default (oldPages, tabRefs, newStart, newOrder, immutable = false) => {
   if (!immutable) {
     newPages.map((page, index) => {
       page.pid = newStart + index;
+      if (page.location.startsWith('about:')) {
+        page.location = urlResource.aboutUrls(page.location);
+      }
       return true;
     });
   }

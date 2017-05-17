@@ -1,6 +1,6 @@
 import test from 'ava';
 
-test('has lulumi: protocol', async (t) => {
+test('has accessible lulumi: protocol', async (t) => {
   const app = t.context.app;
   await app.client.waitForBrowserWindow();
 

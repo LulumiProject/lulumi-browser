@@ -37,7 +37,19 @@ function getSignatures(ParameterSignatureString) {
     return arg;
   });
 
-  return [args];
+  function dig(args) {
+    let results = [args];
+    args.forEach((arg, index) => {
+      if (arg.startsWith('optional')) {
+        let tmp = JSON.parse(JSON.stringify(args));
+        tmp.splice(index, 1);
+        dig(tmp).forEach(r => results.push(r));
+      }
+    });
+    return results;
+  }
+
+  return dig(args);
 };
 
 // Validate arguments.
@@ -45,23 +57,30 @@ function resolveSignature(namespace, name, args) {
   const definedSignature = getParameterSignatureString(namespace, name);
   const candidateSignatures = getSignatures(definedSignature);
   let message = '';
-  let solved = true;
+  let solved = false;
+  let results;
 
   args = Array.prototype.slice.call(args);
-  candidateSignatures.forEach((candidateSignature) => {
-    if (args.length > candidateSignature.length) {
-      message = 'Too many arguments.';
-      solved = false;
+  results = candidateSignatures.map((candidateSignature) => {
+    if (args.length === candidateSignature.length) {
+      solved = true;
+      const typeNames = candidateSignature.forEach((signature, index) => {
+        let types;
+        if (signature.split(' ')[0] === 'optional') {
+          types = signature.split(' ')[1].split('||');
+        } else {
+          types = signature.split(' ')[0].split('||');
+        }
+        if (types.indexOf(typeof args[index]) === -1) {
+          message = 'Wrong type(s).';
+          solved = false;
+        }
+      });
+      return solved;
     }
-    const typeNames = candidateSignature.map((signature, index) => {
-      let types = signature.split(' ')[0].split('||');
-      if (types.indexOf(typeof args[index]) === -1) {
-        message = 'Wrong type(s).';
-        solved = false;
-      }
-    });
+    return false;
   });
-  return solved;
+  return results.indexOf(true) !== -1;
 }
 
 // Returns a string representing the defined signature of the API function.
