@@ -187,6 +187,63 @@ function addCommands() {
       });
     });
   });
+
+  app.client.addCommand('waitForElementFocus', (selector, timeout) => {
+    logVerbose('waitForElementFocus("' + selector + '", "' + timeout + '")');
+    let activeElement;
+    return client.waitForVisible(selector, timeout)
+      .element(selector)
+        .then((el) => { activeElement = el })
+      .waitUntil(() => {
+        return client.elementActive()
+          .then((el) => {
+            return el.value.ELEMENT === activeElement.value.ELEMENT;
+          })
+      }, timeout, null, 100);
+  });
+
+  app.client.addCommand('waitForInputText', (selector, input) => {
+    logVerbose('waitForInputText("' + selector + '", "' + input + '")');
+    return client
+      .waitUntil(() => {
+        return client.getValue(selector).then((val) => {
+          let ret;
+          if (input.constructor === RegExp) {
+            ret = val && val.match(input);
+          } else {
+            ret = val === input;
+          }
+          logVerbose('Current val (in quotes): "' + val + '"');
+          logVerbose('waitForInputText("' + selector + '", "' + input + '") => ' + ret);
+          return ret;
+        })
+      }, 5000, null, 100);
+  });
+
+  app.client.addCommand('setInputText', (selector, input) => {
+    logVerbose('setInputText("' + selector + '", "' + input + '")')
+    return client
+      .setValue(selector, input)
+      .waitForInputText(selector, input);
+  });
+};
+
+export const keys = {
+  COMMAND: '\ue03d',
+  CONTROL: '\ue009',
+  ESCAPE: '\ue00c',
+  RETURN: '\ue006',
+  ENTER: '\ue007',
+  SHIFT: '\ue008',
+  BACKSPACE: '\ue003',
+  DELETE: '\ue017',
+  LEFT: '\ue012',
+  RIGHT: '\ue014',
+  DOWN: '\ue015',
+  UP: '\ue013',
+  PAGEDOWN: '\uE00F',
+  END: '\uE010',
+  NULL: '\uE000'
 };
 
 export default {

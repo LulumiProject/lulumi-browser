@@ -7315,9 +7315,9 @@ spdy@^3.4.1:
     select-hose "^2.0.0"
     spdy-transport "^2.0.15"
 
-spectron@^3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/spectron/-/spectron-3.7.0.tgz#6862443dbb59c2193534fd3402004c6c37820348"
+spectron@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/spectron/-/spectron-3.7.1.tgz#818f68584732187d757da1d7a352adfc89ba136b"
   dependencies:
     dev-null "^0.1.1"
     electron-chromedriver "~1.7.0"
@@ -8023,9 +8023,9 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@^6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-6.1.1.tgz#6481915c59f16692b5f4bd8681afdce62492570c"
+vue-i18n@^6.1.3:
+  version "6.1.3"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-6.1.3.tgz#17e561d8d3b6744e09d623193ccde74a035f0a54"
 
 vue-loader@^12.0.4:
   version "12.0.4"

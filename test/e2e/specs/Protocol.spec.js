@@ -1,12 +1,19 @@
 import test from 'ava';
+import { keys } from '../utils';
 
-test('has accessible lulumi: protocol', async (t) => {
+const urlInput = 'input.el-input__inner';
+
+test('has working about: handlers for redirecting requests to lulumi: protocol', async (t) => {
   const app = t.context.app;
-  await app.client.waitForBrowserWindow();
+  await app.client
+    .waitForBrowserWindow()
+    .click(urlInput)
+    .waitForElementFocus(urlInput)
+    .keys('about:lulumi')
+    .keys(keys.ENTER);
 
   expect(await app.client
     .tabByIndex(0)
-    .loadUrl('lulumi://about/#/')
     .waitForVisible('#app')
-    .getUrl()).to.equal('lulumi://about/#/');
+    .getUrl()).to.equal('lulumi://about/#/lulumi');
 });

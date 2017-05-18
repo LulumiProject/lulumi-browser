@@ -573,6 +573,10 @@
           background-color: rgb(200, 200, 200);
         }
 
+        &:active {
+          background-color: rgb(180, 180, 180);
+        }
+
         &.disabled {
           opacity: 0.3;
         }
