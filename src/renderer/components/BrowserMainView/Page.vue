@@ -204,8 +204,10 @@
         }
       });
 
+      const nav = this.$parent.$el.querySelector('#nav');
       webview.style.height
-        = `calc(100vh - ${document.getElementById('nav').getBoundingClientRect().bottom}px)`;
+        = `calc(100vh - ${nav.clientHeight}px)`;
+      this.$el.querySelector('.findinpage-bar').style.top = `${nav.clientHeight}px`;
       this.navigateTo(this.page.location);
     },
     beforeDestroy() {
@@ -263,7 +265,6 @@
   }
 
   .findinpage-bar {
-    top: 73px;
     right: 0px;
     background: rgba(128, 128, 128, 0.6);
     border-bottom-left-radius: 4px;

@@ -253,8 +253,9 @@
         this.getWebView().style.height = '100vh';
       },
       onLeaveHtmlFullScreen() {
-        this.$el.querySelector('#nav').style.display = 'block';
-        this.getWebView().style.height = 'calc(100vh - 73px)';
+        const nav = this.$el.querySelector('#nav');
+        nav.style.display = 'block';
+        this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
       },
       onNewWindow(event, pageIndex) {
         this.$store.dispatch('incrementPid');
