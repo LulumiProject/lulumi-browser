@@ -28,14 +28,12 @@ function getSignatures(ParameterSignatureString) {
   // First match everything inside the function argument parens.
   let args = ParameterSignatureString.match(/.*?\(([^)]*)\)/)[1];
  
-  // Split the arguments string into an array comma delimited.
-  args = args.split(',').map(function(arg) {
+  // First match everything inside the function argument parens.
+  args = args.split(',')
     // Ensure no inline comments are parsed and trim the whitespace.
-    return arg.replace(/\/\*.*\*\//, '').trim();
-  }).filter(function(arg) {
+    .map(arg => arg.replace(/\/\*.*\*\//, '').trim())
     // Ensure no undefined values are added.
-    return arg;
-  });
+    .filter(arg => arg);
 
   function dig(args) {
     let results = [args];
@@ -532,7 +530,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
           lulumi[key][member] = (function() {
             return function() {
               normalizeArgumentsAndValidate(key, member, arguments);
-              cached.apply(this, arguments);
+              return cached.apply(this, arguments);
             };
           })();
         } catch (event) {};

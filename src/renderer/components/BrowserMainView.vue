@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     #nav
-      tabs(ref="tab")
+      tabs(ref="tabs")
       navbar(ref="navbar")
     swipeArrow
     page(v-for="(page, index) in pages", :isActive="index == currentPageIndex", :pageIndex="index", :ref="`page-${index}`", :key="`page-${page.pid}`")
@@ -557,7 +557,7 @@
       },
       onTabClose(pageIndex) {
         this.onRemovedEvent.emit(new Tab(pageIndex, this.getPage(pageIndex)));
-        const newPages = tabsOrdering(this.pages, this.$refs.tab, 0, this.tabsOrder, true);
+        const newPages = tabsOrdering(this.pages, this.$refs.tabs, 0, this.tabsOrder, true);
         this.$store.dispatch('setPages', {
           pid: this.$store.getters.pid,
           pages: newPages,
@@ -1057,7 +1057,7 @@
 
       ipc.on('request-app-state', (event, force) => {
         const newStart = Math.ceil(Math.random() * 10000);
-        const newPages = tabsOrdering(this.pages, this.$refs.tab, newStart, this.tabsOrder);
+        const newPages = tabsOrdering(this.pages, this.$refs.tabs, newStart, this.tabsOrder);
         const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
         if (downloads.length !== 0) {
           if (force) {
