@@ -4,6 +4,7 @@ dist/*
 builds/*
 extensions/*
 userData/*
+test/userData/*
 coverage
 node_modules/
 npm-debug.log

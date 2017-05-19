@@ -19,9 +19,15 @@ const storagePath = process.env.NODE_ENV === 'development'
 let appStateSaveHandler = null;
 
 let setLanguage = false;
-const langPath = process.env.NODE_ENV === 'development'
-  ? path.join(config.devUserData, 'lulumi-lang')
-  : path.join(app.getPath('userData'), 'lang');
+
+let langPath;
+if (process.env.NODE_ENV === 'development') {
+  langPath = path.join(config.devUserData, 'lulumi-lang');
+} else if (process.env.BABEL_ENV === 'test') {
+  langPath = path.join(config.testUserData, 'lulumi-lang');
+} else {
+  path.join(app.getPath('userData'), 'lang');
+}
 
 const isDarwin = process.platform === 'darwin';
 const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;

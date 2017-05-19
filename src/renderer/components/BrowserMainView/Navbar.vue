@@ -3,13 +3,13 @@
     .control-group
       a(@click="$parent.onClickHome")
         iview-icon(type="ios-home", size="16")
-      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? '' : 'disabled'")
+      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-left-c", size="16")
-      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? '' : 'disabled'")
+      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-right-c", size="16")
-      a(v-if="page.isLoading" @click="$parent.onClickStop")
+      a(v-if="page.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop")
         iview-icon(type="close", size="16")
-      a(v-else @click="$parent.onClickRefresh", :class="page.canRefresh ? '' : 'disabled'")
+      a(v-else @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="page.canRefresh ? 'enabled' : 'disabled'")
         iview-icon(type="android-refresh", size="16")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(

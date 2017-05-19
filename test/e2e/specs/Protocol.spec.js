@@ -1,14 +1,13 @@
 import test from 'ava';
 import { keys } from '../utils';
 
-const urlInput = 'input.el-input__inner';
+const urlInput = '#url-input';
 
 test('has working about: handlers for redirecting requests to lulumi: protocol', async (t) => {
   const app = t.context.app;
   await app.client
-    .waitForBrowserWindow()
+    .waitForVisible(urlInput)
     .click(urlInput)
-    .waitForElementFocus(urlInput)
     .keys('about:lulumi')
     .keys(keys.ENTER);
 

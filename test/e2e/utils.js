@@ -56,8 +56,8 @@ function addCommands() {
     }
   };
 
-  const windowHandlesOrig = app.client.windowHandles;
-  Object.getPrototypeOf(app.client).windowHandles = () => {
+  const windowHandlesOrig = client.windowHandles;
+  Object.getPrototypeOf(client).windowHandles = () => {
     return windowHandlesOrig.apply(this)
       .then((response) => {
         const handles = response.value;
@@ -130,6 +130,22 @@ function addCommands() {
         return false;
       })
     }, 5000, null, 100);
+  });
+
+  app.client.addCommand('windowParentByUrl', (url, childSelector='webview') => {
+    logVerbose('windowParentByUrl("' + url + '", "' + childSelector + '")');
+    return client.windowHandles().then((response) => response.value).then((handles) => {
+      return promiseMapSeries(handles, (handle) => {
+        return client.window(handle).getAttribute(childSelector, 'src').catch(() => '');
+      });
+    }).then((response) => {
+      let index = response.indexOf(url);
+      if (index !== -1) {
+        return client.windowByIndex(index);
+      } else {
+        return undefined;
+      }
+    });
   });
 
   app.client.addCommand('windowByUrl', (url) => {
