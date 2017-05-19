@@ -42,19 +42,7 @@ $ yarn run test
 
 ## API (experimental)
 
-- lulumi
-  * env: `appName(callback), appVersion(callback)`
-  * browserAction: `onClicked`
-  * pageAction: `show(tabId), hide(tabId), onClicked`
-  * alarms: `get(name, callback), getAll(callback), clear(name, callback), clearAll(callback), create(name, alarmInfo), onAlarm`
-  * commands: `onCommand`
-  * runtime: `id, getURL(path), sendMessage(extensionId, message, options, responseCallback), onMessage`
-  * extension: `getURL(path), getBackgroundPage()`
-  * tabs: `get(tabId, callback), getCurrent(callback), duplicate(tabId, callback), query(queryInfo, callback), update(tabId, updateProperties = {}, callback), reload(tabId, reloadProperties, callback), remove(tabIds, callback), detectLanguage(tabId, callback), executeScript(tabId, details, callback), insertCSS: (tabId, details, callback), sendMessage(tabId, message, responseCallback), onUpdated, onCreated, onRemoved`
-  * storage: `local, sync, set(items, callback), get(keys, callback), onChanged`
-  * contextMenus: `create(createProperties, callback)`
-  * webRequest: `onBeforeRequest(callback, filter, opt_extraInfoSpec), onBeforeSendHeaders(callback, filter, opt_extraInfoSpec), onSendHeaders(callback, filter, opt_extraInfoSpec), onHeadersReceived(callback, filter, opt_extraInfoSpec), onResponseStarted(callback, filter, opt_extraInfoSpec), onBeforeRedirect(callback, filter, opt_extraInfoSpec), onCompleted(callback, filter, opt_extraInfoSpec), onErrorOccurred(callback, filter, opt_extraInfoSpec)`
-  * webNavigation: `getFrame(details, callback), getAllFrames(details, callback), onBeforeNavigate(callback), onCommitted(callback), onDOMContentLoaded(callback), onCompleted(callback), onCreatedNavigationTarget(callback)`
+- https://github.com/qazbnm456/lulumi-browser/issues/19
 
 ---
 
