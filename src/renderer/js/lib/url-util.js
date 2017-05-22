@@ -1,4 +1,4 @@
-import config from 'renderer/js/constants/config';
+import config from '../constants/config';
 
 // characters, then : with optional //
 const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;

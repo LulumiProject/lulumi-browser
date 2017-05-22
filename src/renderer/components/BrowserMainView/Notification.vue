@@ -9,7 +9,7 @@
 <script>
   import { Button, ButtonGroup, Col, Row } from 'element-ui';
 
-  import urlUtil from 'renderer/js/lib/url-util';
+  import urlUtil from '../../js/lib/url-util';
 
   export default {
     data() {

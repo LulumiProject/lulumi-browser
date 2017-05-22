@@ -133,7 +133,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   if (LocalStorage) {
     storagePath = process.env.NODE_ENV === 'development'
       ? path.join(path.resolve('./userData'), 'lulumi-local-storage')
-      : path.join(remote.app.getPath('userData'), 'lulumi-local-storage');
+      : path.join(remote.app.getPath('userData'), 'local-storage');
 
     localStorage = new LocalStorage(storagePath);
   }

@@ -11,7 +11,7 @@
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
-          el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1000")
+          el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
             span(class="chrome-tab-title")
               | {{ page.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")

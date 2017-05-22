@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.BABEL_ENV === 'test') {
   langPath = path.join(config.testUserData, 'lulumi-lang');
 } else {
-  path.join(app.getPath('userData'), 'lang');
+  langPath = path.join(app.getPath('userData'), 'lang');
 }
 
 const isDarwin = process.platform === 'darwin';

@@ -5,9 +5,9 @@ import enElement from 'element-ui/lib/locale/lang/en';
 import zhElement from 'element-ui/lib/locale/lang/zh-CN';
 import zhTWElement from 'element-ui/lib/locale/lang/zh-TW';
 
-import en from 'i18n/en';
-import zh from 'i18n/zh-CN';
-import zhTW from 'i18n/zh-TW';
+import en from '../../helper/i18n/en';
+import zh from '../../helper/i18n/zh-CN';
+import zhTW from '../../helper/i18n/zh-TW';
 
 const lang = require('electron').ipcRenderer.sendSync('request-lang');
 

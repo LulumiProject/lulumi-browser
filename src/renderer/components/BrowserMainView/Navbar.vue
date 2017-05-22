@@ -66,15 +66,15 @@
   import { Button, Cascader, Popover } from 'element-ui';
   import IViewIcon from 'iview/src/components/icon';
 
-  import Event from 'src/api/extensions/event';
+  import Event from '../../../api/extensions/event';
 
-  import 'renderer/css/el-autocomplete';
-  import 'renderer/css/el-input';
-  import 'renderer/css/el-cascader';
-  import config from 'renderer/js/constants/config';
-  import urlUtil from 'renderer/js/lib/url-util';
-  // import urlSuggestion from 'renderer/js/lib/url-suggestion';
-  import recommendTopSite from 'renderer/js/data/RecommendTopSite';
+  import '../../css/el-autocomplete';
+  import '../../css/el-input';
+  import '../../css/el-cascader';
+  import config from '../../js/constants/config';
+  import urlUtil from '../../js/lib/url-util';
+  // import urlSuggestion from '../../js/lib/url-suggestion';
+  import recommendTopSite from '../../js/data/RecommendTopSite';
 
   Vue.component('url-suggestion', {
     functional: true,
@@ -202,30 +202,32 @@
     },
     watch: {
       location(newLocation) {
-        const currentLocation = url.parse(newLocation, true);
-        const originalInput = document.getElementsByClassName('el-input__inner')[0];
-        const newElement = document.getElementById('securityLocation');
-        if (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:') {
-          this.secure = true;
-          const newLocation
-            = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
-          originalInput.style.display = 'none';
+        if (process.env.NODE_ENV !== 'testing') {
+          const currentLocation = url.parse(newLocation, true);
+          const originalInput = document.getElementsByClassName('el-input__inner')[0];
+          const newElement = document.getElementById('securityLocation');
+          if (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:') {
+            this.secure = true;
+            const newLocation
+              = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
+            originalInput.style.display = 'none';
 
-          newElement.innerHTML = newLocation;
-          newElement.style.display = 'block';
+            newElement.innerHTML = newLocation;
+            newElement.style.display = 'block';
 
-          newElement.removeEventListener('click', this.clickHandler, false);
-          originalInput.removeEventListener('blur', this.blurHandler, false);
-          newElement.addEventListener('click', this.clickHandler);
-          originalInput.addEventListener('blur', this.blurHandler);
-        } else {
-          this.secure = false;
+            newElement.removeEventListener('click', this.clickHandler, false);
+            originalInput.removeEventListener('blur', this.blurHandler, false);
+            newElement.addEventListener('click', this.clickHandler);
+            originalInput.addEventListener('blur', this.blurHandler);
+          } else {
+            this.secure = false;
 
-          newElement.style.display = 'none';
-          originalInput.style.display = 'block';
+            newElement.style.display = 'none';
+            originalInput.style.display = 'block';
 
-          newElement.removeEventListener('click', this.clickHandler, false);
-          originalInput.removeEventListener('blur', this.blurHandler, false);
+            newElement.removeEventListener('click', this.clickHandler, false);
+            originalInput.removeEventListener('blur', this.blurHandler, false);
+          }
         }
       },
     },
@@ -450,23 +452,25 @@
       },
     },
     mounted() {
-      const originalInput = document.getElementsByClassName('el-input__inner')[0];
-      const newElement = document.createElement('div');
-      newElement.id = 'securityLocation';
-      newElement.classList = 'el-input__inner';
-      newElement.innerHTML = '';
-      newElement.style.display = 'none';
-      originalInput.parentElement.append(newElement);
-
-      this.clickHandler = () => {
+      if (process.env.NODE_ENV !== 'testing') {
+        const originalInput = document.getElementsByClassName('el-input__inner')[0];
+        const newElement = document.createElement('div');
+        newElement.id = 'securityLocation';
+        newElement.classList = 'el-input__inner';
+        newElement.innerHTML = '';
         newElement.style.display = 'none';
-        originalInput.style.display = 'block';
-        originalInput.focus();
-      };
-      this.blurHandler = () => {
-        newElement.style.display = 'block';
-        originalInput.style.display = 'none';
-      };
+        originalInput.parentElement.append(newElement);
+
+        this.clickHandler = () => {
+          newElement.style.display = 'none';
+          originalInput.style.display = 'block';
+          originalInput.focus();
+        };
+        this.blurHandler = () => {
+          newElement.style.display = 'block';
+          originalInput.style.display = 'none';
+        };
+      }
 
       const ipc = this.$electron.ipcRenderer;
 

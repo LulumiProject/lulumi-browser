@@ -5,9 +5,9 @@ import enElement from 'element-ui/lib/locale/lang/en';
 import zhElement from 'element-ui/lib/locale/lang/zh-CN';
 import zhTWElement from 'element-ui/lib/locale/lang/zh-TW';
 
-import * as en from 'i18n/en';
-import * as zh from 'i18n/zh-CN';
-import * as zhTW from 'i18n/zh-TW';
+import * as en from '../../../helper/i18n/en';
+import * as zh from '../../../helper/i18n/zh-CN';
+import * as zhTW from '../../../helper/i18n/zh-TW';
 
 // eslint-disable-next-line no-undef
 const lang = ipcRenderer.sendSync('request-lang');

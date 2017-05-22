@@ -14,20 +14,20 @@
 <script>
   import url from 'url';
 
-  import Tabs from 'components/BrowserMainView/Tabs';
-  import Navbar from 'components/BrowserMainView/Navbar';
-  import swipeArrow from 'components/BrowserMainView/SwipeArrow';
-  import Page from 'components/BrowserMainView/Page';
-  import Download from 'components/BrowserMainView/Download';
+  import Tabs from './BrowserMainView/Tabs';
+  import Navbar from './BrowserMainView/Navbar';
+  import swipeArrow from './BrowserMainView/SwipeArrow';
+  import Page from './BrowserMainView/Page';
+  import Download from './BrowserMainView/Download';
 
-  import urlUtil from 'renderer/js/lib/url-util';
-  import imageUtil from 'renderer/js/lib/image-util';
-  import urlResource from 'renderer/js/lib/url-resource';
-  import tabsOrdering from 'renderer/js/lib/tabs-ordering';
+  import urlUtil from '../js/lib/url-util';
+  import imageUtil from '../js/lib/image-util';
+  import urlResource from '../js/lib/url-resource';
+  import tabsOrdering from '../js/lib/tabs-ordering';
 
-  import ExtensionService from 'src/api/extension-service';
-  import Event from 'src/api/extensions/event';
-  import Tab from 'src/api/extensions/tab';
+  import ExtensionService from '../../api/extension-service';
+  import Event from '../../api/extensions/event';
+  import Tab from '../../api/extensions/tab';
 
   export default {
     data() {

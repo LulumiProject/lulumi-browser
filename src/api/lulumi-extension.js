@@ -284,7 +284,7 @@ app.once('ready', () => {
   // load persisted extensions
   loadedExtensionsPath = process.env.NODE_ENV === 'development'
     ? path.join(config.devUserData, 'lulumi-extensions')
-    : path.join(app.getPath('userData'), 'lulumi-extensions');
+    : path.join(app.getPath('userData'), 'extensions');
   try {
     const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath));
     if (Array.isArray(loadedExtensions)) {

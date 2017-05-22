@@ -1,4 +1,4 @@
-import * as types from 'renderer/store/mutation-types';
+import * as types from '../mutation-types';
 
 const state = {
   about: {

@@ -1,5 +1,4 @@
 import test from 'ava';
-import { keys } from '../utils';
 
 const urlInput = '#url-input';
 const controlGroup = '.control-group';
