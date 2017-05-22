@@ -9,6 +9,8 @@ import store from 'renderer/store';
 
 import { name } from 'src/../.electron-vue/config';
 
+/* eslint-disable no-unused-expressions */
+
 Vue.prototype.$t = () => {};
 Vue.use(Electron);
 
@@ -143,19 +145,93 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
 Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
 Vue.component('el-scrollbar', Scrollbar);
 
+let vm;
+
 describe('BrowserMainView.vue', () => {
-  it('should load the repo of this project in the first created default webview', (done) => {
-    const vm = new Vue({
+  before(async () => {
+    vm = new Vue({
       el: document.createElement('div'),
       render: h => h(BrowserMainView),
       router,
       store,
     }).$mount();
+    // we need at least one active tab
     vm.$store.dispatch('createTab');
+    await vm.$nextTick();
+  });
 
-    vm.$nextTick(() => {
-      expect(vm.$el.querySelector('webview.active').src).to.contain(name);
-      done();
+  describe('Tabs.vue', () => {
+    it('shows the title of webview.getTitle()', async () => {
+      vm.$store.dispatch('pageTitleSet', {
+        pageIndex: 0,
+        webview: {
+          getTitle: () => name,
+        },
+      });
+      await vm.$nextTick();
+      expect(vm.$el.querySelector('.chrome-tab-current .chrome-tab-title').innerHTML).to.contain(name);
+    });
+
+    it('shows the volume icon when there exists at least one media in the page, and it\'s playing', async () => {
+      vm.$store.dispatch('mediaStartedPlaying', {
+        pageIndex: 0,
+        webview: {
+          isAudioMuted: () => false,
+        },
+      });
+      await vm.$nextTick();
+      expect(vm.$el.querySelector('svg.volume-up')).to.exist;
+    });
+
+    it('shows the volume icon when there exists at least one media in the page, and it\'s not playing', async () => {
+      vm.$store.dispatch('mediaStartedPlaying', {
+        pageIndex: 0,
+        webview: {
+          isAudioMuted: () => true,
+        },
+      });
+      await vm.$nextTick();
+      expect(vm.$el.querySelector('svg.volume-off')).to.exist;
+    });
+
+    it('adds one more tab', async () => {
+      vm.$store.dispatch('createTab', 'https://www.youtube.com');
+      await vm.$nextTick();
+      expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(2);
+    });
+
+    it('clicks last created tab', async () => {
+      vm.$store.dispatch('clickTab', 1);
+      await vm.$nextTick();
+      expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('1');
+    });
+
+    it('removes last created tab and moves to adjacent tab', async () => {
+      vm.$store.dispatch('closeTab', 1);
+      await vm.$nextTick();
+      expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(1);
+      expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('0');
+    });
+  });
+
+  describe('Navbar.vue', () => {
+    it('shows the corresponding url to the webview', () => {
+      const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
+      expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);
+    });
+
+    it('has four controls in .control-group', () => {
+      expect(vm.$el.querySelector('.ivu-icon-ios-home')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-arrow-left-c')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-arrow-right-c')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-android-refresh')).to.exist;
+    });
+  });
+
+  describe('Page.vue', () => {
+    it('shows the corresponding url to the webview', () => {
+      const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
+      expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);
     });
   });
 });

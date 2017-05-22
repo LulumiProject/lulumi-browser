@@ -9,8 +9,8 @@
           div#tab-icons(class="chrome-tab-favicon")
             i.el-icon-loading(v-if="page.isLoading")
             img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
-            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume")
-            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume")
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume volume-off")
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume volume-up")
           el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
             span(class="chrome-tab-title")
               | {{ page.title || $t('tabs.loading') }}
