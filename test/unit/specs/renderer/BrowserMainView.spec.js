@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Electron from 'vue-electron';
 import { Autocomplete, Scrollbar } from 'element-ui';
 
-import BrowserMainView from 'renderer/components/BrowserMainView';
+import BrowserMainView from 'components/BrowserMainView';
 
 import router from 'renderer/router';
 import store from 'renderer/store';
@@ -11,6 +11,9 @@ import { name } from 'src/../.electron-vue/config';
 
 Vue.prototype.$t = () => {};
 Vue.use(Electron);
+
+Vue.config.productionTip = false;
+Vue.config.devtools = false;
 
 // Customize Autocomplete component to match out needs
 const CustomAutocomplete = Vue.extend(Autocomplete);
@@ -141,7 +144,7 @@ Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
 Vue.component('el-scrollbar', Scrollbar);
 
 describe('BrowserMainView.vue', () => {
-  it('should load the repo of this project in the first created default webview', () => {
+  it('should load the repo of this project in the first created default webview', (done) => {
     const vm = new Vue({
       el: document.createElement('div'),
       render: h => h(BrowserMainView),
@@ -152,6 +155,7 @@ describe('BrowserMainView.vue', () => {
 
     vm.$nextTick(() => {
       expect(vm.$el.querySelector('webview.active').src).to.contain(name);
+      done();
     });
   });
 });
