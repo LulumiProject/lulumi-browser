@@ -266,22 +266,24 @@
 
   .findinpage-bar {
     right: 0px;
-    background: rgba(128, 128, 128, 0.6);
+    color: ghostwhite;
+    background: rgba(105, 105, 105, 0.8);
     border-bottom-left-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    padding: 5px 3px;
+    padding: 5px 10px;
     animation: slideIn 25ms;
     position: absolute;
+    -webkit-user-select: none;
 
     *:nth-child(1) {
       flex: 1;
     }
 
     *:nth-child(2) {
-      flex: 1;
+      flex: 2;
     }
 
     div {

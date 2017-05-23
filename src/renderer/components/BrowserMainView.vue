@@ -202,9 +202,7 @@
         const appPath = process.env.NODE_ENV === 'development'
           ? process.cwd()
           : this.$electron.remote.app.getAppPath();
-        let errorPage = process.env.NODE_ENV === 'development'
-          ? `file://${appPath}/app/pages/error/index.html`
-          : `file://${appPath}/pages/error/index.html`;
+        let errorPage = `file://${appPath}/helper/pages/error/index.html`;
         errorPage += `?ec=${encodeURIComponent(event.errorCode)}`;
         errorPage += `&url=${encodeURIComponent(event.target.getURL())}`;
         if (event.errorCode !== -3 && event.validatedURL === event.target.getURL()) {
@@ -787,14 +785,14 @@
 
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
-            label: 'Undo',
+            label: this.$t('webview.contextMenu.undo'),
             role: 'undo',
           }));
         }
 
         if (event.params.editFlags.canRedo) {
           menu.append(new MenuItem({
-            label: 'Redo',
+            label: this.$t('webview.contextMenu.redo'),
             role: 'redo',
           }));
         }
@@ -803,45 +801,45 @@
 
         if (event.params.editFlags.canCut) {
           menu.append(new MenuItem({
-            label: 'Cut',
+            label: this.$t('webview.contextMenu.cut'),
             role: 'cut',
           }));
         }
 
         if (event.params.editFlags.canCopy) {
           menu.append(new MenuItem({
-            label: 'Copy',
+            label: this.$t('webview.contextMenu.copy'),
             role: 'copy',
           }));
         }
 
         if (event.params.editFlags.canPaste) {
           menu.append(new MenuItem({
-            label: 'Paste',
+            label: this.$t('webview.contextMenu.paste'),
             role: 'paste',
           }));
           menu.append(new MenuItem({
-            label: 'Paste Without Formatting',
+            label: this.$t('webview.contextMenu.pasteAndMatchStyle'),
             role: 'pasteandmatchstyle',
           }));
         }
 
         menu.append(new MenuItem({
-          label: 'Select All',
+          label: this.$t('webview.contextMenu.selectAll'),
           role: 'selectall',
         }));
         menu.append(new MenuItem({ type: 'separator' }));
 
         if (event.params.linkURL) {
           menu.append(new MenuItem({
-            label: 'Open Link in New Tab',
+            label: this.$t('webview.contextMenu.openLinkInNewTab'),
             click: () => {
               this.$store.dispatch('incrementPid');
               this.$store.dispatch('createTab', event.params.linkURL);
             },
           }));
           menu.append(new MenuItem({
-            label: 'Copy Link Address',
+            label: this.$t('webview.contextMenu.copyLinkAddress'),
             click: () => {
               clipboard.writeText(event.params.linkURL);
             },
@@ -850,7 +848,7 @@
 
         if (event.params.hasImageContents) {
           menu.append(new MenuItem({
-            label: 'Save Image As...',
+            label: this.$t('webview.contextMenu.saveImageAs'),
             click: () => {
               const fs = require('fs');
               const path = require('path');
@@ -880,13 +878,13 @@
             },
           }));
           menu.append(new MenuItem({
-            label: 'Copy Image URL',
+            label: this.$t('webview.contextMenu.copyImageUrl'),
             click: () => {
               clipboard.writeText(event.params.srcURL);
             },
           }));
           menu.append(new MenuItem({
-            label: 'Open Image in New Tab',
+            label: this.$t('webview.contextMenu.openImageInNewTab'),
             click: () => {
               this.$store.dispatch('incrementPid');
               this.$store.dispatch('createTab', event.params.srcURL);
@@ -898,7 +896,10 @@
         if (event.params.selectionText) {
           if (event.params.editFlags.canCopy) {
             menu.append(new MenuItem({
-              label: `Search for "${event.params.selectionText}"`,
+              label: this.$t('webview.contextMenu.searchFor', {
+                selectionText: event.params.selectionText,
+                searchEngine: this.$store.getters.currentSearchEngine.name,
+              }),
               click: () => {
                 this.$store.dispatch('incrementPid');
                 this.$store.dispatch('createTab', event.params.selectionText);
@@ -910,7 +911,7 @@
         if (macOS) {
           if (event.params.selectionText) {
             menu.append(new MenuItem({
-              label: `Look up "${event.params.selectionText}"`,
+              label: this.$t('webview.contextMenu.lookUp', { selectionText: event.params.selectionText }),
               click: () => {
                 this.getWebView().showDefinitionForSelection();
               },
@@ -925,7 +926,7 @@
         const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
         if (sourceLocation !== null) {
           menu.append(new MenuItem({
-            label: 'View Source',
+            label: this.$t('webview.contextMenu.viewSource'),
             click: () => {
               this.$store.dispatch('incrementPid');
               this.$store.dispatch('createTab', sourceLocation);
@@ -933,7 +934,7 @@
           }));
         }
         menu.append(new MenuItem({
-          label: 'Inspect Element',
+          label: this.$t('webview.contextMenu.inspectElement'),
           click: () => {
             this.getWebView().inspectElement(event.params.x, event.params.y);
           },

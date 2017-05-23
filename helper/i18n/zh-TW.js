@@ -53,6 +53,26 @@ export const guest = {
 };
 
 export default {
+  webview: {
+    contextMenu: {
+      undo: '還原',
+      redo: '重做',
+      cut: '剪下',
+      copy: '複製',
+      paste: '貼上',
+      pasteAndMatchStyle: '貼上並符合樣式',
+      selectAll: '選取全部',
+      openLinkInNewTab: '在新分頁中開啟連結',
+      copyLinkAddress: '複製連結網址',
+      saveImageAs: '另存圖片...',
+      copyImageUrl: '複製圖片位址',
+      openImageInNewTab: '在新分頁中開啟圖片',
+      searchFor: '透過 %{searchEngine} 搜尋「%{selectionText}」',
+      lookUp: '查詢「%{selectionText}」',
+      viewSource: '檢視網頁原始碼',
+      inspectElement: '檢查',
+    },
+  },
   downloads: {
     state: {
       progressing: '下載中',

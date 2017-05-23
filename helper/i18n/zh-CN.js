@@ -53,6 +53,26 @@ export const guest = {
 };
 
 export default {
+  webview: {
+    contextMenu: {
+      undo: 'Undo',
+      redo: 'Redo',
+      cut: 'Cut',
+      copy: 'Copy',
+      paste: 'Paste',
+      pasteAndMatchStyle: 'Paste and Match Style',
+      selectAll: 'Select All',
+      openLinkInNewTab: 'Open Link in New Tab',
+      copyLinkAddress: 'Copy Link Address',
+      saveImageAs: 'Save Image As...',
+      copyImageUrl: 'Copy Image URL',
+      openImageInNewTab: 'Open Image in New Tab',
+      searchFor: 'Search %{searchEngine} for "%{selectionText}"',
+      lookUp: 'Look up "%{selectionText}"',
+      viewSource: 'View Source',
+      inspectElement: 'Inspect Element',
+    },
+  },
   downloads: {
     state: {
       progressing: '下载中',
