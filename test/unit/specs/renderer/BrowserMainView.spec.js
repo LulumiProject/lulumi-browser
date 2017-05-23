@@ -8,6 +8,7 @@ import router from 'renderer/router';
 import store from 'renderer/store';
 
 import { name } from 'src/../.electron-vue/config';
+import config from 'renderer/js/constants/config';
 
 /* eslint-disable no-unused-expressions */
 
@@ -149,15 +150,73 @@ let vm;
 
 describe('BrowserMainView.vue', () => {
   before(async () => {
-    vm = new Vue({
+    const Ctor = Vue.extend(BrowserMainView);
+    vm = new Ctor({
       el: document.createElement('div'),
-      render: h => h(BrowserMainView),
       router,
       store,
     }).$mount();
     // we need at least one active tab
     vm.$store.dispatch('createTab');
     await vm.$nextTick();
+  });
+
+  describe('functions', () => {
+    after(() => {
+      vm.$store.dispatch('closeTab', 0);
+    });
+
+    describe('computed.tabsOrder()', () => {
+      it('has no members in tabsOrder initially', () => {
+        expect(vm.tabsOrder).to.be.empty;
+      });
+    });
+
+    describe('computed.homepage()', () => {
+      it('has correct default homepage', () => {
+        expect(vm.homepage).to.equal(config.homepage);
+      });
+    });
+
+    describe('computed.pdfViewer()', () => {
+      it('has correct default pdfViewer', () => {
+        expect(vm.pdfViewer).to.equal(config.pdfViewer);
+      });
+    });
+
+    describe('methods.getWebView()', () => {
+      it('has the corresponding webview element', () => {
+        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.defaultUrl);
+      });
+    });
+
+    describe('methods.getPage()', () => {
+      it('can call navigateTo method from certain page instance to let the webview navigate to somewhere', () => {
+        vm.getPage().navigateTo('https://www.youtube.com/');
+        expect(vm.getWebView().getAttribute('src')).to.equal('https://www.youtube.com/');
+      });
+    });
+
+    describe('methods.getPageObject()', () => {
+      it('can call navigateTo method from certain page instance to let the webview navigate to somewhere', () => {
+        vm.getPage().navigateTo('https://github.com/qazbnm456/lulumi-browser');
+        expect(vm.getPageObject().location).to.equal('https://github.com/qazbnm456/lulumi-browser');
+      });
+    });
+
+    describe('methods.onDidFailLoad()', () => {
+      it('shows error page when it received did-fail-load event', () => {
+        const event = {
+          errorCode: -105,
+          validatedURL: 'http://test/test/',
+          target: {
+            getURL: () => 'http://test/test/',
+          },
+        };
+        vm.onDidFailLoad(event, 0);
+        expect(vm.getWebView().getAttribute('src')).to.contain('/pages/error/index.html');
+      });
+    });
   });
 
   describe('Tabs.vue', () => {
@@ -169,7 +228,7 @@ describe('BrowserMainView.vue', () => {
         },
       });
       await vm.$nextTick();
-      expect(vm.$el.querySelector('.chrome-tab-current .chrome-tab-title').innerHTML).to.contain(name);
+      expect(vm.$el.querySelector('.chrome-tab-current .chrome-tab-title').innerHTML).to.equal(name);
     });
 
     it('shows the volume icon when there exists at least one media in the page, and it\'s playing', async () => {
@@ -195,7 +254,7 @@ describe('BrowserMainView.vue', () => {
     });
 
     it('adds one more tab', async () => {
-      vm.$store.dispatch('createTab', 'https://www.youtube.com');
+      vm.$store.dispatch('createTab', 'https://www.youtube.com/');
       await vm.$nextTick();
       expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(2);
     });
