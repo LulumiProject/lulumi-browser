@@ -409,3 +409,15 @@ ipcMain.on('set-history', (event, val) => {
     webContentsId: event.sender.id,
   });
 });
+
+let online = true;
+ipcMain.on('online-status-changed', (event, status) => {
+  if (status) {
+    if (online === false && status === true) {
+      online = true;
+      mainWindow.webContents.send('reload');
+    }
+  } else {
+    online = false;
+  }
+});

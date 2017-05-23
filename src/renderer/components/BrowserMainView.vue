@@ -591,7 +591,12 @@
         this.getWebView().stop();
       },
       onClickRefresh() {
-        this.getWebView().reload();
+        const webview = this.getWebView();
+        if (webview.getURL() === this.page.location) {
+          webview.reload();
+        } else {
+          webview.loadURL(this.page.location);
+        }
       },
       onEnterLocation(location) {
         let newLocation = null;
@@ -1142,6 +1147,15 @@
           this.onScrollTouchEdge(event);
         }
       });
+
+      // https://github.com/electron/electron/blob/master/docs/tutorial/online-offline-events.md
+      const updateOnlineStatus = () => {
+        ipc.send('online-status-changed', navigator.onLine);
+      };
+
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
 
       this.extensionService = new ExtensionService(this);
 

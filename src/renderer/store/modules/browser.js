@@ -106,6 +106,7 @@ const mutations = {
   },
   [types.DID_STOP_LOADING](state, payload) {
     let url = decodeURIComponent(payload.webview.getURL());
+    url = urlUtil.getLocationIfError(url);
     url = urlUtil.getLocationIfPDF(url);
     const data = urlUtil.getLocationIfAbout(url);
     state.pages[payload.pageIndex].location = data.url;

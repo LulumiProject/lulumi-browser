@@ -258,6 +258,22 @@ const urlUtil = {
   },
 
   /**
+   * Shows the original location from a error page
+   * @param {string} url
+   * @return {string}
+   */
+  getLocationIfError(url) {
+    const errorPage = '/pages/error/index.html';
+    if (url) {
+      if (url.includes(errorPage)) {
+        return url.replace(/^file:.+\/pages\/error\/index.html\?.*url=(\w+:\/\/.+)/, '$1');
+      }
+      return url;
+    }
+    return '';
+  },
+
+  /**
    * Gets about location from a lulumi scheme
    * @param {string} url
    * @return {string}
