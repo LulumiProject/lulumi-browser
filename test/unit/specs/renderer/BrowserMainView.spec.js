@@ -217,9 +217,23 @@ describe('BrowserMainView.vue', () => {
         expect(vm.getWebView().getAttribute('src')).to.contain('/pages/error/index.html');
       });
     });
+
+    describe('methods.onClickHome()', () => {
+      it('redirects to homepage', async () => {
+        vm.onClickHome();
+        expect(vm.getWebView().getAttribute('src')).to.equal(config.homepage);
+      });
+    });
+
+    describe('methods.onEnterLocation()', () => {
+      it('navigates to specified location', async () => {
+        vm.onEnterLocation('https://www.youtube.com/');
+        expect(vm.getWebView().getAttribute('src')).to.equal('https://www.youtube.com/');
+      });
+    });
   });
 
-  describe('Tabs.vue', () => {
+  describe('Tabs.vue (integrated)', () => {
     it('shows the title of webview.getTitle()', async () => {
       vm.$store.dispatch('pageTitleSet', {
         pageIndex: 0,
@@ -273,7 +287,7 @@ describe('BrowserMainView.vue', () => {
     });
   });
 
-  describe('Navbar.vue', () => {
+  describe('Navbar.vue (integrated)', () => {
     it('shows the corresponding url to the webview', () => {
       const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
       expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);
@@ -287,7 +301,7 @@ describe('BrowserMainView.vue', () => {
     });
   });
 
-  describe('Page.vue', () => {
+  describe('Page.vue (integrated)', () => {
     it('shows the corresponding url to the webview', () => {
       const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
       expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);

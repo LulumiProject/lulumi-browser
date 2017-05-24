@@ -252,7 +252,7 @@
         this.value = val;
       },
       onSelect(event) {
-        if (event.title === `${this.currentSearchEngine.name} Search`) {
+        if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
           this.$parent.onEnterLocation(
             `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
         } else {
