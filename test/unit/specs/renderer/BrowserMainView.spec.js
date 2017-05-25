@@ -3,12 +3,12 @@ import Electron from 'vue-electron';
 import { Autocomplete, Scrollbar } from 'element-ui';
 
 import BrowserMainView from 'components/BrowserMainView';
+import config from 'renderer/js/constants/config';
 
 import router from 'renderer/router';
 import store from 'renderer/store';
 
 import { name } from 'src/../.electron-vue/config';
-import config from 'renderer/js/constants/config';
 
 /* eslint-disable no-unused-expressions */
 
