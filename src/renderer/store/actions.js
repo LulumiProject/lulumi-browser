@@ -45,9 +45,6 @@ export const pageFaviconUpdated = ({ commit }, pageIndex, url) => {
   commit(types.PAGE_FAVICON_UPDATED, pageIndex, url);
 };
 
-export const updateLocation = ({ commit }, url) => {
-  commit(types.UPDATE_LOCATION, url);
-};
 export const setCurrentSearchEngineProvider = ({ commit }, val) => {
   commit(types.SET_CURRENT_SEARCH_ENGINE_PROVIDER, val);
 };

@@ -13,6 +13,7 @@
         iview-icon(type="android-refresh", size="16")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
+        ref="input",
         @input="onChange",
         @select="onSelect",
         icon="search",
@@ -20,7 +21,7 @@
         :placeholder="$t('navbar.placeholder')",
         :fetch-suggestions="querySearch",
         v-focus="focused",
-        :value="page.location",
+        :value="showLocation(page.location)",
         popper-class="my-autocomplete",
         custom-item="url-suggestion")
         el-button(slot="prepend")
@@ -232,6 +233,15 @@
       },
     },
     methods: {
+      showLocation(location) {
+        if (location === undefined || location.startsWith('lulumi-extension')) {
+          return '';
+        }
+        let newLocation = decodeURIComponent(location);
+        newLocation = urlUtil.getLocationIfError(newLocation);
+        newLocation = urlUtil.getLocationIfPDF(newLocation);
+        return urlUtil.getLocationIfAbout(newLocation).url;
+      },
       onGoBackMouseDown() {
         this.handler = setTimeout(() => this.$parent.onClickBackContextMenu(), 300);
       },

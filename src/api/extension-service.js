@@ -1,13 +1,19 @@
 import { ipcRenderer } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import url from 'url';
 
 import apiFactory, { initializeExtensionApi } from './api-factory';
 
 export default class ExtHostExtensionService {
   constructor(VueInstance) {
+    this.newtabOverrides = null;
+
     this.ready = false;
+
     this.manifestMap = {};
+    this.manifest = [];
+
     this.instance = VueInstance;
     this.instance.$electron.ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
       if (Object.keys(manifestMap) !== 0) {
@@ -554,18 +560,28 @@ export default class ExtHostExtensionService {
     const remote = vue.$electron.remote;
     const backgroundPages = remote.getGlobal('backgroundPages');
 
+    this.newtabOverrides = null;
     vue.$nextTick(() => {
       Object.keys(this.manifestMap).forEach((extension) => {
+        let ext = this.manifestMap[extension];
         if (backgroundPages[extension]) {
           const webContentsId = backgroundPages[extension].webContentsId;
-          this.manifestMap[extension].webContentsId = webContentsId;
-          manifest.push(this.manifestMap[extension]);
-        } else {
-          manifest.push(this.manifestMap[extension]);
+          ext.webContentsId = webContentsId;
         }
+        if (ext.hasOwnProperty('chrome_url_overrides')) {
+          Object.keys(ext.chrome_url_overrides).forEach((k) => {
+            this[`${k}Overrides`] = `${url.format({
+              protocol: 'lulumi-extension',
+              slashes: true,
+              hostname: ext.extensionId,
+              pathname: ext.chrome_url_overrides[k],
+            })}`;
+          });
+        }
+        manifest.push(ext);
       });
     });
 
-    vue.$refs.navbar.extensions = manifest;
+    this.manifest = manifest;
   }
 }

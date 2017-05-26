@@ -542,8 +542,10 @@
         this.$store.dispatch('incrementPid');
         if (location) {
           this.$store.dispatch('createTab', location);
-        } else {
+        } else if (this.extensionService.newtabOverrides === null) {
           this.$store.dispatch('createTab');
+        } else {
+          this.$store.dispatch('createTab', this.extensionService.newtabOverrides);
         }
         this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
@@ -602,15 +604,12 @@
         let newLocation = null;
         if (location.startsWith('about:')) {
           newLocation = urlResource.aboutUrls(location);
-          this.getPage().navigateTo(newLocation);
         } else if (urlUtil.isNotURL(location)) {
           newLocation = `${this.$store.getters.currentSearchEngine.search}${location}`;
-          this.$store.dispatch('updateLocation', newLocation);
-          this.getPage().navigateTo(newLocation);
         } else {
           newLocation = location;
-          this.getPage().navigateTo(newLocation);
         }
+        this.getPage().navigateTo(newLocation);
       },
       // onTabContextMenu
       onTabContextMenu(event, pageIndex) {

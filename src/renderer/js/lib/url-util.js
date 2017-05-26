@@ -107,7 +107,7 @@ const urlUtil = {
     // for cases, pure string
     const case3Reg = /[?./\s:]/;
     // for cases, data:uri, view-source:uri and about
-    const case4Reg = /^(data|view-source|mailto|about|lulumi|magnet):.*/;
+    const case4Reg = /^(data|view-source|mailto|about|lulumi|lulumi-extension|magnet):.*/;
 
     let str = input.trim();
     const scheme = urlUtil.getScheme(str);

@@ -105,19 +105,16 @@ const mutations = {
     state.pages[payload.pageIndex].canRefresh = true;
   },
   [types.DID_STOP_LOADING](state, payload) {
-    let url = decodeURIComponent(payload.webview.getURL());
-    url = urlUtil.getLocationIfError(url);
-    url = urlUtil.getLocationIfPDF(url);
-    const data = urlUtil.getLocationIfAbout(url);
-    state.pages[payload.pageIndex].location = data.url;
+    const url = payload.webview.getURL();
+    state.pages[payload.pageIndex].location = decodeURIComponent(url);
     if (url.startsWith(config.lulumiPagesCustomProtocol)) {
-      state.pages[payload.pageIndex].title = data.title;
+      const guestUrl = require('url').parse(url);
+      const guestHash = guestUrl.hash.substr(2);
+      state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+      state.pages[payload.pageIndex].location = decodeURIComponent(url);
     } else {
       if (!state.pages[payload.pageIndex].title) {
         state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
-      }
-      if (!state.pages[payload.pageIndex].location) {
-        state.pages[payload.pageIndex].location = decodeURIComponent(url);
       }
       if (!state.pages[payload.pageIndex].favicon) {
         if (payload.pageIndex - 1 < 0) {
@@ -158,11 +155,8 @@ const mutations = {
     state.pages[payload.pageIndex].isLoading = false;
   },
   [types.DID_FAIL_LOAD](state, pageIndex) {
-    if (!state.pages[pageIndex].title) {
-      state.pages[pageIndex].title = 'error';
-      state.pages[pageIndex].location = null;
-      state.pages[pageIndex].error = true;
-    }
+    state.pages[pageIndex].title = 'error';
+    state.pages[pageIndex].error = true;
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
@@ -183,10 +177,6 @@ const mutations = {
   },
   [types.PAGE_FAVICON_UPDATED](state, payload) {
     state.pages[payload.pageIndex].favicon = payload.url;
-  },
-  [types.UPDATE_LOCATION](state, url) {
-    state.pages[state.currentPageIndex].location
-      = decodeURIComponent(urlUtil.getLocationIfPDF(url));
   },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state, val) {
