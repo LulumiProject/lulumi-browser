@@ -16,6 +16,9 @@ export default (oldPages, tabRefs, newStart, newOrder, immutable = false) => {
       if (page.location.startsWith('about:')) {
         page.location = urlResource.aboutUrls(page.location);
       }
+      if (page.location.startsWith('lulumi-extension:')) {
+        page.location = urlResource.aboutUrls('about:newtab');
+      }
       return true;
     });
   }

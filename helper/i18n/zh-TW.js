@@ -32,22 +32,25 @@ export const guest = {
       LanguagePage: {
         title: '語言',
       },
-      historyPage: {
-        title: '歷史紀錄',
-        clear: '清除',
-        sync: '紀錄',
-        syncStatus: {
-          syncing: '同步中',
-          notSyncing: '非同步',
-        },
-        placeholder: '關鍵字',
-        noData: '無紀錄',
+    },
+    historyPage: {
+      title: '歷史紀錄',
+      clear: '清除',
+      sync: '紀錄',
+      syncStatus: {
+        syncing: '同步中',
+        notSyncing: '非同步',
       },
-      extensionsPage: {
-        title: '擴充套件',
-        add: '新增',
-        path: '位置：',
-      },
+      placeholder: '關鍵字',
+      noData: '無紀錄',
+    },
+    extensionsPage: {
+      title: '擴充套件',
+      add: '新增',
+      path: '位置：',
+    },
+    newtabPage: {
+      title: '新分頁',
     },
   },
 };

@@ -2,17 +2,17 @@
   div
     el-row(type="flex", align="middle")
       el-col(:span="4")
-        h1 {{ $t('about.preferencesPage.historyPage.title') }}
+        h1 {{ $t('about.historyPage.title') }}
       el-col(:span="4")
-        div {{ `${$t('about.preferencesPage.historyPage.sync')} ${syncStatus()}` }}
+        div {{ `${$t('about.historyPage.sync')} ${syncStatus()}` }}
         el-switch(@change="toggleSync", v-model="sync", on-color="#13ce66", off-color="#ff4949")
       el-col(:span="12")
-        el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.preferencesPage.historyPage.placeholder')", v-model="filterText")
+        el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.historyPage.placeholder')", v-model="filterText")
       el-col(:span="2")
-        el-button(:disabled="sync", type="info", @click="setHistory") {{ $t('about.preferencesPage.historyPage.clear') }}
+        el-button(:disabled="sync", type="info", @click="setHistory") {{ $t('about.historyPage.clear') }}
     el-row
       el-col(:span="24")
-        el-tree(ref="tree", :empty-text="$t('about.preferencesPage.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
+        el-tree(ref="tree", :empty-text="$t('about.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
 </template>
 
 <script>
@@ -57,9 +57,9 @@
       },
       syncStatus() {
         if (this.sync) {
-          return this.$t('about.preferencesPage.historyPage.syncStatus.syncing');
+          return this.$t('about.historyPage.syncStatus.syncing');
         }
-        return this.$t('about.preferencesPage.historyPage.syncStatus.notSyncing');
+        return this.$t('about.historyPage.syncStatus.notSyncing');
       },
       setHistory() {
         const checkedNodes = this.$refs.tree.getCheckedNodes();

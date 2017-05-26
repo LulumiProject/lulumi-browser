@@ -2,9 +2,9 @@
   div
     el-row(type="flex", align="middle")
       el-col(:span="12")
-        h1 {{ $t('about.preferencesPage.extensionsPage.title') }}
+        h1 {{ $t('about.extensionsPage.title') }}
       el-col(:span="6", :offset="3")
-        el-button(type="info", @click="addExtension") {{ $t('about.preferencesPage.extensionsPage.add') }}
+        el-button(type="info", @click="addExtension") {{ $t('about.extensionsPage.add') }}
     el-row
       el-col(:span="24")
         ul(class="extensions-list")
@@ -18,7 +18,7 @@
               span(v-else)
               | {{ loadName(extension) }}
             div
-              | {{ `${$t('about.preferencesPage.extensionsPage.path')} ` }}
+              | {{ `${$t('about.extensionsPage.path')} ` }}
               span(class="extensions-list__item-path") {{ loadPath(extension) }}
 </template>
 

@@ -19,6 +19,8 @@ const urlResource = {
         return getLulumiExtUrl('about/#/history');
       case 'about:extensions':
         return getLulumiExtUrl('about/#/extensions');
+      case 'about:newtab':
+        return getLulumiExtUrl('about/#/newtab');
       case 'about:blank':
         return url;
       default:

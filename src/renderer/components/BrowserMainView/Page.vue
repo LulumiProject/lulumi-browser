@@ -47,12 +47,7 @@
     methods: {
       navigateTo(location) {
         if (this.$refs.webview) {
-          if (location.startsWith('lulumi-extension://')) {
-            this.$refs.webview.setAttribute('httpreferrer', 'newtab');
-            this.$refs.webview.setAttribute('src', location);
-          } else {
-            this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
-          }
+          this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
         }
       },
       webviewHandler(self, fnName) {

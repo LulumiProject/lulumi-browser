@@ -67,6 +67,11 @@ export default new Router({
       component: require('../components/AboutMainView/Extensions'),
     },
     {
+      path: '/newtab',
+      name: 'about-main-newtab',
+      component: require('../components/AboutMainView/Newtab'),
+    },
+    {
       path: '*',
       redirect: '/',
     },

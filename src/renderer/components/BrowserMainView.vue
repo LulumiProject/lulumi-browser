@@ -213,6 +213,15 @@
             `${errorPage}`);
         }
       },
+      onIpcMessage(event) {
+        if (event.channel === 'newtab') {
+          if (this.extensionService.newtabOverrides) {
+            event.target.send('newtab', this.extensionService.newtabOverrides);
+          } else {
+            event.target.send('newtab', this.$store.getters.tabConfig.defaultUrl);
+          }
+        }
+      },
       onPageTitleSet(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
         this.$store.dispatch('pageTitleSet', {
@@ -544,11 +553,13 @@
       onNewTab(location) {
         this.$store.dispatch('incrementPid');
         if (location) {
-          this.$store.dispatch('createTab', location);
-        } else if (this.extensionService.newtabOverrides === null) {
-          this.$store.dispatch('createTab');
+          if (location.startsWith('about:')) {
+            this.$store.dispatch('createTab', urlResource.aboutUrls(location));
+          } else {
+            this.$store.dispatch('createTab', location);
+          }
         } else {
-          this.$store.dispatch('createTab', this.extensionService.newtabOverrides);
+          this.$store.dispatch('createTab', urlResource.aboutUrls('about:newtab'));
         }
         this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
@@ -959,7 +970,7 @@
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         } else {
-          this.$store.dispatch('createTab');
+          this.$store.dispatch('createTab', urlResource.aboutUrls('about:newtab'));
         }
       });
     },

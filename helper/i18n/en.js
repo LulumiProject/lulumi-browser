@@ -32,22 +32,25 @@ export const guest = {
       LanguagePage: {
         title: 'Language',
       },
-      historyPage: {
-        title: 'History',
-        clear: 'Clear',
-        sync: 'History is',
-        syncStatus: {
-          syncing: 'syncing',
-          notSyncing: 'not syncing',
-        },
-        placeholder: 'Input keyword',
-        noData: 'No data',
+    },
+    historyPage: {
+      title: 'History',
+      clear: 'Clear',
+      sync: 'History is',
+      syncStatus: {
+        syncing: 'syncing',
+        notSyncing: 'not syncing',
       },
-      extensionsPage: {
-        title: 'Extensions',
-        add: 'Add',
-        path: 'Path:',
-      },
+      placeholder: 'Input keyword',
+      noData: 'No data',
+    },
+    extensionsPage: {
+      title: 'Extensions',
+      add: 'Add',
+      path: 'Path:',
+    },
+    newtabPage: {
+      title: 'Newtab',
     },
   },
 };
