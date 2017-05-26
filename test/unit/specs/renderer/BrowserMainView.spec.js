@@ -147,7 +147,6 @@ Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
 Vue.component('el-scrollbar', Scrollbar);
 
 let vm;
-
 describe('BrowserMainView.vue', () => {
   before(async () => {
     const Ctor = Vue.extend(BrowserMainView);

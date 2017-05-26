@@ -1,6 +1,6 @@
 <template lang="pug">
   #page-wrapper
-    h1 {{ $t('about.newtabPage.title') }}
+    h1#newtab-name {{ $t('about.newtabPage.title') }}
 </template>
 
 <script>

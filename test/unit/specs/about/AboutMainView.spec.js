@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import ElementUI from 'element-ui';
 
-import AboutMainView from 'components/AboutMainView';
+import App from 'renderer/App';
 
 import router from 'renderer/router';
 import store from 'renderer/store';
+
+/* eslint-disable no-unused-expressions */
 
 Vue.prototype.$t = () => {};
 Vue.use(ElementUI);
@@ -17,6 +19,7 @@ const config = {
 };
 
 const about = {
+  lulumi: [],
   about: [
     [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
     [`${config.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
@@ -27,19 +30,52 @@ const about = {
   ],
 };
 
-describe('AboutMainView.vue', () => {
-  it('have 6 lists', (done) => {
-    const vm = new Vue({
+let vm;
+describe('App.vue', () => {
+  before(async () => {
+    const Ctor = Vue.extend(App);
+    vm = new Ctor({
       el: document.createElement('div'),
-      render: h => h(AboutMainView),
       router,
       store,
     }).$mount();
     vm.$store.dispatch('updateAbout', about);
+    await vm.$nextTick();
+  });
 
-    vm.$nextTick(() => {
+  describe('about/#/about', () => {
+    it('has 6 lists', () => {
       expect(vm.$el.querySelectorAll('li').length).to.equal(6);
-      done();
+    });
+  });
+
+  describe('about/#/lulumi', () => {
+    before(async () => {
+      vm.$router.replace({ path: '/lulumi' });
+      await vm.$nextTick();
+    });
+    after(async () => {
+      vm.$router.replace({ path: '/' });
+      await vm.$nextTick();
+    });
+
+    it('exists an element, and its id is \'lulumi-name\'', () => {
+      expect(vm.$el.querySelector('#lulumi-name')).to.exist;
+    });
+  });
+
+  describe('about/#/newtab', () => {
+    before(async () => {
+      vm.$router.replace({ path: '/newtab' });
+      await vm.$nextTick();
+    });
+    after(async () => {
+      vm.$router.replace({ path: '/' });
+      await vm.$nextTick();
+    });
+
+    it('exists an element, and its id is \'newtab-name\'', () => {
+      expect(vm.$el.querySelector('#newtab-name')).to.exist;
     });
   });
 });
