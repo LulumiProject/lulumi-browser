@@ -154,9 +154,11 @@ const mutations = {
     state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
     state.pages[payload.pageIndex].isLoading = false;
   },
-  [types.DID_FAIL_LOAD](state, pageIndex) {
-    state.pages[pageIndex].title = 'error';
-    state.pages[pageIndex].error = true;
+  [types.DID_FAIL_LOAD](state, payload) {
+    if (payload.isMainFrame) {
+      state.pages[payload.pageIndex].title = 'error';
+      state.pages[payload.pageIndex].error = true;
+    }
   },
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();

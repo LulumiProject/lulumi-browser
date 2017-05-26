@@ -198,7 +198,10 @@
         });
       },
       onDidFailLoad(event, pageIndex) {
-        this.$store.dispatch('didFailLoad', pageIndex);
+        this.$store.dispatch('didFailLoad', {
+          pageIndex,
+          isMainFrame: event.isMainFrame,
+        });
         const appPath = process.env.NODE_ENV === 'development'
           ? process.cwd()
           : this.$electron.remote.app.getAppPath();

@@ -23,8 +23,8 @@ export const domReady = ({ commit }, pageIndex, webview) => {
 export const didStopLoading = ({ commit }, pageIndex, webview) => {
   commit(types.DID_STOP_LOADING, pageIndex, webview);
 };
-export const didFailLoad = ({ commit }, pageIndex) => {
-  commit(types.DID_FAIL_LOAD, pageIndex);
+export const didFailLoad = ({ commit }, pageIndex, isMainFrame) => {
+  commit(types.DID_FAIL_LOAD, pageIndex, isMainFrame);
 };
 export const pageTitleSet = ({ commit }, pageIndex, webview) => {
   commit(types.PAGE_TITLE_SET, pageIndex, webview);
