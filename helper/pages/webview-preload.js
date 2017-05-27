@@ -110,6 +110,14 @@ if (preferences) {
 const requireTmp = require;
 const moduleTmp = module;
 
+// about:newtab handler
+process.once('document-start', () => {
+  if (document.location.href === 'lulumi://about/#/newtab') {
+    ipcRenderer.on('newtab', (event, newtab) => (document.location.href = newtab));
+    ipcRenderer.sendToHost('newtab');
+  }
+});
+
 process.once('loaded', () => {
   if (process.env.BABEL_ENV === 'test') {
     global.require = requireTmp;
