@@ -17,7 +17,7 @@ const matchesPattern = (pattern) => {
 // Run the code with lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
-  require('./inject-to').injectTo(extensionId, false, context, LocalStorage);
+  require('../api/inject-to').injectTo(extensionId, false, context, LocalStorage);
   global.lulumi = context.lulumi;
   const wrapper = `\n
     var chrome = lulumi;
@@ -113,7 +113,7 @@ const moduleTmp = module;
 // about:newtab handler
 process.once('document-start', () => {
   if (document.location.href === 'lulumi://about/#/newtab') {
-    ipcRenderer.on('newtab', (event, newtab) => (document.location.href = newtab));
+    ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
     ipcRenderer.sendToHost('newtab');
   }
 });

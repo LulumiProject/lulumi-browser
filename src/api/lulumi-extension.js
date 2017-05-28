@@ -88,7 +88,7 @@ const startBackgroundPages = (manifest) => {
       partition: 'persist:__lulumi_extension',
       isBackgroundPage: true,
       commandLineSwitches: ['--background-page'],
-      preload: `${config.lulumiHelperPath}/pages/extension-preload.js`,
+      preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
     });
     backgroundPages[manifest.extensionId] = { html, webContentsId: contents.id, name };
     contents.loadURL(url.format({

@@ -4,7 +4,7 @@ const { LocalStorage } = require('node-localstorage');
 process.once('loaded', () => {
   const inject = (extensionId) => {
     const context = {};
-    require('./inject-to').injectTo(extensionId, true, context, LocalStorage);
+    require('../api/inject-to').injectTo(extensionId, true, context, LocalStorage);
     global.lulumi = context.lulumi;
     global.chrome = global.lulumi;
   };
