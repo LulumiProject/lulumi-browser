@@ -156,7 +156,10 @@ describe('BrowserMainView.vue', () => {
       store,
     }).$mount();
     // we need at least one active tab
-    vm.$store.dispatch('createTab');
+    vm.$store.dispatch('createTab', {
+      url: undefined,
+      follow:true,
+    });
     await vm.$nextTick();
   });
 
@@ -267,7 +270,10 @@ describe('BrowserMainView.vue', () => {
     });
 
     it('adds one more tab', async () => {
-      vm.$store.dispatch('createTab', 'https://www.youtube.com/');
+      vm.$store.dispatch('createTab', {
+        url: 'https://www.youtube.com/',
+        follow: false,
+      });
       await vm.$nextTick();
       expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(2);
     });

@@ -45,7 +45,8 @@ const mutations = {
     state.pid += 1;
   },
   // tab handler
-  [types.CREATE_TAB](state, url) {
+  [types.CREATE_TAB](state, payload) {
+    const url = payload.url;
     let newUrl = null;
     if (urlUtil.isURL(url)) {
       newUrl = url;
@@ -56,10 +57,14 @@ const mutations = {
     } else {
       state.pages.push(createPageObject());
     }
+    const last = state.pages.length - 1;
     if (url) {
-      state.pages[state.pages.length - 1].pid = state.pid;
+      if (payload.follow) {
+        state.currentPageIndex = last;
+      }
+      state.pages[last].pid = state.pid;
     } else {
-      state.currentPageIndex = state.pages.length - 1;
+      state.currentPageIndex = last;
       state.pages[state.currentPageIndex].pid = state.pid;
     }
   },

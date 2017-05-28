@@ -269,7 +269,10 @@
       },
       onNewWindow(event, pageIndex) {
         this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab', event.url);
+        this.$store.dispatch('createTab', {
+          url: event.url,
+          follow: true,
+        });
         if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
           this.onCreatedNavigationTarget.emit({
             sourceFrameId: 0,
@@ -554,18 +557,30 @@
         this.$store.dispatch('incrementPid');
         if (location) {
           if (location.startsWith('about:')) {
-            this.$store.dispatch('createTab', urlResource.aboutUrls(location));
+            this.$store.dispatch('createTab', {
+              url: urlResource.aboutUrls(location),
+              follow: true,
+            });
           } else {
-            this.$store.dispatch('createTab', location);
+            this.$store.dispatch('createTab', {
+              url: location,
+              follow: false,
+            });
           }
         } else {
-          this.$store.dispatch('createTab', urlResource.aboutUrls('about:newtab'));
+          this.$store.dispatch('createTab', {
+            url: urlResource.aboutUrls('about:newtab'),
+            follow: true,
+          });
         }
         this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
       onTabDuplicate(pageIndex) {
         this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab', this.pages[pageIndex].location);
+        this.$store.dispatch('createTab', {
+          url: this.pages[pageIndex].location,
+          follow: false,
+        });
       },
       onTabClick(pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
@@ -676,7 +691,10 @@
           menu.append(new MenuItem({
             label: 'Show history',
             click: () => {
-              this.$store.dispatch('createTab', 'lulumi://about/#/history');
+              this.$store.dispatch('createTab', {
+                url: urlResource.aboutUrls('about:history'),
+                follow: true,
+              });
             },
           }));
 
@@ -711,7 +729,10 @@
           menu.append(new MenuItem({
             label: 'Show history',
             click: () => {
-              this.$store.dispatch('createTab', 'lulumi://about/#/history');
+              this.$store.dispatch('createTab', {
+                url: urlResource.aboutUrls('about:history'),
+                follow: true,
+              });
             },
           }));
 
@@ -853,7 +874,10 @@
             label: this.$t('webview.contextMenu.openLinkInNewTab'),
             click: () => {
               this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', event.params.linkURL);
+              this.$store.dispatch('createTab', {
+                url: event.params.linkURL,
+                follow: false,
+              });
             },
           }));
           menu.append(new MenuItem({
@@ -905,7 +929,10 @@
             label: this.$t('webview.contextMenu.openImageInNewTab'),
             click: () => {
               this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', event.params.srcURL);
+              this.$store.dispatch('createTab', {
+                url: event.params.srcURL,
+                follow: false,
+              });
             },
           }));
         }
@@ -920,7 +947,10 @@
               }),
               click: () => {
                 this.$store.dispatch('incrementPid');
-                this.$store.dispatch('createTab', event.params.selectionText);
+                this.$store.dispatch('createTab', {
+                  url: event.params.selectionText,
+                  follow: false,
+                });
               },
             }));
           }
@@ -947,7 +977,10 @@
             label: this.$t('webview.contextMenu.viewSource'),
             click: () => {
               this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', sourceLocation);
+              this.$store.dispatch('createTab', {
+                url: sourceLocation,
+                follow: true,
+              });
             },
           }));
         }
@@ -970,7 +1003,10 @@
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         } else {
-          this.$store.dispatch('createTab', urlResource.aboutUrls('about:newtab'));
+          this.$store.dispatch('createTab', {
+            url: urlResource.aboutUrls('about:newtab'),
+            follow: true,
+          });
         }
       });
     },

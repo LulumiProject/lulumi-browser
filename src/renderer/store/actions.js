@@ -4,8 +4,8 @@ export const incrementPid = ({ commit }) => {
   commit(types.INCREMENT_PID);
 };
 
-export const createTab = ({ commit }, url) => {
-  commit(types.CREATE_TAB, url);
+export const createTab = ({ commit }, url, follow) => {
+  commit(types.CREATE_TAB, url, follow);
 };
 export const closeTab = ({ commit }, pageIndex) => {
   commit(types.CLOSE_TAB, pageIndex);

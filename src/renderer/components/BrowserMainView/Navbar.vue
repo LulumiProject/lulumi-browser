@@ -72,7 +72,6 @@
   import '../../css/el-autocomplete';
   import '../../css/el-input';
   import '../../css/el-cascader';
-  import config from '../../js/constants/config';
   import urlUtil from '../../js/lib/url-util';
   // import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
@@ -297,7 +296,7 @@
         return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
       },
       handleChange(val) {
-        this.$parent.onNewTab(`${config.lulumiPagesCustomProtocol}about/#/${val.pop()}`);
+        this.$parent.onNewTab(`about:${val.pop()}`);
       },
       loadIcon(extension) {
         try {
