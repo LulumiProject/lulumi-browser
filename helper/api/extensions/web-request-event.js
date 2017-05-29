@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-String.prototype.hashCode = function() {
+String.prototype.hashCode = function () {
   let hash = 0;
   let i;
   let chr;
@@ -23,7 +23,7 @@ class Event {
     this.listeners = [];
   }
 
-  addListener(callback, filter={}, opt_extraInfoSpec=[]) {
+  addListener(callback, filter = {}, opt_extraInfoSpec = []) {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
     ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, digest, filter, callback.toString());

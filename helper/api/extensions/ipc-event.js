@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-String.prototype.hashCode = function() {
+String.prototype.hashCode = function () {
   let hash = 0;
   let i;
   let chr;

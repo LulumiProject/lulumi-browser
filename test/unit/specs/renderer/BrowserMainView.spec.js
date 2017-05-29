@@ -158,7 +158,7 @@ describe('BrowserMainView.vue', () => {
     // we need at least one active tab
     vm.$store.dispatch('createTab', {
       url: undefined,
-      follow:true,
+      follow: true,
     });
     await vm.$nextTick();
   });

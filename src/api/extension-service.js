@@ -12,7 +12,6 @@ export default class ExtHostExtensionService {
     this.ready = false;
 
     this.manifestMap = {};
-    this.manifest = [];
 
     this.instance = VueInstance;
     this.instance.$electron.ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
@@ -582,6 +581,6 @@ export default class ExtHostExtensionService {
       });
     });
 
-    this.manifest = manifest;
+    vue.$refs.navbar.extensions = manifest;
   }
 }

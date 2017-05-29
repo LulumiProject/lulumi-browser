@@ -62,6 +62,7 @@
   import 'vue-awesome/icons/lock';
   import 'vue-awesome/icons/info-circle';
 
+  import Fuse from 'fuse.js';
   import Sortable from 'sortablejs';
 
   import { Button, Cascader, Popover } from 'element-ui';
@@ -199,6 +200,26 @@
       currentSearchEngine() {
         return this.$store.getters.currentSearchEngine;
       },
+      fuse() {
+        const results = [];
+        this.$store.getters.history.forEach((history) => {
+          results.push({
+            title: history.title,
+            value: history.url.replace(/(^\w+:|^)\/\//, ''),
+            icon: 'document',
+          });
+        });
+        const fuse = new Fuse(results, {
+          keys: [{
+            name: 'value',
+            weight: 0.7,
+          }, {
+            name: 'title',
+            weight: 0.3,
+          }],
+        });
+        return fuse;
+      },
     },
     watch: {
       location(newLocation) {
@@ -232,6 +253,18 @@
       },
     },
     methods: {
+      unique(source) {
+        const results = [];
+        const seen = new Set();
+
+        source.forEach((s) => {
+          if (!seen.has(s.value)) {
+            seen.add(s.value);
+            results.push(s);
+          }
+        });
+        return results;
+      },
       showLocation(location) {
         if (location === undefined || location.startsWith('lulumi-extension')) {
           return '';
@@ -270,7 +303,7 @@
       },
       querySearch(queryString, cb) {
         const suggestions = this.suggestions;
-        const results =
+        let results =
           queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
         results.push({
           title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
@@ -290,7 +323,10 @@
           results);
         setTimeout(() => cb(results), 100);
         */
-        cb(results);
+        // fuse results
+        const fuse = this.fuse;
+        results = results.concat(fuse.search(queryString.toLowerCase()));
+        cb(this.unique(results));
       },
       createFilter(queryString) {
         return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
@@ -300,9 +336,7 @@
       },
       loadIcon(extension) {
         try {
-          // eslint-disable-next-line no-prototype-builtins
           const isPageAction = extension.hasOwnProperty('page_action');
-          // eslint-disable-next-line no-prototype-builtins
           const isBrowserAction = extension.hasOwnProperty('browser_action');
           if (isPageAction || isBrowserAction) {
             let icons;
@@ -325,7 +359,6 @@
         }
       },
       showOrNot(extension) {
-        // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
         if (isPageAction) {
           if (this.pageActionMapping[extension.extensionId]) {
@@ -338,9 +371,7 @@
         return 'enabled';
       },
       showPopupOrNot(extension) {
-        // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
-        // eslint-disable-next-line no-prototype-builtins
         const isBrowserAction = extension.hasOwnProperty('browser_action');
         if (isPageAction) {
           if (this.pageActionMapping[extension.extensionId]) {
@@ -360,9 +391,7 @@
         return true;
       },
       showTitle(extension) {
-        // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
-        // eslint-disable-next-line no-prototype-builtins
         const isBrowserAction = extension.hasOwnProperty('browser_action');
         if (isPageAction) {
           return extension.page_action.default_title;
@@ -372,9 +401,7 @@
         return '';
       },
       sendIPC(event, extension) {
-        // eslint-disable-next-line no-prototype-builtins
         const isPageAction = extension.hasOwnProperty('page_action');
-        // eslint-disable-next-line no-prototype-builtins
         const isBrowserAction = extension.hasOwnProperty('browser_action');
         if (isPageAction || isBrowserAction) {
           const webview = this.$refs[`webview-${extension.extensionId}`][0];
