@@ -32,10 +32,6 @@ let mainConfig = {
         exclude: /node_modules/
       },
       {
-        test: /\.json$/,
-        use: 'json-loader'
-      },
-      {
         test: /\.node$/,
         use: 'node-loader'
       }
@@ -51,10 +47,6 @@ let mainConfig = {
     path: path.join(__dirname, '../dist')
   },
   plugins: [
-    new BabiliWebpackPlugin({
-      removeConsole: true,
-      removeDebugger: true
-    }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {
@@ -63,8 +55,26 @@ let mainConfig = {
   target: 'electron-main'
 }
 
+/**
+ * Adjust mainConfig for development settings
+ */
+if (process.env.NODE_ENV !== 'production') {
+  mainConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static')}"`
+    })
+  )
+}
+
+/**
+ * Adjust mainConfig for production settings
+ */
 if (process.env.NODE_ENV === 'production') {
   mainConfig.plugins.push(
+    new BabiliWebpackPlugin({
+      removeConsole: true,
+      removeDebugger: true
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     })

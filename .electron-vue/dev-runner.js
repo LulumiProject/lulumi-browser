@@ -13,6 +13,7 @@ const mainConfig = require('./webpack.main.config')
 const Configs = require('./webpack.renderer.config')
 
 let electronProcess = null
+let manualRestart = false
 let hotMiddleware
 
 function logStats (proc, data) {
@@ -62,10 +63,9 @@ function startRenderer () {
       {
         contentBase: path.join(__dirname, '../'),
         quiet: true,
-        stats: { colors: true },
         setup (app, ctx) {
           app.use(hotMiddleware)
-          ctx.middleware.waitUntilValid((a) => {
+          ctx.middleware.waitUntilValid(() => {
             resolve()
           })
         }
@@ -97,8 +97,14 @@ function startMain () {
       logStats('Main', stats)
 
       if (electronProcess && electronProcess.kill) {
-        electronProcess.kill()
+        manualRestart = true
+        process.kill(electronProcess.pid)
+        electronProcess = null
         startElectron()
+
+        setTimeout(() => {
+          manualRestart = false
+        }, 5000)
       }
 
       resolve()
@@ -107,13 +113,13 @@ function startMain () {
 }
 
 function startElectron () {
-  electronProcess = spawn(electron, [path.join(__dirname, '../dist/main.js')])
+  electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/main.js')])
   electronProcess.stdout.on('data', data => {
     let log = ''
 
     data = data.toString().split(/\r?\n/)
     data.forEach(line => {
-      log += '  ' + line + '\n'
+      log += `  ${line}\n`
     })
 
     if (/[0-9A-z]+/.test(data[0])) {
@@ -126,9 +132,27 @@ function startElectron () {
       )
     }
   })
+  electronProcess.stderr.on('data', data => {
+    let log = ''
 
-  electronProcess.on('exit', (code, signal) => {
-    if (signal !== 'SIGTERM') process.exit()
+    data = data.toString().split(/\r?\n/)
+    data.forEach(line => {
+      log += `  ${line}\n`
+    })
+
+    if (/[0-9A-z]+/.test(data[0])) {
+      console.log(
+        chalk.red.bold('┏ Electron -------------------') +
+        '\n\n' +
+        log +
+        chalk.red.bold('┗ ----------------------------') +
+        '\n'
+      )
+    }
+  })
+
+  electronProcess.on('close', () => {
+    if (!manualRestart) process.exit()
   })
 }
 

@@ -67,10 +67,6 @@ let rendererConfig = {
         use: 'pug-html-loader'
       },
       {
-        test: /\.json$/,
-        use: 'json-loader'
-      },
-      {
         test: /\.node$/,
         use: 'node-loader'
       },
@@ -79,6 +75,7 @@ let rendererConfig = {
         use: {
           loader: 'vue-loader',
           options: {
+            extractCSS: true,
             loaders: {
               pug: 'pug-html-loader',
               sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
@@ -115,6 +112,11 @@ let rendererConfig = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, '../node_modules')
         : false
@@ -189,10 +191,6 @@ let aboutConfig = {
         use: 'pug-html-loader'
       },
       {
-        test: /\.json$/,
-        use: 'json-loader'
-      },
-      {
         test: /\.node$/,
         use: 'node-loader'
       },
@@ -201,6 +199,7 @@ let aboutConfig = {
         use: {
           loader: 'vue-loader',
           options: {
+            extractCSS: true,
             loaders: {
               pug: 'pug-html-loader',
               sass: 'vue-style-loader!css-loader!less-loader!sass-loader?indentedSyntax=1',
@@ -237,9 +236,12 @@ let aboutConfig = {
     new HtmlWebpackPlugin({
       filename: 'about.html',
       template: path.resolve(__dirname, '../src/guest/index.ejs'),
-      nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
-        : false
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: false
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
@@ -262,7 +264,23 @@ let aboutConfig = {
 }
 
 /**
- * Adjust rendererConfig for production settings
+ * Adjust rendererConfig and aboutConfig for development settings
+ */
+if (process.env.NODE_ENV !== 'production') {
+  rendererConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static')}"`
+    })
+  )
+  aboutConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static')}"`
+    })
+  )
+}
+
+/**
+ * Adjust rendererConfig and aboutConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
   rendererConfig.devtool = ''

@@ -4,7 +4,6 @@
     "test": {
       "presets": [
         ["env", {
-          "useBuiltIns": true,
           "targets": { "node": 7 }
         }],
         "stage-0"
@@ -14,7 +13,6 @@
     "main": {
       "presets": [
         ["env", {
-          "useBuiltIns": true,
           "targets": { "node": 7 }
         }],
         "stage-0"
@@ -23,9 +21,7 @@
     "renderer": {
       "presets": [
         ["env", {
-          "modules": false,
-          "targets": { "node": 7 },
-          "useBuiltIns": true
+          "modules": false
         }],
         "stage-0"
       ]

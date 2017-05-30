@@ -4,6 +4,7 @@ dist/*
 builds/*
 extensions/*
 userData/*
+static/*
 test/userData/*
 coverage
 node_modules/
