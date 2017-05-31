@@ -63,6 +63,8 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
+  global.wid = mainWindow.id;
+
   mainWindow.loadURL(winURL);
 
   menu.init();

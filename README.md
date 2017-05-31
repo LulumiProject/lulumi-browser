@@ -46,4 +46,4 @@ $ yarn run test
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[4c6bd9e](https://github.com/SimulatedGREG/electron-vue/commit/4c6bd9e5220199bcb66775721dc2dd823aeb701a) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[3e2f0d2](https://github.com/SimulatedGREG/electron-vue/commit/3e2f0d22ffcc0de8bb34550d388fefe3d3d6d6f2) and developed by [@qazbnm456](https://github.com/qazbnm456).

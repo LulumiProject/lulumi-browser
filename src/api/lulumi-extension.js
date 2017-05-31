@@ -117,11 +117,9 @@ const loadCommands = (mainWindow, manifest) => {
       localshortcut.register(mainWindow, suggested_key.default, () => {
         if (commands[command].suggested_key) {
           if (command === '_execute_page_action') {
-            BrowserWindow.getAllWindows()[0]
-              .webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+            BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
           } else if (command === '_execute_browser_action') {
-            BrowserWindow.getAllWindows()[0]
-              .webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+            BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
           } else {
             webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
               .send('lulumi-commands-triggered', command);
