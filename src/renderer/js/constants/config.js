@@ -1,3 +1,4 @@
+import { nativeImage } from 'electron';
 import path from 'path';
 
 const lulumiRootPath = path.resolve(__dirname, '../');
@@ -21,7 +22,12 @@ const pdfViewer = 'pdf-viewer';
 
 const tabConfig = {
   defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
-  defaultFavicon: 'https://github.com/favicon.ico',
+  defaultFavicon: nativeImage
+    .createFromPath(path.join(__static, 'icons', 'document.png'))
+    .toDataURL('image/png'),
+  lulumiFavicon: nativeImage
+    .createFromPath(path.join(__static, 'icons', 'icon.png'))
+    .toDataURL('image/png'),
 };
 
 export default {
@@ -42,5 +48,5 @@ export default {
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: '13b04615391e9fcbad7fc2412e3f4be12830f4cd',
+  lulumiRev: '16e9f13240026358a7c2b7189c8bb38d59012415',
 };

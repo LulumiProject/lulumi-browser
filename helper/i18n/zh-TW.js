@@ -78,6 +78,7 @@ export default {
   },
   downloads: {
     state: {
+      init: '準備中',
       progressing: '下載中',
       cancelled: '已取消',
       completed: '已完成',

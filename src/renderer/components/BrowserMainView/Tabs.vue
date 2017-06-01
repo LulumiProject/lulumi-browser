@@ -8,7 +8,7 @@
         .chrome-tab-bg
           div#tab-icons(class="chrome-tab-favicon")
             i.el-icon-loading(v-if="page.isLoading")
-            img(v-show="page.favicon", :src="page.favicon", height='16', width='16', v-else)
+            img(:ref="`img-${index}`", :src="page.favicon", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume volume-off")
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume volume-up")
           el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
@@ -29,6 +29,8 @@
 </template>
 
 <script>
+  import path from 'path';
+
   import AwesomeIcon from 'vue-awesome/components/Icon';
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
@@ -66,6 +68,11 @@
       },
     },
     methods: {
+      loadDefaultFavicon(event) {
+        event.target.src = this.$electron.remote.nativeImage
+          .createFromPath(path.join(__static, 'icons', 'document.png'))
+          .toDataURL('image/png');
+      },
       onDoubleClick(event) {
         if (event.target) {
           const mainWindow = this.$electron.remote.getCurrentWindow();

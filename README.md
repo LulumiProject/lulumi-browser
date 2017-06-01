@@ -21,22 +21,22 @@ $ yarn
 # serve with hot reload at localhost:9080
 $ yarn run dev
 
-# build electron app for all platforms
+# build electron application for all platforms
 $ yarn run build
 
-# build electron app for the specific target platform
+# build electron application for the specific target platform
 $ yarn run build:darwin # macOS
 $ yarn run build:linux  # Linux
 $ yarn run build:mas    # Mac AppStore
 $ yarn run build:win32  # Windows
 
-# lint all JS/Vue component files in `src`
+# lint all JS/Vue component files in `src/`
 $ yarn run lint
 
 # lint and fix
 $ yarn run lint:fix
 
-# test electron app for production
+# test electron application for production
 $ yarn run test
 ```
 
@@ -46,4 +46,4 @@ $ yarn run test
 
 ---
 
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[3e2f0d2](https://github.com/SimulatedGREG/electron-vue/commit/3e2f0d22ffcc0de8bb34550d388fefe3d3d6d6f2) and developed by [@qazbnm456](https://github.com/qazbnm456).
+This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[20a2324](https://github.com/SimulatedGREG/electron-vue/commit/20a2324440b99ac002ec3a29d3a8b67f6c74b941) and developed by [@qazbnm456](https://github.com/qazbnm456).

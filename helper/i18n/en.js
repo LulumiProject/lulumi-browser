@@ -78,6 +78,7 @@ export default {
   },
   downloads: {
     state: {
+      init: 'init',
       progressing: 'progressing',
       cancelled: 'cancelled',
       completed: 'completed',

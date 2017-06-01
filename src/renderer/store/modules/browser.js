@@ -117,17 +117,13 @@ const mutations = {
       const guestHash = guestUrl.hash.substr(2);
       state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
       state.pages[payload.pageIndex].location = decodeURIComponent(url);
+      state.pages[payload.pageIndex].favicon = config.tabConfig.lulumiFavicon;
     } else {
       if (!state.pages[payload.pageIndex].title) {
         state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
       }
       if (!state.pages[payload.pageIndex].favicon) {
-        if (payload.pageIndex - 1 < 0) {
-          state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
-        } else {
-          state.pages[payload.pageIndex].favicon
-            = state.pages[payload.pageIndex - 1].favicon || config.tabConfig.defaultFavicon;
-        }
+        state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
       }
       if (state.pages[payload.pageIndex].title !== 'error') {
         if (state.history.length !== 0) {
