@@ -10,14 +10,6 @@ import config from '../renderer/js/constants/config';
 import promisify from '../renderer/js/lib/promisify';
 import * as lulumiExtension from '../api/lulumi-extension';
 
-/**
- * Set `__static` path to static files in production
- */
-if (process.env.NODE_ENV !== 'development') {
-  // eslint-disable-next-line no-underscore-dangle
-  global.__static = require('path').join(__dirname, '/static');
-}
-
 let mainWindow;
 
 let shuttingDown = process.env.BABEL_ENV === 'test';

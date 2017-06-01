@@ -1,6 +1,14 @@
 import { nativeImage } from 'electron';
 import path from 'path';
 
+/**
+ * Set `__static` path to static files in production
+ */
+if (process.env.NODE_ENV !== 'development') {
+  // eslint-disable-next-line no-underscore-dangle
+  global.__static = require('path').join(__dirname, '/static');
+}
+
 const lulumiRootPath = path.resolve(__dirname, '../');
 const lulumiHelperPath = path.resolve(lulumiRootPath, './helper');
 
@@ -48,5 +56,5 @@ export default {
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: '16e9f13240026358a7c2b7189c8bb38d59012415',
+  lulumiRev: '2ff15de39f01230e2f3fc1b21f37456b1e8da218',
 };
