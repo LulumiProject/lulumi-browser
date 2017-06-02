@@ -249,6 +249,7 @@
             newElement.removeEventListener('click', this.clickHandler, false);
             originalInput.removeEventListener('blur', this.blurHandler, false);
           }
+          this.$refs.input.suggestions = [];
         }
       },
     },

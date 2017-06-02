@@ -110,13 +110,21 @@ const mutations = {
     state.pages[payload.pageIndex].canRefresh = true;
   },
   [types.DID_STOP_LOADING](state, payload) {
+    const regexp = new RegExp('^lulumi(-extension)?://.+$');
     const url = payload.webview.getURL();
     state.pages[payload.pageIndex].location = decodeURIComponent(url);
-    if (url.startsWith(config.lulumiPagesCustomProtocol)) {
-      const guestUrl = require('url').parse(url);
-      const guestHash = guestUrl.hash.substr(2);
-      state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
-      state.pages[payload.pageIndex].location = decodeURIComponent(url);
+    if (url.match(regexp)) {
+      if (url.match(regexp)[1] === undefined) {
+        const guestUrl = require('url').parse(url);
+        const guestHash = guestUrl.hash.substr(2);
+        state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+        state.pages[payload.pageIndex].location = decodeURIComponent(url);
+      } else {
+        state.pages[payload.pageIndex].statusText = false;
+        state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
+        state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
+        state.pages[payload.pageIndex].isLoading = false;
+      }
       state.pages[payload.pageIndex].favicon = config.tabConfig.lulumiFavicon;
     } else {
       if (!state.pages[payload.pageIndex].title) {
@@ -125,6 +133,7 @@ const mutations = {
       if (!state.pages[payload.pageIndex].favicon) {
         state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
       }
+      // history
       if (state.pages[payload.pageIndex].title !== 'error') {
         if (state.history.length !== 0) {
           if (state.history[state.history.length - 1].url
