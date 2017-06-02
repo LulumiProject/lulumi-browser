@@ -18,7 +18,7 @@
         ref="input")
         template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.favicon') }}
         template(slot="append")
-          img.preview(:src="defaultFavicon")
+          img.preview(:src="defaultFavicon", width="24px")
 </template>
 
 <script>

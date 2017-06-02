@@ -33,7 +33,7 @@ function clean () {
  */
 function rev() {
   console.log('\x1b[34mWriting rev into app(s)...\n\x1b[0m')
-  const appConfig = require('path').resolve(__dirname ,'../src/renderer/js/constants/config.js')
+  const appConfig = require('path').resolve(__dirname ,'../src/main/js/constants/config.js')
   fs.readFile(appConfig, 'utf8', (err, data) => {
     if (err) {
       console.error(err)

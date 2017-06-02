@@ -6,7 +6,7 @@ import path from 'path';
 import punycode from 'punycode';
 import url from 'url';
 
-import config from '../renderer/js/constants/config';
+import config from '../main/js/constants/config';
 import './extensions/listeners';
 
 const objectValues = object => Object.keys(object).map(key => object[key]);

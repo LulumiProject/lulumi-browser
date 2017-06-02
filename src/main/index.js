@@ -6,9 +6,17 @@ import { app, BrowserWindow, ipcMain, protocol, shell, systemPreferences } from 
 import menu from './js/lib/menu';
 import session from './js/lib/session';
 import autoUpdater from './js/lib/auto-updater';
-import config from '../renderer/js/constants/config';
-import promisify from '../renderer/js/lib/promisify';
+import config from './js/constants/config';
+import promisify from './js/lib/promisify';
 import * as lulumiExtension from '../api/lulumi-extension';
+
+/**
+ * Set `__static` path to static files in production
+ */
+if (process.env.NODE_ENV !== 'development') {
+  // eslint-disable-next-line no-underscore-dangle
+  global.__static = path.resolve(__dirname, '../static');
+}
 
 let mainWindow;
 
