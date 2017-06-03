@@ -12,6 +12,7 @@ import * as lulumiExtension from '../api/lulumi-extension';
 
 /**
  * Set `__static` path to static files in production
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
   // eslint-disable-next-line no-underscore-dangle

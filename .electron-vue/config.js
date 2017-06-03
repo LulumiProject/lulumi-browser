@@ -13,7 +13,7 @@ const config = {
   port: 9080,
 
   // electron-packager options
-  // Docs: https://simulatedgreg.gitbooks.io/electron-vue/content/docs/building_your_app.html
+  // https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-packager.html
   building: {
     arch: 'x64',
     asar: true,
