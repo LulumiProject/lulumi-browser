@@ -3,7 +3,7 @@
     transition(name="notification")
       #notification(v-show="showNotification && isActive")
         notification
-    webview(:element-loading-text="$t('page.loading')", ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(plugins, :element-loading-text="$t('page.loading')", ref="webview", :class="isActive ? 'active' : 'hidden'")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", :placeholder="$t('page.findInPage.placeholder')")
       span(ref="findinpageCount")

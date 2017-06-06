@@ -60,7 +60,7 @@ function createWindow() {
     width: 1080,
     minWidth: 320,
     minHeight: 500,
-    titleBarStyle: 'hidden-inset',
+    titleBarStyle: 'hiddenInset',
     autoHideMenuBar: true,
   });
 
