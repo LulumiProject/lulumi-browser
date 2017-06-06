@@ -473,11 +473,12 @@ aws4@^1.2.1:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
-axios@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.1.tgz#c0b6d26600842384b8f509e57111f0d2df8223ca"
+axios@^0.16.2:
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.2.tgz#ba4f92f17167dfbab40983785454b9ac149c3c6d"
   dependencies:
     follow-redirects "^1.2.3"
+    is-buffer "^1.1.5"
 
 babel-code-frame@^6.11.0, babel-code-frame@^6.16.0, babel-code-frame@^6.22.0:
   version "6.22.0"
@@ -715,13 +716,13 @@ babel-plugin-espower@^2.3.2:
     espurify "^1.6.0"
     estraverse "^4.1.1"
 
-babel-plugin-istanbul@^4.1.3:
-  version "4.1.3"
-  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.1.3.tgz#6ee6280410dcf59c7747518c3dfd98680958f102"
+babel-plugin-istanbul@^4.1.4:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.1.4.tgz#18dde84bf3ce329fddf3f4103fae921456d8e587"
   dependencies:
     find-up "^2.1.0"
-    istanbul-lib-instrument "^1.7.1"
-    test-exclude "^4.1.0"
+    istanbul-lib-instrument "^1.7.2"
+    test-exclude "^4.1.1"
 
 babel-plugin-minify-builtins@^0.1.1:
   version "0.1.1"
@@ -1689,9 +1690,9 @@ cfonts@^1.1.3:
     commander "2.9.0"
     window-size "0.3.0"
 
-chai@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/chai/-/chai-4.0.0.tgz#f6c989e45a5707d40c54d97ddd7ca89b30a6a06a"
+chai@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/chai/-/chai-4.0.2.tgz#2f7327c4de6f385dd7787999e2ab02697a32b83b"
   dependencies:
     assertion-error "^1.0.1"
     check-error "^1.0.1"
@@ -2743,20 +2744,7 @@ electron-download@^3.0.1:
     semver "^5.3.0"
     sumchecker "^1.2.0"
 
-electron-download@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-4.0.0.tgz#53b54b744f992a89b198a7c23c2c4c329aaedabd"
-  dependencies:
-    debug "^2.2.0"
-    fs-extra "^2.0.0"
-    minimist "^1.2.0"
-    nugget "^2.0.0"
-    path-exists "^3.0.0"
-    rc "^1.1.2"
-    semver "^5.3.0"
-    sumchecker "^2.0.1"
-
-electron-download@^4.1.0:
+electron-download@^4.0.0, electron-download@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-4.1.0.tgz#bf932c746f2f87ffcc09d1dd472f2ff6b9187845"
   dependencies:
@@ -2790,9 +2778,9 @@ electron-osx-sign@^0.4.1:
     plist "^2.0.1"
     tempfile "^1.1.1"
 
-electron-packager@^8.7.0:
-  version "8.7.0"
-  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-8.7.0.tgz#3a2b82219f0046b48130ccfc26764f149de7b9d2"
+electron-packager@^8.7.1:
+  version "8.7.1"
+  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-8.7.1.tgz#22607a44116cb4c1bce72246783990cae4fcf903"
   dependencies:
     asar "^0.13.0"
     debug "^2.2.0"
@@ -2835,9 +2823,9 @@ electron@^1.7.2:
     electron-download "^3.0.1"
     extract-zip "^1.0.3"
 
-element-ui@^1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.4.tgz#119322bda2a93b6481e1b8cfcded6947486abcd8"
+element-ui@^1.3.5:
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.3.5.tgz#b2bae0bd09cff986ead0d1b12c5541eba7802823"
   dependencies:
     async-validator "^1.6.9"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -3449,9 +3437,9 @@ file-entry-cache@^2.0.0:
     flat-cache "^1.2.1"
     object-assign "^4.0.1"
 
-file-loader@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-0.11.1.tgz#6b328ee1234a729e4e47d36375dd6d35c0e1db84"
+file-loader@^0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-0.11.2.tgz#4ff1df28af38719a6098093b88c82c71d1794a34"
   dependencies:
     loader-utils "^1.0.2"
 
@@ -4274,7 +4262,7 @@ is-binary-path@^1.0.0:
   dependencies:
     binary-extensions "^1.0.0"
 
-is-buffer@^1.0.2:
+is-buffer@^1.0.2, is-buffer@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.5.tgz#1f3b26ef613b214b88cbca23cc6c01d87961eecc"
 
@@ -4535,20 +4523,20 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
-istanbul-lib-coverage@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-1.1.0.tgz#caca19decaef3525b5d6331d701f3f3b7ad48528"
+istanbul-lib-coverage@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-1.1.1.tgz#73bfb998885299415c93d38a3e9adf784a77a9da"
 
-istanbul-lib-instrument@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-1.7.1.tgz#169e31bc62c778851a99439dd99c3cc12184d360"
+istanbul-lib-instrument@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-1.7.2.tgz#6014b03d3470fb77638d5802508c255c06312e56"
   dependencies:
     babel-generator "^6.18.0"
     babel-template "^6.16.0"
     babel-traverse "^6.18.0"
     babel-types "^6.18.0"
     babylon "^6.13.0"
-    istanbul-lib-coverage "^1.1.0"
+    istanbul-lib-coverage "^1.1.1"
     semver "^5.3.0"
 
 istanbul@^0.4.0:
@@ -4570,9 +4558,9 @@ istanbul@^0.4.0:
     which "^1.1.1"
     wordwrap "^1.0.0"
 
-iview@^2.0.0-rc.14:
-  version "2.0.0-rc.14"
-  resolved "https://registry.yarnpkg.com/iview/-/iview-2.0.0-rc.14.tgz#7180e2ac5140bf895924d7961997e6a5366eb6cc"
+iview@^2.0.0-rc.16:
+  version "2.0.0-rc.16"
+  resolved "https://registry.yarnpkg.com/iview/-/iview-2.0.0-rc.16.tgz#e19c70f4ff7a0c67f5e202b7ec2814c87b880242"
   dependencies:
     async-validator "^1.6.7"
     core-js "^2.4.1"
@@ -4901,9 +4889,9 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-less-loader@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-4.0.3.tgz#d1e6462ca2f090c11248455e14b8dda4616d0521"
+less-loader@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-4.0.4.tgz#b4a8c43843e65c67d2ea2eb1465b5c4233d5006a"
   dependencies:
     clone "^2.1.1"
     loader-utils "^1.1.0"
@@ -6570,24 +6558,24 @@ pug-error@^1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/pug-error/-/pug-error-1.3.2.tgz#53ae7d9d29bb03cf564493a026109f54c47f5f26"
 
-pug-filters@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/pug-filters/-/pug-filters-2.1.2.tgz#3590b41adb34749f71d3f1f1a9f745011119117b"
+pug-filters@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/pug-filters/-/pug-filters-2.1.3.tgz#d59767a220de797dd755489f66834cf9aa83aa54"
   dependencies:
     clean-css "^3.3.0"
     constantinople "^3.0.1"
     jstransformer "1.0.0"
     pug-error "^1.3.2"
-    pug-walk "^1.1.2"
+    pug-walk "^1.1.3"
     resolve "^1.1.6"
     uglify-js "^2.6.1"
 
-pug-html-loader@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/pug-html-loader/-/pug-html-loader-1.1.4.tgz#83703f05dcae77e42c2ec9864857f46e468319c0"
+pug-html-loader@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/pug-html-loader/-/pug-html-loader-1.1.5.tgz#b46855a7790a306e43ec5db297dbdbb7995f4b5a"
   dependencies:
     loader-utils "^0.2.17"
-    pug "^2.0.0-beta9"
+    pug "^2.0.0-rc.2"
 
 pug-lexer@^3.1.0:
   version "3.1.0"
@@ -6597,23 +6585,23 @@ pug-lexer@^3.1.0:
     is-expression "^3.0.0"
     pug-error "^1.3.2"
 
-pug-linker@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/pug-linker/-/pug-linker-3.0.0.tgz#2416f06aaa1a9720e3b3261d1e8ca72f6f5123d2"
+pug-linker@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/pug-linker/-/pug-linker-3.0.1.tgz#ba3f8ff213ca8f3a304859b44fed13ca7b9dfa19"
   dependencies:
     pug-error "^1.3.2"
-    pug-walk "^1.1.2"
+    pug-walk "^1.1.3"
 
-pug-load@^2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/pug-load/-/pug-load-2.0.6.tgz#86da4b31c4f76fd9a471982b9b3d00e6c8a3f945"
+pug-load@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/pug-load/-/pug-load-2.0.7.tgz#531d0c6e11546010e984630d03df406367d2de77"
   dependencies:
     object-assign "^4.1.0"
-    pug-walk "^1.1.2"
+    pug-walk "^1.1.3"
 
-pug-parser@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/pug-parser/-/pug-parser-2.0.2.tgz#53a680cfd05039dcb0c27d029094bc4a792689b0"
+pug-parser@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/pug-parser/-/pug-parser-3.0.0.tgz#37c619dd800f642187ce4d6ce1a164cdd75487a3"
   dependencies:
     pug-error "^1.3.2"
     token-stream "0.0.1"
@@ -6628,20 +6616,20 @@ pug-strip-comments@^1.0.2:
   dependencies:
     pug-error "^1.3.2"
 
-pug-walk@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/pug-walk/-/pug-walk-1.1.2.tgz#debb24c070a95d5fc2aebf3589261833d2332e3b"
+pug-walk@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/pug-walk/-/pug-walk-1.1.3.tgz#d7cd5b23db3ca87c636c86a0973f9cd8e030436c"
 
-pug@^2.0.0-beta9, pug@^2.0.0-rc.1:
-  version "2.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/pug/-/pug-2.0.0-rc.1.tgz#723c08b3349bb9b96865b9ed7d3e379e247cd984"
+pug@^2.0.0-rc.2:
+  version "2.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/pug/-/pug-2.0.0-rc.2.tgz#07845527790ab2c6be67dcf5eb1f31804081f04a"
   dependencies:
     pug-code-gen "^1.1.1"
-    pug-filters "^2.1.2"
+    pug-filters "^2.1.3"
     pug-lexer "^3.1.0"
-    pug-linker "^3.0.0"
-    pug-load "^2.0.6"
-    pug-parser "^2.0.2"
+    pug-linker "^3.0.1"
+    pug-load "^2.0.7"
+    pug-parser "^3.0.0"
     pug-runtime "^2.0.3"
     pug-strip-comments "^1.0.2"
 
@@ -7016,9 +7004,9 @@ request@2.79.0:
     tunnel-agent "~0.4.1"
     uuid "^3.0.0"
 
-require-dir@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/require-dir/-/require-dir-0.3.1.tgz#b5a8e28bae0343bb0d0cc38ab1f531e1931b264a"
+require-dir@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/require-dir/-/require-dir-0.3.2.tgz#c1d5c75e9fbffde9f2e6b33e383db4f594b5a6a9"
 
 require-directory@^2.1.1:
   version "2.1.1"
@@ -7069,13 +7057,7 @@ resolve@1.1.x:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.1.7.tgz#203114d82ad2c5ed9e8e0411b3932875e889e97b"
 
-resolve@^1.1.6:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.3.2.tgz#1f0442c9e0cbb8136e87b9305f932f46c7f28235"
-  dependencies:
-    path-parse "^1.0.5"
-
-resolve@^1.2.0, resolve@^1.3.3:
+resolve@^1.1.6, resolve@^1.2.0, resolve@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.3.3.tgz#655907c3469a8680dc2de3a275a8fdd69691f0e5"
   dependencies:
@@ -7402,9 +7384,9 @@ sort-keys@^1.0.0, sort-keys@^1.1.1, sort-keys@^1.1.2:
   dependencies:
     is-plain-obj "^1.0.0"
 
-sortablejs@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.5.1.tgz#efae13b84c677f3b3d3f4f8e46c7e05fc6acb525"
+sortablejs@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.6.0.tgz#097cc19267218af2ca1cd455ed858f380136ab68"
 
 source-list-map@^0.1.7, source-list-map@~0.1.7:
   version "0.1.8"
@@ -7647,9 +7629,9 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
-style-loader@^0.18.1:
-  version "0.18.1"
-  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-0.18.1.tgz#6afca8953c842830e5e2dc84796309880a97f7e8"
+style-loader@^0.18.2:
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-0.18.2.tgz#cc31459afbcd6d80b7220ee54b291a9fd66ff5eb"
   dependencies:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
@@ -7776,9 +7758,9 @@ term-size@^0.1.0:
   dependencies:
     execa "^0.4.0"
 
-test-exclude@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.1.0.tgz#04ca70b7390dd38c98d4a003a173806ca7991c91"
+test-exclude@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.1.1.tgz#4d84964b0966b0087ecc334a2ce002d3d9341e26"
   dependencies:
     arrify "^1.0.1"
     micromatch "^2.3.11"
@@ -8232,9 +8214,9 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@^6.1.3:
-  version "6.1.3"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-6.1.3.tgz#17e561d8d3b6744e09d623193ccde74a035f0a54"
+vue-i18n@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.0.1.tgz#d43e206b8ac9b918a06d8de4a3e29d8a9adc89b9"
 
 vue-loader@^12.2.1:
   version "12.2.1"
