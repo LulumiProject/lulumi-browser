@@ -215,6 +215,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
 
   lulumi.runtime = {
     id: thisExtensionId,
+    getManifest: () => remote.getGlobal('manifestMap')[thisExtensionId],
     getURL: path => url.format({
       protocol: 'lulumi-extension',
       slashes: true,
