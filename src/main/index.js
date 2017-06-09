@@ -403,6 +403,7 @@ ipcMain.on('set-lang', (event, val) => {
       promisify(writeFile, langPath, JSON.stringify(val.lang))
         .then(() => {
           setLanguage = true;
+          menu.setLocale(val.lang);
           app.quit();
         });
     }
