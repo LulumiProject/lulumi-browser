@@ -1,3 +1,58 @@
+export const appMenu = {
+  app: {
+    about: 'About %{appName}',
+    services: {
+      title: 'Services',
+    },
+    hide: 'Hide %{appName}',
+    hideOthers: 'Hide Others',
+    unhide: 'Show All',
+    quit: 'Quit %{appName}',
+  },
+  file: {
+    title: 'File',
+    newTab: 'New Tab',
+    closeTab: 'Close Tab',
+  },
+  edit: {
+    title: 'Edit',
+    undo: 'Undo',
+    redo: 'Redo',
+    cut: 'Cut',
+    copy: 'Copy',
+    paste: 'Paste',
+    pasteAndMatchStyle: 'Paste and Match Style',
+    delete: 'Delete',
+    selectAll: 'Select All',
+    find: 'Find',
+    speech: {
+      title: 'Speech',
+      startSpeaking: 'Start Speaking',
+      stopSpeaking: 'Stop Speaking',
+    },
+  },
+  view: {
+    title: 'View',
+    reload: 'Reload',
+    forceReload: 'Force Reload',
+    toggleDevTools: 'Toggle Developer Tools',
+    resetZoom: 'Actual Size',
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
+    toggleFullscreen: 'Toggle Fullscreen',
+  },
+  window: {
+    title: 'Window',
+    minimize: 'Minimize',
+    close: 'Close Window',
+    front: 'Bring All to Front',
+  },
+  help: {
+    title: 'Help',
+    reportIssue: 'Report Issue',
+  },
+};
+
 export const guest = {
   about: {
     aboutPage: 'About Page',

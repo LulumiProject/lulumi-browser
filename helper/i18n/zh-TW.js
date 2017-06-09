@@ -1,3 +1,58 @@
+export const appMenu = {
+  app: {
+    about: '關於 %{appName}',
+    services: {
+      title: '服務',
+    },
+    hide: '隱藏 %{appName}',
+    hideOthers: '隱藏其他',
+    unhide: '全部顯示',
+    quit: '離開 %{appName}',
+  },
+  file: {
+    title: '檔案',
+    newTab: '新增分頁',
+    closeTab: '關閉分頁',
+  },
+  edit: {
+    title: '編輯',
+    undo: '還原輸入',
+    redo: '重做',
+    cut: '剪下',
+    copy: '複製',
+    paste: '貼上',
+    pasteAndMatchStyle: '貼上並符合樣式',
+    delete: '刪除',
+    selectAll: '全選',
+    find: '尋找',
+    speech: {
+      title: '語音',
+      startSpeaking: '開始',
+      stopSpeaking: '暫停',
+    },
+  },
+  view: {
+    title: '檢視',
+    reload: '重新載入此網頁',
+    forceReload: '強制重新載入此網頁',
+    toggleDevTools: '開發人員工具',
+    resetZoom: '實際大小',
+    zoomIn: '放大',
+    zoomOut: '縮小',
+    toggleFullscreen: '進入全螢幕',
+  },
+  window: {
+    title: '視窗',
+    minimize: '最小化',
+    close: '關閉視窗',
+    front: '全部移至最上層',
+  },
+  help: {
+    title: '說明',
+    reportIssue: '回報問題',
+  },
+};
+
 export const guest = {
   about: {
     aboutPage: '關於頁面',

@@ -553,7 +553,7 @@
         webContents.send('guest-here-your-data', this.$store.getters.history);
       },
       // tabHandlers
-      onNewTab(location) {
+      onNewTab(location, follow = false) {
         this.$store.dispatch('incrementPid');
         if (location) {
           if (location.startsWith('about:')) {
@@ -564,7 +564,7 @@
           } else {
             this.$store.dispatch('createTab', {
               url: location,
-              follow: false,
+              follow,
             });
           }
         } else {

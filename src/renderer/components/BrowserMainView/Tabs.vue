@@ -114,9 +114,9 @@
           this.$parent.onClickRefresh();
         }
       });
-      ipc.on('new-tab', () => {
+      ipc.on('new-tab', (event, payload) => {
         if (this.$parent.onNewTab) {
-          this.$parent.onNewTab();
+          this.$parent.onNewTab(payload.location, payload.follow);
         }
       });
       ipc.on('tab-close', () => {
