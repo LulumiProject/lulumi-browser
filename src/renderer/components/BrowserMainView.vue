@@ -793,11 +793,11 @@
                   menuItem.click = (menuItem, BrowserWindow) => {
                     this.$electron.remote.webContents.fromId(menuItem.webContentsId)
                       .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}-${menuItem.digest}`,
-                      event.params,
-                      this.currentPageIndex,
-                      menuItem,
-                      BrowserWindow,
-                    );
+                        event.params,
+                        this.currentPageIndex,
+                        menuItem,
+                        BrowserWindow,
+                      );
                   };
                   const submenu = menuItem.submenu;
                   if (submenu) {
@@ -806,11 +806,11 @@
                       sub.click = (menuItem, BrowserWindow) => {
                         this.$electron.remote.webContents.fromId(sub.webContentsId)
                           .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}-${sub.digest}`,
-                          event.params,
-                          this.currentPageIndex,
-                          menuItem,
-                          BrowserWindow,
-                        );
+                            event.params,
+                            this.currentPageIndex,
+                            menuItem,
+                            BrowserWindow,
+                          );
                       };
                     });
                   }
@@ -1016,6 +1016,10 @@
       if (window.process.platform === 'darwin') {
         document.body.classList.add('darwin');
       }
+
+      ipc.on('startFindInPage', () => {
+        this.getPage(this.currentPageIndex).findInPage();
+      });
 
       ipc.on('open-pdf', (event, data) => {
         if (this.onOpenPDF) {

@@ -57,6 +57,17 @@
           }
         };
       },
+      findInPage() {
+        if (this.hidden) {
+          this.findinpage.start();
+          this.findinpage.counter.textContent = `
+            ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
+          `;
+        } else {
+          this.findinpage.input.focus();
+          this.findinpage.input.select();
+        }
+      },
     },
     watch: {
       isActive(newState) {
@@ -97,9 +108,7 @@
         webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
-      const ipc = this.$electron.ipcRenderer;
-
-      const findinpage = {
+      this.findinpage = {
         container: this.$refs.findinpageBar,
         input: this.$refs.findinpageInput,
         counter: this.$refs.findinpageCount,
@@ -108,62 +117,62 @@
         endButton: this.$refs.findinpageEnd,
         activeWebview: webview,
         start: () => {
-          findinpage.counter.textContent = '';
+          this.findinpage.counter.textContent = '';
           this.hidden = false;
           this.$nextTick(() => {
-            findinpage.input.focus();
-            findinpage.input.select();
+            this.findinpage.input.focus();
+            this.findinpage.input.select();
           });
 
-          if (findinpage.input.value) {
-            this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value);
+          if (this.findinpage.input.value) {
+            this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value);
           }
         },
         end: () => {
           this.hidden = true;
 
           this.$nextTick(() => {
-            if (findinpage.activeWebview) {
-              findinpage.activeWebview.stopFindInPage('keepSelection');
-              if (findinpage.input === document.activeElement) {
-                findinpage.activeWebview.focus();
+            if (this.findinpage.activeWebview) {
+              this.findinpage.activeWebview.stopFindInPage('keepSelection');
+              if (this.findinpage.input === document.activeElement) {
+                this.findinpage.activeWebview.focus();
               }
             }
           });
         },
       };
 
-      findinpage.endButton.addEventListener('click', () => {
-        findinpage.end();
+      this.findinpage.endButton.addEventListener('click', () => {
+        this.findinpage.end();
       });
 
-      findinpage.input.addEventListener('input', (event) => {
+      this.findinpage.input.addEventListener('input', (event) => {
         if (event.target.value) {
-          this.requestId = findinpage.activeWebview.findInPage(event.target.value);
+          this.requestId = this.findinpage.activeWebview.findInPage(event.target.value);
         }
       });
 
-      findinpage.input.addEventListener('keypress', (event) => {
+      this.findinpage.input.addEventListener('keypress', (event) => {
         if (event.keyCode === 13) {
-          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
+          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
             forward: true,
             findNext: true,
           });
         }
       });
 
-      findinpage.previous.addEventListener('click', () => {
-        if (findinpage.input.value) {
-          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
+      this.findinpage.previous.addEventListener('click', () => {
+        if (this.findinpage.input.value) {
+          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
             forward: false,
             findNext: true,
           });
         }
       });
 
-      findinpage.next.addEventListener('click', () => {
-        if (findinpage.input.value) {
-          this.requestId = findinpage.activeWebview.findInPage(findinpage.input.value, {
+      this.findinpage.next.addEventListener('click', () => {
+        if (this.findinpage.input.value) {
+          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
             forward: true,
             findNext: true,
           });
@@ -180,26 +189,9 @@
             } else {
               match = 2;
             }
-            findinpage.counter.textContent = `
+            this.findinpage.counter.textContent = `
               ${this.$t('page.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('page.findInPage.match', match)}
             `;
-          }
-        }
-      });
-
-      // Every page would add a listenter to the startFindInPage event,
-      // so ignore the listenters warning.
-      ipc.setMaxListeners(0);
-      ipc.on('startFindInPage', () => {
-        if (this.pageIndex === this.$store.getters.currentPageIndex) {
-          if (this.hidden) {
-            findinpage.start();
-            findinpage.counter.textContent = `
-              ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
-            `;
-          } else {
-            findinpage.input.focus();
-            findinpage.input.select();
           }
         }
       });
@@ -209,12 +201,6 @@
         = `calc(100vh - ${nav.clientHeight}px)`;
       this.$el.querySelector('.findinpage-bar').style.top = `${nav.clientHeight}px`;
       this.navigateTo(this.page.location);
-    },
-    beforeDestroy() {
-      const ipc = this.$electron.ipcRenderer;
-      ipc.removeAllListeners([
-        'startFindInPage',
-      ]);
     },
   };
 </script>
