@@ -108,6 +108,10 @@ let rendererConfig = {
       }
     ]
   },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
+  },
   plugins: [
     new ExtractTextPlugin('[name].css'),
     new HtmlWebpackPlugin({
@@ -231,6 +235,10 @@ let aboutConfig = {
         },
       }
     ]
+  },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
     new ExtractTextPlugin('[name].css'),

@@ -81,7 +81,7 @@ const startBackgroundPages = (manifest) => {
     } else {
       name = '_generated_background_page.html';
       const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
-      html = new Buffer(`<html><body>${scripts}</body></html>`);
+      html = Buffer.from(`<html><body>${scripts}</body></html>`);
     }
 
     const contents = webContents.create({
