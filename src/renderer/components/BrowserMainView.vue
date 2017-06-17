@@ -998,7 +998,7 @@
       const ipc = this.$electron.ipcRenderer;
       const webFrame = this.$electron.webFrame;
 
-      webFrame.setZoomLevelLimits(1, 1);
+      webFrame.setVisualZoomLevelLimits(1, 1);
       ipc.on('set-app-state', (event, newState) => {
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
