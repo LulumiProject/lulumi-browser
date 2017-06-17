@@ -82,7 +82,7 @@
         'load-commit': 'onLoadCommit',
         'did-start-loading': 'onDidStartLoading',
         'did-stop-loading': 'onDidStopLoading',
-        'did-finish-load': 'onDidFinishLoading',
+        'did-finish-load': 'onDidFinishLoad',
         'did-fail-load': 'onDidFailLoad',
         'did-get-response-details': 'onDidGetResponseDetails',
         'did-get-redirect-request': 'onDidGetRedirectRequest',
@@ -102,6 +102,7 @@
         'context-menu': 'onContextMenu',
         'will-navigate': 'onWillNavigate',
         'did-navigate': 'onDidNavigate',
+        'did-navigate-in-page': 'onDidNavigateInPage',
       };
 
       Object.keys(webviewEvents).forEach((key) => {

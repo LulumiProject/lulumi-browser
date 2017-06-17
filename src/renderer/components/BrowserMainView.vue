@@ -98,6 +98,20 @@
         i = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
         return this.$store.getters.pages[i];
       },
+      historyMappings() {
+        const history = this.$store.getters.history;
+        const out = {};
+
+        history.forEach((h) => {
+          if (!out[h.url]) {
+            out[h.url] = {
+              title: h.title,
+              icon: h.favicon,
+            };
+          }
+        });
+        return out;
+      },
       // lulumi.alarms
       getAlarm(name) {
         return this.alarms[name];
@@ -452,7 +466,7 @@
           frameId: 0,
           parentFrameId: -1,
           processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-          tabId: this.pageIndex,
+          tabId: pageIndex,
           timeStamp: Date.now(),
           url: event.url,
         });
@@ -677,12 +691,14 @@
         const goBack = document.getElementById('browser-navbar__goBack');
 
         const current = webContents.getActiveIndex();
-        const history = webContents.history;
+        const locations = webContents.history;
 
-        if (current === history.length - 1 && current !== 0) {
+        const history = this.historyMappings();
+
+        if (current <= locations.length - 1 && current !== 0) {
           for (let i = current - 1; i >= 0; i--) {
             menu.append(new MenuItem({
-              label: history[i],
+              label: history[locations[i]].title,
               click: () => webview.goToIndex(i),
             }));
           }
@@ -715,12 +731,14 @@
         const goForward = document.getElementById('browser-navbar__goForward');
 
         const current = webContents.getActiveIndex();
-        const history = webContents.history;
+        const locations = webContents.history;
 
-        if (current < history.length - 1) {
-          for (let i = current + 1; i < history.length; i++) {
+        const history = this.historyMappings();
+
+        if (current <= locations.length - 1 && current !== locations.length - 1) {
+          for (let i = current + 1; i < locations.length; i++) {
             menu.append(new MenuItem({
-              label: history[i],
+              label: history[locations[i]].title,
               click: () => webview.goToIndex(i),
             }));
           }

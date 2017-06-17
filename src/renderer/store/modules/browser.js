@@ -133,6 +133,24 @@ const mutations = {
       if (!state.pages[payload.pageIndex].favicon) {
         state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
       }
+    }
+    state.pages[payload.pageIndex].statusText = false;
+    state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
+    state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
+    state.pages[payload.pageIndex].isLoading = false;
+  },
+  [types.DID_FAIL_LOAD](state, payload) {
+    if (payload.isMainFrame) {
+      state.pages[payload.pageIndex].title = 'error';
+      state.pages[payload.pageIndex].error = true;
+    }
+  },
+  [types.PAGE_TITLE_SET](state, payload) {
+    state.pages[payload.pageIndex].title = payload.webview.getTitle();
+    const regexp = new RegExp('^lulumi(-extension)?://.+$');
+    const url = payload.webview.getURL();
+    state.pages[payload.pageIndex].location = decodeURIComponent(url);
+    if (!url.match(regexp)) {
       // history
       if (state.pages[payload.pageIndex].title !== 'error') {
         if (state.history.length !== 0) {
@@ -159,19 +177,6 @@ const mutations = {
         }
       }
     }
-    state.pages[payload.pageIndex].statusText = false;
-    state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
-    state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-    state.pages[payload.pageIndex].isLoading = false;
-  },
-  [types.DID_FAIL_LOAD](state, payload) {
-    if (payload.isMainFrame) {
-      state.pages[payload.pageIndex].title = 'error';
-      state.pages[payload.pageIndex].error = true;
-    }
-  },
-  [types.PAGE_TITLE_SET](state, payload) {
-    state.pages[payload.pageIndex].title = payload.webview.getTitle();
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText
