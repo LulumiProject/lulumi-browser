@@ -162,7 +162,10 @@ export default {
       options: {
         preferences: '設定',
         downloads: '下載',
-        history: '紀錄',
+        history: {
+          title: '紀錄',
+          history: '紀錄',
+        },
         extensions: '擴充功能',
         help: '說明',
         lulumi: '關於 Lulumi',

@@ -112,6 +112,9 @@
         });
         return out;
       },
+      lastOpenedTabs() {
+        return this.$store.getters.lastOpenedTabs.slice(0, 8);
+      },
       // lulumi.alarms
       getAlarm(name) {
         return this.alarms[name];
@@ -691,10 +694,17 @@
 
         if (current <= locations.length - 1 && current !== 0) {
           for (let i = current - 1; i >= 0; i--) {
-            menu.append(new MenuItem({
-              label: history[locations[i]].title,
-              click: () => webview.goToIndex(i),
-            }));
+            try {
+              menu.append(new MenuItem({
+                label: history[locations[i]].title,
+                click: () => webview.goToIndex(i),
+              }));
+            } catch (e) {
+              menu.append(new MenuItem({
+                label: locations[i],
+                click: () => webview.goToIndex(i),
+              }));
+            }
           }
 
           menu.append(new MenuItem({ type: 'separator' }));
@@ -728,10 +738,17 @@
 
         if (current <= locations.length - 1 && current !== locations.length - 1) {
           for (let i = current + 1; i < locations.length; i++) {
-            menu.append(new MenuItem({
-              label: history[locations[i]].title,
-              click: () => webview.goToIndex(i),
-            }));
+            try {
+              menu.append(new MenuItem({
+                label: history[locations[i]].title,
+                click: () => webview.goToIndex(i),
+              }));
+            } catch (e) {
+              menu.append(new MenuItem({
+                label: locations[i],
+                click: () => webview.goToIndex(i),
+              }));
+            }
           }
 
           menu.append(new MenuItem({ type: 'separator' }));
@@ -790,11 +807,26 @@
         const navbar = document.getElementById('browser-navbar');
         const common = document.getElementById('browser-navbar__common');
 
+        const lastOpenedTabs = [];
+        this.lastOpenedTabs().forEach((tab) => {
+          lastOpenedTabs.push(new MenuItem({
+            label: tab.title,
+            click: () => this.onNewTab(tab.url),
+          }));
+        });
+
         menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.history'),
-          click: () => {
-            this.onNewTab('about:history');
-          },
+          label: this.$t('navbar.common.options.history.title'),
+          submenu: [
+            new MenuItem({
+              label: this.$t('navbar.common.options.history.history'),
+              click: () => {
+                this.onNewTab('about:history');
+              },
+            }),
+            new MenuItem({ type: 'separator' }),
+            new MenuItem({ label: '最近關閉的分頁', enabled: false }),
+          ].concat(lastOpenedTabs),
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.downloads'),

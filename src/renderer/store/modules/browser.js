@@ -18,6 +18,7 @@ const state = {
   history: [],
   permissions: {},
   mappings: [],
+  lastOpenedTabs: [],
 };
 
 function createPageObject(url) {
@@ -70,6 +71,13 @@ const mutations = {
   },
   [types.CLOSE_TAB](state, pageIndex) {
     if (state.pages.length > pageIndex) {
+      if (state.pages[pageIndex].title !== 'error') {
+        state.lastOpenedTabs.unshift({
+          title: state.pages[pageIndex].title,
+          url: state.pages[pageIndex].location,
+          favicon: state.pages[pageIndex].favicon,
+        });
+      }
       state.pages.splice(pageIndex, 1);
       if (state.pages.length === 0) {
         state.currentPageIndex = 0;

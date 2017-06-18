@@ -10,5 +10,6 @@ export const tabConfig = state => state.browser.tabConfig;
 export const lang = state => state.browser.lang;
 export const downloads = state => state.browser.downloads;
 export const history = state => state.browser.history;
+export const lastOpenedTabs = state => state.browser.lastOpenedTabs;
 export const permissions = state => state.browser.permissions;
 export const mappings = state => state.browser.mappings;

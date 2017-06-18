@@ -162,7 +162,10 @@ export default {
       options: {
         preferences: 'Preferences',
         downloads: 'Downloads',
-        history: 'History',
+        history: {
+          title: 'History',
+          history: 'History',
+        },
         extensions: 'Extensions',
         help: 'Help',
         lulumi: 'About Lulumi',
