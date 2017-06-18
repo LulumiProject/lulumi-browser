@@ -14,8 +14,8 @@ export const clickTab = ({ commit }, pageIndex) => {
   commit(types.CLICK_TAB, pageIndex);
 };
 
-export const didStartLoading = ({ commit }, pageIndex) => {
-  commit(types.DID_START_LOADING, pageIndex);
+export const didStartLoading = ({ commit }, pageIndex, webview) => {
+  commit(types.DID_START_LOADING, pageIndex, webview);
 };
 export const domReady = ({ commit }, pageIndex, webview) => {
   commit(types.DOM_READY, pageIndex, webview);
@@ -66,8 +66,8 @@ export const setDownloads = ({ commit }, val) => {
 export const setHistory = ({ commit }, val) => {
   commit(types.SET_HISTORY, val);
 };
-export const setPages = ({ commit }, val) => {
-  commit(types.SET_PAGES, val);
+export const setPages = ({ commit }, pages) => {
+  commit(types.SET_PAGES, pages);
 };
 export const setTabsOrder = ({ commit }, val) => {
   commit(types.SET_TABS_ORDER, val);

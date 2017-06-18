@@ -108,9 +108,12 @@ const mutations = {
     state.currentPageIndex = pageIndex;
   },
   // page handlers
-  [types.DID_START_LOADING](state, pageIndex) {
-    state.pages[pageIndex].isLoading = true;
-    state.pages[pageIndex].error = false;
+  [types.DID_START_LOADING](state, payload) {
+    const url = payload.webview.getURL();
+    state.pages[payload.pageIndex].location = decodeURIComponent(url);
+  
+    state.pages[payload.pageIndex].isLoading = true;
+    state.pages[payload.pageIndex].error = false;
   },
   [types.DOM_READY](state, payload) {
     state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
@@ -225,9 +228,8 @@ const mutations = {
   [types.SET_HISTORY](state, val) {
     state.history = val;
   },
-  [types.SET_PAGES](state, val) {
-    state.pid = val.pid;
-    state.pages = val.pages;
+  [types.SET_PAGES](state, pages) {
+    state.pages = pages;
   },
   [types.SET_TABS_ORDER](state, val) {
     if (val.length === 0) {

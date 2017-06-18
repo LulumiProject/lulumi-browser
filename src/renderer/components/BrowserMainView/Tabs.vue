@@ -121,7 +121,7 @@
       });
       ipc.on('tab-close', () => {
         if (this.$parent.onTabClose) {
-          this.$parent.onTabClose();
+          this.$parent.onTabClose(this.currentPageIndex);
         }
       });
     },

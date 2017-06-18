@@ -2,16 +2,15 @@ import urlResource from './url-resource';
 
 export default (oldPages, tabRefs, newStart, newOrder, immutable = false) => {
   const newPages = [];
-  oldPages.map((page, index) => {
+  oldPages.forEach((page, index) => {
     if (newOrder.length === 0) {
       newPages[index] = Object.assign({}, page);
     } else {
       newPages[index] = Object.assign({}, oldPages[newOrder[index]]);
     }
-    return true;
   });
   if (!immutable) {
-    newPages.map((page, index) => {
+    newPages.forEach((page, index) => {
       page.pid = newStart + index;
       if (page.location.startsWith('about:')) {
         page.location = urlResource.aboutUrls(page.location);
@@ -19,7 +18,6 @@ export default (oldPages, tabRefs, newStart, newOrder, immutable = false) => {
       if (page.location.startsWith('lulumi-extension:')) {
         page.location = urlResource.aboutUrls('about:newtab');
       }
-      return true;
     });
   }
   return newPages;

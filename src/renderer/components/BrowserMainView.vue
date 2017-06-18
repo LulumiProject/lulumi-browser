@@ -165,7 +165,10 @@
       // pageHandlers
       onDidStartLoading(event, pageIndex) {
         const webview = this.getWebView(pageIndex);
-        this.$store.dispatch('didStartLoading', pageIndex);
+        this.$store.dispatch('didStartLoading', {
+          pageIndex,
+          webview,
+        });
         this.$store.dispatch('updateMappings', {
           webContentsId: webview.getWebContents().id,
           pageIndex,
@@ -597,18 +600,12 @@
       onTabClose(pageIndex) {
         this.onRemovedEvent.emit(new Tab(pageIndex, this.getPage(pageIndex)));
         const newPages = tabsOrdering(this.pages, this.$refs.tabs, 0, this.tabsOrder, true);
-        this.$store.dispatch('setPages', {
-          pid: this.$store.getters.pid,
-          pages: newPages,
-        });
+        this.$store.dispatch('setPages', newPages);
         this.$nextTick(() => {
-          if (pageIndex === undefined) {
-            pageIndex = this.currentPageIndex;
-          }
           if (this.tabsOrder.length === 0) {
             this.$store.dispatch('closeTab', pageIndex);
           } else {
-            this.$store.dispatch('closeTab', this.tabsOrder.findIndex(element => element === pageIndex));
+            this.$store.dispatch('closeTab', this.tabsOrder.indexOf(pageIndex));
           }
           this.$store.dispatch('setTabsOrder', []);
         });
@@ -657,9 +654,7 @@
         menu.append(new MenuItem({
           label: this.$t('tabs.contextMenu.newTab'),
           accelerator: 'CmdOrCtrl+T',
-          click: () => {
-            this.onNewTab();
-          },
+          click: () => this.onNewTab(),
         }));
         menu.append(new MenuItem({
           label: this.$t('tabs.contextMenu.duplicateTab'),
@@ -710,9 +705,7 @@
           menu.append(new MenuItem({ type: 'separator' }));
           menu.append(new MenuItem({
             label: this.$t('navbar.navigator.history'),
-            click: () => {
-              this.onNewTab('about:history');
-            },
+            click: () => this.onNewTab('about:history'),
           }));
 
           menu.popup(this.$electron.remote.getCurrentWindow(), {
@@ -754,9 +747,7 @@
           menu.append(new MenuItem({ type: 'separator' }));
           menu.append(new MenuItem({
             label: this.$t('navbar.navigator.history'),
-            click: () => {
-              this.onNewTab('about:history');
-            },
+            click: () => this.onNewTab('about:history'),
           }));
 
           menu.popup(this.$electron.remote.getCurrentWindow(), {
@@ -820,9 +811,7 @@
           submenu: [
             new MenuItem({
               label: this.$t('navbar.common.options.history.history'),
-              click: () => {
-                this.onNewTab('about:history');
-              },
+              click: () => this.onNewTab('about:history'),
             }),
             new MenuItem({ type: 'separator' }),
             new MenuItem({ label: '最近關閉的分頁', enabled: false }),
@@ -830,32 +819,24 @@
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.downloads'),
-          click: () => {
-            this.onNewTab('about:downloads');
-          },
+          click: () => this.onNewTab('about:downloads'),
         }));
         menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.extensions'),
-          click: () => {
-            this.onNewTab('about:extensions');
-          },
+          click: () => this.onNewTab('about:extensions'),
         }));
         menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.preferences'),
-          click: () => {
-            this.onNewTab('about:preferences');
-          },
+          click: () => this.onNewTab('about:preferences'),
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.help'),
           submenu: [
             new MenuItem({
               label: this.$t('navbar.common.options.lulumi'),
-              click: () => {
-                this.onNewTab('about:lulumi');
-              },
+              click: () => this.onNewTab('about:lulumi'),
             }),
           ],
         }));
@@ -997,9 +978,7 @@
         if (event.params.linkURL) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.openLinkInNewTab'),
-            click: () => {
-              this.onNewTab(event.params.linkURL);
-            },
+            click: () => this.onNewTab(event.params.linkURL),
           }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.copyLinkAddress'),
@@ -1048,9 +1027,7 @@
           }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.openImageInNewTab'),
-            click: () => {
-              this.onNewTab(event.params.srcURL);
-            },
+            click: () => this.onNewTab(event.params.srcURL),
           }));
         }
 
@@ -1062,9 +1039,7 @@
                 selectionText: event.params.selectionText,
                 searchEngine: this.$store.getters.currentSearchEngine.name,
               }),
-              click: () => {
-                this.onNewTab(event.params.selectionText);
-              },
+              click: () => this.onNewTab(event.params.selectionText),
             }));
           }
         }
@@ -1088,9 +1063,7 @@
         if (sourceLocation !== null) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.viewSource'),
-            click: () => {
-              this.onNewTab(sourceLocation, true);
-            },
+            click: () => this.onNewTab(sourceLocation, true),
           }));
         }
         menu.append(new MenuItem({
