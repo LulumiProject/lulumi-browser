@@ -1,13 +1,13 @@
 <template lang="pug">
   #browser-navbar
     .control-group
-      a(@click="$parent.onClickHome")
+      a(@click="$parent.onClickHome", class="enabled")
         iview-icon(type="ios-home", size="16")
       a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-left-c", size="16")
       a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-right-c", size="16")
-      a(v-if="page.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop")
+      a(v-if="page.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
         iview-icon(type="close", size="16")
       a(v-else @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="page.canRefresh ? 'enabled' : 'disabled'")
         iview-icon(type="android-refresh", size="16")
@@ -33,8 +33,7 @@
             span {{ $t('navbar.indicator.insecure') }}
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
-          :key="extension",
-          style="padding-top: 3px;",)
+          :key="extension")
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
           img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                         :src="loadIcon(extension)",
@@ -44,7 +43,9 @@
                         @contextmenu.prevent="onContextmenu(extension)",
                         slot="reference")
           webview(:ref="`webview-${extension.extensionId}`")
-    el-cascader#dropdown(expand-trigger="hover", :options="options", v-model="selectedOptions", @change="handleChange")
+    .common-group
+      a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
+        iview-icon(type="android-more-vertical", size="22")
 </template>
 
 <script>
@@ -65,14 +66,13 @@
   import Fuse from 'fuse.js';
   import Sortable from 'sortablejs';
 
-  import { Button, Cascader, Popover } from 'element-ui';
+  import { Button, Popover } from 'element-ui';
   import IViewIcon from 'iview/src/components/icon';
 
   import Event from '../../../api/extensions/event';
 
   import '../../css/el-autocomplete';
   import '../../css/el-input';
-  import '../../css/el-cascader';
   import urlUtil from '../../js/lib/url-util';
   // import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
@@ -129,35 +129,6 @@
         focused: false,
         value: '',
         suggestions: recommendTopSite,
-        selectedOptions: [],
-        options: [
-          {
-            value: 'preferences',
-            label: this.$t('navbar.cascader.options.preferences'),
-          },
-          {
-            value: 'downloads',
-            label: this.$t('navbar.cascader.options.downloads'),
-          },
-          {
-            value: 'history',
-            label: this.$t('navbar.cascader.options.history'),
-          },
-          {
-            value: 'extensions',
-            label: this.$t('navbar.cascader.options.extensions'),
-          },
-          {
-            value: 'help',
-            label: this.$t('navbar.cascader.options.help'),
-            children: [
-              {
-                value: 'lulumi',
-                label: this.$t('navbar.cascader.options.lulumi'),
-              },
-            ],
-          },
-        ],
         extensions: [],
         onbrowserActionClickedEvent: new Event(),
         onpageActionClickedEvent: new Event(),
@@ -166,7 +137,6 @@
     components: {
       'awesome-icon': AwesomeIcon,
       'el-button': Button,
-      'el-cascader': Cascader,
       'el-popover': Popover,
       'iview-icon': IViewIcon,
     },
@@ -331,9 +301,6 @@
       },
       createFilter(queryString) {
         return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
-      },
-      handleChange(val) {
-        this.$parent.onNewTab(`about:${val.pop()}`);
       },
       loadIcon(extension) {
         try {
@@ -548,23 +515,24 @@
 
     a {
       flex: 1;
+      padding: 6%;
+      border-radius: 3px;
+      cursor: default;
       text-decoration: none;
       color: #777;
-      cursor: default;
 
-      &:hover {
-        text-decoration: none;
-        color: blue;
-      }
+      &.enabled {
+        &:hover {
+          background-color: rgb(210, 210, 210);
+        }
 
-      &:last-child {
-        border-top-right-radius: 3px;
-        border-bottom-right-radius: 3px;
+        &:active {
+          background-color: rgb(200, 200, 200);
+        }
       }
 
       &.disabled {
         color: #bbb;
-        cursor: default;
       }
     }
 
@@ -608,14 +576,14 @@
       .extension {
         width: 16px;
         padding: 5px;
-        border-radius: 2px;
+        border-radius: 3px;
 
         &:hover {
-          background-color: rgb(200, 200, 200);
+          background-color: rgb(210, 210, 210);
         }
 
         &:active {
-          background-color: rgb(180, 180, 180);
+          background-color: rgb(200, 200, 200);
         }
 
         &.disabled {
@@ -624,9 +592,15 @@
       }
     }
 
-    #dropdown {
-      width: 0px;
-      margin: 5px -5px 2px 30px;
+    .common-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+
+      #browser-navbar__common {
+        padding: 2px;
+      }
     }
   }
 </style>

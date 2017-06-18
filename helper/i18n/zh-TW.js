@@ -113,6 +113,9 @@ export const guest = {
 export default {
   webview: {
     contextMenu: {
+      back: '上一頁',
+      forward: '下一頁',
+      reload: '重新載入',
       undo: '還原',
       redo: '重做',
       cut: '剪下',
@@ -146,7 +149,16 @@ export default {
       secure: '安全',
       insecure: '一般',
     },
-    cascader: {
+    navigator: {
+      history: '顯示完整紀錄',
+    },
+    contextMenu: {
+      cut: '剪下',
+      copy: '複製',
+      paste: '貼上',
+      pasteAndGo: '貼上並搜尋',
+    },
+    common: {
       options: {
         preferences: '設定',
         downloads: '下載',
@@ -181,5 +193,10 @@ export default {
   },
   tabs: {
     loading: '載入中',
+    contextMenu: {
+      newTab: '新增分頁',
+      duplicateTab: '複製分頁',
+      closeTab: '關閉分頁',
+    },
   },
 };

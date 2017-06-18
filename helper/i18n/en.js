@@ -113,6 +113,9 @@ export const guest = {
 export default {
   webview: {
     contextMenu: {
+      back: 'Back',
+      forward: 'Forward',
+      reload: 'Reload',
       undo: 'Undo',
       redo: 'Redo',
       cut: 'Cut',
@@ -146,7 +149,16 @@ export default {
       secure: 'Secure',
       insecure: 'Normal',
     },
-    cascader: {
+    navigator: {
+      history: 'Show history',
+    },
+    contextMenu: {
+      cut: 'Cut',
+      copy: 'Copy',
+      paste: 'Paste',
+      pasteAndGo: 'Paste and Go',
+    },
+    common: {
       options: {
         preferences: 'Preferences',
         downloads: 'Downloads',
@@ -181,5 +193,10 @@ export default {
   },
   tabs: {
     loading: 'loading',
+    contextMenu: {
+      newTab: 'New Tab',
+      duplicateTab: 'Duplicate Tab',
+      closeTab: 'Close Tab',
+    },
   },
 };

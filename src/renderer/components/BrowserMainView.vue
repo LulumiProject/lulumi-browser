@@ -282,11 +282,7 @@
         this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
       },
       onNewWindow(event, pageIndex) {
-        this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab', {
-          url: event.url,
-          follow: true,
-        });
+        this.onNewTab(event.url, true);
         if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
           this.onCreatedNavigationTarget.emit({
             sourceFrameId: 0,
@@ -590,11 +586,7 @@
         this.onCreatedEvent.emit(new Tab(this.currentPageIndex, null));
       },
       onTabDuplicate(pageIndex) {
-        this.$store.dispatch('incrementPid');
-        this.$store.dispatch('createTab', {
-          url: this.pages[pageIndex].location,
-          follow: false,
-        });
+        this.onNewTab(this.pages[pageIndex].location);
       },
       onTabClick(pageIndex) {
         this.$store.dispatch('clickTab', pageIndex);
@@ -660,20 +652,22 @@
         const menu = new Menu();
 
         menu.append(new MenuItem({
-          label: 'New Tab',
+          label: this.$t('tabs.contextMenu.newTab'),
+          accelerator: 'CmdOrCtrl+T',
           click: () => {
             this.onNewTab();
           },
         }));
         menu.append(new MenuItem({
-          label: 'Duplicate',
+          label: this.$t('tabs.contextMenu.duplicateTab'),
           click: () => {
             this.onTabDuplicate(pageIndex);
           },
         }));
         menu.append(new MenuItem({ type: 'separator' }));
         menu.append(new MenuItem({
-          label: 'Close Tab',
+          label: this.$t('tabs.contextMenu.closeTab'),
+          accelerator: 'CmdOrCtrl+W',
           click: () => {
             this.onTabClose(pageIndex);
           },
@@ -705,12 +699,9 @@
 
           menu.append(new MenuItem({ type: 'separator' }));
           menu.append(new MenuItem({
-            label: 'Show history',
+            label: this.$t('navbar.navigator.history'),
             click: () => {
-              this.$store.dispatch('createTab', {
-                url: urlResource.aboutUrls('about:history'),
-                follow: true,
-              });
+              this.onNewTab('about:history');
             },
           }));
 
@@ -745,12 +736,9 @@
 
           menu.append(new MenuItem({ type: 'separator' }));
           menu.append(new MenuItem({
-            label: 'Show history',
+            label: this.$t('navbar.navigator.history'),
             click: () => {
-              this.$store.dispatch('createTab', {
-                url: urlResource.aboutUrls('about:history'),
-                follow: true,
-              });
+              this.onNewTab('about:history');
             },
           }));
 
@@ -769,19 +757,22 @@
         const clipboard = this.$electron.clipboard;
 
         menu.append(new MenuItem({
-          label: 'Cut',
+          label: this.$t('navbar.contextMenu.cut'),
+          accelerator: 'CmdOrCtrl+X',
           role: 'cut',
         }));
         menu.append(new MenuItem({
-          label: 'Copy',
+          label: this.$t('navbar.contextMenu.copy'),
+          accelerator: 'CmdOrCtrl+C',
           role: 'copy',
         }));
         menu.append(new MenuItem({
-          label: 'Paste',
+          label: this.$t('navbar.contextMenu.paste'),
+          accelerator: 'CmdOrCtrl+V',
           role: 'paste',
         }));
         menu.append(new MenuItem({
-          label: 'Paste and Go',
+          label: this.$t('navbar.contextMenu.pasteAndGo'),
           click: () => {
             let location = el.value.slice(0, el.selectionStart);
             location += clipboard.readText();
@@ -792,11 +783,65 @@
 
         menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
       },
+      // onCommonMenu
+      onCommonMenu() {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const navbar = document.getElementById('browser-navbar');
+        const common = document.getElementById('browser-navbar__common');
+
+        menu.append(new MenuItem({
+          label: this.$t('navbar.common.options.history'),
+          click: () => {
+            this.onNewTab('about:history');
+          },
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.common.options.downloads'),
+          click: () => {
+            this.onNewTab('about:downloads');
+          },
+        }));
+        menu.append(new MenuItem({ type: 'separator' }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.common.options.extensions'),
+          click: () => {
+            this.onNewTab('about:extensions');
+          },
+        }));
+        menu.append(new MenuItem({ type: 'separator' }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.common.options.preferences'),
+          click: () => {
+            this.onNewTab('about:preferences');
+          },
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.common.options.help'),
+          submenu: [
+            new MenuItem({
+              label: this.$t('navbar.common.options.lulumi'),
+              click: () => {
+                this.onNewTab('about:lulumi');
+              },
+            }),
+          ],
+        }));
+
+        menu.popup(this.$electron.remote.getCurrentWindow(), {
+          async: true,
+          x: Math.floor(common.getBoundingClientRect().right),
+          y: Math.floor(navbar.getBoundingClientRect().bottom),
+        });
+      },
       // onWebviewContextMenu
       onWebviewContextMenu(event) {
         const { Menu, MenuItem } = this.$electron.remote;
         const menu = new Menu();
         const clipboard = this.$electron.clipboard;
+
+        const webview = this.getWebView();
+        const page = this.getPageObject();
 
         const registerExtensionContextMenus = (menu) => {
           const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
@@ -840,9 +885,33 @@
           });
         };
 
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.back'),
+          click: () => {
+            this.onClickBack();
+          },
+          enabled: page.canGoBack,
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.forward'),
+          click: () => {
+            this.onClickForward();
+          },
+          enabled: page.canGoForward,
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.reload'),
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            this.onClickRefresh();
+          },
+          enabled: page.canRefresh,
+        }));
+
         if (event.params.editFlags.canUndo) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.undo'),
+            accelerator: 'CmdOrCtrl+Z',
             role: 'undo',
           }));
         }
@@ -850,6 +919,7 @@
         if (event.params.editFlags.canRedo) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.redo'),
+            accelerator: 'CmdOrCtrl+Shift+Z',
             role: 'redo',
           }));
         }
@@ -859,6 +929,7 @@
         if (event.params.editFlags.canCut) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.cut'),
+            accelerator: 'CmdOrCtrl+X',
             role: 'cut',
           }));
         }
@@ -866,6 +937,7 @@
         if (event.params.editFlags.canCopy) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.copy'),
+            accelerator: 'CmdOrCtrl+C',
             role: 'copy',
           }));
         }
@@ -873,16 +945,19 @@
         if (event.params.editFlags.canPaste) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.paste'),
+            accelerator: 'CmdOrCtrl+V',
             role: 'paste',
           }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.pasteAndMatchStyle'),
+            accelerator: 'CmdOrCtrl+Shift+V',
             role: 'pasteandmatchstyle',
           }));
         }
 
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.selectAll'),
+          accelerator: 'CmdOrCtrl+A',
           role: 'selectall',
         }));
         menu.append(new MenuItem({ type: 'separator' }));
@@ -891,11 +966,7 @@
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.openLinkInNewTab'),
             click: () => {
-              this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', {
-                url: event.params.linkURL,
-                follow: false,
-              });
+              this.onNewTab(event.params.linkURL);
             },
           }));
           menu.append(new MenuItem({
@@ -946,11 +1017,7 @@
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.openImageInNewTab'),
             click: () => {
-              this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', {
-                url: event.params.srcURL,
-                follow: false,
-              });
+              this.onNewTab(event.params.srcURL);
             },
           }));
         }
@@ -964,11 +1031,7 @@
                 searchEngine: this.$store.getters.currentSearchEngine.name,
               }),
               click: () => {
-                this.$store.dispatch('incrementPid');
-                this.$store.dispatch('createTab', {
-                  url: event.params.selectionText,
-                  follow: false,
-                });
+                this.onNewTab(event.params.selectionText);
               },
             }));
           }
@@ -979,7 +1042,7 @@
             menu.append(new MenuItem({
               label: this.$t('webview.contextMenu.lookUp', { selectionText: event.params.selectionText }),
               click: () => {
-                this.getWebView().showDefinitionForSelection();
+                webview.showDefinitionForSelection();
               },
             }));
           }
@@ -994,18 +1057,14 @@
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.viewSource'),
             click: () => {
-              this.$store.dispatch('incrementPid');
-              this.$store.dispatch('createTab', {
-                url: sourceLocation,
-                follow: true,
-              });
+              this.onNewTab(sourceLocation, true);
             },
           }));
         }
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.inspectElement'),
           click: () => {
-            this.getWebView().inspectElement(event.params.x, event.params.y);
+            webview.inspectElement(event.params.x, event.params.y);
           },
         }));
 
@@ -1021,10 +1080,7 @@
         if (newState && Object.keys(newState).length !== 0) {
           this.$store.dispatch('setAppState', newState);
         } else {
-          this.$store.dispatch('createTab', {
-            url: urlResource.aboutUrls('about:newtab'),
-            follow: true,
-          });
+          this.onNewTab('about:newtab');
         }
       });
     },

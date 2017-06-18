@@ -113,6 +113,9 @@ export const guest = {
 export default {
   webview: {
     contextMenu: {
+      back: 'Back',
+      forward: 'Forward',
+      reload: 'Reload',
       undo: 'Undo',
       redo: 'Redo',
       cut: 'Cut',
@@ -146,7 +149,16 @@ export default {
       secure: '安全',
       insecure: '一般',
     },
-    cascader: {
+    navigator: {
+      history: 'Show history',
+    },
+    contextMenu: {
+      cut: 'Cut',
+      copy: 'Copy',
+      paste: 'Paste',
+      pasteAndGo: 'Paste and Go',
+    },
+    common: {
       options: {
         preferences: '设定',
         downloads: '下载',
@@ -181,5 +193,10 @@ export default {
   },
   tabs: {
     loading: '载入中',
+    contextMenu: {
+      newTab: 'New Tab',
+      duplicateTab: 'Duplicate Tab',
+      closeTab: 'Close Tab',
+    },
   },
 };
