@@ -7,7 +7,7 @@
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
           div#tab-icons(class="chrome-tab-favicon")
-            i.el-icon-loading(v-if="page.isLoading")
+            i.el-icon-loading(v-if="page.isLoading", style="font-size: 16px; padding-right: 2px;")
             img(:src="page.favicon", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume volume-off")
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume volume-up")
