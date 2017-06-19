@@ -24,6 +24,7 @@
   import imageUtil from '../js/lib/image-util';
   import urlResource from '../js/lib/url-resource';
   import tabsOrdering from '../js/lib/tabs-ordering';
+  import responseNewState from '../js/lib/response-new-state';
 
   import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
@@ -599,15 +600,9 @@
       },
       onTabClose(pageIndex) {
         this.onRemovedEvent.emit(new Tab(pageIndex, this.getPage(pageIndex)));
-        const newPages = tabsOrdering(this.pages, this.$refs.tabs, 0, this.tabsOrder, true);
-        this.$store.dispatch('setPages', newPages);
+        this.$store.dispatch('closeTab', pageIndex);
         this.$nextTick(() => {
-          if (this.tabsOrder.length === 0) {
-            this.$store.dispatch('closeTab', pageIndex);
-          } else {
-            this.$store.dispatch('closeTab', this.tabsOrder.indexOf(pageIndex));
-          }
-          this.$store.dispatch('setTabsOrder', []);
+          this.$store.dispatch('setTabsOrder', this.$refs.tabs.sortable.toArray());
         });
       },
       // navHandlers
@@ -1197,24 +1192,20 @@
       ipc.on('request-app-state', (event, force) => {
         const newStart = Math.ceil(Math.random() * 10000);
         const newPages = tabsOrdering(this.pages, this.$refs.tabs, newStart, this.tabsOrder);
-        const downloads = this.$store.getters.downloads.filter(download => download.state === 'progressing');
+        const newCurrentPageIndex = this.tabsOrder.indexOf(this.currentPageIndex) === -1
+          ? this.currentPageIndex
+          : this.tabsOrder.indexOf(this.currentPageIndex);
+        const downloads = this.$store.getters.downloads;
+
         if (downloads.length !== 0) {
           if (force) {
-            ipc.send('response-app-state', {
-              ready: true,
-              newState: {
-                pid: newStart + (newPages.length - 1),
-                pages: newPages,
-                currentPageIndex: this.currentPageIndex,
-                currentSearchEngine: this.$store.getters.currentSearchEngine,
-                homepage: this.$store.getters.homepage,
-                pdfViewer: this.$store.getters.pdfViewer,
-                tabConfig: this.$store.getters.tabConfig,
-                lang: this.$store.getters.lang,
-                downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
-                history: this.$store.getters.history,
-              },
-            });
+            responseNewState(
+              this.$store.getters,
+              newStart,
+              newPages,
+              newCurrentPageIndex,
+              downloads.filter(download => download.state !== 'progressing'),
+            );
           } else {
             this.$electron.remote.dialog.showMessageBox({
               type: 'warning',
@@ -1223,44 +1214,28 @@
               buttons: ['Abort and Leave', 'Cancel'],
             }, (index) => {
               if (index === 0) {
-                downloads.map((download) => {
+                downloads.filter(download => download.state === 'progressing').map((download) => {
                   this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
                   return true;
                 });
-                ipc.send('response-app-state', {
-                  ready: true,
-                  newState: {
-                    pid: newStart + (newPages.length - 1),
-                    pages: newPages,
-                    currentPageIndex: this.currentPageIndex,
-                    currentSearchEngine: this.$store.getters.currentSearchEngine,
-                    homepage: this.$store.getters.homepage,
-                    pdfViewer: this.$store.getters.pdfViewer,
-                    tabConfig: this.$store.getters.tabConfig,
-                    lang: this.$store.getters.lang,
-                    downloads: this.$store.getters.downloads.filter(download => download.state !== 'progressing'),
-                    history: this.$store.getters.history,
-                  },
-                });
+                responseNewState(
+                  this.$store.getters,
+                  newStart,
+                  newPages,
+                  newCurrentPageIndex,
+                  downloads.filter(download => download.state !== 'progressing'),
+                );
               }
             });
           }
         } else {
-          ipc.send('response-app-state', {
-            ready: true,
-            newState: {
-              pid: newStart + (newPages.length - 1),
-              pages: newPages,
-              currentPageIndex: this.currentPageIndex,
-              currentSearchEngine: this.$store.getters.currentSearchEngine,
-              homepage: this.$store.getters.homepage,
-              pdfViewer: this.$store.getters.pdfViewer,
-              tabConfig: this.$store.getters.tabConfig,
-              lang: this.$store.getters.lang,
-              downloads: this.$store.getters.downloads,
-              history: this.$store.getters.history,
-            },
-          });
+          responseNewState(
+            this.$store.getters,
+            newStart,
+            newPages,
+            newCurrentPageIndex,
+            downloads,
+          );
         }
       });
 

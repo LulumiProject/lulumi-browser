@@ -40,6 +40,16 @@ function createPageObject(url) {
   };
 }
 
+function tabsMapping() {
+  const newOrder = [];
+  for (let i = 0; i < state.pages.length; i++) {
+    newOrder[i] = state.tabsOrder.indexOf(i) === -1
+      ? i
+      : state.tabsOrder.indexOf(i);
+  }
+  return newOrder;
+}
+
 const mutations = {
   // global counter
   [types.INCREMENT_PID](state) {
@@ -78,29 +88,43 @@ const mutations = {
           favicon: state.pages[pageIndex].favicon,
         });
       }
-      state.pages.splice(pageIndex, 1);
-      if (state.pages.length === 0) {
-        state.currentPageIndex = 0;
+
+      if (state.pages.length === 1) {
+        state.pages = [createPageObject()];
         state.pid += 1;
-        state.pages.push(createPageObject());
-        state.pages[state.pages.length - 1].pid = state.pid;
+        state.pages[0].pid = state.pid;
+        state.currentPageIndex = 0;
       } else {
         // find the nearest adjacent page to make active
-        // eslint-disable-next-line no-lonely-if
-        if (state.currentPageIndex >= pageIndex) {
-          for (let i = pageIndex; i >= 0; i--) {
-            if (state.pages[i]) {
-              state.currentPageIndex = i;
+        const mapping = tabsMapping();
+        const currentPageIndex = state.currentPageIndex;
+        if (currentPageIndex === pageIndex) {
+          for (let i = mapping[pageIndex] + 1; i < state.pages.length; i++) {
+            if (state.pages[mapping.indexOf(i)]) {
+              state.pages.splice(pageIndex, 1);
+              if (mapping.indexOf(i) > pageIndex) {
+                state.currentPageIndex = mapping.indexOf(i) - 1;
+              } else {
+                state.currentPageIndex = mapping.indexOf(i);
+              }
               return;
             }
           }
-          for (let i = pageIndex; i < state.pages.length; i++) {
-            if (state.pages[i]) {
-              state.currentPageIndex = i;
+          for (let i = mapping[pageIndex] - 1; i >= 0; i--) {
+            if (state.pages[mapping.indexOf(i)]) {
+              state.pages.splice(pageIndex, 1);
+              if (mapping.indexOf(i) > pageIndex) {
+                state.currentPageIndex = mapping.indexOf(i) - 1;
+              } else {
+                state.currentPageIndex = mapping.indexOf(i);
+              }
               return;
             }
           }
+        } else if (currentPageIndex > pageIndex) {
+          state.currentPageIndex = currentPageIndex - 1;
         }
+        state.pages.splice(pageIndex, 1);
       }
     }
   },
@@ -111,7 +135,7 @@ const mutations = {
   [types.DID_START_LOADING](state, payload) {
     const url = payload.webview.getURL();
     state.pages[payload.pageIndex].location = decodeURIComponent(url);
-  
+
     state.pages[payload.pageIndex].isLoading = true;
     state.pages[payload.pageIndex].error = false;
   },
