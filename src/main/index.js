@@ -39,6 +39,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const isDarwin = process.platform === 'darwin';
+const isWindows = process.platform === 'win32';
+
+const autoHideMenuBarSetting = isDarwin;
 const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
 
 const winURL = process.env.NODE_ENV === 'development'
@@ -61,7 +64,8 @@ function createWindow() {
     minWidth: 320,
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
-    autoHideMenuBar: true,
+    autoHideMenuBar: autoHideMenuBarSetting,
+    frame: !isWindows,
   });
 
   global.wid = mainWindow.id;
