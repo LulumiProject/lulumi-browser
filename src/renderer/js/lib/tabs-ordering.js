@@ -1,9 +1,11 @@
 import urlResource from './url-resource';
 
 export default (oldPages, tabRefs, newStart, newOrder) => {
-  let newPages = [];
+  const newPages = [];
   if (newOrder.length === 0) {
-    newPages = oldPages;
+    for (let index = 0; index < oldPages.length; index++) {
+      newPages[index] = Object.assign({}, oldPages[index]);
+    }
   } else {
     oldPages.forEach((page, index) => {
       newPages[index] = Object.assign({}, oldPages[newOrder[index]]);
