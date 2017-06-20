@@ -14,6 +14,8 @@
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
         ref="input",
+        @keyup.shift.up.native="selectPortion",
+        @keyup.shift.down.native="selectPortion",
         @input="onChange",
         @select="onSelect",
         icon="search",
@@ -224,6 +226,16 @@
       },
     },
     methods: {
+      selectPortion(event) {
+        const code = event.code;
+        const el = event.target;
+        if (code === 'ArrowUp') {
+          el.selectionEnd = el.selectionStart;
+          el.selectionStart = 0;
+        } else if (code === 'ArrowDown') {
+          el.selectionEnd = el.value.length;
+        }
+      },
       unique(source) {
         const results = [];
         const seen = new Set();
