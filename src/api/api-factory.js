@@ -19,7 +19,7 @@ function findOrCreate(tabId, VueInstance) {
     }
   } else {
     tabArray.forEach((tab) => {
-      tab.activate(tab.id === VueInstance.$store.getters.currentPageIndex);
+      tab.hightlight(tab.id === VueInstance.$store.getters.currentPageIndex);
     });
   }
   return tab;
@@ -143,7 +143,7 @@ export default (VueInstance) => {
       if (updateProperties.hasOwnProperty('highlighted')) {
         if (updateProperties.highlighted) {
           VueInstance.onTabClick(tab.id);
-          tab.activate();
+          tab.hightlight();
         }
       }
 
@@ -191,6 +191,7 @@ export default (VueInstance) => {
       const tab = findOrCreate(tabId, VueInstance);
       VueInstance.getPage(tab.id).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },
+    onActivated: VueInstance.onActivatedEvent,
     onUpdated: VueInstance.onUpdatedEvent,
     onCreated: VueInstance.onCreatedEvent,
     onRemoved: VueInstance.onRemovedEvent,

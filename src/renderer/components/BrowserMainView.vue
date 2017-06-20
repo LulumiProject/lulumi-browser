@@ -47,12 +47,13 @@
         onCreatedEvent: new Event(),
         onRemovedEvent: new Event(),
         alarms: {},
+        onActivatedEvent: new Event(),
         onAlarmEvent: new Event(),
         onBeforeNavigate: new Event(),
-        onCommitted: new Event(),
-        onDOMContentLoaded: new Event(),
-        onCompleted: new Event(),
         onCreatedNavigationTarget: new Event(),
+        onCommitted: new Event(),
+        onCompleted: new Event(),
+        onDOMContentLoaded: new Event(),
       };
     },
     components: {
@@ -1090,6 +1091,13 @@
       if (window.process.platform === 'darwin') {
         document.body.classList.add('darwin');
       }
+
+      ipc.on('browser-window-focus', () => {
+        this.onActivatedEvent.emit({
+          tabId: this.currentPageIndex,
+          windowId: 0,
+        });
+      });
 
       ipc.on('startFindInPage', () => {
         this.getPage(this.currentPageIndex).findInPage();

@@ -166,6 +166,37 @@ ipcMain.once('lulumi-alarms-on-alarm', (event) => {
   });
 });
 
+ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message) => {
+  const window = BrowserWindow.fromId(global.wid);
+  window.webContents.send('lulumi-runtime-send-message', {
+    extensionId,
+    message,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.once('lulumi-runtime-on-message', (event) => {
+  const window = BrowserWindow.fromId(global.wid);
+  ipcMain.on('lulumi-runtime-add-listener-on-message', (event, digest) => {
+    window.webContents.send('lulumi-runtime-add-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-runtime-remove-listener-on-message', (event, digest) => {
+    window.webContents.send('lulumi-runtime-remove-listener-on-message', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-runtime-emit-on-message', (event, message) => {
+    window.webContents.send('lulumi-runtime-emit-on-message', {
+      message,
+      sender: event.sender,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
 ipcMain.on('lulumi-tabs-get', (event, tabId) => {
   const window = BrowserWindow.fromId(global.wid);
   window.webContents.send('lulumi-tabs-get', {
@@ -246,37 +277,6 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
     webContentsId: event.sender.id,
   });
 });
-
-ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message) => {
-  const window = BrowserWindow.fromId(global.wid);
-  window.webContents.send('lulumi-runtime-send-message', {
-    extensionId,
-    message,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.once('lulumi-runtime-on-message', (event) => {
-  const window = BrowserWindow.fromId(global.wid);
-  ipcMain.on('lulumi-runtime-add-listener-on-message', (event, digest) => {
-    window.webContents.send('lulumi-runtime-add-listener-on-message', {
-      digest,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('lulumi-runtime-remove-listener-on-message', (event, digest) => {
-    window.webContents.send('lulumi-runtime-remove-listener-on-message', {
-      digest,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('lulumi-runtime-emit-on-message', (event, message) => {
-    window.webContents.send('lulumi-runtime-emit-on-message', {
-      message,
-      sender: event.sender,
-      webContentsId: event.sender.id,
-    });
-  });
-});
 ipcMain.on('lulumi-tabs-send-message', (event, tabId, message) => {
   const window = BrowserWindow.fromId(global.wid);
   window.webContents.send('lulumi-tabs-send-message', {
@@ -285,7 +285,27 @@ ipcMain.on('lulumi-tabs-send-message', (event, tabId, message) => {
     webContentsId: event.sender.id,
   });
 });
-
+ipcMain.once('lulumi-tabs-on-activated', (event) => {
+  const window = BrowserWindow.fromId(global.wid);
+  ipcMain.on('lulumi-tabs-add-listener-on-activated', (event, digest) => {
+    window.webContents.send('lulumi-tabs-add-listener-on-activated', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-remove-listener-on-activated', (event, digest) => {
+    window.webContents.send('lulumi-tabs-remove-listener-on-activated', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('lulumi-tabs-emit-on-activated', (event, args) => {
+    window.webContents.send('lulumi-tabs-emit-on-activated', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});
 ipcMain.once('lulumi-tabs-on-updated', (event) => {
   const window = BrowserWindow.fromId(global.wid);
   ipcMain.on('lulumi-tabs-add-listener-on-updated', (event, digest) => {
@@ -307,7 +327,6 @@ ipcMain.once('lulumi-tabs-on-updated', (event) => {
     });
   });
 });
-
 ipcMain.once('lulumi-tabs-on-created', (event) => {
   const window = BrowserWindow.fromId(global.wid);
   ipcMain.on('lulumi-tabs-add-listener-on-created', (event, digest) => {
@@ -329,7 +348,6 @@ ipcMain.once('lulumi-tabs-on-created', (event) => {
     });
   });
 });
-
 ipcMain.once('lulumi-tabs-on-removed', (event) => {
   const window = BrowserWindow.fromId(global.wid);
   ipcMain.on('lulumi-tabs-add-listener-on-removed', (event, digest) => {

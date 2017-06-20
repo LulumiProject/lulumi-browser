@@ -232,6 +232,10 @@ app.on('before-quit', (event) => {
   appStateSave();
 });
 
+app.on('browser-window-focus', () => {
+  mainWindow.webContents.send('browser-window-focus');
+});
+
 ipcMain.on('response-app-state', (event, data) => {
   if (data.ready) {
     promisify(writeFile, storagePath, JSON.stringify(data.newState))

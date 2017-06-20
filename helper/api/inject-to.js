@@ -340,6 +340,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       });
       ipcRenderer.send('lulumi-tabs-send-message', tabId, message);
     },
+    onActivated: new IpcEvent('tabs', 'on-activated'),
     onUpdated: new IpcEvent('tabs', 'on-updated'),
     onCreated: new IpcEvent('tabs', 'on-created'),
     onRemoved: new IpcEvent('tabs', 'on-removed'),
