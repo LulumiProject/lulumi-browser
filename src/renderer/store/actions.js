@@ -66,9 +66,6 @@ export const setDownloads = ({ commit }, val) => {
 export const setHistory = ({ commit }, val) => {
   commit(types.SET_HISTORY, val);
 };
-export const setPages = ({ commit }, pages) => {
-  commit(types.SET_PAGES, pages);
-};
 export const setTabsOrder = ({ commit }, val) => {
   commit(types.SET_TABS_ORDER, val);
 };

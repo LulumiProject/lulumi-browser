@@ -252,9 +252,6 @@ const mutations = {
   [types.SET_HISTORY](state, val) {
     state.history = val;
   },
-  [types.SET_PAGES](state, pages) {
-    state.pages = pages;
-  },
   [types.SET_TABS_ORDER](state, val) {
     if (val.length === 0) {
       state.tabsOrder = val;

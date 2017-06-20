@@ -22,7 +22,6 @@ export const SET_TAB_CONFIG = 'SET_TAB_CONFIG';
 export const SET_LANG = 'SET_LANG';
 export const SET_DOWNLOADS = 'SET_DOWNLOADS';
 export const SET_HISTORY = 'SET_HISTORY';
-export const SET_PAGES = 'SET_PAGES';
 export const SET_TABS_ORDER = 'SET_TABS_ORDER';
 export const SET_PAGE_ACTION = 'SET_PAGE_ACTION';
 export const CLEAR_PAGE_ACTION = 'CLEAR_PAGE_ACTION';
