@@ -245,7 +245,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
         }
       });
       */
-      ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, (extensionId !== thisExtensionId) /* whether it's external message */);
+      ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, (extensionId !== thisExtensionId) /* whether it's an external message */);
     },
     onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),
     onMessageExternal: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message-external') : new Event(),

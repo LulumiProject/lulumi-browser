@@ -159,8 +159,8 @@ function createWindow() {
   appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
 }
 
+protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 if (process.env.NODE_ENV === 'development') {
-  protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
   app.on('ready', () => {
     protocol.registerHttpProtocol('lulumi', (request, callback) => {
       const url = request.url.substr((config.lulumiPagesCustomProtocol).length);
