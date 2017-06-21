@@ -44,6 +44,10 @@ $ yarn run test
 
 - https://github.com/qazbnm456/lulumi-browser/issues/19
 
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](code-of-conduct.md). By participating in this project you agree to abide by its terms.
+
 ---
 
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[3a1e893](https://github.com/SimulatedGREG/electron-vue/commit/3a1e893e10e8dcfb4c5e5580810ed70f74b3a83e) and developed by [@qazbnm456](https://github.com/qazbnm456).
