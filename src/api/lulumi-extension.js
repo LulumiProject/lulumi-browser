@@ -114,18 +114,20 @@ const loadCommands = (mainWindow, manifest) => {
   if (commands) {
     Object.keys(commands).forEach((command) => {
       const suggested_key = commands[command].suggested_key;
-      localshortcut.register(mainWindow, suggested_key.default, () => {
-        if (commands[command].suggested_key) {
-          if (command === '_execute_page_action') {
-            BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
-          } else if (command === '_execute_browser_action') {
-            BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
-          } else {
-            webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
-              .send('lulumi-commands-triggered', command);
+      if (suggested_key) {
+        localshortcut.register(mainWindow, suggested_key.default, () => {
+          if (commands[command].suggested_key) {
+            if (command === '_execute_page_action') {
+              BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+            } else if (command === '_execute_browser_action') {
+              BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+            } else {
+              webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
+                .send('lulumi-commands-triggered', command);
+            }
           }
-        }
-      });
+        });
+      }
     });
   }
 };

@@ -226,24 +226,29 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
         && (typeof message === 'function')
         && (typeof responseCallback !== 'function')) {
+        // sendMessage(message, responseCallback)
         lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
         return;
       } else if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
         && (message === undefined)) {
-        lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
+        // sendMessage(message)
+        lulumi.runtime.sendMessage(thisExtensionId, extensionId, () => {});
         return;
       }
       // lulumi-runtime-send-message-result event will be set multiple times
       // if we have multiple lulumi.runtime.sendMessage, so ignore the listenters warning.
+      /*
       ipcRenderer.setMaxListeners(0);
       ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
         }
       });
-      ipcRenderer.send('lulumi-runtime-send-message', thisExtensionId, message);
+      */
+      ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, (extensionId !== thisExtensionId) /* whether it's external message */);
     },
     onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),
+    onMessageExternal: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message-external') : new Event(),
   };
 
   lulumi.extension = {

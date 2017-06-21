@@ -199,7 +199,7 @@ export default class ExtHostExtensionService {
 
     ipc.on('lulumi-runtime-send-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').runtime.sendMessage(data.extensionId, data.message, data.webContentsId);
+        require('lulumi').runtime.sendMessage(data.extensionId, data.message, data.external, data.webContentsId);
       }
     });
     ipc.on('lulumi-runtime-add-listener-on-message', (event, data) => {

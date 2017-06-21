@@ -166,11 +166,12 @@ ipcMain.once('lulumi-alarms-on-alarm', (event) => {
   });
 });
 
-ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message) => {
+ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message, external) => {
   const window = BrowserWindow.fromId(global.wid);
   window.webContents.send('lulumi-runtime-send-message', {
     extensionId,
     message,
+    external,
     webContentsId: event.sender.id,
   });
 });

@@ -160,7 +160,7 @@ function createWindow() {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  protocol.registerStandardSchemes(['lulumi']);
+  protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
   app.on('ready', () => {
     protocol.registerHttpProtocol('lulumi', (request, callback) => {
       const url = request.url.substr((config.lulumiPagesCustomProtocol).length);

@@ -17,8 +17,12 @@ process.once('loaded', () => {
 
   global.ipcRenderer = ipcRenderer;
 
-  ipcRenderer.on('lulumi-runtime-send-message', (event, message, sender) => {
-    global.lulumi.runtime.onMessage.emit(message, sender);
+  ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {
+    if (external) {
+      global.lulumi.runtime.onMessageExternal.emit(message, sender);
+    } else {
+      global.lulumi.runtime.onMessage.emit(message, sender);
+    }
   });
   ipcRenderer.on('lulumi-page-action-clicked', (event, tab) => {
     global.lulumi.tabs.get(tab.id, tab => global.lulumi.pageAction.onClicked.emit(tab));
