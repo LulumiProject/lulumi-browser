@@ -77,6 +77,15 @@ ipcMain.once('lulumi-browser-action-on-message', (event) => {
   });
 });
 
+ipcMain.on('lulumi-page-action-set-icon', (event, extensionId, startPage, details) => {
+  const window = BrowserWindow.fromId(global.wid);
+  window.webContents.send('lulumi-page-action-set-icon', {
+    extensionId,
+    startPage,
+    details,
+    webContentsId: event.sender.id,
+  });
+});
 ipcMain.on('lulumi-page-action-show', (event, tabId, extensionId, enabled) => {
   const window = BrowserWindow.fromId(global.wid);
   window.webContents.send('lulumi-page-action-show', {

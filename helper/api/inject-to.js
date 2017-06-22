@@ -176,6 +176,15 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   lulumi.pageAction = {
+    setIcon: (details, callback) => {
+      ipcRenderer.once('lulumi-page-action-set-icon-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-page-action-set-icon',
+        thisExtensionId, lulumi.runtime.getManifest().startPage, details);
+    },
     show: (tabId) => {
       ipcRenderer.send('lulumi-page-action-show', tabId, thisExtensionId, true);
     },

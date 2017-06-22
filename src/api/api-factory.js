@@ -49,6 +49,12 @@ export default (VueInstance) => {
   };
 
   const pageAction = {
+    setIcon: (extensionId, startPage, details) => {
+      if (details.hasOwnProperty('path')) {
+        VueInstance.$refs.navbar.setPageActionIcon(extensionId, `${startPage}/${details.path}`);
+        return `${startPage}/${details.path}`;
+      }
+    },
     onClicked: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {

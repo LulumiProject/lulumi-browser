@@ -317,6 +317,9 @@
       setBrowserActionIcon(extensionId, path) {
         this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
       },
+      setPageActionIcon(extensionId, path) {
+        this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+      },
       loadIcon(extension) {
         try {
           const isPageAction = extension.hasOwnProperty('page_action');
