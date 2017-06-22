@@ -314,6 +314,9 @@
       createFilter(queryString) {
         return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
       },
+      setBrowserActionIcon(extensionId, path) {
+        this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+      },
       loadIcon(extension) {
         try {
           const isPageAction = extension.hasOwnProperty('page_action');

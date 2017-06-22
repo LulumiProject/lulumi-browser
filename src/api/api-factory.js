@@ -33,6 +33,12 @@ export default (VueInstance) => {
   };
 
   const browserAction = {
+    setIcon: (extensionId, startPage, details) => {
+      if (details.hasOwnProperty('path')) {
+        VueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${details.path}`);
+        return `${startPage}/${details.path}`;
+      }
+    },
     onClicked: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {
@@ -174,11 +180,7 @@ export default (VueInstance) => {
     },
     executeScript: (tabId, details = {}) => {
       const tab = findOrCreate(tabId, VueInstance);
-      if (details.hasOwnProperty('file')) {
-        VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(
-          String(fs.readFileSync(path.join(manifest.srcDirectory, details.file))),
-          false);
-      } else if (details.hasOwnProperty('code')) {
+      if (details.hasOwnProperty('code')) {
         VueInstance.getPage(tab.id).$refs.webview.executeJavaScript(details.code, false);
       }
     },
@@ -313,6 +315,8 @@ export default (VueInstance) => {
 
   return {
     env,
+    browserAction,
+    pageAction,
     runtime,
     tabs,
     storage,

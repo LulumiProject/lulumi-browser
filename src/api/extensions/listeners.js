@@ -45,6 +45,15 @@ ipcMain.on('lulumi-env-app-version', (event) => {
   });
 });
 
+ipcMain.on('lulumi-browser-action-set-icon', (event, extensionId, startPage, details) => {
+  const window = BrowserWindow.fromId(global.wid);
+  window.webContents.send('lulumi-browser-action-set-icon', {
+    extensionId,
+    startPage,
+    details,
+    webContentsId: event.sender.id,
+  });
+});
 ipcMain.once('lulumi-browser-action-on-message', (event) => {
   const window = BrowserWindow.fromId(global.wid);
   ipcMain.on('lulumi-browser-action-add-listener-on-message', (event, digest) => {

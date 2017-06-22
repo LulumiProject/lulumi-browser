@@ -49,6 +49,12 @@ export default class ExtHostExtensionService {
       }
     });
 
+    ipc.on('lulumi-browser-action-set-icon', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-env-app-version-result', require('lulumi').browserAction.setIcon(data.extensionId, data.startPage, data.details));
+      }
+    });
     ipc.on('lulumi-browser-action-add-listener-on-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);

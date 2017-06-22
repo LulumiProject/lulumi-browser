@@ -40,6 +40,11 @@ function getSignatures(ParameterSignatureString) {
     args.forEach((arg, index) => {
       if (arg.startsWith('optional')) {
         const tmp = JSON.parse(JSON.stringify(args));
+        tmp[index] = "undefined";
+        dig(tmp).forEach(r => results.push(r));
+      }
+      if (arg.startsWith('optional')) {
+        const tmp = JSON.parse(JSON.stringify(args));
         tmp.splice(index, 1);
         dig(tmp).forEach(r => results.push(r));
       }
@@ -84,7 +89,9 @@ function resolveSignature(namespace, name, args) {
       solved = true;
       candidateSignature.forEach((signature, index) => {
         let types;
-        if (signature.split(' ')[0] === 'optional') {
+        if (signature.split(' ')[0] === 'undefined') {
+          types = "undefined";
+        } else if (signature.split(' ')[0] === 'optional') {
           types = signature.split(' ')[1].split('||');
         } else {
           types = signature.split(' ')[0].split('||');
@@ -121,6 +128,7 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
   }
 }
 
+ipcRenderer.setMaxListeners(0);
 exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
@@ -155,7 +163,16 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   lulumi.browserAction = {
-    onClicked: (isBackgroundPage === false) ? new IpcEvent('page-action', 'on-clicked') : new Event(),
+    setIcon: (details, callback) => {
+      ipcRenderer.once('lulumi-browser-action-set-icon-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-browser-action-set-icon',
+        thisExtensionId, lulumi.runtime.getManifest().startPage, details);
+    },
+    onClicked: isBackgroundPage ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
 
   lulumi.pageAction = {
@@ -165,7 +182,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
     hide: (tabId) => {
       ipcRenderer.send('lulumi-page-action-hide', tabId, thisExtensionId, false);
     },
-    onClicked: (isBackgroundPage === false) ? new IpcEvent('page-action', 'on-clicked') : new Event(),
+    onClicked: isBackgroundPage ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
 
   if (isBackgroundPage) {
@@ -235,10 +252,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
         lulumi.runtime.sendMessage(thisExtensionId, extensionId, () => {});
         return;
       }
-      // lulumi-runtime-send-message-result event will be set multiple times
-      // if we have multiple lulumi.runtime.sendMessage, so ignore the listenters warning.
       /*
-      ipcRenderer.setMaxListeners(0);
       ipcRenderer.once('lulumi-runtime-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
@@ -247,13 +261,20 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       */
       ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, (extensionId !== thisExtensionId) /* whether it's an external message */);
     },
-    onMessage: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message') : new Event(),
-    onMessageExternal: (isBackgroundPage === false) ? new IpcEvent('runtime', 'on-message-external') : new Event(),
+    onMessage: isBackgroundPage ? new Event() : new IpcEvent('runtime', 'on-message') ,
+    onMessageExternal: isBackgroundPage ? new Event() : new IpcEvent('runtime', 'on-message-external'),
   };
 
   lulumi.extension = {
     getURL: lulumi.runtime.getURL,
-    getBackgroundPage: () => global,
+    getBackgroundPage: () => {
+      if (isBackgroundPage) {
+        return global;
+      } else {
+        // TODO: need to modify here to get the Window object of background page
+        return global;
+      }
+    },
   };
 
   lulumi.tabs = {
@@ -526,9 +547,10 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   // wrapper
+  const blackList = ['handleMenuItems', 'contextMenusIPC'];
   Object.keys(lulumi).forEach((key) => {
     Object.keys(lulumi[key]).forEach((member) => {
-      if (typeof lulumi[key][member] === 'function') {
+      if (typeof lulumi[key][member] === 'function' && !blackList.includes(member)) {
         try {
           const cached = lulumi[key][member];
           lulumi[key][member] = (function () {
