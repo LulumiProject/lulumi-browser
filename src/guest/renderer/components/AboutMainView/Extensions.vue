@@ -42,7 +42,7 @@
       loadIcon(extensionId) {
         const id = this.findId(extensionId);
         if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
-          return window.renderProcessPreferences[id].icons['16'];
+          return Object.values(window.renderProcessPreferences[id].icons)[0];
         }
         return undefined;
       },

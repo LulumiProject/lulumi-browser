@@ -66,7 +66,7 @@ export default (VueInstance) => {
 
   const runtime = {
     sendMessage: (extensionId, message, external, webContentsId) => {
-      let webContents;
+      let webContents = false;
       let tabId = VueInstance.$store.getters.mappings[webContentsId];
       if (tabId === undefined) {
         // it's a popup.html or a background script
@@ -75,7 +75,8 @@ export default (VueInstance) => {
       const backgroundPages = VueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       VueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
-        .send('lulumi-runtime-send-message', external, message, { url: webContents.getURL() });
+        .send('lulumi-runtime-send-message', external, message,
+          (webContents ? { url: webContents.getURL() } : { tab: findOrCreate(tabId, VueInstance) }));
     },
     onMessage: (webContentsId) => {
       let id = VueInstance.$store.getters.mappings[webContentsId];

@@ -324,19 +324,24 @@
         try {
           const isPageAction = extension.hasOwnProperty('page_action');
           const isBrowserAction = extension.hasOwnProperty('browser_action');
-          if (isPageAction || isBrowserAction) {
-            let icons;
-            if (isPageAction) {
-              icons = extension.page_action.default_icon;
-            } else if (isBrowserAction) {
-              icons = extension.browser_action.default_icon;
-            }
+          const manifestIcon = extension.hasOwnProperty('icons');
+          let icons = false;
+          if (isPageAction) {
+            icons = extension.page_action.default_icon;
+          }
+          if (isBrowserAction) {
+            icons = extension.browser_action.default_icon;
+          }
+          if (manifestIcon) {
+            icons = extension.icons;
+          }
+          if (icons) {
             if (typeof icons === 'string') {
               return this.$electron.remote.nativeImage
                 .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
             }
             return this.$electron.remote.nativeImage
-              .createFromPath(path.join(extension.srcDirectory, icons['16'])).toDataURL('image/png');
+              .createFromPath(path.join(extension.srcDirectory, Object.values(icons)[0])).toDataURL('image/png');
           }
           return undefined;
         } catch (event) {
