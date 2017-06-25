@@ -224,6 +224,21 @@ export default (VueInstance) => {
       });
       VueInstance.addContextMenus(menuItems, webContentsId);
     },
+    remove: (menuItems, webContentsId) => {
+      menuItems.forEach((menuItem) => {
+        menuItem.webContentsId = webContentsId;
+        const submenu = menuItem.submenu;
+        if (submenu) {
+          submenu.forEach((sub) => {
+            sub.webContentsId = webContentsId;
+          });
+        }
+      });
+      VueInstance.addContextMenus(menuItems, webContentsId);
+    },
+    removeAll: (menuItems, webContentsId) => {
+      VueInstance.addContextMenus([], webContentsId);
+    },
   };
 
   const webNavigation = {

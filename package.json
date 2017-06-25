@@ -32,7 +32,7 @@
     "electron-localshortcut": "^0.6.1",
     "fetch-jsonp": "^1.1.1",
     "fuse.js": "^3.0.5",
-    "lulumi": "^0.0.14",
+    "lulumi": "^0.0.15",
     "node-localstorage": "^1.3.0",
     "punycode": "^2.1.0",
     "strip-css-comments": "^3.0.0",

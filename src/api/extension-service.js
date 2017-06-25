@@ -441,6 +441,18 @@ export default class ExtHostExtensionService {
         webContents.send('lulumi-context-menus-create-result', require('lulumi').contextMenus.create(data.menuItems, data.webContentsId));
       }
     });
+    ipc.on('lulumi-context-menus-remove', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-context-menus-remove-result', require('lulumi').contextMenus.remove(data.menuItems, data.webContentsId));
+      }
+    });
+    ipc.on('lulumi-context-menus-remove-all', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-context-menus-remove-all-result', require('lulumi').contextMenus.removeAll(data.menuItems, data.webContentsId));
+      }
+    });
 
     ipc.on('lulumi-web-navigation-get-frame', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {

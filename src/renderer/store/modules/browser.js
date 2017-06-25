@@ -183,8 +183,7 @@ const mutations = {
   [types.PAGE_TITLE_SET](state, payload) {
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
     const regexp = new RegExp('^lulumi(-extension)?://.+$');
-    const url = payload.webview.getURL();
-    state.pages[payload.pageIndex].location = decodeURIComponent(url);
+    const url = state.pages[payload.pageIndex].location;
     if (!url.match(regexp)) {
       // history
       if (state.pages[payload.pageIndex].title !== 'error') {

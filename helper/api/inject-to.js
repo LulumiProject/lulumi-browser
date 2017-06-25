@@ -128,6 +128,8 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
   }
 }
 
+let nextId = 0;
+
 ipcRenderer.setMaxListeners(0);
 exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
@@ -435,75 +437,121 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   lulumi.contextMenus = {
-    menuItems: [],
-    menuItemsIPC: [],
-    contextMenusIPC: (id, onclick, digest) => {
-      lulumi.contextMenus.menuItemsIPC.push(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`);
-      ipcRenderer.on(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${id}-${digest}`, (event, params, tabId, menuItem, BrowserWindow) => {
-        const info = {
-          menuItemId: id,
-          mediaType: params.mediaType,
-          linkUrl: params.linkURL,
-          srcUrl: params.srcURL,
-          pageUrl: params.pageURL,
-          frameUrl: params.frameURL,
-          selectionText: params.selectionText,
-          editable: params.isEditable,
-          checked: menuItem.checked,
-        };
-        lulumi.tabs.get(tabId, tab => onclick(info, tab));
-      });
-    },
-    handleMenuItems: (createProperties) => {
-      let digest;
-      if (createProperties.type !== 'separator') {
-        digest = createProperties.onclick.toString().hashCode();
-      }
-      let flag = true;
-      lulumi.contextMenus.menuItems.forEach((menuItem) => {
-        if (menuItem.id === createProperties.parentId) {
-          menuItem.type = 'submenu';
-          if (menuItem.submenu) {
-            menuItem.submenu.push({
-              label: createProperties.title,
-              id: createProperties.id,
-              type: createProperties.type,
-              checked: createProperties.checked,
-              digest,
-              extensionId: thisExtensionId,
+    menuItems: {},
+    menuItemsIPC: {},
+    contextMenusIPC: (parentMenuItemId, menuItemId, onclick, remove = false) => {
+      if (remove) {
+        if (menuItemId) {
+          if (lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id]) {
+            Object.keys(lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id]).forEach((menuItemIPCId) => {
+              if (menuItemIPCId === menuItemId) {
+                lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].forEach((menuItemIPC) => {
+                  ipcRenderer.removeAllListeners([ menuItemIPC ]);
+                });
+                lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId] = [];
+              }
             });
-          } else {
-            menuItem.submenu = [{
-              label: createProperties.title,
-              id: createProperties.id,
-              type: createProperties.type,
-              checked: createProperties.checked,
-              digest,
-              extensionId: thisExtensionId,
-            }];
           }
-          if (createProperties.type !== 'separator' && createProperties.onclick) {
-            lulumi.contextMenus.contextMenusIPC(createProperties.id, createProperties.onclick, digest);
+        } else {
+          if (lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id]) {
+            Object.keys(lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id]).forEach((menuItemIPCId) => {
+              lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].forEach((menuItemIPC) => {
+                ipcRenderer.removeAllListeners([ menuItemIPC ]);
+              });
+              lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId] = [];
+            });
           }
-          flag = false;
         }
-      });
-      if (flag) {
-        lulumi.contextMenus.menuItems.push({
-          label: createProperties.title,
-          id: createProperties.id,
-          type: createProperties.type,
-          checked: createProperties.checked,
-          digest,
-          extensionId: thisExtensionId,
+      } else {
+        if (!lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id]) {
+          lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id] = {};
+        }
+        if (parentMenuItemId) {
+          if (lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][parentMenuItemId]) {
+            lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][parentMenuItemId].push(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${menuItemId}`);
+          }
+        } else {
+          lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemId] = [`lulumi-context-menus-clicked-${lulumi.runtime.id}-${menuItemId}`];
+        }
+        ipcRenderer.on(`lulumi-context-menus-clicked-${lulumi.runtime.id}-${menuItemId}`, (event, params, tabId, menuItem, BrowserWindow) => {
+          const info = {
+            menuItemId,
+            mediaType: params.mediaType,
+            linkUrl: params.linkURL,
+            srcUrl: params.srcURL,
+            pageUrl: params.pageURL,
+            frameUrl: params.frameURL,
+            selectionText: params.selectionText,
+            editable: params.isEditable,
+            checked: menuItem.checked,
+          };
+          lulumi.tabs.get(tabId, tab => onclick(info, tab));
         });
-        if (createProperties.type !== 'separator' && createProperties.onclick) {
-          lulumi.contextMenus.contextMenusIPC(createProperties.id, createProperties.onclick, digest);
+      }
+    },
+    handleMenuItems: (createProperties, menuItemId) => {
+      if ((createProperties === null) && (menuItemId === null)) {
+        if (lulumi.contextMenus.menuItems[lulumi.runtime.id]) {
+          lulumi.contextMenus.menuItems[lulumi.runtime.id] = [];
+          lulumi.contextMenus.contextMenusIPC(null, null, true);
+        }
+      } else if (createProperties !== null) {
+        let flag = true;
+        if (!lulumi.contextMenus.menuItems[lulumi.runtime.id]) {
+          lulumi.contextMenus.menuItems[lulumi.runtime.id] = [];
+        }
+        lulumi.contextMenus.menuItems[lulumi.runtime.id].forEach((menuItem) => {
+          if (menuItem.id === createProperties.parentId) {
+            menuItem.type = 'submenu';
+            if (menuItem.submenu) {
+              menuItem.submenu.push({
+                label: createProperties.title,
+                id: createProperties.id,
+                type: createProperties.type,
+                checked: createProperties.checked,
+                extensionId: thisExtensionId,
+              });
+            } else {
+              menuItem.submenu = [{
+                label: createProperties.title,
+                id: createProperties.id,
+                type: createProperties.type,
+                checked: createProperties.checked,
+                extensionId: thisExtensionId,
+              }];
+            }
+            if (createProperties.type !== 'separator' && createProperties.onclick) {
+              lulumi.contextMenus.contextMenusIPC(createProperties.parentId, createProperties.id, createProperties.onclick);
+            }
+            flag = false;
+          }
+        });
+        if (flag) {
+          lulumi.contextMenus.menuItems[lulumi.runtime.id].push({
+            label: createProperties.title,
+            id: createProperties.id,
+            type: createProperties.type,
+            checked: createProperties.checked,
+            extensionId: thisExtensionId,
+          });
+          if (createProperties.type !== 'separator' && createProperties.onclick) {
+            lulumi.contextMenus.contextMenusIPC(null, createProperties.id, createProperties.onclick);
+          }
+        }
+      } else if (menuItemId !== null) {
+        if (lulumi.contextMenus.menuItems[lulumi.runtime.id]) {
+          lulumi.contextMenus.menuItems[lulumi.runtime.id].forEach((menuItem, index) => {
+            if (menuItem.id === menuItemId) {
+              lulumi.contextMenus.menuItems[lulumi.runtime.id].splice(index, 1);
+            }
+          });
+          lulumi.contextMenus.contextMenusIPC(null, menuItemId, null, true);
         }
       }
     },
     create: (createProperties, callback) => {
-      let id = `${lulumi.runtime.id}-${Date.now()}`;
+      nextId += 1;
+      let id = `${lulumi.runtime.id}-${nextId}`;
       if (createProperties.id) {
         id = createProperties.id;
       } else {
@@ -514,9 +562,29 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
           callback(result);
         }
       });
-      lulumi.contextMenus.handleMenuItems(createProperties);
-      ipcRenderer.send('lulumi-context-menus-create', lulumi.contextMenus.menuItems);
+      lulumi.contextMenus.handleMenuItems(createProperties, null);
+      ipcRenderer.send('lulumi-context-menus-create', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
       return id;
+    },
+    remove: (menuItemId, callback) => {
+      const id = menuItemId;
+      ipcRenderer.once('lulumi-context-menus-remove-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      lulumi.contextMenus.handleMenuItems(null, menuItemId);
+      ipcRenderer.send('lulumi-context-menus-remove', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
+      return id;
+    },
+    removeAll: (callback) => {
+      ipcRenderer.once('lulumi-context-menus-remove-all-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      lulumi.contextMenus.handleMenuItems(null, null);
+      ipcRenderer.send('lulumi-context-menus-remove-all', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
     },
   };
 

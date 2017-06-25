@@ -864,7 +864,7 @@
                   menuItem.label = menuItem.label.replace('%s', event.params.selectionText);
                   menuItem.click = (menuItem, BrowserWindow) => {
                     this.$electron.remote.webContents.fromId(menuItem.webContentsId)
-                      .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}-${menuItem.digest}`,
+                      .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}`,
                         event.params,
                         this.currentPageIndex,
                         menuItem,
@@ -877,7 +877,7 @@
                       sub.label.replace('%s', event.params.selectionText);
                       sub.click = (menuItem, BrowserWindow) => {
                         this.$electron.remote.webContents.fromId(sub.webContentsId)
-                          .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}-${sub.digest}`,
+                          .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}`,
                             event.params,
                             this.currentPageIndex,
                             menuItem,

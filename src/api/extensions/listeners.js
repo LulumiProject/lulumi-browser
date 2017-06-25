@@ -418,6 +418,20 @@ ipcMain.on('lulumi-context-menus-create', (event, menuItems) => {
     webContentsId: event.sender.id,
   });
 });
+ipcMain.on('lulumi-context-menus-remove', (event, menuItems) => {
+  const window = BrowserWindow.fromId(global.wid);
+  window.webContents.send('lulumi-context-menus-remove', {
+    menuItems,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('lulumi-context-menus-remove-all', (event, menuItems) => {
+  const window = BrowserWindow.fromId(global.wid);
+  window.webContents.send('lulumi-context-menus-remove-all', {
+    menuItems,
+    webContentsId: event.sender.id,
+  });
+});
 
 ipcMain.on('lulumi-web-navigation-get-frame', (event, details) => {
   const window = BrowserWindow.fromId(global.wid);

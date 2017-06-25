@@ -2,7 +2,7 @@ import urlResource from './url-resource';
 
 export default (oldPages, tabRefs, newStart, newOrder) => {
   const newPages = [];
-  if (newOrder.length === 0) {
+  if (newOrder.length <= oldPages.length) {
     for (let index = 0; index < oldPages.length; index++) {
       newPages[index] = Object.assign({}, oldPages[index]);
     }
