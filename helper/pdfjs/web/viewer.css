@@ -212,6 +212,7 @@
 .annotationLayer .underlineAnnotation,
 .annotationLayer .squigglyAnnotation,
 .annotationLayer .strikeoutAnnotation,
+.annotationLayer .lineAnnotation svg line,
 .annotationLayer .fileAttachmentAnnotation {
   cursor: pointer;
 }
@@ -250,6 +251,10 @@
 .pdfViewer .page canvas {
   margin: 0;
   display: block;
+}
+
+.pdfViewer .page canvas[hidden] {
+  display: none;
 }
 
 .pdfViewer .page .loadingIcon {
@@ -614,8 +619,7 @@ html[dir='rtl'] #toolbarContainer, .findbar, .secondaryToolbar {
   top: 32px;
   position: absolute;
   z-index: 10000;
-  height: 32px;
-
+  height: auto;
   min-width: 16px;
   padding: 0px 6px 0px 6px;
   margin: 4px 2px 4px 2px;
@@ -626,10 +630,21 @@ html[dir='rtl'] #toolbarContainer, .findbar, .secondaryToolbar {
   cursor: default;
 }
 
+.findbar {
+  min-width: 300px;
+}
+.findbar > div {
+  height: 32px;
+}
+.findbar.wrapContainers > div {
+  clear: both;
+}
+.findbar.wrapContainers > div#findbarMessageContainer {
+  height: auto;
+}
 html[dir='ltr'] .findbar {
   left: 68px;
 }
-
 html[dir='rtl'] .findbar {
   right: 68px;
 }
@@ -639,6 +654,21 @@ html[dir='rtl'] .findbar {
   -moz-user-select: none;
 }
 
+#findInput {
+  width: 200px;
+}
+#findInput::-webkit-input-placeholder {
+  font-style: italic;
+}
+#findInput::-moz-placeholder {
+  font-style: italic;
+}
+#findInput:-ms-input-placeholder {
+  font-style: italic;
+}
+#findInput::placeholder {
+  font-style: italic;
+}
 #findInput[data-status="pending"] {
   background-image: url(images/loading-small.png);
   background-repeat: no-repeat;
@@ -730,6 +760,9 @@ html[dir='ltr'] .doorHangerRight:before {
   font-style: italic;
   color: #A6B7D0;
 }
+#findMsg:empty {
+  display: none;
+}
 
 #findInput.notFound {
   background-color: rgb(255, 102, 102);
@@ -752,14 +785,14 @@ html[dir='rtl'] #toolbarViewerLeft {
 html[dir='ltr'] #toolbarViewerLeft > *,
 html[dir='ltr'] #toolbarViewerMiddle > *,
 html[dir='ltr'] #toolbarViewerRight > *,
-html[dir='ltr'] .findbar > * {
+html[dir='ltr'] .findbar * {
   position: relative;
   float: left;
 }
 html[dir='rtl'] #toolbarViewerLeft > *,
 html[dir='rtl'] #toolbarViewerMiddle > *,
 html[dir='rtl'] #toolbarViewerRight > *,
-html[dir='rtl'] .findbar > * {
+html[dir='rtl'] .findbar * {
   position: relative;
   float: right;
 }
@@ -801,10 +834,6 @@ html[dir='rtl'] .splitToolbarButton > .toolbarButton {
 .secondaryToolbarButton[disabled],
 .overlayButton[disabled] {
   opacity: .5;
-}
-
-.toolbarButton.group {
-  margin-right: 0;
 }
 
 .splitToolbarButton.toggled .toolbarButton {
@@ -1187,6 +1216,24 @@ html[dir="rtl"] #viewOutline.toolbarButton::before {
   content: url(images/toolbarButton-search.png);
 }
 
+.toolbarButton.pdfSidebarNotification::after {
+  position: absolute;
+  display: inline-block;
+  top: 1px;
+  /* Create a filled circle, with a diameter of 9 pixels, using only CSS: */
+  content: '';
+  background-color: #70DB55;
+  height: 9px;
+  width: 9px;
+  border-radius: 50%;
+}
+html[dir='ltr'] .toolbarButton.pdfSidebarNotification::after {
+  left: 17px;
+}
+html[dir='rtl'] .toolbarButton.pdfSidebarNotification::after {
+  right: 17px;
+}
+
 .secondaryToolbarButton {
   position: relative;
   margin: 0 0 4px 0;
@@ -1233,6 +1280,10 @@ html[dir="rtl"] .secondaryToolbarButton > span {
 
 .secondaryToolbarButton.rotateCw::before {
   content: url(images/secondaryToolbarButton-rotateCw.png);
+}
+
+.secondaryToolbarButton.selectTool::before {
+  content: url(images/secondaryToolbarButton-selectTool.png);
 }
 
 .secondaryToolbarButton.handTool::before {
@@ -1960,6 +2011,10 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     content: url(images/secondaryToolbarButton-rotateCw@2x.png);
   }
 
+  .secondaryToolbarButton.selectTool::before {
+    content: url(images/secondaryToolbarButton-selectTool@2x.png);
+  }
+
   .secondaryToolbarButton.handTool::before {
     content: url(images/secondaryToolbarButton-handTool@2x.png);
   }
@@ -2147,7 +2202,7 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
 }
 
 @media all and (max-width: 640px) {
-  .hiddenSmallView {
+  .hiddenSmallView, .hiddenSmallView * {
     display: none;
   }
   .visibleSmallView {
@@ -2155,6 +2210,12 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
   }
   .toolbarButtonSpacer {
     width: 0;
+  }
+  html[dir='ltr'] .findbar {
+    left: 38px;
+  }
+  html[dir='rtl'] .findbar {
+    right: 38px;
   }
 }
 
