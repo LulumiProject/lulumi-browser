@@ -6,6 +6,7 @@
       el-table-column(:label="$t('about.lulumiPage.value')", width="180", align="center")
         template(scope="scope")
           a.cell(v-if="scope.row.key === 'rev'", :href="`https://github.com/qazbnm456/lulumi-browser/commit/${scope.row.value}`") {{ scope.row.value.substring(0, 7) }}
+          .cell(v-else-if="scope.row.key === 'userData'", style="color: cornflowerblue; cursor: pointer;", @click="showItemInFolder(`${scope.row.value}`)") {{ scope.row.value }}
           .cell(v-else) {{ scope.row.value }}
 </template>
 
@@ -15,6 +16,12 @@
       return {
         datas: this.$store.getters.about,
       };
+    },
+    methods: {
+      showItemInFolder(userData) {
+        // eslint-disable-next-line no-undef
+        ipcRenderer.send('show-item-in-folder', userData);
+      },
     },
   };
 </script>
