@@ -307,6 +307,12 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
         key: 'os.arch',
         value: os.arch(),
       },
+      {
+        key: 'userData',
+        value: process.env.NODE_ENV === 'development'
+          ? config.devUserData
+          : app.getPath('userData'),
+      },
     ];
     data.preferences = [
       ['Search Engine Provider', 'search'],
