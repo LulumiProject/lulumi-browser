@@ -241,8 +241,8 @@
         const seen = new Set();
 
         source.forEach((s) => {
-          if (!seen.has(s.value)) {
-            seen.add(s.value);
+          if (!seen.has(`${s.icon}:${s.value}`)) {
+            seen.add(`${s.icon}:${s.value}`);
             results.push(s);
           }
         });
