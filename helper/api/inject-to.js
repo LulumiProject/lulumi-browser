@@ -6,6 +6,7 @@ const url = require('url');
 const IpcEvent = require('./extensions/ipc-event');
 const webRequestEvent = require('./extensions/web-request-event');
 const Event = require('./extensions/event');
+const Port = require('./extensions/port');
 
 String.prototype.hashCode = function () {
   let hash = 0;
@@ -131,7 +132,7 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
 let nextId = 0;
 
 ipcRenderer.setMaxListeners(0);
-exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) => {
+exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
   let storagePath;
@@ -174,7 +175,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       ipcRenderer.send('lulumi-browser-action-set-icon',
         thisExtensionId, lulumi.runtime.getManifest().startPage, details);
     },
-    onClicked: isBackgroundPage ? new Event() : new IpcEvent('page-action', 'on-clicked'),
+    onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
 
   lulumi.pageAction = {
@@ -193,10 +194,10 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
     hide: (tabId) => {
       ipcRenderer.send('lulumi-page-action-hide', tabId, thisExtensionId, false);
     },
-    onClicked: isBackgroundPage ? new Event() : new IpcEvent('page-action', 'on-clicked'),
+    onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
 
-  if (isBackgroundPage) {
+  if ((scriptType === 'event')) {
     lulumi.commands = {
       onCommand: new Event(),
     };
@@ -243,6 +244,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
 
   lulumi.runtime = {
     id: thisExtensionId,
+    port: null,
     getManifest: () => remote.getGlobal('manifestMap')[thisExtensionId],
     getURL: path => url.format({
       protocol: 'lulumi-extension',
@@ -272,14 +274,40 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
       */
       ipcRenderer.send('lulumi-runtime-send-message', extensionId, message, (extensionId !== thisExtensionId) /* whether it's an external message */);
     },
-    onMessage: isBackgroundPage ? new Event() : new IpcEvent('runtime', 'on-message') ,
-    onMessageExternal: isBackgroundPage ? new Event() : new IpcEvent('runtime', 'on-message-external'),
+    beforeConnect: (extensionId, connectInfo, responseScriptType, webContentsId) => {
+      if (lulumi.runtime.port && responseScriptType && !lulumi.runtime.port.disconnected && scriptType !== 'event') {
+        lulumi.runtime.port.updateResponseScriptType(responseScriptType);
+      } else {
+        if (lulumi.runtime.port) {
+          lulumi.runtime.port.disconnect();
+        }
+        lulumi.runtime.port = new Port(extensionId, connectInfo, scriptType, responseScriptType, webContentsId);
+        lulumi.runtime.onConnect.emit(lulumi.runtime.port);
+      }
+    },
+    connect: (extensionId, connectInfo = {}) => {
+      if (scriptType !== 'event') {
+        if (typeof extensionId === 'undefined') {
+          // connect()
+          extensionId = thisExtensionId;
+        } else if ((typeof extensionId === 'object') && (Object.keys(connectInfo).length === 0)) {
+          // connect(connectInfo)
+          connectInfo = extensionId;
+          extensionId = thisExtensionId;
+        }
+        lulumi.runtime.port = new Port(extensionId, connectInfo, scriptType, null, null);
+      }
+      return lulumi.runtime.port;
+    },
+    onMessage: (scriptType === 'event') ? new Event() : new IpcEvent('runtime', 'on-message') ,
+    onMessageExternal: (scriptType === 'event') ? new Event() : new IpcEvent('runtime', 'on-message-external'),
+    onConnect: (scriptType === 'event') ? new Event() : 'Event scripts only',
   };
 
   lulumi.extension = {
     getURL: lulumi.runtime.getURL,
     getBackgroundPage: () => {
-      if (isBackgroundPage) {
+      if (scriptType === 'event') {
         return global;
       } else {
         // TODO: need to modify here to get the Window object of background page
@@ -624,7 +652,7 @@ exports.injectTo = (thisExtensionId, isBackgroundPage, context, LocalStorage) =>
   };
 
   // wrapper
-  const blackList = ['handleMenuItems', 'contextMenusIPC'];
+  const blackList = ['beforeConnect', 'handleMenuItems', 'contextMenusIPC'];
   Object.keys(lulumi).forEach((key) => {
     Object.keys(lulumi[key]).forEach((member) => {
       if (typeof lulumi[key][member] === 'function' && !blackList.includes(member)) {

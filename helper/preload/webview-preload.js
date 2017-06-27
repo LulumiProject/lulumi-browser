@@ -19,7 +19,7 @@ const matchesPattern = (pattern) => {
 // Run the code with lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
-  require('../api/inject-to').injectTo(extensionId, false, context, LocalStorage);
+  require('../api/inject-to').injectTo(extensionId, 'content', context, LocalStorage);
   global.lulumi = context.lulumi;
   const wrapper = `\n
     var chrome = lulumi;

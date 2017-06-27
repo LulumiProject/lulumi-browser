@@ -84,8 +84,13 @@ function createWindow() {
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     webPreferences.allowDisplayingInsecureContent = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
+    const regexp = new RegExp('^lulumi-extension://.+/popup.html$');
     if (params.src.startsWith('lulumi-extension://')) {
-      webPreferences.preload = path.join(config.lulumiPreloadPath, 'extension-preload.js');
+      if (params.src.match(regexp)) {
+        webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
+      } else {
+        webPreferences.preload = path.join(config.lulumiPreloadPath, 'extension-preload.js');
+      }
     } else {
       webPreferences.preload = path.join(config.lulumiPreloadPath, 'webview-preload.js');
     }

@@ -2515,13 +2515,7 @@ debug@2.6.1:
   dependencies:
     ms "0.7.2"
 
-debug@^2.1.1, debug@^2.2.0, debug@^2.6.3:
-  version "2.6.3"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.3.tgz#0f7eb8c30965ec08c72accfa0130c8b79984141d"
-  dependencies:
-    ms "0.7.2"
-
-debug@^2.1.3, debug@^2.4.5, debug@^2.5.1, debug@^2.6.1, debug@^2.6.8:
+debug@^2.1.1, debug@^2.1.3, debug@^2.2.0, debug@^2.4.5, debug@^2.5.1, debug@^2.6.1, debug@^2.6.3, debug@^2.6.8:
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
   dependencies:
@@ -5365,9 +5359,9 @@ lru-cache@^4.0.0, lru-cache@^4.0.1:
     pseudomap "^1.0.1"
     yallist "^2.0.0"
 
-lulumi@^0.0.15:
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.15.tgz#78e69290d2afe35672505939adda18e8038cd901"
+lulumi@^0.0.16:
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.16.tgz#3fc769cb6597f14862a19ea757418a42cad0d8d4"
 
 macaddress@^0.2.8:
   version "0.2.8"
