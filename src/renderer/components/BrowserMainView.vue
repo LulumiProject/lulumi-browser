@@ -357,8 +357,8 @@
         }
       },
       onWillDownloadAnyFile(event, data) {
+        this.showDownloadBar = true;
         if (this.$electron.remote.webContents.fromId(data.webContentsId)) {
-          this.showDownloadBar = true;
           this.$store.dispatch('createDownloadTask', {
             name: data.name,
             url: data.url,
@@ -388,25 +388,33 @@
           startTime: data.startTime,
           state: data.state,
         });
-        let option = null;
-        if (data.state === 'completed') {
-          option = {
-            title: 'Success',
-            body: `${data.name} download successfully!`,
-          };
-        } else if (data.state === 'cancelled') {
-          option = {
-            title: 'Cancelled',
-            body: `${data.name} has been cancelled!`,
-          };
+        const download =
+          this.$store.getters.downloads.filter(download => download.startTime === data.startTime);
+        if (download.length) {
+          let option = null;
+          if (data.state === 'completed') {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          } else if (data.state === 'cancelled') {
+            option = {
+              title: 'Cancelled',
+              body: `${data.name} has been cancelled!`,
+            };
+          } else {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          }
+          /* eslint-disable no-new */
+          new Notification(option.title, option);
         } else {
-          option = {
-            title: 'Success',
-            body: `${data.name} download successfully!`,
-          };
+          this.showDownloadBar = this.$store.getters.downloads.every(download => download.style === 'hidden')
+            ? false
+            : this.showDownloadBar;
         }
-        /* eslint-disable no-new */
-        new Notification(option.title, option);
       },
       onCloseDownloadBar() {
         this.showDownloadBar = false;
@@ -1204,8 +1212,9 @@
           ? this.currentPageIndex
           : this.tabsOrder.indexOf(this.currentPageIndex);
         const downloads = this.$store.getters.downloads;
+        const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
-        if (downloads.length !== 0) {
+        if (pendingDownloads.length !== 0) {
           if (force) {
             responseNewState(
               this.$store.getters,
@@ -1222,16 +1231,15 @@
               buttons: ['Abort and Leave', 'Cancel'],
             }, (index) => {
               if (index === 0) {
-                downloads.filter(download => download.state === 'progressing').map((download) => {
+                pendingDownloads.forEach((download) => {
                   this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
-                  return true;
                 });
                 responseNewState(
                   this.$store.getters,
                   newStart,
                   newPages,
                   newCurrentPageIndex,
-                  downloads.filter(download => download.state !== 'progressing'),
+                  this.$store.getters.downloads,
                 );
               }
             });

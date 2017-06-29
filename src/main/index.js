@@ -48,7 +48,7 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
 
-function appStateSave(force = false) {
+function appStateSave(force = true) {
   if (mainWindow) {
     mainWindow.webContents.send('request-app-state', force);
   }
@@ -234,7 +234,7 @@ app.on('before-quit', (event) => {
   event.preventDefault();
   clearInterval(appStateSaveHandler);
   appStateSaveHandler = null;
-  appStateSave();
+  appStateSave(false);
 });
 
 app.on('browser-window-focus', () => {

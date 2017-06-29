@@ -276,33 +276,29 @@ const mutations = {
   },
   // downloads handlers
   [types.CREATE_DOWNLOAD_TASK](state, file) {
-    state.downloads.push(file);
+    state.downloads.unshift(file);
   },
   [types.UPDATE_DOWNLOADS_PROGRESS](state, file) {
-    state.downloads.every((download) => {
+    state.downloads.forEach((download) => {
       if (download.startTime === file.startTime) {
         download.getReceivedBytes = file.getReceivedBytes;
         download.savePath = file.savePath;
         download.isPaused = file.isPaused;
         download.canResume = file.canResume;
         download.state = file.state;
-        return false;
       }
-      return true;
     });
   },
   [types.COMPLETE_DOWNLOADS_PROGRESS](state, file) {
-    state.downloads.every((download, index) => {
+    state.downloads.forEach((download, index) => {
       if (download.startTime === file.startTime) {
-        if (download.savePath === '') {
-          state.downloads.splice(index, 1);
-        } else {
+        if (download.savePath) {
           download.name = file.name;
           download.state = file.state;
+        } else {
+          state.downloads.splice(index, 1);
         }
-        return false;
       }
-      return true;
     });
   },
   [types.CLOSE_DOWNLOAD_BAR](state) {

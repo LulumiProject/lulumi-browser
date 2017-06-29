@@ -154,4 +154,5 @@ new Vue({
   router,
   store,
   template: '<App/>',
+  name: 'root',
 }).$mount('#app');

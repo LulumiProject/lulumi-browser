@@ -104,7 +104,9 @@
       getFileIcon(savePath, index) {
         if (savePath) {
           imageUtil.getBase64FromFileIcon(savePath, 'normal').then((dataURL) => {
-            document.getElementById(`icon-${index}`).setAttribute('src', dataURL);
+            if (document.getElementById(`icon-${index}`)) {
+              document.getElementById(`icon-${index}`).setAttribute('src', dataURL);
+            }
           });
         }
       },
