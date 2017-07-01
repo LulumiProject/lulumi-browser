@@ -413,10 +413,10 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.storage = {
     set: (items, callback) => {
-      Object.keys(items).forEach((item) => {
-        const oldValue = localStorage.getItem(item);
-        const newValue = items[item];
-        localStorage.setItem(item, JSON.stringify(newValue));
+      Object.keys(items).forEach((key) => {
+        const oldValue = JSON.parse(localStorage.getItem(key));
+        const newValue = items[key];
+        localStorage.setItem(key, JSON.stringify(newValue));
 
         lulumi.storage.onChanged.emit([{
           oldValue,
@@ -429,26 +429,53 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       }
     },
     get: (keys, callback) => {
-      let ks;
-      if (keys.constructor === Object) {
-        ks = keys;
-      } else if (keys.constructor === String) {
-        ks = [keys];
-      } else if (keys.constructor === Array) {
-        ks = keys;
-      }
-
       const ret = {};
-      Object.keys(ks).forEach((key) => {
-        const tkey = ks[key];
-        ret[tkey] = JSON.parse(localStorage.getItem(tkey));
-        if (ret[tkey] === null) {
-          ret[tkey] = undefined;
+      let ks;
+      if (keys !== null) {
+        if (keys.constructor === Object) {
+          ks = [];
+          Object.keys(keys).forEach(key => (ks.push(key)));
+        } else if (keys.constructor === String) {
+          ks = [keys];
+        } else if (keys.constructor === Array) {
+          ks = keys;
         }
-      });
+        ks.forEach((key) => {
+            ret[key] = JSON.parse(localStorage.getItem(key));
+            if (ret[key] === null) {
+              ret[key] = undefined;
+            }
+        });
+      } else {
+        localStorage._keys.forEach((key) => {
+            ret[key] = JSON.parse(localStorage.getItem(key));
+            if (ret[key] === null) {
+              ret[key] = undefined;
+            }
+        });
+      }
 
       if (callback) {
         callback(ret);
+      }
+    },
+    remove: (keys, callback) => {
+      if (keys !== null) {
+        let ks;
+        if (keys.constructor === String) {
+          ks = [keys];
+        } else if (keys.constructor === Array) {
+          ks = keys;
+        } else {
+          return;
+        }
+        ks.forEach((key) => {
+          localStorage.removeItem(key);
+        });
+
+        if (callback) {
+          callback();
+        }
       }
     },
     onChanged: new IpcEvent('storage', 'on-changed'),
@@ -457,11 +484,13 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   lulumi.storage.local = {
     get: lulumi.storage.get,
     set: lulumi.storage.set,
+    remove: lulumi.storage.remove,
   };
 
   lulumi.storage.sync = {
     get: lulumi.storage.get,
     set: lulumi.storage.set,
+    remove: lulumi.storage.remove,
   };
 
   lulumi.contextMenus = {
