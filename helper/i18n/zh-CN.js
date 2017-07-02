@@ -50,6 +50,8 @@ export const appMenu = {
   help: {
     title: 'Help',
     reportIssue: 'Report Issue',
+    forceReload: 'Force Reload',
+    toggleDevTools: 'Toggle Developer Tools',
   },
 };
 

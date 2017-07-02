@@ -50,6 +50,8 @@ export const appMenu = {
   help: {
     title: '說明',
     reportIssue: '回報問題',
+    forceReload: '強制重新載入',
+    toggleDevTools: '開發人員工具',
   },
 };
 

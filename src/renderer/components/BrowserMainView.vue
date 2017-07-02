@@ -639,6 +639,22 @@
           webview.loadURL(this.page.location);
         }
       },
+      onClickForceRefresh() {
+        const webview = this.getWebView();
+        if (webview.getURL() === this.page.location) {
+          webview.reloadIgnoringCache();
+        } else {
+          webview.loadURL(this.page.location);
+        }
+      },
+      onClickToggleDevTools() {
+        const webview = this.getWebView();
+        if (webview.getURL() === this.page.location) {
+          webview.openDevTools({ mode: 'bottom' });
+        } else {
+          webview.loadURL(this.page.location);
+        }
+      },
       onEnterLocation(location) {
         let newLocation = null;
         if (location.startsWith('about:')) {
@@ -1067,6 +1083,7 @@
         if (sourceLocation !== null) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.viewSource'),
+            accelerator: 'Shift+CmdOrCtrl+U',
             click: () => this.onNewTab(sourceLocation, true),
           }));
         }

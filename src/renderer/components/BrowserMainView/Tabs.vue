@@ -115,6 +115,16 @@
           this.$parent.onClickRefresh();
         }
       });
+      ipc.on('forceReload', () => {
+        if (this.$parent.onClickForceRefresh) {
+          this.$parent.onClickForceRefresh();
+        }
+      });
+      ipc.on('toggleDevTools', () => {
+        if (this.$parent.onClickToggleDevTools) {
+          this.$parent.onClickToggleDevTools();
+        }
+      });
       ipc.on('new-tab', (event, payload) => {
         if (this.$parent.onNewTab) {
           if (payload) {

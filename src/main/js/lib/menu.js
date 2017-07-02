@@ -89,11 +89,13 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.forceReload'),
-          role: 'forcereload',
+          accelerator: 'Shift+CmdOrCtrl+R',
+          click: () => BrowserWindow.fromId(global.wid).webContents.send('forceReload'),
         },
         {
           label: i18n.t('view.toggleDevTools'),
-          role: 'toggledevtools',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click: () => BrowserWindow.fromId(global.wid).webContents.send('toggleDevTools'),
         },
         {
           type: 'separator',
@@ -150,6 +152,14 @@ const getTemplate = () => {
             location: 'https://github.com/qazbnm456/lulumi-browser/issues',
             follow: true,
           }),
+        },
+        {
+          label: i18n.t('help.forceReload'),
+          click: () => BrowserWindow.fromId(global.wid).webContents.reloadIgnoringCache(),
+        },
+        {
+          label: i18n.t('help.toggleDevTools'),
+          click: () => BrowserWindow.fromId(global.wid).webContents.toggleDevTools(),
         },
       ],
     },
