@@ -647,6 +647,15 @@
           webview.loadURL(this.page.location);
         }
       },
+      onClickViewSource() {
+        const webview = this.getWebView();
+        if (webview.getURL() === this.page.location) {
+          const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
+          if (sourceLocation !== null) {
+            this.onNewTab(sourceLocation, true);
+          }
+        }
+      },
       onClickToggleDevTools() {
         const webview = this.getWebView();
         if (webview.getURL() === this.page.location) {
@@ -1083,7 +1092,7 @@
         if (sourceLocation !== null) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.viewSource'),
-            accelerator: 'Shift+CmdOrCtrl+U',
+            accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
             click: () => this.onNewTab(sourceLocation, true),
           }));
         }

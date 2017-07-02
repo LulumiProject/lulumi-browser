@@ -120,6 +120,11 @@
           this.$parent.onClickForceRefresh();
         }
       });
+      ipc.on('viewSource', () => {
+        if (this.$parent.onClickViewSource) {
+          this.$parent.onClickViewSource();
+        }
+      });
       ipc.on('toggleDevTools', () => {
         if (this.$parent.onClickToggleDevTools) {
           this.$parent.onClickToggleDevTools();

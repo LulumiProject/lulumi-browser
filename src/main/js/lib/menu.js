@@ -93,12 +93,11 @@ const getTemplate = () => {
           click: () => BrowserWindow.fromId(global.wid).webContents.send('forceReload'),
         },
         {
-          label: i18n.t('view.toggleDevTools'),
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('toggleDevTools'),
+          type: 'separator',
         },
         {
-          type: 'separator',
+          label: i18n.t('view.toggleFullscreen'),
+          role: 'togglefullscreen',
         },
         {
           label: i18n.t('view.resetZoom'),
@@ -116,8 +115,14 @@ const getTemplate = () => {
           type: 'separator',
         },
         {
-          label: i18n.t('view.toggleFullscreen'),
-          role: 'togglefullscreen',
+          label: i18n.t('view.viewSource'),
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
+          click: () => BrowserWindow.fromId(global.wid).webContents.send('viewSource'),
+        },
+        {
+          label: i18n.t('view.toggleDevTools'),
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click: () => BrowserWindow.fromId(global.wid).webContents.send('toggleDevTools'),
         },
       ],
     },
