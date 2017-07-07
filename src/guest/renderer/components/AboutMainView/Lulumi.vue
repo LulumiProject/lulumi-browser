@@ -10,18 +10,19 @@
           .cell(v-else) {{ scope.row.value }}
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        datas: this.$store.getters.about,
-      };
-    },
-    methods: {
-      showItemInFolder(userData) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('show-item-in-folder', userData);
-      },
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+
+  @Component
+  export default class Lulumi extends Vue {
+    get datas(): any {
+      return this.$store.getters.about;
+    }
+
+    showItemInFolder(userData: string): void {
+      ipcRenderer.send('show-item-in-folder', userData);
+    }
   };
 </script>

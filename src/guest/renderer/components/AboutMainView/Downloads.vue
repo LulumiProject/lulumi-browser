@@ -20,77 +20,83 @@
               el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="small", icon="document", @click="showItemInFolder(file.savePath)")
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        files: [],
-        handler: null,
-      };
-    },
-    methods: {
-      fetch() {
-        this.handler = setInterval(() => {
-          // eslint-disable-next-line no-undef
-          ipcRenderer.send('guest-want-data', 'downloads');
-        }, 100);
-      },
-      clear() {
-        clearInterval(this.handler);
-      },
-      percentage(file) {
-        return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
-      },
-      setDownloads(index) {
-        if (index !== -1) {
-          this.files.splice(index, 1);
-        } else {
-          this.files = this.files.filter(file => file.state === 'progressing');
-        }
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('set-downloads', this.files);
-      },
-      showItemInFolder(savePath) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('show-item-in-folder', savePath);
-      },
-      checkStateForProgress(state) {
-        switch (state) {
-          case 'progressing':
-            return '';
-          case 'cancelled':
-          case 'interrupted':
-            return 'exception';
-          case 'completed':
-          default:
-            return 'success';
-        }
-      },
-      pauseDownload(startTime) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('pause-downloads-progress', startTime);
-      },
-      resumeDownload(startTime) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('resume-downloads-progress', startTime);
-      },
-      cancelDownload(startTime) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('cancel-downloads-progress', startTime);
-      },
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  interface File {
+    webContentsId: number;
+    name: string;
+    url: string;
+    totalBytes: number;
+    isPaused: boolean;
+    canResume: boolean;
+    startTime: Date;
+    state: string;
+    getReceivedBytes: number;
+    savePath: string;
+  }
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+
+  @Component
+  export default class Downloads extends Vue {
+    files: Array<File> = [];
+    handler: any = null;
+
+    fetch() {
+      this.handler = setInterval(() => {
+        ipcRenderer.send('guest-want-data', 'downloads');
+      }, 100);
+    }
+    clear() {
+      clearInterval(this.handler);
+    }
+    percentage(file: File): number {
+      return (file.getReceivedBytes / file.totalBytes) * 100;
+    }
+    setDownloads(index) {
+      if (index !== -1) {
+        this.files.splice(index, 1);
+      } else {
+        this.files = this.files.filter(file => file.state === 'progressing');
+      }
+      ipcRenderer.send('set-downloads', this.files);
+    }
+    showItemInFolder(savePath) {
+      ipcRenderer.send('show-item-in-folder', savePath);
+    }
+    checkStateForProgress(state) {
+      switch (state) {
+        case 'progressing':
+          return '';
+        case 'cancelled':
+        case 'interrupted':
+          return 'exception';
+        case 'completed':
+        default:
+          return 'success';
+      }
+    }
+    pauseDownload(startTime) {
+      ipcRenderer.send('pause-downloads-progress', startTime);
+    }
+    resumeDownload(startTime) {
+      ipcRenderer.send('resume-downloads-progress', startTime);
+    }
+    cancelDownload(startTime) {
+      ipcRenderer.send('cancel-downloads-progress', startTime);
+    }
+
     mounted() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.files = ret;
       });
       this.fetch();
-    },
+    }
     beforeDestroy() {
       this.clear();
-      // eslint-disable-next-line no-undef
       ipcRenderer.removeAllListeners('guest-here-your-data');
-    },
+    }
   };
 </script>
 

@@ -9,6 +9,7 @@ const state = {
   extensions: {},
 };
 
+/* tslint:disable:function-name */
 const mutations = {
   [types.UPDATE_ABOUT](state, data) {
     state.about.about = data.about;

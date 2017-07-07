@@ -3,13 +3,13 @@ import axios from 'axios';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-default/index.css';
 
-import App from './App';
+import App from './App.vue';
 import router from './router';
 import store from './store';
 import i18n from './i18n';
 
-Vue.prototype.$http = axios;
-Vue.http = Vue.prototype.$http;
+(Vue as any).prototype.$http = axios;
+(Vue as any).http = (Vue as any).prototype.$http;
 
 Vue.use(ElementUI);
 
@@ -20,9 +20,9 @@ if (process.env.NODE_ENV === 'production') {
 
 /* eslint-disable no-new */
 new Vue({
-  components: { App },
   i18n,
   router,
   store,
+  components: { App },
   template: '<App/>',
 }).$mount('#app');

@@ -10,32 +10,29 @@
       template(slot="prepend") {{ $t('about.preferencesPage.homePage.homepage') }}
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        homepage: '',
-      };
-    },
-    methods: {
-      setHomepage() {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('set-homepage', {
-          homepage: this.homepage,
-        });
-      },
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+
+  @Component
+  export default class Homepage extends Vue {
+    homepage: string = '';
+
+    setHomepage(): void {
+      ipcRenderer.send('set-homepage', {
+        homepage: this.homepage,
+      });
+    }
+
     mounted() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'homepage');
-      // eslint-disable-next-line no-undef
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.homepage = ret.homepage;
       });
-    },
+    }
     beforeDestroy() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.removeAllListeners('guest-here-your-data');
-    },
+    }
   };
 </script>

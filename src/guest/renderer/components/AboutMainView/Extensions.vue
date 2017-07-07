@@ -22,59 +22,73 @@
               span(class="extensions-list__item-path") {{ loadPath(extension) }}
 </template>
 
-<script>
-  export default {
-    computed: {
-      extensions() {
-        return this.$store.getters.extensions;
-      },
-    },
-    methods: {
-      findId(extensionId) {
-        // eslint-disable-next-line no-undef
-        return window.renderProcessPreferences
-          .findIndex(element => element.extensionId === extensionId);
-      },
-      loadName(extensionId) {
-        const id = this.findId(extensionId);
-        return window.renderProcessPreferences[id].name;
-      },
-      loadIcon(extensionId) {
-        const id = this.findId(extensionId);
-        if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
-          return Object.values(window.renderProcessPreferences[id].icons)[0];
-        }
-        return undefined;
-      },
-      loadPath(extensionId) {
-        const id = this.findId(extensionId);
-        return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
-      },
-      openDevTools(webContentsId) {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('open-dev-tools', webContentsId);
-      },
-      addExtension() {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.once('add-extension-result', () => {
-          window.location.reload();
-        });
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('add-extension');
-      },
-      removeExtension(extensionId) {
-        const id = this.findId(extensionId);
-        // eslint-disable-next-line no-undef
-        ipcRenderer.once('remove-extension-result', (event, result) => {
-          if (result === 'OK') {
-            window.location.reload();
-          }
-        });
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  interface RenderProcessPreference {
+    name: string;
+    extensionId: string;
+    icons: Array<string>;
+    srcDirectory: string;
+  }
+  interface RenderProcessPreferences {
+    [index: number]: RenderProcessPreference;
+    findIndex: (element: any) => number;
+  }
+  interface Window {
+    renderProcessPreferences: RenderProcessPreferences,
+    location: {
+      reload: () => void;
+    };
+  };
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+  declare const window: Window;
+
+  @Component
+  export default class Extensions extends Vue {
+    get extensions(): any {
+      return this.$store.getters.extensions;
+    }
+
+    findId(extensionId) {
+      return window.renderProcessPreferences
+        .findIndex(element => element.extensionId === extensionId);
+    }
+    loadName(extensionId) {
+      const id = this.findId(extensionId);
+      return window.renderProcessPreferences[id].name;
+    }
+    loadIcon(extensionId) {
+      const id = this.findId(extensionId);
+      if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
+        return (Object as any).values(window.renderProcessPreferences[id].icons)[0];
+      }
+      return undefined;
+    }
+    loadPath(extensionId) {
+      const id = this.findId(extensionId);
+      return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
+    }
+    openDevTools(webContentsId) {
+      ipcRenderer.send('open-dev-tools', webContentsId);
+    }
+    addExtension() {
+      ipcRenderer.once('add-extension-result', () => {
         window.location.reload();
-      },
-    },
+      });
+      ipcRenderer.send('add-extension');
+    }
+    removeExtension(extensionId) {
+      const id = this.findId(extensionId);
+      ipcRenderer.once('remove-extension-result', (event, result) => {
+        if (result === 'OK') {
+          window.location.reload();
+        }
+      });
+      ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);
+      window.location.reload();
+    }
   };
 </script>
 

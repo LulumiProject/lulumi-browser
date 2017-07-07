@@ -7,35 +7,40 @@
       el-table-column(prop="name", :label="$t('about.preferencesPage.searchEngineProviderPage.name')", width="180", align="center")
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        tableData: [],
-      };
-    },
-    methods: {
-      // eslint-disable-next-line consistent-return
-      currentSearchEngine(row) {
-        if (row.current === 'Y') {
-          return 'activated';
-        }
-      },
-      handleCurrentChange(obj) {
-        if (obj) {
-          // eslint-disable-next-line no-undef
-          ipcRenderer.send('set-current-search-engine-provider', {
-            name: obj.name,
-            search: obj.search,
-            autocomplete: obj.autocomplete,
-          });
-        }
-      },
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  interface TableData {
+    current: string;
+    name: string;
+    search: string;
+    autocomplete: string;
+  }
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+
+  @Component
+  export default class SearchEngineProvider extends Vue {
+    tableData: Array<TableData> = [];
+
+    currentSearchEngine(row): string {
+      if (row.current === 'Y') {
+        return 'activated';
+      }
+      return '';
+    }
+    handleCurrentChange(obj): void {
+      if (obj) {
+        ipcRenderer.send('set-current-search-engine-provider', {
+          name: obj.name,
+          search: obj.search,
+          autocomplete: obj.autocomplete,
+        });
+      }
+    }
+
     mounted() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'searchEngineProvider');
-      // eslint-disable-next-line no-undef
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.tableData = [];
         ret.searchEngine.forEach((val) => {
@@ -47,11 +52,10 @@
           });
         });
       });
-    },
+    }
     beforeDestroy() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.removeAllListeners('guest-here-your-data');
-    },
+    }
   };
 </script>
 

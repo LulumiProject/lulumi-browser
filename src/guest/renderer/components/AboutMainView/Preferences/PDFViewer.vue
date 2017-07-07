@@ -8,42 +8,39 @@
       el-option(v-for="item in options", :label="item.label", :value="item.value", :key="item.value")
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        options: [
-          {
-            value: 'pdf-viewer',
-            label: 'Chrome pdf extension',
-          },
-          {
-            value: 'PDF.js',
-            label: 'PDF Reader in JavaScript',
-          },
-        ],
-        pdfViewer: '',
-      };
-    },
-    methods: {
-      setPDFViewer() {
-        // eslint-disable-next-line no-undef
-        ipcRenderer.send('set-pdf-viewer', {
-          pdfViewer: this.pdfViewer,
-        });
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  declare const ipcRenderer: Electron.IpcRenderer;
+
+  @Component
+  export default class PDFViewer extends Vue {
+    options: Array<object> = [
+      {
+        value: 'pdf-viewer',
+        label: 'Chrome pdf extension',
       },
-    },
+      {
+        value: 'PDF.js',
+        label: 'PDF Reader in JavaScript',
+      },
+    ];
+    pdfViewer: string = '';
+
+    setPDFViewer() {
+      ipcRenderer.send('set-pdf-viewer', {
+        pdfViewer: this.pdfViewer,
+      });
+    }
+
     mounted() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.send('guest-want-data', 'pdfViewer');
-      // eslint-disable-next-line no-undef
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.pdfViewer = ret.pdfViewer;
       });
-    },
+    }
     beforeDestroy() {
-      // eslint-disable-next-line no-undef
       ipcRenderer.removeAllListeners('guest-here-your-data');
-    },
+    }
   };
 </script>

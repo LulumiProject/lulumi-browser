@@ -32,7 +32,25 @@ let rendererConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
+        test: /\.(ts)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'tslint-loader'
+        }
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/]
+          }
+        }
+      },
+      {
+        test: /\.js$/,
         enforce: 'pre',
         exclude: /node_modules/,
         use: {
@@ -143,7 +161,7 @@ let rendererConfig = {
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
   target: 'electron-renderer'
 }
@@ -152,7 +170,7 @@ let aboutConfig = {
   name: 'about',
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    about: path.join(__dirname, '../src/guest/renderer/main.js')
+    about: path.join(__dirname, '../src/guest/renderer/main.ts')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -160,7 +178,25 @@ let aboutConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
+        test: /\.(ts)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'tslint-loader'
+        }
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/]
+          }
+        }
+      },
+      {
+        test: /\.js$/,
         enforce: 'pre',
         exclude: /node_modules/,
         use: {
@@ -267,7 +303,7 @@ let aboutConfig = {
       'i18n': path.join(__dirname, '../helper/i18n'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.js', '.vue', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
   target: 'web'
 }

@@ -20,6 +20,24 @@ let mainConfig = {
   module: {
     rules: [
       {
+        test: /\.(ts)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'tslint-loader'
+        }
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/]
+          }
+        }
+      },
+      {
         test: /\.(js)$/,
         enforce: 'pre',
         exclude: /node_modules/,
@@ -57,7 +75,7 @@ let mainConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.js', '.json']
+    extensions: ['.ts', '.js', '.json']
   },
   target: 'electron-main'
 }

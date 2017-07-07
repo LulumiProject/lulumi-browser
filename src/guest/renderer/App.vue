@@ -4,14 +4,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  interface Window {
+    about: object,
+    manifestMap: object,
+    backgroundPages: object,
+  };
+
+  declare const window: Window;
+
   export default {
     name: 'lulumi-browser',
     mounted() {
       if (window.about) {
         this.$store.dispatch('updateAbout', window.about);
       } else {
-        // eslint-disable-next-line no-alert
         alert('Error: window.about not found!');
       }
       if (window.manifestMap) {
@@ -27,7 +34,6 @@
         });
         this.$store.dispatch('updateExtensions', extensions);
       } else {
-        // eslint-disable-next-line no-alert
         alert('Error: window.extensions not found!');
       }
     },

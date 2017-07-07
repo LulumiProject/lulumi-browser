@@ -19,7 +19,7 @@ const config = {
     asar: true,
     dir: path.join(__dirname, '../'),
     icon: path.join(__dirname, '../build/icons/icon'),
-    ignore: /(^\/(src|test|build|extensions|userData|\.\w+|README|yarn))|\.gitkeep/,
+    ignore: /(^\/(src|test|build|extensions|userData|tslint|\.\w+|README|yarn))|\.gitkeep/,
     out: path.join(__dirname, '../builds'),
     overwrite: true,
     platform: process.env.BUILD_TARGET || 'all',

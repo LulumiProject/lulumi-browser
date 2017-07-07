@@ -8,14 +8,16 @@
       router-view
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        path: '/preferences',
-        datas: this.$store.getters.about,
-      };
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  @Component
+  export default class Preferences extends Vue {
+    path: string = '/preferences';
+
+    get datas(): any {
+      return this.$store.getters.about;
+    }
   };
 </script>
 
