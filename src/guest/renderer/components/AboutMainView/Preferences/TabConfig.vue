@@ -31,7 +31,7 @@
     defaultUrl: string = '';
     defaultFavicon: string = '';
 
-    setTabConfig() {
+    setTabConfig(): void {
       ipcRenderer.send('set-tab-config', {
         defaultUrl: this.defaultUrl,
         defaultFavicon: this.defaultFavicon,

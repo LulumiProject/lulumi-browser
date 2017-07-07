@@ -17,7 +17,7 @@
 
   @Component
   export default class Lulumi extends Vue {
-    get datas(): any {
+    get datas() {
       return this.$store.getters.about;
     }
 

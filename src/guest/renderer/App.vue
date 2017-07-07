@@ -5,6 +5,8 @@
 </template>
 
 <script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
   interface Window {
     about: object,
     manifestMap: object,
@@ -13,8 +15,8 @@
 
   declare const window: Window;
 
-  export default {
-    name: 'lulumi-browser',
+  @Component({ name: 'lulumi-browser' })
+  export default class App extends Vue {
     mounted() {
       if (window.about) {
         this.$store.dispatch('updateAbout', window.about);
@@ -36,7 +38,7 @@
       } else {
         alert('Error: window.extensions not found!');
       }
-    },
+    }
   };
 </script>
 

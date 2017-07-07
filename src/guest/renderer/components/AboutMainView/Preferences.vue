@@ -15,7 +15,7 @@
   export default class Preferences extends Vue {
     path: string = '/preferences';
 
-    get datas(): any {
+    get datas() {
       return this.$store.getters.about;
     }
   };

@@ -43,18 +43,18 @@
     files: Array<File> = [];
     handler: any = null;
 
-    fetch() {
+    fetch(): void {
       this.handler = setInterval(() => {
         ipcRenderer.send('guest-want-data', 'downloads');
       }, 100);
     }
-    clear() {
+    clear(): void {
       clearInterval(this.handler);
     }
     percentage(file: File): number {
       return (file.getReceivedBytes / file.totalBytes) * 100;
     }
-    setDownloads(index) {
+    setDownloads(index: number): void {
       if (index !== -1) {
         this.files.splice(index, 1);
       } else {
@@ -62,10 +62,10 @@
       }
       ipcRenderer.send('set-downloads', this.files);
     }
-    showItemInFolder(savePath) {
+    showItemInFolder(savePath: string): void {
       ipcRenderer.send('show-item-in-folder', savePath);
     }
-    checkStateForProgress(state) {
+    checkStateForProgress(state: string): string {
       switch (state) {
         case 'progressing':
           return '';
@@ -77,13 +77,13 @@
           return 'success';
       }
     }
-    pauseDownload(startTime) {
+    pauseDownload(startTime: Date): void {
       ipcRenderer.send('pause-downloads-progress', startTime);
     }
-    resumeDownload(startTime) {
+    resumeDownload(startTime: Date): void {
       ipcRenderer.send('resume-downloads-progress', startTime);
     }
-    cancelDownload(startTime) {
+    cancelDownload(startTime: Date): void {
       ipcRenderer.send('cancel-downloads-progress', startTime);
     }
 

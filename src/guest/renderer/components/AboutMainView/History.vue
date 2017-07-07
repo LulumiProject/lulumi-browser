@@ -17,6 +17,7 @@
 
 <script lang="ts">
   import { Component, Watch, Vue } from 'vue-property-decorator';
+  import VueI18n from 'vue-i18n';
 
   import '../../css/el-tree';
 
@@ -26,7 +27,7 @@
     label: string;
     favicon: string;
     url: string;
-    time: Date;
+    time: string;
     flag: boolean;
     children: Array<HistoryItem>;
   }
@@ -66,7 +67,7 @@
         this.clear();
       }
     }
-    syncStatus() {
+    syncStatus(): VueI18n.TranslateResult {
       if (this.sync) {
         return this.$t('about.historyPage.syncStatus.syncing');
       }
@@ -85,7 +86,7 @@
       }
       ipcRenderer.send('set-history', this.history);
     }
-    filterNode(value: string, data: HistoryItem) {
+    filterNode(value: string, data: HistoryItem): boolean {
       if (!value) {
         return true;
       }
@@ -94,7 +95,7 @@
       }
       return data.title.toLowerCase().indexOf(value.toLowerCase()) !== -1;
     }
-    transformArr(history): Array<HistoryItem> {
+    transformArr(history: Array<HistoryItem>): Array<HistoryItem> {
       const newArr: Array<HistoryItem> = [];
       const labels: object = {};
       let i: number;
@@ -113,7 +114,7 @@
       }
       return newArr;
     }
-    customRender(h, node) {
+    customRender(h: Vue.CreateElement, node: any): Vue.VNode {
       const history: HistoryItem = node.data;
       if (history.children) {
         return h('span', history.label);

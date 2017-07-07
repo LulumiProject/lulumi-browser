@@ -9,14 +9,12 @@ import * as en from '../../../helper/i18n/en';
 import * as zh from '../../../helper/i18n/zh-CN';
 import * as zhTW from '../../../helper/i18n/zh-TW';
 
-declare const ipcRenderer: any;
+declare const ipcRenderer: Electron.IpcRenderer;
 
-// eslint-disable-next-line no-undef
 const lang = ipcRenderer.sendSync('request-lang');
 
 Vue.use(VueI18n);
 
-// eslint-disable-next-line camelcase
 export default new VueI18n({
   locale: lang,
   messages: {

@@ -18,7 +18,6 @@ if (process.env.NODE_ENV === 'production') {
   Vue.config.devtools = false;
 }
 
-/* eslint-disable no-new */
 new Vue({
   i18n,
   router,

@@ -27,7 +27,7 @@
     ];
     pdfViewer: string = '';
 
-    setPDFViewer() {
+    setPDFViewer(): void {
       ipcRenderer.send('set-pdf-viewer', {
         pdfViewer: this.pdfViewer,
       });

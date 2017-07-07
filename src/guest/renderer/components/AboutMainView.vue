@@ -6,13 +6,14 @@
       router-link(:to="`/${data[1]}`", :key="$route.path") {{ data[0] }}
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        datas: this.$store.getters.about,
-      };
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  @Component
+  export default class AboutMainView extends Vue {
+    get datas() {
+      return this.$store.getters.about;
+    }
   };
 </script>
 

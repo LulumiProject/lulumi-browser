@@ -47,39 +47,39 @@
 
   @Component
   export default class Extensions extends Vue {
-    get extensions(): any {
+    get extensions() {
       return this.$store.getters.extensions;
     }
 
-    findId(extensionId) {
+    findId(extensionId: string): number {
       return window.renderProcessPreferences
         .findIndex(element => element.extensionId === extensionId);
     }
-    loadName(extensionId) {
-      const id = this.findId(extensionId);
+    loadName(extensionId: string): string {
+      const id: number = this.findId(extensionId);
       return window.renderProcessPreferences[id].name;
     }
-    loadIcon(extensionId) {
-      const id = this.findId(extensionId);
+    loadIcon(extensionId: string): string | undefined {
+      const id: number = this.findId(extensionId);
       if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
         return (Object as any).values(window.renderProcessPreferences[id].icons)[0];
       }
       return undefined;
     }
-    loadPath(extensionId) {
+    loadPath(extensionId: string): string {
       const id = this.findId(extensionId);
       return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
     }
-    openDevTools(webContentsId) {
+    openDevTools(webContentsId: number): void {
       ipcRenderer.send('open-dev-tools', webContentsId);
     }
-    addExtension() {
+    addExtension(): void {
       ipcRenderer.once('add-extension-result', () => {
         window.location.reload();
       });
       ipcRenderer.send('add-extension');
     }
-    removeExtension(extensionId) {
+    removeExtension(extensionId: string): void {
       const id = this.findId(extensionId);
       ipcRenderer.once('remove-extension-result', (event, result) => {
         if (result === 'OK') {

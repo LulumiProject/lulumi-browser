@@ -23,13 +23,13 @@
   export default class SearchEngineProvider extends Vue {
     tableData: Array<TableData> = [];
 
-    currentSearchEngine(row): string {
+    currentSearchEngine(row: TableData): string {
       if (row.current === 'Y') {
         return 'activated';
       }
       return '';
     }
-    handleCurrentChange(obj): void {
+    handleCurrentChange(obj: TableData): void {
       if (obj) {
         ipcRenderer.send('set-current-search-engine-provider', {
           name: obj.name,
