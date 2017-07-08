@@ -6,90 +6,92 @@
       el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+  import VueI18n from 'vue-i18n';
+
   import { Button, ButtonGroup, Col, Row } from 'element-ui';
 
   import urlUtil from '../../js/lib/url-util';
 
-  export default {
-    data() {
-      return {
-        type: null,
-        template: '',
-        permission: null,
-        hostname: '',
-        id: -1,
-        handler: null,
-      };
-    },
+  import Page from './Page.vue';
+
+  @Component({
     components: {
       'el-button': Button,
       'el-button-group': ButtonGroup,
       'el-col': Col,
       'el-row': Row,
     },
-    computed: {
-      permissions() {
-        return this.$store.getters.permissions;
-      },
-    },
-    methods: {
-      clear() {
-        if (this.handler) {
-          clearTimeout(this.handler);
-        }
-      },
-      onAllow() {
-        const ipc = this.$electron.ipcRenderer;
+  })
+  export default class Notification extends Vue {
+    type: string = '';
+    template: VueI18n.LocaleMessage = '';
+    permission: string = ''; 
+    hostname: string | null;
+    id: number = -1;
+    handler: any;
+    
+    get permissions() {
+      return this.$store.getters.permissions;
+    }
 
-        if (this.type === 'permission') {
-          ipc.send(`response-permission-${this.id}`, {
-            accept: true,
-          });
-          this.$store.dispatch('setPermissions', {
-            hostname: this.hostname,
-            permission: this.permission,
-            accept: true,
-          });
-        } else {
-          ipc.send('quit-and-install', {
-            accept: true,
-          });
-        }
-        this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
-        this.$parent.showNotification = false;
+    clear() {
+      if (this.handler) {
+        clearTimeout(this.handler);
+      }
+    }
+    onAllow() {
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
-        if (this.handler) {
-          clearTimeout(this.handler);
-        }
-      },
-      onDeny() {
-        const ipc = this.$electron.ipcRenderer;
+      if (this.type === 'permission') {
+        ipc.send(`response-permission-${this.id}`, {
+          accept: true,
+        });
+        this.$store.dispatch('setPermissions', {
+          hostname: this.hostname,
+          permission: this.permission,
+          accept: true,
+        });
+      } else {
+        ipc.send('quit-and-install', {
+          accept: true,
+        });
+      }
+      (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc(100vh - 73px)';
+      (this.$parent as Page).showNotification = false;
 
-        if (this.type === 'permission') {
-          ipc.send(`response-permission-${this.id}`, {
-            accept: false,
-          });
-          this.$store.dispatch('setPermissions', {
-            hostname: this.hostname,
-            permission: this.permission,
-            accept: false,
-          });
-        } else {
-          ipc.send('quit-and-install', {
-            accept: false,
-          });
-        }
-        this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
-        this.$parent.showNotification = false;
+      if (this.handler) {
+        clearTimeout(this.handler);
+      }
+    }
+    onDeny() {
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
-        if (this.handler) {
-          clearTimeout(this.handler);
-        }
-      },
-    },
+      if (this.type === 'permission') {
+        ipc.send(`response-permission-${this.id}`, {
+          accept: false,
+        });
+        this.$store.dispatch('setPermissions', {
+          hostname: this.hostname,
+          permission: this.permission,
+          accept: false,
+        });
+      } else {
+        ipc.send('quit-and-install', {
+          accept: false,
+        });
+      }
+      (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc(100vh - 73px)';
+      (this.$parent as Page).showNotification = false;
+
+      if (this.handler) {
+        clearTimeout(this.handler);
+      }
+    }
+
     mounted() {
-      const ipc = this.$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
       // Every page would add a listenter to the request-permission and
       // update-available event, so ignore the listenters warning.
@@ -97,74 +99,77 @@
       ipc.on('update-available', (event, data) => {
         this.type = 'update';
         this.template = this.$t('notification.update.updateAvailable', { releaseName: data.releaseName });
-        this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
-        this.$parent.showNotification = true;
+        (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc((100vh - 73px) - 35px)';
+        (this.$parent as Page).showNotification = true;
       });
       ipc.on('request-permission', (event, data) => {
-        if (this.$parent.$refs.webview.getWebContents().id === data.webContentsId) {
-          const webContents = this.$electron.remote.webContents.fromId(data.webContentsId);
+        if ((this.$parent.$refs.webview as Electron.WebviewTag).getWebContents().id === data.webContentsId) {
+          const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+          const webview = this.$parent.$refs.webview as Electron.WebviewTag;
           this.id = data.webContentsId;
           this.hostname = urlUtil.getHostname(webContents.getURL());
           this.permission = data.permission;
-          if (this.permission !== 'setLanguage') {
-            if (this.permissions[`${this.hostname}`]) {
-              if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
-                ipc.send(`response-permission-${this.id}`, {
-                  accept: true,
-                });
-              } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
-                ipc.send(`response-permission-${this.id}`, {
-                  accept: false,
-                });
+          if (this.hostname !== null) {
+            if (this.permission !== 'setLanguage') {
+              if (this.permissions[`${this.hostname}`]) {
+                if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
+                  ipc.send(`response-permission-${this.id}`, {
+                    accept: true,
+                  });
+                } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
+                  ipc.send(`response-permission-${this.id}`, {
+                    accept: false,
+                  });
+                } else {
+                  this.type = 'permission';
+                  this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
+                  webview.style.height = 'calc((100vh - 73px) - 35px)';
+                  (this.$parent as Page).showNotification = true;
+                  this.handler = setTimeout(() => {
+                    ipc.send(`response-permission-${this.id}`, {
+                      accept: false,
+                    });
+                    webview.style.height = 'calc(100vh - 73px)';
+                    (this.$parent as Page).showNotification = false;
+                  }, 5000);
+                }
               } else {
                 this.type = 'permission';
                 this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
-                this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
-                this.$parent.showNotification = true;
+                webview.style.height = 'calc((100vh - 73px) - 35px)';
+                (this.$parent as Page).showNotification = true;
                 this.handler = setTimeout(() => {
                   ipc.send(`response-permission-${this.id}`, {
                     accept: false,
                   });
-                  this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
-                  this.$parent.showNotification = false;
+                  webview.style.height = 'calc(100vh - 73px)';
+                  (this.$parent as Page).showNotification = false;
                 }, 5000);
               }
             } else {
               this.type = 'permission';
-              this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
-              this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
-              this.$parent.showNotification = true;
+              this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
+              webview.style.height = 'calc((100vh - 73px) - 35px)';
+              (this.$parent as Page).showNotification = true;
               this.handler = setTimeout(() => {
                 ipc.send(`response-permission-${this.id}`, {
                   accept: false,
                 });
-                this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
-                this.$parent.showNotification = false;
-              }, 5000);
+                webview.style.height = 'calc(100vh - 73px)';
+                (this.$parent as Page).showNotification = false;
+              }, 10000);
             }
-          } else {
-            this.type = 'permission';
-            this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
-            this.$parent.$refs.webview.style.height = 'calc((100vh - 73px) - 35px)';
-            this.$parent.showNotification = true;
-            this.handler = setTimeout(() => {
-              ipc.send(`response-permission-${this.id}`, {
-                accept: false,
-              });
-              this.$parent.$refs.webview.style.height = 'calc(100vh - 73px)';
-              this.$parent.showNotification = false;
-            }, 10000);
           }
         }
       });
-    },
+    }
     beforeDestroy() {
-      const ipc = this.$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       ipc.removeAllListeners('update-available');
       ipc.removeAllListeners('request-permission');
 
       this.clear();
-    },
+    }
   };
 </script>
 

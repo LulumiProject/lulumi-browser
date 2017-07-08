@@ -13,22 +13,44 @@
         i(ref="findinpageEnd", class="el-icon-circle-close")
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Watch, Vue } from 'vue-property-decorator';
+
   import urlUtil from '../../js/lib/url-util';
 
   import Event from '../../../api/extensions/event';
 
-  import Notification from './Notification';
+  import Notification from './Notification.vue';
 
-  export default {
-    data() {
-      return {
-        hidden: true,
-        requestId: null,
-        showNotification: false,
-        onMessageEvent: new Event(),
-      };
-    },
+  interface PageObject {
+    pid: number;
+    location: string;
+    statusText: boolean;
+    favicon: string | null;
+    title: string | null;
+    isLoading: boolean;
+    isSearching: boolean;
+    canGoBack: boolean;
+    canGoForward: boolean;
+    canRefresh: boolean;
+    error: boolean;
+    hasMedia: boolean;
+    isAudioMuted: boolean;
+    pageActionMapping: object;
+  }
+  interface FindInPageObject {
+    container?: HTMLElement;
+    input: HTMLElement;
+    counter: HTMLElement;
+    previous: HTMLElement;
+    next: HTMLElement;
+    endButton: HTMLElement;
+    activeWebview: Electron.WebviewTag;
+    start(): void;
+    end(): void;
+  }
+
+  @Component({
     props: [
       'isActive',
       'pageIndex',
@@ -36,48 +58,76 @@
     components: {
       Notification,
     },
-    computed: {
-      page() {
-        return this.$store.getters.pages[this.pageIndex];
-      },
-      currentPageIndex() {
-        return this.$store.getters.currentPageIndex;
-      },
-    },
-    methods: {
-      navigateTo(location) {
-        if (this.$refs.webview) {
-          this.$refs.webview.setAttribute('src', urlUtil.getUrlFromInput(location));
+  })
+  export default class Page extends Vue {
+    dummyPageObject: PageObject = {
+      pid: -1,
+      location: '',
+      statusText: false,
+      favicon: null,
+      title: null,
+      isLoading: false,
+      isSearching: false,
+      canGoBack: false,
+      canGoForward: false,
+      canRefresh: false,
+      error: false,
+      hasMedia: false,
+      isAudioMuted: false,
+      pageActionMapping: {},
+    };
+    hidden: boolean = true;
+    requestId: number | null | void = null;
+    showNotification: boolean = false;
+    onMessageEvent: Event = new Event();
+
+    isActive: boolean;
+    pageIndex: number;
+
+    findinpage: FindInPageObject;
+    
+    get page(): PageObject {
+      const page: PageObject = this.$store.getters.pages[this.pageIndex];
+      if (typeof page === 'undefined') {
+        return this.dummyPageObject;
+      }
+      return page;
+    }
+    get currentPageIndex() {
+      return this.$store.getters.currentPageIndex;
+    }
+    navigateTo(location) {
+      if (this.$refs.webview) {
+        (this.$refs.webview as Electron.WebviewTag).setAttribute('src', urlUtil.getUrlFromInput(location));
+      }
+    }
+    webviewHandler(self, fnName) {
+      return (event) => {
+        if (self.$parent[fnName]) {
+          self.$parent[fnName](event, this.pageIndex);
         }
-      },
-      webviewHandler(self, fnName) {
-        return (event) => {
-          if (self.$parent[fnName]) {
-            self.$parent[fnName](event, this.pageIndex);
-          }
-        };
-      },
-      findInPage() {
-        if (this.hidden) {
-          this.findinpage.start();
-          this.findinpage.counter.textContent = `
-            ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
-          `;
-        } else {
-          this.findinpage.input.focus();
-          this.findinpage.input.select();
-        }
-      },
-    },
-    watch: {
-      isActive(newState) {
-        if (newState && !this.hidden) {
-          this.$nextTick(() => this.$refs.findinpageInput.focus());
-        }
-      },
-    },
+      };
+    }
+    findInPage() {
+      if (this.hidden) {
+        this.findinpage.start();
+        this.findinpage.counter.textContent = `
+          ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
+        `;
+      } else {
+        this.findinpage.input.focus();
+        (this.findinpage.input as any).select();
+      }
+    }
+    @Watch('isActive')
+    onIsActive(newState: string): void {
+      if (newState && !this.hidden) {
+        this.$nextTick(() => (this.$refs.findinpageInput as any).focus());
+      }
+    }
+
     mounted() {
-      const webview = this.$refs.webview;
+      const webview = this.$refs.webview as Electron.WebviewTag;
       const webviewEvents = {
         'load-commit': 'onLoadCommit',
         'did-start-loading': 'onDidStartLoading',
@@ -106,11 +156,10 @@
       };
 
       Object.keys(webviewEvents).forEach((key) => {
-        webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
+        webview.addEventListener((key as any), this.webviewHandler(this, webviewEvents[key]));
       });
 
       this.findinpage = {
-        container: this.$refs.findinpageBar,
         input: this.$refs.findinpageInput,
         counter: this.$refs.findinpageCount,
         previous: this.$refs.findinpagePreviousMatch,
@@ -122,11 +171,11 @@
           this.hidden = false;
           this.$nextTick(() => {
             this.findinpage.input.focus();
-            this.findinpage.input.select();
+            (this.findinpage.input as any).select();
           });
 
-          if (this.findinpage.input.value) {
-            this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value);
+          if ((this.findinpage.input as any).value) {
+            this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value);
           }
         },
         end: () => {
@@ -141,21 +190,21 @@
             }
           });
         },
-      };
+      } as any;
 
       this.findinpage.endButton.addEventListener('click', () => {
         this.findinpage.end();
       });
 
       this.findinpage.input.addEventListener('input', (event) => {
-        if (event.target.value) {
-          this.requestId = this.findinpage.activeWebview.findInPage(event.target.value);
+        if ((event.target as any).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((event.target as any).value);
         }
       });
 
       this.findinpage.input.addEventListener('keypress', (event) => {
         if (event.keyCode === 13) {
-          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
             forward: true,
             findNext: true,
           });
@@ -163,8 +212,8 @@
       });
 
       this.findinpage.previous.addEventListener('click', () => {
-        if (this.findinpage.input.value) {
-          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
+        if ((this.findinpage.input as any).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
             forward: false,
             findNext: true,
           });
@@ -172,8 +221,8 @@
       });
 
       this.findinpage.next.addEventListener('click', () => {
-        if (this.findinpage.input.value) {
-          this.requestId = this.findinpage.activeWebview.findInPage(this.findinpage.input.value, {
+        if ((this.findinpage.input as any).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
             forward: true,
             findNext: true,
           });
@@ -198,11 +247,13 @@
       });
 
       const nav = this.$parent.$el.querySelector('#nav');
-      webview.style.height
-        = `calc(100vh - ${nav.clientHeight}px)`;
-      this.$el.querySelector('.findinpage-bar').style.top = `${nav.clientHeight}px`;
-      this.navigateTo(this.page.location);
-    },
+      if (nav !== null) {
+        webview.style.height
+          = `calc(100vh - ${nav.clientHeight}px)`;
+        (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
+        this.navigateTo(this.page.location);
+      }
+    }
   };
 </script>
 

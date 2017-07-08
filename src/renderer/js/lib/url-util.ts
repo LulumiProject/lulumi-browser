@@ -17,7 +17,7 @@ const urlUtil = {
    * @param {String} input The input value.
    * @returns {String} The found scheme.
    */
-  getScheme(input) {
+  getScheme(input: string): string | null {
     // This function returns one of following:
     // - scheme + ':' (ex. http:)
     // - scheme + '://' (ex. http://)
@@ -31,7 +31,7 @@ const urlUtil = {
    * @param {String} input The input value.
    * @returns {Boolean} Whether or not the input has a scheme.
    */
-  hasScheme(input) {
+  hasScheme(input: string): boolean {
     return !!urlUtil.getScheme(input);
   },
 
@@ -40,30 +40,32 @@ const urlUtil = {
    * @param {String} input path, with opetional schema
    * @returns {String} path with a scheme
    */
-  prependScheme(input) {
+  prependScheme(input: string): string {
     if (input === undefined || input === null) {
       return input;
     }
 
+    let newInput: string = input;
+
     // expand relative path
-    if (input.startsWith('~/')) {
-      input = input.replace(/^~/, os.homedir());
+    if (newInput.startsWith('~/')) {
+      newInput = newInput.replace(/^~/, os.homedir());
     }
 
     // detect absolute file paths
-    if (input.startsWith('/')) {
-      input = fileScheme + input;
+    if (newInput.startsWith('/')) {
+      newInput = fileScheme + newInput;
     }
 
     // If there's no scheme, prepend the default scheme
-    if (!urlUtil.hasScheme(input)) {
-      input = defaultScheme + input;
+    if (!urlUtil.hasScheme(newInput)) {
+      newInput = defaultScheme + newInput;
     }
 
-    return input;
+    return newInput;
   },
 
-  canParseURL(input) {
+  canParseURL(input: string): boolean {
     if (typeof window === 'undefined') {
       return true;
     }
@@ -75,11 +77,11 @@ const urlUtil = {
     }
   },
 
-  isImageAddress(url) {
+  isImageAddress(url: string): object | null {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/));
   },
 
-  isHttpAddress(url) {
+  isHttpAddress(url: string): object | null {
     return (url.match(/^https?:\/\/(.*)/));
   },
 
@@ -88,7 +90,7 @@ const urlUtil = {
    * @param {String} input The input value.
    * @returns {Boolean} Returns true if this is not a valid URL.
    */
-  isNotURL(input) {
+  isNotURL(input: string): boolean {
     if (input === undefined || input === null) {
       return true;
     }
@@ -137,23 +139,25 @@ const urlUtil = {
    * @param {String} input The input value.
    * @returns {String} The formatted URL.
    */
-  getUrlFromInput(input) {
+  getUrlFromInput(input: string): string {
     if (input === undefined || input === null) {
       return '';
     }
 
-    input = input.trim();
+    let newInput: string = input;
 
-    input = urlUtil.prependScheme(input);
+    newInput = newInput.trim();
 
-    if (urlUtil.isNotURL(input)) {
-      return input;
+    newInput = urlUtil.prependScheme(newInput);
+
+    if (urlUtil.isNotURL(newInput)) {
+      return newInput;
     }
 
     try {
-      return new window.URL(input).href;
+      return new window.URL(newInput).href;
     } catch (e) {
-      return input;
+      return newInput;
     }
   },
 
@@ -162,7 +166,7 @@ const urlUtil = {
    * @param {String} input The input URL.
    * @returns {Boolean} Whether or not this is a valid URL.
    */
-  isURL(input) {
+  isURL(input: string): boolean {
     return !urlUtil.isNotURL(input);
   },
 
@@ -171,7 +175,7 @@ const urlUtil = {
    * @param {String} input The input URL.
    * @returns {Boolean} Whether or not this is a view-source URL.
    */
-  isViewSourceUrl(url) {
+  isViewSourceUrl(url: string): boolean {
     return url.toLowerCase().startsWith('view-source:');
   },
 
@@ -180,7 +184,7 @@ const urlUtil = {
    * @param {String} input The input url.
    * @returns {Boolean} Whether or not this is a data url.
    */
-  isDataUrl(url) {
+  isDataUrl(url: string): boolean {
     return url.toLowerCase().startsWith('data:');
   },
 
@@ -189,7 +193,7 @@ const urlUtil = {
    * @param {String} input The input url.
    * @returns {Boolean} Whether or not this is an image data url.
    */
-  isImageDataUrl(url) {
+  isImageDataUrl(url: string): boolean {
     return url.toLowerCase().startsWith('data:image/');
   },
 
@@ -198,7 +202,7 @@ const urlUtil = {
    * @param {String} input The view-source url.
    * @returns {String} A normal url.
    */
-  getUrlFromViewSourceUrl(input) {
+  getUrlFromViewSourceUrl(input: string): string {
     if (!urlUtil.isViewSourceUrl(input)) {
       return input;
     }
@@ -210,7 +214,7 @@ const urlUtil = {
    * @param {String} input The input URL.
    * @returns {String} The view-source URL.
    */
-  getViewSourceUrlFromUrl(input) {
+  getViewSourceUrlFromUrl(input: string): string | null {
     if (urlUtil.isImageAddress(input) || !urlUtil.isHttpAddress(input)) {
       return null;
     }
@@ -223,18 +227,18 @@ const urlUtil = {
   },
 
   /**
-   * Extracts the hostname or returns undefined.
+   * Extracts the hostname or returns null.
    * @param {String} input The input URL.
    * @returns {String} The host name.
    */
-  getHostname(input, excludePort) {
+  getHostname(input: string, excludePort: boolean = false): string | null {
     try {
       if (excludePort) {
         return new window.URL(input).hostname;
       }
       return new window.URL(input).host;
     } catch (e) {
-      return undefined;
+      return null;
     }
   },
 
@@ -243,13 +247,13 @@ const urlUtil = {
    * @param {string} url
    * @return {string}
    */
-  getLocationIfPDF(url) {
-    const PDFViewerWithPDFJS = '/pdfjs/web/viewer.html';
-    const PDFViewerForChrome = 'chrome://pdf-viewer/index.html?src=';
+  getLocationIfPDF(url: string): string {
+    const PDF_VIEWER_WITH_PDFJS = '/pdfjs/web/viewer.html';
+    const PDF_VIEWER_FOR_CHROME = 'chrome://pdf-viewer/index.html?src=';
     if (url) {
-      if (url.includes(PDFViewerWithPDFJS)) {
+      if (url.includes(PDF_VIEWER_WITH_PDFJS)) {
         return url.replace(/^file:.+\/pdfjs\/web\/viewer.html\?file=(\w+:\/\/.+)/, '$1');
-      } else if (url.includes(PDFViewerForChrome)) {
+      } else if (url.includes(PDF_VIEWER_FOR_CHROME)) {
         return url.replace(/^chrome:\/\/pdf-viewer\/index\.html\?src=/, '');
       }
       return url;
@@ -262,7 +266,7 @@ const urlUtil = {
    * @param {string} url
    * @return {string}
    */
-  getLocationIfError(url) {
+  getLocationIfError(url: string): string {
     const errorPage = '/pages/error/index.html';
     if (url) {
       if (url.includes(errorPage)) {
@@ -276,9 +280,9 @@ const urlUtil = {
   /**
    * Gets about location from a lulumi scheme
    * @param {string} url
-   * @return {string}
+   * @return {object}
    */
-  getLocationIfAbout(url) {
+  getLocationIfAbout(url: string): object {
     if (url.startsWith(config.lulumiPagesCustomProtocol)) {
       const guestUrl = require('url').parse(url);
       const guestHash = guestUrl.hash.substr(2);
@@ -289,8 +293,8 @@ const urlUtil = {
       };
     }
     return {
-      title: undefined,
       url,
+      title: undefined,
     };
   },
 
@@ -299,7 +303,7 @@ const urlUtil = {
    * @param {string} url The URL to find a favicon for
    * @return {string} url The base favicon URL
    */
-  getDefaultFaviconUrl(url) {
+  getDefaultFaviconUrl(url: string): string {
     if (urlUtil.isURL(url)) {
       const loc = new window.URL(url);
       return `${loc.protocol}//${loc.host}/favicon.ico`;
@@ -310,11 +314,11 @@ const urlUtil = {
   /**
    * Gets the filename of the image from a URL.
    * @param {string} url The URL to find a filename of the image
-   * @return {string} filename The filename of the image
+   * @return {Promise}
    */
-  getFilenameFromUrl(url) {
+  getFilenameFromUrl(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const img = new window.Image();
+      const img = new (window as any).Image();
       img.onerror = () => {
         resolve('');
         reject();

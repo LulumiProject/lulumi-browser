@@ -3,7 +3,7 @@ import config from '../../js/constants/config';
 import urlUtil from '../../js/lib/url-util';
 import timeUtil from '../../js/lib/time-util';
 
-const state = {
+const state: State = {
   pid: 0,
   pages: [],
   tabsOrder: [],
@@ -21,12 +21,12 @@ const state = {
   lastOpenedTabs: [],
 };
 
-function createPageObject(url) {
+function createPageObject(url: string | null = null): PageObject {
   return {
     pid: 0,
     location: url || state.tabConfig.defaultUrl,
     statusText: false,
-    favicon: false,
+    favicon: null,
     title: null,
     isLoading: false,
     isSearching: false,
@@ -41,8 +41,8 @@ function createPageObject(url) {
 }
 
 function tabsMapping() {
-  const newOrder = [];
-  for (let i = 0; i < state.pages.length; i++) {
+  const newOrder: number[] = [];
+  for (let i = 0; i < state.pages.length; i += 1) {
     newOrder[i] = state.tabsOrder.indexOf(i) === -1
       ? i
       : state.tabsOrder.indexOf(i);
@@ -50,6 +50,7 @@ function tabsMapping() {
   return newOrder;
 }
 
+/* tslint:disable:function-name */
 const mutations = {
   // global counter
   [types.INCREMENT_PID](state) {
@@ -57,8 +58,8 @@ const mutations = {
   },
   // tab handler
   [types.CREATE_TAB](state, payload) {
-    const url = payload.url;
-    let newUrl = null;
+    const url: string = payload.url;
+    let newUrl: string | null = null;
     if (urlUtil.isURL(url)) {
       newUrl = url;
       state.pages.push(createPageObject(newUrl));
@@ -99,7 +100,7 @@ const mutations = {
         const mapping = tabsMapping();
         const currentPageIndex = state.currentPageIndex;
         if (currentPageIndex === pageIndex) {
-          for (let i = mapping[pageIndex] + 1; i < state.pages.length; i++) {
+          for (let i = mapping[pageIndex] + 1; i < state.pages.length; i += 1) {
             if (state.pages[mapping.indexOf(i)]) {
               state.pages.splice(pageIndex, 1);
               if (mapping.indexOf(i) > pageIndex) {
@@ -110,7 +111,7 @@ const mutations = {
               return;
             }
           }
-          for (let i = mapping[pageIndex] - 1; i >= 0; i--) {
+          for (let i = mapping[pageIndex] - 1; i >= 0; i -= 1) {
             if (state.pages[mapping.indexOf(i)]) {
               state.pages.splice(pageIndex, 1);
               if (mapping.indexOf(i) > pageIndex) {
@@ -133,7 +134,7 @@ const mutations = {
   },
   // page handlers
   [types.DID_START_LOADING](state, payload) {
-    const url = payload.webview.getURL();
+    const url: string = payload.webview.getURL();
     state.pages[payload.pageIndex].location = decodeURIComponent(url);
 
     state.pages[payload.pageIndex].isLoading = true;
@@ -145,34 +146,37 @@ const mutations = {
     state.pages[payload.pageIndex].canRefresh = true;
   },
   [types.DID_STOP_LOADING](state, payload) {
-    const regexp = new RegExp('^lulumi(-extension)?://.+$');
-    const url = payload.webview.getURL();
-    state.pages[payload.pageIndex].location = decodeURIComponent(url);
-    if (url.match(regexp)) {
-      if (url.match(regexp)[1] === undefined) {
-        const guestUrl = require('url').parse(url);
-        const guestHash = guestUrl.hash.substr(2);
-        state.pages[payload.pageIndex].title = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
-        state.pages[payload.pageIndex].location = decodeURIComponent(url);
+    const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
+    const url: string = payload.webview.getURL();
+    if (url !== null) {
+      state.pages[payload.pageIndex].location = decodeURIComponent(url);
+      if (url.match(regexp)) {
+        if (url.match(regexp)![1] === undefined) {
+          const guestUrl = require('url').parse(url);
+          const guestHash = guestUrl.hash.substr(2);
+          state.pages[payload.pageIndex].title
+            = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+          state.pages[payload.pageIndex].location = decodeURIComponent(url);
+        } else {
+          state.pages[payload.pageIndex].statusText = false;
+          state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
+          state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
+          state.pages[payload.pageIndex].isLoading = false;
+        }
+        state.pages[payload.pageIndex].favicon = config.tabConfig.lulumiFavicon;
       } else {
-        state.pages[payload.pageIndex].statusText = false;
-        state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
-        state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-        state.pages[payload.pageIndex].isLoading = false;
+        if (!state.pages[payload.pageIndex].title) {
+          state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
+        }
+        if (!state.pages[payload.pageIndex].favicon) {
+          state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
+        }
       }
-      state.pages[payload.pageIndex].favicon = config.tabConfig.lulumiFavicon;
-    } else {
-      if (!state.pages[payload.pageIndex].title) {
-        state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
-      }
-      if (!state.pages[payload.pageIndex].favicon) {
-        state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
-      }
+      state.pages[payload.pageIndex].statusText = false;
+      state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
+      state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
+      state.pages[payload.pageIndex].isLoading = false;
     }
-    state.pages[payload.pageIndex].statusText = false;
-    state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
-    state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-    state.pages[payload.pageIndex].isLoading = false;
   },
   [types.DID_FAIL_LOAD](state, payload) {
     if (payload.isMainFrame) {
@@ -181,9 +185,9 @@ const mutations = {
     }
   },
   [types.PAGE_TITLE_SET](state, payload) {
+    const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
+    const url: string = state.pages[payload.pageIndex].location;
     state.pages[payload.pageIndex].title = payload.webview.getTitle();
-    const regexp = new RegExp('^lulumi(-extension)?://.+$');
-    const url = state.pages[payload.pageIndex].location;
     if (!url.match(regexp)) {
       // history
       if (state.pages[payload.pageIndex].title !== 'error') {

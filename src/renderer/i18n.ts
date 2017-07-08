@@ -13,7 +13,6 @@ const lang = require('electron').ipcRenderer.sendSync('request-lang');
 
 Vue.use(VueI18n);
 
-// eslint-disable-next-line camelcase
 export default new VueI18n({
   locale: lang,
   messages: {

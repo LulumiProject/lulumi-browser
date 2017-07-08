@@ -6,22 +6,28 @@
       awesome-icon(name="arrow-right")
 </template>
 
-<script>
-  import AwesomeIcon from 'vue-awesome/components/Icon';
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  import AwesomeIcon from 'vue-awesome/components/Icon.vue';
   import 'vue-awesome/icons/arrow-left';
   import 'vue-awesome/icons/arrow-right';
 
-  export default {
+  import BrowserMainView from '../BrowserMainView.vue';
+
+  @Component({
     components: {
       'awesome-icon': AwesomeIcon,
     },
+  })
+  export default class SwipeArrow extends Vue {
     mounted() {
       window.addEventListener('wheel', (event) => {
-        if (this.$parent.onWheel) {
-          this.$parent.onWheel(event);
+        if ((this.$parent as BrowserMainView).onWheel) {
+          (this.$parent as BrowserMainView).onWheel(event);
         }
-      }, { passive: true });
-    },
+      }, true);
+    }
   };
 </script>
 

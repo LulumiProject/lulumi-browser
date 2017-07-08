@@ -18,7 +18,7 @@
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
-      div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab()")
+      div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab('about:newtab')")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
         .chrome-tab-bg(style="padding-right: 10px;")
@@ -28,10 +28,12 @@
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
   import path from 'path';
 
-  import AwesomeIcon from 'vue-awesome/components/Icon';
+  import AwesomeIcon from 'vue-awesome/components/Icon.vue';
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
 
@@ -39,17 +41,40 @@
 
   import { Button, Tooltip } from 'element-ui';
 
-  export default {
+  import BrowserMainView from '../BrowserMainView.vue';
+
+  interface PageObject {
+    pid: number;
+    location: string;
+    statusText: boolean;
+    favicon: string | null;
+    title: string | null;
+    isLoading: boolean;
+    isSearching: boolean;
+    canGoBack: boolean;
+    canGoForward: boolean;
+    canRefresh: boolean;
+    error: boolean;
+    hasMedia: boolean;
+    isAudioMuted: boolean;
+    pageActionMapping: object;
+  }
+
+  declare const __static: string;
+
+  @Component({
     directives: {
       sortable: {
         update(el, binding, vnode) {
-          vnode.context.sortable =
+          (vnode.context as Tabs).sortable =
             Sortable.create(el, {
               draggable: '.chrome-tab-draggable',
               animation: 150,
               ghostClass: 'ghost',
               onUpdate() {
-                vnode.context.$store.dispatch('setTabsOrder', this.toArray());
+                if (typeof vnode.context !== 'undefined') {
+                  vnode.context.$store.dispatch('setTabsOrder', this.toArray());
+                }
               },
             });
         },
@@ -60,91 +85,92 @@
       'el-button': Button,
       'el-tooltip': Tooltip,
     },
-    computed: {
-      pages() {
-        return this.$store.getters.pages;
-      },
-      currentPageIndex() {
-        return this.$store.getters.currentPageIndex;
-      },
-    },
-    methods: {
-      loadDefaultFavicon(event) {
-        event.target.src = this.$electron.remote.nativeImage
-          .createFromPath(path.join(__static, 'icons', 'document.png'))
-          .toDataURL('image/png');
-      },
-      onDoubleClick(event) {
-        if (event.target) {
-          const mainWindow = this.$electron.remote.getCurrentWindow();
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize();
-          } else {
-            mainWindow.maximize();
-          }
-        }
-      },
-      onMouseMove(event) {
-        const x = event.pageX - event.target.offsetLeft;
-        const y = event.pageY - event.target.offsetTop;
-        const xy = `${x} ${y}`;
+  })
+  export default class Tabs extends Vue {
+    sortable: any;
 
-        // eslint-disable-next-line max-len
-        const bgWebKit = `-webkit-gradient(radial, ${xy}, 0, ${xy}, 100, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0.0))), linear-gradient(to bottom, #ddd 90%, #f5f5f5)`;
+    get pages(): Array<PageObject> {
+      return this.$store.getters.pages;
+    }
+    get currentPageIndex(): number {
+      return this.$store.getters.currentPageIndex;
+    }
 
-        const target = event.target.parentNode.parentNode;
-        if (!target.classList.contains('chrome-tab-current')) {
-          target.getElementsByClassName('left-edge')[0].style.background = bgWebKit;
-          target.getElementsByClassName('chrome-tab-bg')[0].style.background = bgWebKit;
-          target.getElementsByClassName('right-edge')[0].style.background = bgWebKit;
+    loadDefaultFavicon(event) {
+      event.target.src = (this as any).$electron.remote.nativeImage
+        .createFromPath(path.join(__static, 'icons', 'document.png'))
+        .toDataURL('image/png');
+    }
+    onDoubleClick(event) {
+      if (event.target) {
+        const mainWindow = (this as any).$electron.remote.getCurrentWindow();
+        if (mainWindow.isMaximized()) {
+          mainWindow.unmaximize();
+        } else {
+          mainWindow.maximize();
         }
-      },
-      onMouseLeave(event) {
-        const target = event.target.parentNode.parentNode;
-        if (!target.classList.contains('chrome-tab-current')) {
-          target.getElementsByClassName('left-edge')[0].style.background = '';
-          target.getElementsByClassName('chrome-tab-bg')[0].style.background = '';
-          target.getElementsByClassName('right-edge')[0].style.background = '';
-        }
-      },
-    },
+      }
+    }
+    onMouseMove(event) {
+      const x = event.pageX - event.target.offsetLeft;
+      const y = event.pageY - event.target.offsetTop;
+      const xy = `${x} ${y}`;
+
+      const bgWebKit = `-webkit-gradient(radial, ${xy}, 0, ${xy}, 100, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0.0))), linear-gradient(to bottom, #ddd 90%, #f5f5f5)`;
+
+      const target = event.target.parentNode.parentNode;
+      if (!target.classList.contains('chrome-tab-current')) {
+        target.getElementsByClassName('left-edge')[0].style.background = bgWebKit;
+        target.getElementsByClassName('chrome-tab-bg')[0].style.background = bgWebKit;
+        target.getElementsByClassName('right-edge')[0].style.background = bgWebKit;
+      }
+    }
+    onMouseLeave(event) {
+      const target = event.target.parentNode.parentNode;
+      if (!target.classList.contains('chrome-tab-current')) {
+        target.getElementsByClassName('left-edge')[0].style.background = '';
+        target.getElementsByClassName('chrome-tab-bg')[0].style.background = '';
+        target.getElementsByClassName('right-edge')[0].style.background = '';
+      }
+    }
+
     mounted() {
-      const ipc = this.$electron.ipcRenderer;
+      const ipc = (this as any).$electron.ipcRenderer;
       ipc.on('reload', () => {
-        if (this.$parent.onClickRefresh) {
-          this.$parent.onClickRefresh();
+        if ((this.$parent as BrowserMainView).onClickRefresh) {
+          (this.$parent as BrowserMainView).onClickRefresh();
         }
       });
       ipc.on('forceReload', () => {
-        if (this.$parent.onClickForceRefresh) {
-          this.$parent.onClickForceRefresh();
+        if ((this.$parent as BrowserMainView).onClickForceRefresh) {
+          (this.$parent as BrowserMainView).onClickForceRefresh();
         }
       });
       ipc.on('viewSource', () => {
-        if (this.$parent.onClickViewSource) {
-          this.$parent.onClickViewSource();
+        if ((this.$parent as BrowserMainView).onClickViewSource) {
+          (this.$parent as BrowserMainView).onClickViewSource();
         }
       });
       ipc.on('toggleDevTools', () => {
-        if (this.$parent.onClickToggleDevTools) {
-          this.$parent.onClickToggleDevTools();
+        if ((this.$parent as BrowserMainView).onClickToggleDevTools) {
+          (this.$parent as BrowserMainView).onClickToggleDevTools();
         }
       });
       ipc.on('new-tab', (event, payload) => {
-        if (this.$parent.onNewTab) {
+        if ((this.$parent as BrowserMainView).onNewTab) {
           if (payload) {
-            this.$parent.onNewTab(payload.location, payload.follow);
+            (this.$parent as BrowserMainView).onNewTab(payload.location, payload.follow);
           } else {
-            this.$parent.onNewTab();
+            (this.$parent as BrowserMainView).onNewTab('about:newtab');
           }
         }
       });
       ipc.on('tab-close', () => {
-        if (this.$parent.onTabClose) {
-          this.$parent.onTabClose(this.currentPageIndex);
+        if ((this.$parent as BrowserMainView).onTabClose) {
+          (this.$parent as BrowserMainView).onTabClose(this.currentPageIndex);
         }
       });
-    },
+    }
   };
 </script>
 
