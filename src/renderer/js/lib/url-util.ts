@@ -282,7 +282,7 @@ const urlUtil = {
    * @param {string} url
    * @return {object}
    */
-  getLocationIfAbout(url: string): object {
+  getLocationIfAbout(url: string): AboutLocationObject {
     if (url.startsWith(config.lulumiPagesCustomProtocol)) {
       const guestUrl = require('url').parse(url);
       const guestHash = guestUrl.hash.substr(2);
@@ -294,7 +294,7 @@ const urlUtil = {
     }
     return {
       url,
-      title: undefined,
+      title: '',
     };
   },
 

@@ -1,8 +1,5 @@
 // Place your settings in this file to overwrite the default settings
 {
     "editor.detectIndentation": false,
-    "editor.tabSize": 2,
-    "files.associations": {
-        "*.vue": "vue"
-    }
+    "editor.tabSize": 2
 }

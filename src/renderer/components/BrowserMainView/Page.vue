@@ -116,13 +116,13 @@
         `;
       } else {
         this.findinpage.input.focus();
-        (this.findinpage.input as any).select();
+        (this.findinpage.input as HTMLInputElement).select();
       }
     }
     @Watch('isActive')
     onIsActive(newState: string): void {
       if (newState && !this.hidden) {
-        this.$nextTick(() => (this.$refs.findinpageInput as any).focus());
+        this.$nextTick(() => (this.$refs.findinpageInput as HTMLElement).focus());
       }
     }
 
@@ -171,11 +171,11 @@
           this.hidden = false;
           this.$nextTick(() => {
             this.findinpage.input.focus();
-            (this.findinpage.input as any).select();
+            (this.findinpage.input as HTMLInputElement).select();
           });
 
-          if ((this.findinpage.input as any).value) {
-            this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value);
+          if ((this.findinpage.input as HTMLInputElement).value) {
+            this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as HTMLInputElement).value);
           }
         },
         end: () => {
@@ -197,14 +197,14 @@
       });
 
       this.findinpage.input.addEventListener('input', (event) => {
-        if ((event.target as any).value) {
-          this.requestId = this.findinpage.activeWebview.findInPage((event.target as any).value);
+        if ((event.target as HTMLInputElement).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((event.target as HTMLInputElement).value);
         }
       });
 
       this.findinpage.input.addEventListener('keypress', (event) => {
         if (event.keyCode === 13) {
-          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as HTMLInputElement).value, {
             forward: true,
             findNext: true,
           });
@@ -212,8 +212,8 @@
       });
 
       this.findinpage.previous.addEventListener('click', () => {
-        if ((this.findinpage.input as any).value) {
-          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
+        if ((this.findinpage.input as HTMLInputElement).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as HTMLInputElement).value, {
             forward: false,
             findNext: true,
           });
@@ -221,8 +221,8 @@
       });
 
       this.findinpage.next.addEventListener('click', () => {
-        if ((this.findinpage.input as any).value) {
-          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as any).value, {
+        if ((this.findinpage.input as HTMLInputElement).value) {
+          this.requestId = this.findinpage.activeWebview.findInPage((this.findinpage.input as HTMLInputElement).value, {
             forward: true,
             findNext: true,
           });
@@ -239,9 +239,8 @@
             } else {
               match = 2;
             }
-            this.findinpage.counter.textContent = `
-              ${this.$t('page.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('page.findInPage.match', match)}
-            `;
+            this.findinpage.counter.textContent
+              = `${this.$t('page.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('page.findInPage.match', match)}`;
           }
         }
       });

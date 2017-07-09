@@ -18,14 +18,12 @@
     "lib": [
       "dom",
       "es2015",
-      "es7"
+      "es7",
+      "es2017.object"
     ],
     "baseUrl": ".",
 		"typeRoots": [
 			"typings"
 		]
-  },
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

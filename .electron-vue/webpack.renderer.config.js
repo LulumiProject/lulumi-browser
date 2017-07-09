@@ -78,8 +78,8 @@ let rendererConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        include: [ path.resolve(__dirname, '../src/renderer'), path.resolve(__dirname, '../src/api'), path.resolve('../node_modules/vue-awesome') ],
-        exclude: /node_modules(?![\\/]vue-awesome[\\/])/
+        include: [ path.resolve(__dirname, '../src/renderer'), path.resolve(__dirname, '../src/api') ],
+        exclude: /node_modules/
       },
       {
         test: /\.pug$/,
@@ -102,7 +102,7 @@ let rendererConfig = {
               less: 'vue-style-loader!css-loader!less-loader'
             },
           },
-        },
+        }
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -161,7 +161,7 @@ let rendererConfig = {
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.json', '.css', '.less', '.pug']
   },
   target: 'electron-renderer'
 }
@@ -224,8 +224,8 @@ let aboutConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        include: [ path.resolve(__dirname, '../src/guest/renderer'), path.resolve('../node_modules/vue-awesome') ],
-        exclude: /node_modules(?![\\/]vue-awesome[\\/])/
+        include: [ path.resolve(__dirname, '../src/guest/renderer') ],
+        exclude: /node_modules/
       },
       {
         test: /\.pug$/,
@@ -248,7 +248,7 @@ let aboutConfig = {
               less: 'vue-style-loader!css-loader!less-loader'
             },
           },
-        },
+        }
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -303,7 +303,7 @@ let aboutConfig = {
       'i18n': path.join(__dirname, '../helper/i18n'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.json', '.css', '.less', '.pug']
   },
   target: 'web'
 }

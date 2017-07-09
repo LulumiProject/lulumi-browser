@@ -62,7 +62,7 @@
     loadIcon(extensionId: string): string | undefined {
       const id: number = this.findId(extensionId);
       if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
-        return (Object as any).values(window.renderProcessPreferences[id].icons)[0];
+        return Object.values(window.renderProcessPreferences[id].icons)[0];
       }
       return undefined;
     }

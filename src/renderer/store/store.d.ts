@@ -19,13 +19,23 @@ interface TabConfig {
   defaultFavicon: string;
   lulumiFavicon: string;
 }
+interface SearchEngineObject {
+  name: string;
+  search: string;
+  autocomplete: string;
+}
+interface LastOpenedTabObject {
+  title: string;
+  url: string;
+  favicon: string | null;
+}
 interface State {
   pid: number;
   pages: Array<PageObject>;
   tabsOrder: Array<number>;
   currentPageIndex: number;
-  searchEngine: Array<object>;
-  currentSearchEngine: object;
+  searchEngine: Array<SearchEngineObject>;
+  currentSearchEngine: SearchEngineObject;
   homepage: string;
   pdfViewer: string;
   tabConfig: TabConfig;
@@ -34,5 +44,5 @@ interface State {
   history: Array<object>;
   permissions: object;
   mappings: Array<number>;
-  lastOpenedTabs: Array<object>;
+  lastOpenedTabs: Array<LastOpenedTabObject>;
 }

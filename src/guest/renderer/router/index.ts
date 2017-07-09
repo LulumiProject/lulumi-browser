@@ -8,41 +8,41 @@ export default new Router({
     {
       path: '/',
       name: 'about-main',
-      component: require('../components/AboutMainView'),
+      component: require('components/AboutMainView.vue'),
     },
     {
       path: '/lulumi',
       name: 'about-main-lulumi',
-      component: require('../components/AboutMainView/Lulumi'),
+      component: require('components/AboutMainView/Lulumi.vue'),
     },
     {
       path: '/preferences',
-      component: require('../components/AboutMainView/Preferences'),
+      component: require('components/AboutMainView/Preferences.vue'),
       children: [
         {
           path: 'search',
           name: 'about-main-preferences-search-engine-provider',
-          component: require('../components/AboutMainView/Preferences/SearchEngineProvider'),
+          component: require('components/AboutMainView/Preferences/SearchEngineProvider.vue'),
         },
         {
           path: 'homepage',
           name: 'about-main-preferences-homepage',
-          component: require('../components/AboutMainView/Preferences/Homepage'),
+          component: require('components/AboutMainView/Preferences/Homepage.vue'),
         },
         {
           path: 'pdfViewer',
           name: 'about-main-preferences-pdfViewer',
-          component: require('../components/AboutMainView/Preferences/PDFViewer'),
+          component: require('components/AboutMainView/Preferences/PDFViewer.vue'),
         },
         {
           path: 'tab',
           name: 'about-main-preferences-tab-config',
-          component: require('../components/AboutMainView/Preferences/TabConfig'),
+          component: require('components/AboutMainView/Preferences/TabConfig.vue'),
         },
         {
           path: 'language',
           name: 'about-main-preferences-language',
-          component: require('../components/AboutMainView/Preferences/Language'),
+          component: require('components/AboutMainView/Preferences/Language.vue'),
         },
         {
           path: '',
@@ -54,22 +54,22 @@ export default new Router({
     {
       path: '/downloads',
       name: 'about-main-downloads',
-      component: require('../components/AboutMainView/Downloads'),
+      component: require('components/AboutMainView/Downloads.vue'),
     },
     {
       path: '/history',
       name: 'about-main-history',
-      component: require('../components/AboutMainView/History'),
+      component: require('components/AboutMainView/History.vue'),
     },
     {
       path: '/extensions',
       name: 'about-main-extensions',
-      component: require('../components/AboutMainView/Extensions'),
+      component: require('components/AboutMainView/Extensions.vue'),
     },
     {
       path: '/newtab',
       name: 'about-main-newtab',
-      component: require('../components/AboutMainView/Newtab'),
+      component: require('components/AboutMainView/Newtab.vue'),
     },
     {
       path: '*',

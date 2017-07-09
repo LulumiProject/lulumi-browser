@@ -96,12 +96,12 @@
       return this.$store.getters.currentPageIndex;
     }
 
-    loadDefaultFavicon(event) {
-      event.target.src = (this as any).$electron.remote.nativeImage
+    loadDefaultFavicon(event: Electron.Event) {
+      (event.target as HTMLImageElement).src = (this as any).$electron.remote.nativeImage
         .createFromPath(path.join(__static, 'icons', 'document.png'))
         .toDataURL('image/png');
     }
-    onDoubleClick(event) {
+    onDoubleClick(event: Electron.Event) {
       if (event.target) {
         const mainWindow = (this as any).$electron.remote.getCurrentWindow();
         if (mainWindow.isMaximized()) {
@@ -111,31 +111,31 @@
         }
       }
     }
-    onMouseMove(event) {
-      const x = event.pageX - event.target.offsetLeft;
-      const y = event.pageY - event.target.offsetTop;
+    onMouseMove(event: MouseEvent) {
+      const x = event.pageX - (event.target as HTMLElement).offsetLeft;
+      const y = event.pageY - (event.target as HTMLElement).offsetTop;
       const xy = `${x} ${y}`;
 
       const bgWebKit = `-webkit-gradient(radial, ${xy}, 0, ${xy}, 100, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0.0))), linear-gradient(to bottom, #ddd 90%, #f5f5f5)`;
 
-      const target = event.target.parentNode.parentNode;
+      const target = (event.target as Element).parentNode!.parentNode as HTMLElement;
       if (!target.classList.contains('chrome-tab-current')) {
-        target.getElementsByClassName('left-edge')[0].style.background = bgWebKit;
-        target.getElementsByClassName('chrome-tab-bg')[0].style.background = bgWebKit;
-        target.getElementsByClassName('right-edge')[0].style.background = bgWebKit;
+        (target.getElementsByClassName('left-edge')[0] as HTMLElement).style.background = bgWebKit;
+        (target.getElementsByClassName('chrome-tab-bg')[0] as HTMLElement).style.background = bgWebKit;
+        (target.getElementsByClassName('right-edge')[0] as HTMLElement).style.background = bgWebKit;
       }
     }
-    onMouseLeave(event) {
-      const target = event.target.parentNode.parentNode;
+    onMouseLeave(event: MouseEvent) {
+      const target = (event.target as Element).parentNode!.parentNode as HTMLElement;
       if (!target.classList.contains('chrome-tab-current')) {
-        target.getElementsByClassName('left-edge')[0].style.background = '';
-        target.getElementsByClassName('chrome-tab-bg')[0].style.background = '';
-        target.getElementsByClassName('right-edge')[0].style.background = '';
+        (target.getElementsByClassName('left-edge')[0] as HTMLElement).style.background = '';
+        (target.getElementsByClassName('chrome-tab-bg')[0] as HTMLElement).style.background = '';
+        (target.getElementsByClassName('right-edge')[0] as HTMLElement).style.background = '';
       }
     }
 
     mounted() {
-      const ipc = (this as any).$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       ipc.on('reload', () => {
         if ((this.$parent as BrowserMainView).onClickRefresh) {
           (this.$parent as BrowserMainView).onClickRefresh();

@@ -121,6 +121,7 @@
     "webpack-dev-server": "^2.5.0",
     "webpack-hot-middleware": "^2.18.1",
     "webpack-merge": "^4.1.0",
+    "@types/chrome": "^0.0.47",
     "@types/mocha": "^2.2.41",
     "@types/sinon": "^2.3.2"
   },

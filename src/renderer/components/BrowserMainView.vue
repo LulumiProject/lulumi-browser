@@ -55,6 +55,11 @@
     isAudioMuted: boolean;
     pageActionMapping: object;
   }
+  interface LastOpenedTabObject {
+    title: string;
+    url: string;
+    favicon: string | null;
+  }
 
   @Component({
     name: 'browser-main',
@@ -153,17 +158,17 @@
       });
       return out;
     }
-    lastOpenedTabs() {
+    lastOpenedTabs(): LastOpenedTabObject[] {
       return this.$store.getters.lastOpenedTabs.slice(0, 8);
     }
     // lulumi.alarms
-    getAlarm(name) {
+    getAlarm(name): Alarm {
       return this.alarms[name];
     }
-    getAllAlarm() {
+    getAllAlarm(): AlarmArray {
       return this.alarms;
     }
-    clearAlarm(name) {
+    clearAlarm(name: string): boolean {
       if (this.alarms[name] && this.alarms[name].handler) {
         if (this.alarms[name].periodInMinutes) {
           clearInterval(this.alarms[name].handler);
@@ -171,8 +176,8 @@
       }
       return delete this.alarms[name];
     }
-    clearAllAlarm() {
-      (Object as any).values(this.alarms).forEach((alarm) => {
+    clearAllAlarm(): void {
+      Object.values(this.alarms).forEach((alarm) => {
         if (alarm.handler) {
           if (alarm.periodInMinutes) {
             clearInterval(alarm.handler);
@@ -183,7 +188,7 @@
       });
       this.alarms = {};
     }
-    createAlarm(name, alarmInfo) {
+    createAlarm(name: string, alarmInfo): void {
       this.clearAlarm(name);
       let timeout;
       this.alarms[name] = alarmInfo;
@@ -200,11 +205,11 @@
           = setTimeout(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
       }
     }
-    addContextMenus(menuItems, webContentsId) {
+    addContextMenus(menuItems, webContentsId: number): void {
       this.contextMenus[`'${webContentsId}'`] = [menuItems];
     }
     // pageHandlers
-    onDidStartLoading(event, pageIndex) {
+    onDidStartLoading(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('didStartLoading', {
         pageIndex,
@@ -223,7 +228,7 @@
         url: webview.getURL(),
       });
     }
-    onDomReady(event, pageIndex) {
+    onDomReady(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       const location = webview.getURL();
       const parsedURL = url.parse(location, true);
@@ -251,17 +256,17 @@
         url: location,
       });
     }
-    onDidStopLoading(event, pageIndex) {
+    onDidStopLoading(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('didStopLoading', {
         pageIndex,
         webview,
       });
     }
-    onDidFailLoad(event, pageIndex) {
+    onDidFailLoad(event, pageIndex: number): void {
       this.$store.dispatch('didFailLoad', {
         pageIndex,
-        isMainFrame: event.isMainFrame,
+        isMainFrame: (event as Electron.DidFailLoadEvent).isMainFrame,
       });
       const appPath = process.env.NODE_ENV === 'development'
         ? process.cwd()
@@ -274,61 +279,61 @@
           `${errorPage}`);
       }
     }
-    onIpcMessage(event): void {
+    onIpcMessage(event: Electron.IpcMessageEvent): void {
       if (event.channel === 'newtab') {
         if (this.extensionService.newtabOverrides !== '') {
-          event.target.send('newtab', this.extensionService.newtabOverrides);
+          (event.target as any).send('newtab', this.extensionService.newtabOverrides);
         } else {
-          event.target.send('newtab', this.$store.getters.tabConfig.defaultUrl);
+          (event.target as any).send('newtab', this.$store.getters.tabConfig.defaultUrl);
         }
       }
     }
-    onPageTitleSet(event, pageIndex) {
+    onPageTitleSet(event: Electron.PageTitleUpdatedEvent, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('pageTitleSet', {
         pageIndex,
         webview,
       });
     }
-    onUpdateTargetUrl(event, pageIndex) {
+    onUpdateTargetUrl(event: Electron.UpdateTargetUrlEvent, pageIndex: number): void {
       this.$store.dispatch('updateTargetUrl', {
         pageIndex,
         url: event.url,
       });
     }
-    onMediaStartedPlaying(event, pageIndex) {
+    onMediaStartedPlaying(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('mediaStartedPlaying', {
         pageIndex,
         webview,
       });
     }
-    onMediaPaused(event, pageIndex) {
+    onMediaPaused(event: Electron.Event, pageIndex: number): void {
       this.$store.dispatch('mediaPaused', pageIndex);
     }
-    onToggleAudio(event, pageIndex, muted) {
+    onToggleAudio(event: Electron.Event, pageIndex: number, muted: boolean): void {
       this.getWebView(pageIndex).setAudioMuted(muted);
       this.$store.dispatch('toggleAudio', {
         pageIndex,
         muted,
       });
     }
-    onPageFaviconUpdated(event, pageIndex) {
+    onPageFaviconUpdated(event: Electron.PageFaviconUpdatedEvent, pageIndex: number): void {
       this.$store.dispatch('pageFaviconUpdated', {
         pageIndex,
         url: event.favicons[0],
       });
     }
-    onEnterHtmlFullScreen() {
+    onEnterHtmlFullScreen(): void {
       (this.$el.querySelector('#nav') as any).style.display = 'none';
       this.getWebView().style.height = '100vh';
     }
-    onLeaveHtmlFullScreen() {
+    onLeaveHtmlFullScreen(): void {
       const nav: any = this.$el.querySelector('#nav');
       nav.style.display = 'block';
       this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
     }
-    onNewWindow(event, pageIndex) {
+    onNewWindow(event: Electron.NewWindowEvent, pageIndex: number): void {
       this.onNewTab(event.url, true);
       if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
         this.onCreatedNavigationTarget.emit({
@@ -341,7 +346,7 @@
         });
       }
     }
-    onWheel(event) {
+    onWheel(event: WheelEvent): void {
       const leftSwipeArrow = document.getElementById('left-swipe-arrow');
       const rightSwipeArrow = document.getElementById('right-swipe-arrow');
 
@@ -386,7 +391,7 @@
         }
       }
     }
-    onOpenPDF(event, data) {
+    onOpenPDF(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webview = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         if (this.pdfViewer === 'pdf-viewer') {
@@ -397,7 +402,7 @@
         }
       }
     }
-    onWillDownloadAnyFile(event, data) {
+    onWillDownloadAnyFile(event: Electron.Event, data): void {
       this.showDownloadBar = true;
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         this.$store.dispatch('createDownloadTask', {
@@ -413,7 +418,7 @@
         });
       }
     }
-    onUpdateDownloadsProgress(event, data) {
+    onUpdateDownloadsProgress(event: Electron.Event, data): void {
       this.$store.dispatch('updateDownloadsProgress', {
         startTime: data.startTime,
         getReceivedBytes: data.getReceivedBytes,
@@ -423,7 +428,7 @@
         state: data.state,
       });
     }
-    onCompleteDownloadsProgress(event, data) {
+    onCompleteDownloadsProgress(event: Electron.Event, data): void {
       this.$store.dispatch('completeDownloadsProgress', {
         name: data.name,
         startTime: data.startTime,
@@ -456,17 +461,17 @@
           : this.showDownloadBar;
       }
     }
-    onCloseDownloadBar() {
+    onCloseDownloadBar(): void {
       this.showDownloadBar = false;
       this.$store.dispatch('closeDownloadBar');
     }
-    onScrollTouchBegin(event, swipeGesture) {
+    onScrollTouchBegin(event: Electron.Event, swipeGesture: boolean): void {
       if (swipeGesture) {
         this.trackingFingers = true;
         this.isSwipeOnEdge = false;
       }
     }
-    onScrollTouchEnd() {
+    onScrollTouchEnd(): void {
       const leftSwipeArrow = document.getElementById('left-swipe-arrow');
       const rightSwipeArrow = document.getElementById('right-swipe-arrow');
 
@@ -494,13 +499,13 @@
         this.hnorm = 0;
       }
     }
-    onScrollTouchEdge() {
+    onScrollTouchEdge(): void {
       this.isSwipeOnEdge = true;
     }
-    onContextMenu(event) {
+    onContextMenu(event: Electron.Event): void {
       this.onWebviewContextMenu(event);
     }
-    onWillNavigate(event, pageIndex) {
+    onWillNavigate(event: Electron.WillNavigateEvent, pageIndex: number): void {
       this.$store.dispatch('clearPageAction', {
         pageIndex,
       });
@@ -514,7 +519,7 @@
         url: event.url,
       });
     }
-    onDidNavigate(event, pageIndex) {
+    onDidNavigate(event: Electron.DidNavigateEvent, pageIndex: number): void {
       this.onCompleted.emit({
         frameId: 0,
         parentFrameId: -1,
@@ -524,7 +529,7 @@
         url: event.url,
       });
     }
-    onGetSearchEngineProvider(event, data) {
+    onGetSearchEngineProvider(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', {
@@ -533,7 +538,7 @@
         });
       }
     }
-    onSetSearchEngineProvider(event, data) {
+    onSetSearchEngineProvider(event: Electron.Event, data): void {
       this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', {
@@ -541,7 +546,7 @@
         currentSearchEngine: this.$store.getters.currentSearchEngine,
       });
     }
-    onGetHomepage(event, data) {
+    onGetHomepage(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', {
@@ -549,14 +554,14 @@
         });
       }
     }
-    onSetHomepage(event, data) {
+    onSetHomepage(event: Electron.Event, data): void {
       this.$store.dispatch('setHomepage', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', {
         homepage: this.$store.getters.homepage,
       });
     }
-    onGetPDFViewer(event, data) {
+    onGetPDFViewer(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', {
@@ -564,25 +569,25 @@
         });
       }
     }
-    onSetPDFViewer(event, data) {
+    onSetPDFViewer(event: Electron.Event, data): void {
       this.$store.dispatch('setPDFViewer', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', {
         pdfViewer: this.$store.getters.pdfViewer,
       });
     }
-    onGetTabConfig(event, data) {
+    onGetTabConfig(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
       }
     }
-    onSetTabConfig(event, data) {
+    onSetTabConfig(event: Electron.Event, data): void {
       this.$store.dispatch('setTabConfig', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
     }
-    onGetLang(event, data) {
+    onGetLang(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', {
@@ -590,37 +595,37 @@
         });
       }
     }
-    onSetLang(event, data) {
+    onSetLang(event: Electron.Event, data): void {
       this.$store.dispatch('setLang', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', {
         lang: this.$store.getters.lang,
       });
     }
-    onGetDownloads(event, data) {
+    onGetDownloads(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', this.$store.getters.downloads);
       }
     }
-    onSetDownloads(event, data) {
+    onSetDownloads(event: Electron.Event, data): void {
       this.$store.dispatch('setDownloads', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', this.$store.getters.downloads);
     }
-    onGetHistory(event, data) {
+    onGetHistory(event: Electron.Event, data): void {
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send('guest-here-your-data', this.$store.getters.history);
       }
     }
-    onSetHistory(event, data) {
+    onSetHistory(event: Electron.Event, data): void {
       this.$store.dispatch('setHistory', data.val);
       const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
       webContents.send('guest-here-your-data', this.$store.getters.history);
     }
     // tabHandlers
-    onNewTab(location, follow = false) {
+    onNewTab(location: string, follow = false): void {
       this.$store.dispatch('incrementPid');
       if (location) {
         if (location.startsWith('about:')) {
@@ -637,13 +642,13 @@
       }
       this.onCreatedEvent.emit(new Tab(this.currentPageIndex, false));
     }
-    onTabDuplicate(pageIndex) {
+    onTabDuplicate(pageIndex: number): void {
       this.onNewTab(this.pages[pageIndex].location);
     }
-    onTabClick(pageIndex) {
+    onTabClick(pageIndex: number): void {
       this.$store.dispatch('clickTab', pageIndex);
     }
-    onTabClose(pageIndex) {
+    onTabClose(pageIndex: number): void {
       this.onRemovedEvent.emit(new Tab(pageIndex, false));
       this.$store.dispatch('closeTab', pageIndex);
       this.$nextTick(() => {
@@ -651,23 +656,23 @@
       });
     }
     // navHandlers
-    onClickHome() {
+    onClickHome(): void {
       this.getPage().navigateTo(this.homepage);
     }
-    onClickBack() {
+    onClickBack(): void {
       if (this.getPageObject().error) {
         this.getWebView().goToOffset(-2);
       } else {
         this.getWebView().goBack();
       }
     }
-    onClickForward() {
+    onClickForward(): void {
       this.getWebView().goForward();
     }
-    onClickStop() {
+    onClickStop(): void {
       this.getWebView().stop();
     }
-    onClickRefresh() {
+    onClickRefresh(): void {
       const webview = this.getWebView();
       if (webview.getURL() === this.page.location) {
         webview.reload();
@@ -675,7 +680,7 @@
         webview.loadURL(this.page.location);
       }
     }
-    onClickForceRefresh() {
+    onClickForceRefresh(): void {
       const webview = this.getWebView();
       if (webview.getURL() === this.page.location) {
         webview.reloadIgnoringCache();
@@ -683,7 +688,7 @@
         webview.loadURL(this.page.location);
       }
     }
-    onClickViewSource() {
+    onClickViewSource(): void {
       const webview = this.getWebView();
       if (webview.getURL() === this.page.location) {
         const sourceLocation = urlUtil.getViewSourceUrlFromUrl(this.getPageObject().location);
@@ -692,7 +697,7 @@
         }
       }
     }
-    onClickToggleDevTools() {
+    onClickToggleDevTools(): void {
       const webview = this.getWebView();
       if (webview.getURL() === this.page.location) {
         webview.getWebContents().openDevTools({ mode: 'bottom' });
@@ -700,7 +705,7 @@
         webview.loadURL(this.page.location);
       }
     }
-    onEnterLocation(location) {
+    onEnterLocation(location: string): void {
       let newLocation: string;
       if (location.startsWith('about:')) {
         newLocation = urlResource.aboutUrls(location);
@@ -712,7 +717,7 @@
       this.getPage().navigateTo(newLocation);
     }
     // onTabContextMenu
-    onTabContextMenu(event, pageIndex) {
+    onTabContextMenu(event: Electron.Event, pageIndex: number): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
 
@@ -739,7 +744,7 @@
       menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
     }
     // onClickBackContextMenu
-    onClickBackContextMenu() {
+    onClickBackContextMenu(): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const webview = this.getWebView();
@@ -783,7 +788,7 @@
       }
     }
     // onClickForwardContextMenu
-    onClickForwardContextMenu() {
+    onClickForwardContextMenu(): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const webview = this.getWebView();
@@ -827,10 +832,10 @@
       }
     }
     // onNavContextMenu
-    onNavContextMenu(event) {
+    onNavContextMenu(event: Electron.Event): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
-      const el = event.target;
+      const el = event.target as HTMLInputElement;
       const clipboard = (this as any).$electron.clipboard;
 
       menu.append(new MenuItem({
@@ -861,14 +866,14 @@
       menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
     }
     // onCommonMenu
-    onCommonMenu() {
+    onCommonMenu(): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const navbar = document.getElementById('browser-navbar');
       const common = document.getElementById('browser-navbar__common');
 
       if (navbar !== null && common !== null) {
-        const lastOpenedTabs: object[] = [];
+        const lastOpenedTabs: LastOpenedTabObject[] = [];
         this.lastOpenedTabs().forEach((tab) => {
           lastOpenedTabs.push(new MenuItem({
             label: tab.title,
@@ -919,13 +924,14 @@
       }
     }
     // onWebviewContextMenu
-    onWebviewContextMenu(event) {
+    onWebviewContextMenu(event: Electron.Event): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const clipboard = (this as any).$electron.clipboard;
 
       const webview = this.getWebView();
       const page = this.getPageObject();
+      const params: Electron.ContextMenuParams = (event as any).params;
 
       const registerExtensionContextMenus = (menu) => {
         const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
@@ -936,11 +942,11 @@
           contextMenus[webContentsIdInString].forEach((menuItems) => {
             menuItems.forEach((menuItem) => {
               if (menuItem.type !== 'separator') {
-                menuItem.label = menuItem.label.replace('%s', event.params.selectionText);
+                menuItem.label = menuItem.label.replace('%s', params.selectionText);
                 menuItem.click = (menuItem, BrowserWindow) => {
                   (this as any).$electron.remote.webContents.fromId(menuItem.webContentsId)
                     .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}`,
-                      event.params,
+                      params,
                       this.currentPageIndex,
                       menuItem,
                       BrowserWindow,
@@ -949,11 +955,11 @@
                 const submenu = menuItem.submenu;
                 if (submenu) {
                   submenu.forEach((sub) => {
-                    sub.label.replace('%s', event.params.selectionText);
+                    sub.label.replace('%s', params.selectionText);
                     sub.click = (menuItem, BrowserWindow) => {
                       (this as any).$electron.remote.webContents.fromId(sub.webContentsId)
                         .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}`,
-                          event.params,
+                          params,
                           this.currentPageIndex,
                           menuItem,
                           BrowserWindow,
@@ -992,7 +998,7 @@
         enabled: page.canRefresh,
       }));
 
-      if (event.params.editFlags.canUndo) {
+      if (params.editFlags.canUndo) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.undo'),
           accelerator: 'CmdOrCtrl+Z',
@@ -1000,7 +1006,7 @@
         }));
       }
 
-      if (event.params.editFlags.canRedo) {
+      if (params.editFlags.canRedo) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.redo'),
           accelerator: 'CmdOrCtrl+Shift+Z',
@@ -1010,7 +1016,7 @@
 
       menu.append(new MenuItem({ type: 'separator' }));
 
-      if (event.params.editFlags.canCut) {
+      if (params.editFlags.canCut) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.cut'),
           accelerator: 'CmdOrCtrl+X',
@@ -1018,7 +1024,7 @@
         }));
       }
 
-      if (event.params.editFlags.canCopy) {
+      if (params.editFlags.canCopy) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.copy'),
           accelerator: 'CmdOrCtrl+C',
@@ -1026,7 +1032,7 @@
         }));
       }
 
-      if (event.params.editFlags.canPaste) {
+      if (params.editFlags.canPaste) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.paste'),
           accelerator: 'CmdOrCtrl+V',
@@ -1046,27 +1052,27 @@
       }));
       menu.append(new MenuItem({ type: 'separator' }));
 
-      if (event.params.linkURL) {
+      if (params.linkURL) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.openLinkInNewTab'),
-          click: () => this.onNewTab(event.params.linkURL),
+          click: () => this.onNewTab(params.linkURL),
         }));
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.copyLinkAddress'),
           click: () => {
-            clipboard.writeText(event.params.linkURL);
+            clipboard.writeText(params.linkURL);
           },
         }));
       }
 
-      if (event.params.hasImageContents) {
+      if (params.hasImageContents) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.saveImageAs'),
           click: () => {
             const fs = require('fs');
             const path = require('path');
             const electron = (this as any).$electron;
-            urlUtil.getFilenameFromUrl(event.params.srcURL).then(
+            urlUtil.getFilenameFromUrl(params.srcURL).then(
               (filename) => {
                 const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
                 electron.remote.dialog.showSaveDialog(
@@ -1080,7 +1086,7 @@
                     ],
                   }, async (filename) => {
                     if (filename) {
-                      const dataURL = await imageUtil.getBase64FromImageUrl(event.params.srcURL);
+                      const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
                       fs.writeFileSync(
                         filename, electron.nativeImage.createFromDataURL(dataURL).toPNG());
                     }
@@ -1093,32 +1099,32 @@
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.copyImageUrl'),
           click: () => {
-            clipboard.writeText(event.params.srcURL);
+            clipboard.writeText(params.srcURL);
           },
         }));
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.openImageInNewTab'),
-          click: () => this.onNewTab(event.params.srcURL),
+          click: () => this.onNewTab(params.srcURL),
         }));
       }
 
       menu.append(new MenuItem({ type: 'separator' }));
-      if (event.params.selectionText) {
-        if (event.params.editFlags.canCopy) {
+      if (params.selectionText) {
+        if (params.editFlags.canCopy) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.searchFor', {
-              selectionText: event.params.selectionText,
+              selectionText: params.selectionText,
               searchEngine: this.$store.getters.currentSearchEngine.name,
             }),
-            click: () => this.onNewTab(event.params.selectionText),
+            click: () => this.onNewTab(params.selectionText),
           }));
         }
       }
       const macOS = /^darwin/.test(process.platform);
       if (macOS) {
-        if (event.params.selectionText) {
+        if (params.selectionText) {
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.lookUp', { selectionText: event.params.selectionText }),
+            label: this.$t('webview.contextMenu.lookUp', { selectionText: params.selectionText }),
             click: () => {
               webview.showDefinitionForSelection();
             },
@@ -1141,7 +1147,7 @@
       menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.inspectElement'),
         click: () => {
-          webview.inspectElement(event.params.x, event.params.y);
+          webview.inspectElement(params.x, params.y);
         },
       }));
 
@@ -1149,8 +1155,8 @@
     }
 
     beforeMount() {
-      const ipc = (this as any).$electron.ipcRenderer;
-      const webFrame = (this as any).$electron.webFrame;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const webFrame: Electron.WebFrame = (this as any).$electron.webFrame;
 
       webFrame.setVisualZoomLevelLimits(1, 1);
       ipc.on('set-app-state', (event, newState) => {
@@ -1162,7 +1168,7 @@
       });
     }
     mounted() {
-      const ipc = (this as any).$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
       if (process.platform === 'darwin') {
         document.body.classList.add('darwin');

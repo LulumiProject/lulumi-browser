@@ -50,13 +50,14 @@
         iview-icon(type="android-more-vertical", size="22")
 </template>
 
-<script>
-  import Vue from 'vue';
+<script lang="ts">
+  import { Component, Watch, Vue } from 'vue-property-decorator';
+
   import path from 'path';
   import url from 'url';
   import { focus } from 'vue-focus';
 
-  import AwesomeIcon from 'vue-awesome/components/Icon';
+  import AwesomeIcon from 'vue-awesome/components/Icon.vue';
   import 'vue-awesome/icons/angle-double-left';
   import 'vue-awesome/icons/angle-left';
   import 'vue-awesome/icons/angle-right';
@@ -78,6 +79,30 @@
   import urlUtil from '../../js/lib/url-util';
   // import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
+
+  import BrowserMainView from '../BrowserMainView.vue';
+
+  interface PageObject {
+    pid: number;
+    location: string;
+    statusText: boolean;
+    favicon: string | null;
+    title: string | null;
+    isLoading: boolean;
+    isSearching: boolean;
+    canGoBack: boolean;
+    canGoForward: boolean;
+    canRefresh: boolean;
+    error: boolean;
+    hasMedia: boolean;
+    isAudioMuted: boolean;
+    pageActionMapping: object;
+  }
+  interface SearchEngineObject {
+    name: string;
+    search: string;
+    autocomplete: string;
+  }
 
   Vue.component('url-suggestion', {
     functional: true,
@@ -110,7 +135,7 @@
     },
   });
 
-  export default {
+  @Component({
     directives: {
       focus,
       sortable: {
@@ -122,84 +147,94 @@
         },
       },
     },
-    data() {
-      return {
-        handler: null,
-        clickHandler: null,
-        blurHandler: null,
-        secure: false,
-        focused: false,
-        value: '',
-        suggestions: recommendTopSite,
-        extensions: [],
-        onbrowserActionClickedEvent: new Event(),
-        onpageActionClickedEvent: new Event(),
-      };
-    },
     components: {
       'awesome-icon': AwesomeIcon,
       'el-button': Button,
       'el-popover': Popover,
       'iview-icon': IViewIcon,
     },
-    computed: {
-      page() {
-        if (this.$store.getters.pages.length === 0) {
-          return {
-            canGoBack: false,
-            canGoForward: false,
-            canRefresh: false,
-            pageActionMapping: {},
-          };
-        }
-        return this.$store.getters.pages[this.$store.getters.currentPageIndex];
-      },
-      currentPageIndex() {
-        return this.$store.getters.currentPageIndex;
-      },
-      pageActionMapping() {
-        if (this.$store.getters.pages.length === 0) {
-          return {};
-        }
-        return this.$store.getters.pages[this.$store.getters.currentPageIndex].pageActionMapping;
-      },
-      location() {
-        if (this.$store.getters.pages.length === 0) {
-          return '';
-        }
-        return this.$store.getters.pages[this.$store.getters.currentPageIndex].location;
-      },
-      currentSearchEngine() {
-        return this.$store.getters.currentSearchEngine;
-      },
-      fuse() {
-        const results = [];
-        this.$store.getters.history.forEach((history) => {
-          results.push({
-            title: history.title,
-            value: history.url.replace(/(^\w+:|^)\/\//, ''),
-            icon: 'document',
-          });
+  })
+  export default class Navbar extends Vue {
+    dummyPageObject: PageObject = {
+      pid: -1,
+      location: '',
+      statusText: false,
+      favicon: null,
+      title: null,
+      isLoading: false,
+      isSearching: false,
+      canGoBack: false,
+      canGoForward: false,
+      canRefresh: false,
+      error: false,
+      hasMedia: false,
+      isAudioMuted: false,
+      pageActionMapping: {},
+    };
+    handler: any;
+    clickHandler: any;
+    blurHandler: any;
+    secure: boolean = false;
+    focused: boolean = false;
+    value: string = '';
+    suggestions: object[] = recommendTopSite;
+    extensions: any[] = [];
+    onbrowserActionClickedEvent: Event = new Event();
+    onpageActionClickedEvent: Event = new Event();
+    
+    get page(): PageObject {
+      if (this.$store.getters.pages.length === 0) {
+        return this.dummyPageObject;
+      }
+      return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+    }
+    get currentPageIndex():number {
+      return this.$store.getters.currentPageIndex;
+    }
+    get pageActionMapping(): object {
+      if (this.$store.getters.pages.length === 0) {
+        return {};
+      }
+      return this.$store.getters.pages[this.$store.getters.currentPageIndex].pageActionMapping;
+    }
+    get location(): string {
+      if (this.$store.getters.pages.length === 0) {
+        return '';
+      }
+      return this.$store.getters.pages[this.$store.getters.currentPageIndex].location;
+    }
+    get currentSearchEngine(): SearchEngineObject {
+      return this.$store.getters.currentSearchEngine;
+    }
+    get fuse(): Fuse {
+      const results: object[] = [];
+      this.$store.getters.history.forEach((history) => {
+        results.push({
+          title: history.title,
+          value: history.url.replace(/(^\w+:|^)\/\//, ''),
+          icon: 'document',
         });
-        const fuse = new Fuse(results, {
-          keys: [{
-            name: 'value',
-            weight: 0.7,
-          }, {
-            name: 'title',
-            weight: 0.3,
-          }],
-        });
-        return fuse;
-      },
-    },
-    watch: {
-      location(newLocation) {
-        if (process.env.NODE_ENV !== 'testing') {
-          const currentLocation = url.parse(newLocation, true);
-          const originalInput = document.getElementsByClassName('el-input__inner')[0];
-          const newElement = document.getElementById('securityLocation');
-          if (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:') {
+      });
+      const fuse = new Fuse(results, {
+        keys: [{
+          name: 'value',
+          weight: 0.7,
+        }, {
+          name: 'title',
+          weight: 0.3,
+        }],
+      });
+      return fuse;
+    }
+
+    @Watch('location')
+    onLocation(newLocation: string): void {
+      if (process.env.NODE_ENV !== 'testing') {
+        const currentLocation = url.parse(newLocation, true);
+        const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
+        const newElement = document.getElementById('securityLocation');
+        if (newElement !== null) {
+          if (typeof currentLocation.href !== 'undefined' && (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:')) {
             this.secure = true;
             const newLocation
               = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
@@ -221,309 +256,308 @@
             newElement.removeEventListener('click', this.clickHandler, false);
             originalInput.removeEventListener('blur', this.blurHandler, false);
           }
-          this.$refs.input.suggestions = [];
+          (this.$refs.input as any).suggestions = [];
         }
-      },
-    },
-    methods: {
-      selectPortion(event) {
-        const code = event.code;
-        const el = event.target;
-        if (code === 'ArrowUp') {
-          el.selectionEnd = el.selectionStart;
-          el.selectionStart = 0;
-        } else if (code === 'ArrowDown') {
-          el.selectionEnd = el.value.length;
-        }
-      },
-      unique(source) {
-        const results = [];
-        const seen = new Set();
+      }
+    }
 
-        source.forEach((s) => {
-          if (!seen.has(`${s.icon}:${s.value}`)) {
-            seen.add(`${s.icon}:${s.value}`);
-            results.push(s);
-          }
-        });
-        return results;
-      },
-      showLocation(location) {
-        if (location === undefined || location.startsWith('lulumi-extension')) {
-          return '';
+    selectPortion(event): void {
+      const code: string = event.code;
+      const el = event.target;
+      if (code === 'ArrowUp') {
+        el.selectionEnd = el.selectionStart;
+        el.selectionStart = 0;
+      } else if (code === 'ArrowDown') {
+        el.selectionEnd = el.value.length;
+      }
+    }
+    unique(source): object[] {
+      const results: object[] = [];
+      const seen: Set<string> = new Set();
+
+      source.forEach((s) => {
+        if (!seen.has(`${s.icon}:${s.value}`)) {
+          seen.add(`${s.icon}:${s.value}`);
+          results.push(s);
         }
-        let newLocation = decodeURIComponent(location);
-        newLocation = urlUtil.getLocationIfError(newLocation);
-        newLocation = urlUtil.getLocationIfPDF(newLocation);
-        return urlUtil.getLocationIfAbout(newLocation).url;
-      },
-      onGoBackMouseDown() {
-        this.handler = setTimeout(() => this.$parent.onClickBackContextMenu(), 300);
-      },
-      onGoForwardMouseDown() {
-        this.handler = setTimeout(() => this.$parent.onClickForwardContextMenu(), 300);
-      },
-      onGoBackMouseUp() {
-        if (this.handler) {
-          clearTimeout(this.handler);
-        }
-      },
-      onGoForwardMouseUp() {
-        if (this.handler) {
-          clearTimeout(this.handler);
-        }
-      },
-      onChange(val) {
-        this.value = val;
-      },
-      onSelect(event) {
-        if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
-          this.$parent.onEnterLocation(
-            `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
-        } else {
-          this.$parent.onEnterLocation(event.value);
-        }
-      },
-      querySearch(queryString, cb) {
-        const suggestions = this.suggestions;
-        let results =
-          queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
-        results.push({
-          title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
+      });
+      return results;
+    }
+    showLocation(location: string): string {
+      if (location === undefined || location.startsWith('lulumi-extension')) {
+        return '';
+      }
+      let newLocation = decodeURIComponent(location);
+      newLocation = urlUtil.getLocationIfError(newLocation);
+      newLocation = urlUtil.getLocationIfPDF(newLocation);
+      return urlUtil.getLocationIfAbout(newLocation).url;
+    }
+    onGoBackMouseDown(): void {
+      this.handler = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
+    }
+    onGoForwardMouseDown(): void {
+      this.handler = setTimeout(() => (this.$parent as BrowserMainView).onClickForwardContextMenu(), 300);
+    }
+    onGoBackMouseUp(): void {
+      if (this.handler) {
+        clearTimeout(this.handler);
+      }
+    }
+    onGoForwardMouseUp(): void {
+      if (this.handler) {
+        clearTimeout(this.handler);
+      }
+    }
+    onChange(val: string): void {
+      this.value = val;
+    }
+    onSelect(event): void {
+      if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
+        (this.$parent as BrowserMainView).onEnterLocation(
+          `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
+      } else {
+        (this.$parent as BrowserMainView).onEnterLocation(event.value);
+      }
+    }
+    querySearch(queryString: string, cb: Function): void {
+      const suggestions = this.suggestions;
+      let results =
+        queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
+      results.push({
+        title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
+        value: this.value,
+        icon: 'search',
+      });
+      if (results.length === 1 && urlUtil.isURL(this.value)) {
+        results.unshift({
           value: this.value,
-          icon: 'search',
+          icon: 'document',
         });
-        if (results.length === 1 && urlUtil.isURL(this.value)) {
-          results.unshift({
-            value: this.value,
-            icon: 'document',
-          });
-        }
-        /*
-        results = urlSuggestion(
-          this.currentSearchEngine.name,
-          `${this.currentSearchEngine.autocomplete}${this.value}`,
-          results);
-        setTimeout(() => cb(results), 100);
-        */
-        // fuse results
-        const fuse = this.fuse;
-        results = results.concat(fuse.search(queryString.toLowerCase()));
-        cb(this.unique(results));
-      },
-      createFilter(queryString) {
-        return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
-      },
-      setBrowserActionIcon(extensionId, path) {
-        this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
-      },
-      setPageActionIcon(extensionId, path) {
-        this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
-      },
-      loadIcon(extension) {
-        try {
-          const isPageAction = extension.hasOwnProperty('page_action');
-          const isBrowserAction = extension.hasOwnProperty('browser_action');
-          const manifestIcon = extension.hasOwnProperty('icons');
-          let icons = false;
-          if (isPageAction) {
-            icons = extension.page_action.default_icon;
-          }
-          if (isBrowserAction) {
-            icons = extension.browser_action.default_icon;
-          }
-          if (manifestIcon) {
-            icons = extension.icons;
-          }
-          if (icons) {
-            if (typeof icons === 'string') {
-              return this.$electron.remote.nativeImage
-                .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
-            }
-            return this.$electron.remote.nativeImage
-              .createFromPath(path.join(extension.srcDirectory, Object.values(icons)[0])).toDataURL('image/png');
-          }
-          return undefined;
-        } catch (event) {
-          return this.$electron.remote.nativeImage
-            .createFromPath(path.join(extension.srcDirectory, extension.icons['16'])).toDataURL('image/png');
-        }
-      },
-      showOrNot(extension) {
-        const isPageAction = extension.hasOwnProperty('page_action');
-        if (isPageAction) {
-          if (this.pageActionMapping[extension.extensionId]) {
-            if (this.pageActionMapping[extension.extensionId].enabled) {
-              return 'enabled';
-            }
-          }
-          return 'disabled';
-        }
-        return 'enabled';
-      },
-      showPopupOrNot(extension) {
+      }
+      /*
+      results = urlSuggestion(
+        this.currentSearchEngine.name,
+        `${this.currentSearchEngine.autocomplete}${this.value}`,
+        results);
+      setTimeout(() => cb(results), 100);
+      */
+      // fuse results
+      const fuse = this.fuse;
+      results = results.concat(fuse.search(queryString.toLowerCase()));
+      cb(this.unique(results));
+    }
+    createFilter(queryString: string): (suggestion: any) => boolean {
+      return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
+    }
+    setBrowserActionIcon(extensionId: string, path: string): void {
+      this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+    }
+    setPageActionIcon(extensionId: string, path: string): void {
+      this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+    }
+    loadIcon(extension: any): string | undefined {
+      try {
         const isPageAction = extension.hasOwnProperty('page_action');
         const isBrowserAction = extension.hasOwnProperty('browser_action');
+        const manifestIcon = extension.hasOwnProperty('icons');
+        let icons = false;
         if (isPageAction) {
-          if (this.pageActionMapping[extension.extensionId]) {
-            if (this.pageActionMapping[extension.extensionId].enabled) {
-              if (extension.page_action.default_popup) {
-                return false;
-              }
+          icons = extension.page_action.default_icon;
+        }
+        if (isBrowserAction) {
+          icons = extension.browser_action.default_icon;
+        }
+        if (manifestIcon) {
+          icons = extension.icons;
+        }
+        if (icons) {
+          if (typeof icons === 'string') {
+            return (this as any).$electron.remote.nativeImage
+              .createFromPath(path.join(extension.srcDirectory, icons)).toDataURL('image/png');
+          }
+          return (this as any).$electron.remote.nativeImage
+            .createFromPath(path.join(extension.srcDirectory, Object.values(icons)[0])).toDataURL('image/png');
+        }
+        return undefined;
+      } catch (event) {
+        return (this as any).$electron.remote.nativeImage
+          .createFromPath(path.join(extension.srcDirectory, extension.icons['16'])).toDataURL('image/png');
+      }
+    }
+    showOrNot(extension: any): string {
+      const isPageAction = extension.hasOwnProperty('page_action');
+      if (isPageAction) {
+        if (this.pageActionMapping[extension.extensionId]) {
+          if (this.pageActionMapping[extension.extensionId].enabled) {
+            return 'enabled';
+          }
+        }
+        return 'disabled';
+      }
+      return 'enabled';
+    }
+    showPopupOrNot(extension: any): boolean {
+      const isPageAction = extension.hasOwnProperty('page_action');
+      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      if (isPageAction) {
+        if (this.pageActionMapping[extension.extensionId]) {
+          if (this.pageActionMapping[extension.extensionId].enabled) {
+            if (extension.page_action.default_popup) {
+              return false;
             }
           }
-          return true;
-        } else if (isBrowserAction) {
-          if (extension.browser_action.default_popup) {
-            return false;
-          }
-          return true;
         }
         return true;
-      },
-      showTitle(extension) {
-        const isPageAction = extension.hasOwnProperty('page_action');
-        const isBrowserAction = extension.hasOwnProperty('browser_action');
-        if (isPageAction) {
-          return extension.page_action.default_title;
-        } else if (isBrowserAction) {
-          return extension.browser_action.default_title;
+      } else if (isBrowserAction) {
+        if (extension.browser_action.default_popup) {
+          return false;
         }
-        return '';
-      },
-      sendIPC(event, extension) {
-        const isPageAction = extension.hasOwnProperty('page_action');
-        const isBrowserAction = extension.hasOwnProperty('browser_action');
-        if (isPageAction || isBrowserAction) {
-          const webview = this.$refs[`webview-${extension.extensionId}`][0];
-          webview.addEventListener('context-menu', (event) => {
-            const { Menu, MenuItem } = this.$electron.remote;
-            const menu = new Menu();
+        return true;
+      }
+      return true;
+    }
+    showTitle(extension: any): string {
+      const isPageAction = extension.hasOwnProperty('page_action');
+      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      if (isPageAction) {
+        return extension.page_action.default_title;
+      } else if (isBrowserAction) {
+        return extension.browser_action.default_title;
+      }
+      return '';
+    }
+    sendIPC(event: Electron.Event, extension: any): void {
+      const isPageAction = extension.hasOwnProperty('page_action');
+      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      if (isPageAction || isBrowserAction) {
+        const webview = this.$refs[`webview-${extension.extensionId}`][0];
+        webview.addEventListener('context-menu', (event) => {
+          const { Menu, MenuItem } = (this as any).$electron.remote;
+          const menu = new Menu();
 
-            menu.append(new MenuItem({
-              label: 'Inspect Element',
-              click: () => {
-                webview.inspectElement(event.params.x, event.params.y);
-              },
-            }));
+          menu.append(new MenuItem({
+            label: 'Inspect Element',
+            click: () => {
+              webview.inspectElement(event.params.x, event.params.y);
+            },
+          }));
 
-            menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
-          });
-          webview.addEventListener('ipc-message', (event) => {
-            if (event.channel === 'resize') {
-              const size = event.args[0];
-              webview.style.height = `calc(${size.height + 30}px)`;
-              webview.style.width = `calc(${size.width + 20}px)`;
-              webview.style.overflow = 'hidden';
-            }
-          });
-          webview.addEventListener('dom-ready', () => {
-            webview.executeJavaScript(`
-              var height = document.body.clientHeight;
-              var width = document.body.clientWidth;
-              ipcRenderer.sendToHost('resize', {
-                height,
-                width,
-              });
-            `);
-          });
-          if (isPageAction) {
-            if (event.target.classList.contains('enabled')) {
-              if (extension.page_action.default_popup) {
-                webview.setAttribute('src', `${url.format({
-                  protocol: 'lulumi-extension',
-                  slashes: true,
-                  hostname: extension.extensionId,
-                  pathname: extension.page_action.default_popup,
-                })}`);
-                return;
-              }
-              if (extension.webContentsId) {
-                this.$electron.remote.webContents.fromId(extension.webContentsId)
-                  .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
-              }
-            }
-          } else if (isBrowserAction) {
-            if (extension.browser_action.default_popup) {
+          menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+        });
+        webview.addEventListener('ipc-message', (event: Electron.IpcMessageEvent) => {
+          if (event.channel === 'resize') {
+            const size = event.args[0];
+            webview.style.height = `calc(${size.height + 30}px)`;
+            webview.style.width = `calc(${size.width + 20}px)`;
+            webview.style.overflow = 'hidden';
+          }
+        });
+        webview.addEventListener('dom-ready', () => {
+          webview.executeJavaScript(`
+            var height = document.body.clientHeight;
+            var width = document.body.clientWidth;
+            ipcRenderer.sendToHost('resize', {
+              height,
+              width,
+            });
+          `);
+        });
+        if (isPageAction) {
+          if ((event.target as HTMLElement).classList.contains('enabled')) {
+            if (extension.page_action.default_popup) {
               webview.setAttribute('src', `${url.format({
                 protocol: 'lulumi-extension',
                 slashes: true,
                 hostname: extension.extensionId,
-                pathname: extension.browser_action.default_popup,
+                pathname: extension.page_action.default_popup,
               })}`);
               return;
             }
             if (extension.webContentsId) {
-              this.$electron.remote.webContents.fromId(extension.webContentsId)
-                .send('lulumi-browser-action-clicked', { id: this.currentPageIndex });
+              (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
+                .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
             }
           }
+        } else if (isBrowserAction) {
+          if (extension.browser_action.default_popup) {
+            webview.setAttribute('src', `${url.format({
+              protocol: 'lulumi-extension',
+              slashes: true,
+              hostname: extension.extensionId,
+              pathname: extension.browser_action.default_popup,
+            })}`);
+            return;
+          }
+          if (extension.webContentsId) {
+            (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
+              .send('lulumi-browser-action-clicked', { id: this.currentPageIndex });
+          }
         }
-      },
-      removeExtension(name) {
-        const ipc = this.$electron.ipcRenderer;
-        ipc.send('remove-extension', name);
-      },
-      onContextmenu(extension) {
-        const { Menu, MenuItem } = this.$electron.remote;
-        const menu = new Menu();
+      }
+    }
+    removeExtension(name: string): void {
+      const ipc = (this as any).$electron.ipcRenderer;
+      ipc.send('remove-extension', name);
+    }
+    onContextmenu(extension: any): void {
+      const { Menu, MenuItem } = (this as any).$electron.remote;
+      const menu = new Menu();
 
-        menu.append(new MenuItem({
-          label: 'Remove extension',
-          click: () => {
-            this.removeExtension(extension.name);
-          },
-        }));
+      menu.append(new MenuItem({
+        label: 'Remove extension',
+        click: () => {
+          this.removeExtension(extension.name);
+        },
+      }));
 
-        menu.popup(this.$electron.remote.getCurrentWindow(), { async: true });
-      },
-    },
+      menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+    }
+
     mounted() {
       if (process.env.NODE_ENV !== 'testing') {
         const originalInput = document.getElementsByClassName('el-input__inner')[0];
-        const newElement = document.createElement('div');
+        let newElement = document.createElement('div');
         newElement.id = 'securityLocation';
-        newElement.classList = 'el-input__inner';
+        (newElement as any).classList = 'el-input__inner';
         newElement.innerHTML = '';
         newElement.style.display = 'none';
-        originalInput.parentElement.append(newElement);
+        (originalInput.parentElement as any).append(newElement);
 
         this.clickHandler = () => {
           newElement.style.display = 'none';
-          originalInput.style.display = 'block';
-          originalInput.focus();
+          (originalInput as HTMLInputElement).style.display = 'block';
+          (originalInput as HTMLInputElement).focus();
         };
         this.blurHandler = () => {
           newElement.style.display = 'block';
-          originalInput.style.display = 'none';
+          (originalInput as HTMLInputElement).style.display = 'none';
         };
       }
 
-      const ipc = this.$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
-      ipc.on('lulumi-commands-execute-page-action', (event, extensionId) => {
+      ipc.on('lulumi-commands-execute-page-action', (event: Electron.IpcMessageEvent, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
       });
-      ipc.on('lulumi-commands-execute-browser-action', (event, extensionId) => {
+      ipc.on('lulumi-commands-execute-browser-action', (event: Electron.IpcMessageEvent, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
       });
 
       ipc.on('add-extension-result', () => {
-        this.$parent.extensionService.update();
+        (this.$parent as BrowserMainView).extensionService.update();
         this.$forceUpdate();
       });
-      ipc.on('remove-extension-result', (event, result) => {
+      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, result: string) => {
         if (result === 'OK') {
-          this.$parent.extensionService.update();
+          (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
         } else {
-          // eslint-disable-next-line no-alert
           alert(result);
         }
       });
-    },
+    }
   };
 </script>
 
