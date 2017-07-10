@@ -1,10 +1,10 @@
 import config from '../constants/config';
 
 // characters, then : with optional //
-const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
-const defaultScheme = 'http://';
-const fileScheme = 'file://';
-const os = require('os');
+const rscheme: RegExp = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
+const defaultScheme: string = 'http://';
+const fileScheme: string = 'file://';
+const os: any = require('os');
 
 /**
  * A simple class for parsing and dealing with URLs.

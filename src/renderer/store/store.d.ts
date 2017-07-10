@@ -14,6 +14,10 @@ interface PageObject {
   isAudioMuted: boolean;
   pageActionMapping: object;
 }
+interface PageObjectList extends Array<PageObject> {
+  [index: number]: PageObject;
+  length: number;
+}
 interface TabConfig {
   defaultUrl: string;
   defaultFavicon: string;
@@ -31,7 +35,7 @@ interface LastOpenedTabObject {
 }
 interface State {
   pid: number;
-  pages: Array<PageObject>;
+  pages: PageObjectList;
   tabsOrder: Array<number>;
   currentPageIndex: number;
   searchEngine: Array<SearchEngineObject>;

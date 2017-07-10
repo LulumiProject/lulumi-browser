@@ -1,5 +1,11 @@
+interface SuggestionObject {
+  title: string;
+  value: string;
+  icon: string;
+}
+
 // Top 500 alexa sites sorted by popularity
-const recommendTopSite = [
+const recommendTopSite: SuggestionObject[] = [
   {
     title: 'Gmail',
     value: 'gmail.com',

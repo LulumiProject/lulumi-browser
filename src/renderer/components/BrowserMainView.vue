@@ -56,7 +56,7 @@
     pageActionMapping: object;
   }
   interface LastOpenedTabObject {
-    title: string;
+    title?: string;
     url: string;
     favicon: string | null;
   }

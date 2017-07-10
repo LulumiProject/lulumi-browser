@@ -1,11 +1,11 @@
 import config from '../constants/config';
 
-function getLulumiExtUrl(relativeUrl) {
+function getLulumiExtUrl(relativeUrl: string): string {
   return `${config.lulumiPagesCustomProtocol}${relativeUrl}`;
 }
 
 const urlResource = {
-  aboutUrls(url) {
+  aboutUrls(url: string): string {
     switch (url) {
       case 'about:about':
         return getLulumiExtUrl('about/#/');

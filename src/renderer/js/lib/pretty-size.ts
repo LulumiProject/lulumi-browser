@@ -10,23 +10,24 @@ const prettySize = {
    * @param {Boolean} [nospace=false] Don't print a space
    * @param {Boolean} [one=false] Only print one character
    */
-  process(size, nospace, one) {
-    let mysize;
-    let f;
+  process(size: number, nospace: boolean = false, one: boolean = false): string {
+    let mysize: string = '';
+    let f: string;
 
     sizes.forEach((f, id) => {
+      let first: string = '';
       if (one) {
-        f = f.slice(0, 1);
+        first = f.slice(0, 1);
       }
 
-      const s = 1024 ** id;
-      let fixed;
+      const s: number = 1024 ** id;
+      let fixed: string;
       if (size >= s) {
         fixed = String((size / s).toFixed(1));
         if (fixed.indexOf('.0') === fixed.length - 2) {
           fixed = fixed.slice(0, -2);
         }
-        mysize = fixed + (nospace ? '' : ' ') + f;
+        mysize = fixed + (nospace ? '' : ' ') + first;
       }
     });
 

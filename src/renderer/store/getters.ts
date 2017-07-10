@@ -6,7 +6,7 @@ export const getters = {
   pid(state: BrowserState): number {
     return state.browser.pid;
   },
-  pages(state: BrowserState): PageObject[] {
+  pages(state: BrowserState): PageObjectList {
     return state.browser.pages;
   },
   tabsOrder(state: BrowserState) {

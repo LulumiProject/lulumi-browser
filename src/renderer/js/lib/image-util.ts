@@ -1,4 +1,3 @@
-/* eslint-disable no-new */
 /**
  * A simple class for fetching images from URLs or files.
  * @class imageUtil
@@ -9,9 +8,9 @@ const imageUtil = {
    * @param {String} input The input value.
    * @returns {String} The found image encoded by base64.
    */
-  getBase64FromImageUrl(input) {
+  getBase64FromImageUrl(input: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const img = new window.Image();
+      const img: HTMLImageElement = new (window as any).Image();
       img.setAttribute('crossOrigin', 'anonymous');
       img.onerror = () => {
         reject();
@@ -20,7 +19,7 @@ const imageUtil = {
         const canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        canvas.getContext('2d')
+        canvas.getContext('2d')!
           .drawImage(img, 0, 0);
         resolve(canvas.toDataURL('image/png'));
       };
@@ -34,11 +33,11 @@ const imageUtil = {
    * @param {String} size The size of returned icon (small, normal, large).
    * @returns {String} The found image encoded by base64.
    */
-  getBase64FromFileIcon(path, size = 'normal') {
+  getBase64FromFileIcon(path: string, size: any = 'normal'): Promise<string> {
     return new Promise((resolve, reject) => {
       require('electron').remote.app.getFileIcon(path, { size }, (err, icon) => {
         if (icon) {
-          resolve(icon.toDataURL('image/png'));
+          resolve(icon.toDataURL());
         } else {
           reject(err);
         }
@@ -51,8 +50,8 @@ const imageUtil = {
    * @param {String} input The input value.
    * @param {Function} cb The callback function.
    */
-  getWorkingImageUrl(input, cb) {
-    const img = new window.Image();
+  getWorkingImageUrl(input: string, cb: Function): void {
+    const img = new (window as any).Image();
     img.onload = () => cb(true);
     img.onerror = () => cb(false);
     img.src = input;

@@ -1,9 +1,9 @@
 import urlResource from './url-resource';
 
-export default (oldPages, tabRefs, newStart, newOrder) => {
-  const newPages = [];
+export default (oldPages: PageObjectList, tabRefs, newStart, newOrder) => {
+  const newPages: PageObjectList = [];
   if (newOrder.length < oldPages.length) {
-    for (let index = 0; index < oldPages.length; index++) {
+    for (let index = 0; index < oldPages.length; index += 1) {
       newPages[index] = Object.assign({}, oldPages[index]);
     }
   } else {

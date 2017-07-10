@@ -1,6 +1,8 @@
 import { nativeImage } from 'electron';
 import path from 'path';
 
+declare const __static;
+
 const searchEngine = [
   {
     name: 'Google',
@@ -21,20 +23,20 @@ const tabConfig = {
   defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
   defaultFavicon: nativeImage
     .createFromPath(path.join(__static, 'icons', 'document.png'))
-    .toDataURL('image/png'),
+    .toDataURL(),
   lulumiFavicon: nativeImage
     .createFromPath(path.join(__static, 'icons', 'icon.png'))
-    .toDataURL('image/png'),
+    .toDataURL(),
 };
 
 export default {
-  lulumiPagesCustomProtocol: 'lulumi://',
   tabConfig,
+  searchEngine,
+  homepage,
+  pdfViewer,
+  lulumiPagesCustomProtocol: 'lulumi://',
   aboutPages: {
     about: 'List of about pages',
   },
-  searchEngine,
   currentSearchEngine: searchEngine[0],
-  homepage,
-  pdfViewer,
 };

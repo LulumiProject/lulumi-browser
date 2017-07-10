@@ -103,6 +103,11 @@
     search: string;
     autocomplete: string;
   }
+  interface SuggestionObject {
+    title?: string;
+    value: string;
+    icon: string;
+  }
 
   Vue.component('url-suggestion', {
     functional: true,
@@ -177,7 +182,7 @@
     secure: boolean = false;
     focused: boolean = false;
     value: string = '';
-    suggestions: object[] = recommendTopSite;
+    suggestions: Array<SuggestionObject> = recommendTopSite;
     extensions: any[] = [];
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
@@ -320,7 +325,7 @@
       }
     }
     querySearch(queryString: string, cb: Function): void {
-      const suggestions = this.suggestions;
+      const suggestions: Array<SuggestionObject> = this.suggestions;
       let results =
         queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
       results.push({

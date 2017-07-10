@@ -1,6 +1,6 @@
 import fetchJsonp from 'fetch-jsonp';
 
-export default (provider, autocomplete, results) => {
+export default (provider: string, autocomplete: string, results: Array<SuggestionObject>) => {
   if (provider === 'Google') {
     fetchJsonp(autocomplete)
       .then(response => response.json())

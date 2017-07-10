@@ -56,7 +56,7 @@
     }
     setDownloads(index: number): void {
       if (index !== -1) {
-        this.files.splice(index, 1);
+        this.$delete(this.files, 1);
       } else {
         this.files = this.files.filter(file => file.state === 'progressing');
       }
