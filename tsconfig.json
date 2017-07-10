@@ -1,0 +1,9 @@
+{
+  "include": [
+    "./src/**/*",
+    "./helper/**/*"
+  ],
+  "exclude":[
+    "./src/typings/*"
+  ]
+}
