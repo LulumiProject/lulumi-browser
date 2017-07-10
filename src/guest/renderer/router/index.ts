@@ -1,75 +1,102 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
+/* tslint:disable */
+const AboutMainView = () => 
+  import(/* webpackChunkName: "route-about-main-view" */ '../components/AboutMainView.vue');
+const Lulumi = () =>
+  import(/* webpackChunkName: "route-lulumi" */ '../components/AboutMainView/Lulumi.vue');
+const Preferences = () =>
+  import(/* webpackChunkName: "route-preferences" */ '../components/AboutMainView/Preferences.vue');
+const SearchEngineProvider = () =>
+  import(/* webpackChunkName: "route-search-engine-provider" */ '../components/AboutMainView/Preferences/SearchEngineProvider.vue');
+const Homepage = () =>
+  import(/* webpackChunkName: "route-homepage" */ '../components/AboutMainView/Preferences/Homepage.vue');
+const PDFViewer = () =>
+  import(/* webpackChunkName: "route-pdf-viewer" */ '../components/AboutMainView/Preferences/PDFViewer.vue');
+const TabConfig = () =>
+  import(/* webpackChunkName: "route-tab-config" */ '../components/AboutMainView/Preferences/TabConfig.vue');
+const Language = () =>
+  import(/* webpackChunkName: "route-language" */ '../components/AboutMainView/Preferences/Language.vue');
+const Downloads = () =>
+  import(/* webpackChunkName: "route-downloads" */ '../components/AboutMainView/Downloads.vue');
+const History = () =>
+  import(/* webpackChunkName: "route-history" */ '../components/AboutMainView/History.vue');
+const Extensions = () =>
+  import(/* webpackChunkName: "route-extensions" */ '../components/AboutMainView/Extensions.vue');
+const Newtab = () =>
+  import(/* webpackChunkName: "route-newtab" */ '../components/AboutMainView/Newtab.vue');
+
 Vue.use(Router);
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'about-main',
-      component: require('components/AboutMainView.vue'),
+      name: 'about-main-view',
+      component: AboutMainView,
     },
     {
       path: '/lulumi',
-      name: 'about-main-lulumi',
-      component: require('components/AboutMainView/Lulumi.vue'),
+      name: 'lulumi',
+      component: Lulumi,
     },
     {
       path: '/preferences',
-      component: require('components/AboutMainView/Preferences.vue'),
+      component: Preferences,
       children: [
         {
           path: 'search',
-          name: 'about-main-preferences-search-engine-provider',
-          component: require('components/AboutMainView/Preferences/SearchEngineProvider.vue'),
+          name: 'search-engine-provider',
+          component: SearchEngineProvider,
         },
         {
           path: 'homepage',
-          name: 'about-main-preferences-homepage',
-          component: require('components/AboutMainView/Preferences/Homepage.vue'),
+          name: 'homepage',
+          component: Homepage,
         },
         {
           path: 'pdfViewer',
-          name: 'about-main-preferences-pdfViewer',
-          component: require('components/AboutMainView/Preferences/PDFViewer.vue'),
+          name: 'pdfViewer',
+          component: PDFViewer,
         },
         {
           path: 'tab',
-          name: 'about-main-preferences-tab-config',
-          component: require('components/AboutMainView/Preferences/TabConfig.vue'),
+          name: 'tab-config',
+          component: TabConfig,
         },
         {
           path: 'language',
-          name: 'about-main-preferences-language',
-          component: require('components/AboutMainView/Preferences/Language.vue'),
+          name: 'language',
+          component: Language,
         },
         {
           path: '',
-          name: 'about-main-preferences',
+          name: 'preferences',
+          component: Preferences,
           redirect: 'search',
         },
       ],
     },
     {
       path: '/downloads',
-      name: 'about-main-downloads',
-      component: require('components/AboutMainView/Downloads.vue'),
+      name: 'downloads',
+      component: Downloads,
     },
     {
       path: '/history',
-      name: 'about-main-history',
-      component: require('components/AboutMainView/History.vue'),
+      name: 'history',
+      component: History,
     },
     {
       path: '/extensions',
-      name: 'about-main-extensions',
-      component: require('components/AboutMainView/Extensions.vue'),
+      name: 'extensions',
+      component: Extensions,
     },
     {
       path: '/newtab',
-      name: 'about-main-newtab',
-      component: require('components/AboutMainView/Newtab.vue'),
+      name: 'newtab',
+      component: Newtab,
     },
     {
       path: '*',

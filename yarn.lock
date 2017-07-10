@@ -2126,6 +2126,10 @@ commander@2.9.0, commander@2.9.x, commander@^2.8.1, commander@^2.9.0, commander@
   dependencies:
     graceful-readlink ">= 1.0.0"
 
+commandpost@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/commandpost/-/commandpost-1.1.0.tgz#3524ac70002f3e8a5efcc2850294517b0bd60cd1"
+
 common-path-prefix@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/common-path-prefix/-/common-path-prefix-1.0.0.tgz#cd52f6f0712e0baab97d6f9732874f22f47752c0"
@@ -8198,9 +8202,16 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
+typescript-formatter@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/typescript-formatter/-/typescript-formatter-5.2.0.tgz#cd45294f74c4cc880f48f81983a21fb264f6f173"
+  dependencies:
+    commandpost "^1.0.0"
+    editorconfig "^0.13.2"
+
+typescript@^2.5.0-dev.20170707:
+  version "2.5.0-dev.20170707"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.0-dev.20170707.tgz#f915e2f1e3ced9077adaefa0867392d063970fa2"
 
 uglify-js@2.6.x:
   version "2.6.4"

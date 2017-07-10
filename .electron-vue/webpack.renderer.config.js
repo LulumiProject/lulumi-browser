@@ -149,6 +149,7 @@ let rendererConfig = {
   ],
   output: {
     filename: '[name].js',
+    chunkFilename: '[name].js',
     libraryTarget: 'commonjs2',
     path: path.join(__dirname, '../dist')
   },
@@ -293,6 +294,7 @@ let aboutConfig = {
   ],
   output: {
     filename: '[name].js',
+    chunkFilename: '[name].js',
     libraryTarget: 'commonjs2',
     path: path.join(__dirname, '../dist')
   },
