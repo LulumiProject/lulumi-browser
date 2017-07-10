@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 /* tslint:disable */
-const AboutMainView = () => 
+const AboutMainView = () =>
   import(/* webpackChunkName: "route-about-main-view" */ '../components/AboutMainView.vue');
 const Lulumi = () =>
   import(/* webpackChunkName: "route-lulumi" */ '../components/AboutMainView/Lulumi.vue');

@@ -105,8 +105,8 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
     handleKeyEnter(event) {
       if ((this as any).suggestionVisible
-            && (this as any).highlightedIndex >= 0
-            && (this as any).highlightedIndex < (this as any).suggestions.length) {
+        && (this as any).highlightedIndex >= 0
+        && (this as any).highlightedIndex < (this as any).suggestions.length) {
         (this as any).select((this as any).suggestions[(this as any).highlightedIndex]);
       } else {
         (this.$parent.$parent as any).onEnterLocation(event.target.value);

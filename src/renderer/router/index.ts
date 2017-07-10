@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 /* tslint:disable */
-const BrowserMainView = () => 
+const BrowserMainView = () =>
   import(/* webpackChunkName: "route-browser-main-view" */ '../components/BrowserMainView.vue');
 
 Vue.use(Router);

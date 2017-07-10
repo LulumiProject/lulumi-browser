@@ -121,7 +121,7 @@ const urlUtil = {
       return true;
     }
     if (case2Reg.test(str) || !case3Reg.test(str) ||
-        (scheme === undefined && /\s/g.test(str))) {
+      (scheme === undefined && /\s/g.test(str))) {
       return true;
     }
     if (case4Reg.test(str)) {
