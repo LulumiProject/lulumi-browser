@@ -1,3 +1,19 @@
+// *.vue
+declare module '*.vue' {
+  import Vue from 'vue';
+  export default Vue;
+};
+
+// extension api
+interface GlobalObject extends NodeJS.Global {
+  wid: number;
+  renderProcessPreferences: Array<any>;
+}
+interface CustomBrowserWindow extends Electron.BrowserWindow {
+  addExtension(srcDirectory: string): void;
+}
+
+// store
 interface PageObject {
   pid: number;
   location: string;
@@ -49,4 +65,15 @@ interface State {
   permissions: object;
   mappings: Array<number>;
   lastOpenedTabs: Array<LastOpenedTabObject>;
+}
+
+// src/renderer/js
+interface SuggestionObject {
+  title?: string;
+  value: string;
+  icon: string;
+}
+interface AboutLocationObject {
+  title: string;
+  url: string;
 }

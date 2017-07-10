@@ -9,9 +9,14 @@ import url from 'url';
 import config from '../main/js/constants/config';
 import './extensions/listeners';
 
+/* tslint:disable:no-console */
+/* tslint:disable:max-line-length */
+
+const globalObjet = global as GlobalObject;
+
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
-global.renderProcessPreferences = [];
+globalObjet.renderProcessPreferences = [];
 // extensionId => manifest
 const manifestMap = {};
 // name => manifest
@@ -84,13 +89,13 @@ const startBackgroundPages = (manifest) => {
       html = Buffer.from(`<html><body>${scripts}</body></html>`);
     }
 
-    const contents = webContents.create({
+    const contents = (webContents as any).create({
       partition: 'persist:__lulumi_extension',
       isBackgroundPage: true,
       commandLineSwitches: ['--background-page'],
       preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
     });
-    backgroundPages[manifest.extensionId] = { html, webContentsId: contents.id, name };
+    backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
     contents.loadURL(url.format({
       protocol: 'lulumi-extension',
       slashes: true,
@@ -105,7 +110,7 @@ const removeBackgroundPages = (manifest) => {
     return;
   }
 
-  webContents.fromId(backgroundPages[manifest.extensionId].webContentsId).destroy();
+  (webContents.fromId(backgroundPages[manifest.extensionId].webContentsId) as any).destroy();
   delete backgroundPages[manifest.extensionId];
 };
 
@@ -118,9 +123,9 @@ const loadCommands = (mainWindow, manifest) => {
         localshortcut.register(mainWindow, suggested_key.default, () => {
           if (commands[command].suggested_key) {
             if (command === '_execute_page_action') {
-              BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+              BrowserWindow.fromId(globalObjet.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
             } else if (command === '_execute_browser_action') {
-              BrowserWindow.fromId(global.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+              BrowserWindow.fromId(globalObjet.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
             } else {
               webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
                 .send('lulumi-commands-triggered', command);
@@ -158,19 +163,21 @@ const injectContentScripts = (manifest, entry) => {
 };
 
 const removeRenderProcessPreferences = (manifest) => {
-  global.renderProcessPreferences = global.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
+  globalObjet.renderProcessPreferences = globalObjet.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
 };
 
 const loadIcons = (manifest, entry) => {
+  /*
   const readArrayOfFiles = relativePath => ({
     url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
     code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
   });
+  */
 
   const iconsToEntry = (icons) => {
     const object = {};
     Object.keys(icons).forEach((key) => {
-      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL('image/png');
+      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL();
     });
     return object;
   };
@@ -199,7 +206,7 @@ const loadExtension = (manifest) => {
   startBackgroundPages(manifest);
   entry = injectContentScripts(manifest, entry);
   entry = loadIcons(manifest, entry);
-  global.renderProcessPreferences.push(entry);
+  globalObjet.renderProcessPreferences.push(entry);
 };
 
 const loadLulumiExtensions = (win, manifests) => {
@@ -209,7 +216,7 @@ const loadLulumiExtensions = (win, manifests) => {
 
   manifests.forEach(loadExtension);
 
-  const extensionInfoArray = manifests.map(manifestToExtensionInfo);
+  // const extensionInfoArray = manifests.map(manifestToExtensionInfo);
 };
 
 app.on('web-contents-created', (event, webContents) => {
@@ -250,8 +257,8 @@ const lulumiExtensionHandler = (request, callback) => {
   });
 };
 
-app.on('session-created', (sess) => {
-  sess.protocol.registerBufferProtocol('lulumi-extension', lulumiExtensionHandler, (error) => {
+app.on(('session-created' as any), (sess) => {
+  ((sess as any).protocol as Electron.Protocol).registerBufferProtocol('lulumi-extension', lulumiExtensionHandler, (error) => {
     if (error) {
       console.error(`Unable to register lulumi-extension protocol: ${error}`);
     }
@@ -259,7 +266,7 @@ app.on('session-created', (sess) => {
 });
 
 // the persistent path of "Lulumi Extensions" preference file
-let loadedExtensionsPath = null;
+let loadedExtensionsPath: string = '';
 
 app.on('will-quit', () => {
   try {
@@ -286,7 +293,7 @@ app.once('ready', () => {
     ? path.join(config.devUserData, 'lulumi-extensions')
     : path.join(app.getPath('userData'), 'extensions');
   try {
-    const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath));
+    const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
     if (Array.isArray(loadedExtensions)) {
       for (const srcDirectory of loadedExtensions) {
         // start background pages and set content scripts
@@ -299,7 +306,7 @@ app.once('ready', () => {
   }
 
   // the public API to add/remove extensions
-  BrowserWindow.addExtension = (srcDirectory) => {
+  (BrowserWindow as any).addExtension = (srcDirectory) => {
     const manifest = getManifestFromPath(srcDirectory);
     if (manifest) {
       loadExtension(manifest);
@@ -307,7 +314,7 @@ app.once('ready', () => {
     }
   };
 
-  BrowserWindow.removeExtension = (name) => {
+  (BrowserWindow as any).removeExtension = (name) => {
     const manifest = manifestNameMap[name];
     if (!manifest) {
       return;
@@ -319,7 +326,7 @@ app.once('ready', () => {
     delete manifestNameMap[name];
   };
 
-  BrowserWindow.getExtensions = () => {
+  (BrowserWindow as any).getExtensions = () => {
     const extensions = {};
     Object.keys(manifestNameMap).forEach((name) => {
       const manifest = manifestNameMap[name];

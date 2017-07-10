@@ -2,7 +2,22 @@ import { remote } from 'electron';
 
 // Refs: http://ithelp.ithome.com.tw/articles/10188558
 class Tab {
-  constructor(tabId, highlighted = true) {
+  id: number;
+  index: number;
+  windowId: number;
+  openerTabId: number;
+  highlighted: boolean;
+  active: boolean;
+  pinned: boolean;
+  url: string | null;
+  title: string | null;
+  favIconUrl: string | null;
+  status: string;
+  incognito: boolean;
+  width: number;
+  height: number;
+  sessionId: number;
+  constructor(tabId: number, highlighted: boolean = true) {
     this.id = tabId; // 頁籤的標識符。(某些狀況可能會沒有id)
     this.index = tabId; // 頁籤在所在窗口中的索引，從 0 開始。
     this.windowId = 0; // 頁籤所在窗口的標識符。
@@ -20,14 +35,14 @@ class Tab {
     this.sessionId; // session標識符。(如果使用session匯入tab可能導致沒有tab的id而只有session的id)
   }
 
-  update(url = null, title = null, favIconUrl = null) {
+  update(url: string | null = null, title: string | null = null, favIconUrl: string | null = null) {
     this.active = remote.getCurrentWindow().isFocused();
     this.url = url;
     this.title = title;
     this.favIconUrl = favIconUrl;
   }
 
-  hightlight(highlighted = true) {
+  hightlight(highlighted: boolean = true) {
     this.highlighted = highlighted;
   }
 }
