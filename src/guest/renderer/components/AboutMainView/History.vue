@@ -12,7 +12,7 @@
         el-button(:disabled="sync", type="info", @click="setHistory") {{ $t('about.historyPage.clear') }}
     el-row
       el-col(:span="24")
-        el-tree(ref="tree", :empty-text="$t('about.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="render", :filter-node-method="filterNode")
+        el-tree(ref="tree", :empty-text="$t('about.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="customRender", :filter-node-method="filterNode")
 </template>
 
 <script>
@@ -103,7 +103,7 @@
         }
         return newArr;
       },
-      render(h, node) {
+      customRender(h, node) {
         const history = node.data;
         if (history.children) {
           return h('span', history.label);
@@ -129,9 +129,7 @@
     beforeDestroy() {
       this.clear();
       // eslint-disable-next-line no-undef
-      ipcRenderer.removeAllListeners([
-        'guest-here-your-data',
-      ]);
+      ipcRenderer.removeAllListeners('guest-here-your-data');
     },
   };
 </script>

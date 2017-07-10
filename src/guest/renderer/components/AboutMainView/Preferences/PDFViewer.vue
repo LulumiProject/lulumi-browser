@@ -43,9 +43,7 @@
     },
     beforeDestroy() {
       // eslint-disable-next-line no-undef
-      ipcRenderer.removeAllListeners([
-        'guest-here-your-data',
-      ]);
+      ipcRenderer.removeAllListeners('guest-here-your-data');
     },
   };
 </script>

@@ -65,9 +65,7 @@ class Port {
 
   _onDisconnect () {
     this.disconnected = true;
-    ipcRenderer.removeAllListeners([
-      `lulumi-runtime-port-${this.extensionId}`,
-    ]);
+    ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}`);
     this.onDisconnect.emit();
   }
 }

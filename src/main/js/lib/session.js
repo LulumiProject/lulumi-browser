@@ -134,11 +134,9 @@ export default {
         });
 
         item.on('done', (event, state) => {
-          ipcMain.removeAllListeners([
-            'pause-downloads-progress',
-            'resume-downloads-progress',
-            'cancel-downloads-progress',
-          ]);
+          ipcMain.removeAllListeners('pause-downloads-progress');
+          ipcMain.removeAllListeners('resume-downloads-progress');
+          ipcMain.removeAllListeners('cancel-downloads-progress');
           mainWindow.webContents.send('complete-downloads-progress', {
             name: item.getFilename(),
             startTime: item.getStartTime(),

@@ -160,12 +160,8 @@
     },
     beforeDestroy() {
       const ipc = this.$electron.ipcRenderer;
-      ipc.removeAllListeners([
-        'update-available',
-      ]);
-      ipc.removeAllListeners([
-        'request-permission',
-      ]);
+      ipc.removeAllListeners('update-available');
+      ipc.removeAllListeners('request-permission');
 
       this.clear();
     },

@@ -39,7 +39,7 @@ class Event {
     if (index !== -1) {
       this.listeners.splice(index, 1);
     }
-    ipcRenderer.removeAllListeners([`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`]);
+    ipcRenderer.removeAllListeners(`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`);
     ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, digest);
   }
 
