@@ -86,7 +86,7 @@ const startBackgroundPages = (manifest: ManifestObject) => {
   if (manifest.background) {
     if (manifest.background.page) {
       name = manifest.background.page;
-      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page), 'urf8');
+      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page), 'utf8');
     } else {
       name = '_generated_background_page.html';
       if (manifest.background.scripts) {
