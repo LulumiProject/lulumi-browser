@@ -35,7 +35,7 @@ interface GlobalObject extends NodeJS.Global {
   online: boolean;
   wid: number;
   __static: string;
-  renderProcessPreferences: Array<any>;
+  renderProcessPreferences: any[];
   backgroundPages: BackgroundPages;
   manifestMap: ManifestMap;
   manifestNameMap: ManifestNameMap;
@@ -84,19 +84,19 @@ interface LastOpenedTabObject {
 interface State {
   pid: number;
   pages: PageObjectList;
-  tabsOrder: Array<number>;
+  tabsOrder: number[];
   currentPageIndex: number;
-  searchEngine: Array<SearchEngineObject>;
+  searchEngine: SearchEngineObject[];
   currentSearchEngine: SearchEngineObject;
   homepage: string;
   pdfViewer: string;
   tabConfig: TabConfig;
   lang: string;
-  downloads: Array<object>;
-  history: Array<object>;
+  downloads: object[];
+  history: object[];
   permissions: object;
-  mappings: Array<number>;
-  lastOpenedTabs: Array<LastOpenedTabObject>;
+  mappings: number[];
+  lastOpenedTabs: LastOpenedTabObject[];
 }
 
 // src/renderer/js
