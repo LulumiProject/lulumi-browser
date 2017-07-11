@@ -8,20 +8,15 @@ const version = app.getVersion();
 
 export default {
   init() {
-    autoUpdater.on('error', (err, msg) => {
-      // eslint-disable-next-line no-console
+    autoUpdater.on(('error' as any), (err, msg) => {
+      // tslint:disable-next-line:no-console
       console.error(`Error fetching updates, ${msg} (${err.stack})`);
     });
 
     autoUpdater.setFeedURL(`${FEED_URL}/${version}`);
 
-    setTimeout(() => {
-      autoUpdater.checkForUpdates();
-    }, 1000 * 10);
-
-    setInterval(() => {
-      autoUpdater.checkForUpdates();
-    }, 1000 * 60 * 5);
+    setTimeout(() => autoUpdater.checkForUpdates(), 1000 * 10);
+    setInterval(() => autoUpdater.checkForUpdates(), 1000 * 60 * 5);
   },
   listen(mainWindow) {
     autoUpdater.once('update-downloaded', (event, releaseNotes, releaseName) => {

@@ -18,9 +18,9 @@ const objectValues = object => Object.keys(object).map(key => object[key]);
 
 globalObjet.renderProcessPreferences = [];
 // extensionId => manifest
-const manifestMap = {};
+const manifestMap: ManifestMap = {};
 // name => manifest
-const manifestNameMap = {};
+const manifestNameMap: ManifestNameMap = {};
 
 const generateExtensionIdFromName = name => punycode.toASCII(name).replace(/[\W_]+/g, '-').toLowerCase();
 
@@ -30,63 +30,69 @@ const isWindowOrWebView = (webContents) => {
 };
 
 // Create or get manifest object from |srcDirectory|.
-const getManifestFromPath = (srcDirectory) => {
-  let manifest;
-  let manifestContent;
+const getManifestFromPath: (srcDirectory: string) => ManifestObject | null =
+  (srcDirectory: string): ManifestObject | null => {
+    let manifest: ManifestObject;
+    let manifestContent: string;
 
-  try {
-    manifestContent = fs.readFileSync(path.join(srcDirectory, 'manifest.json'));
-  } catch (readError) {
-    console.warn(`Reading ${path.join(srcDirectory, 'manifest.json')} failed.`);
-    console.warn(readError.stack || readError);
-    throw readError;
-  }
+    try {
+      manifestContent = fs.readFileSync(path.join(srcDirectory, 'manifest.json'), 'utf8');
+    } catch (readError) {
+      console.warn(`Reading ${path.join(srcDirectory, 'manifest.json')} failed.`);
+      console.warn(readError.stack || readError);
+      throw readError;
+    }
 
-  try {
-    manifest = JSON.parse(manifestContent);
-  } catch (parseError) {
-    console.warn(`Parsing ${path.join(srcDirectory, 'manifest.json')} failed.`);
-    console.warn(parseError.stack || parseError);
-    throw parseError;
-  }
+    try {
+      manifest = JSON.parse(manifestContent);
+    } catch (parseError) {
+      console.warn(`Parsing ${path.join(srcDirectory, 'manifest.json')} failed.`);
+      console.warn(parseError.stack || parseError);
+      throw parseError;
+    }
 
-  if (!manifestNameMap[manifest.name]) {
-    const extensionId = generateExtensionIdFromName(manifest.name);
-    manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
-    Object.assign(manifest, {
-      srcDirectory,
-      extensionId,
-      startPage: url.format({
-        protocol: 'lulumi-extension',
-        slashes: true,
-        hostname: extensionId,
-        pathname: manifest.devtools_page,
-      }),
-    });
-    return manifest;
-  } else if (manifest && manifest.name) {
-    console.warn(`Attempted to load extension "${manifest.name}" that has already been loaded.`);
-  }
-};
+    if (!manifestNameMap[manifest.name]) {
+      const extensionId = generateExtensionIdFromName(manifest.name);
+      manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
+      Object.assign(manifest, {
+        srcDirectory,
+        extensionId,
+        startPage: url.format({
+          protocol: 'lulumi-extension',
+          slashes: true,
+          hostname: extensionId,
+          pathname: manifest.devtools_page,
+        }),
+      });
+      return manifest;
+    } else if (manifest && manifest.name) {
+      console.warn(`Attempted to load extension "${manifest.name}" that has already been loaded.`);
+      return null;
+    }
+    console.warn('Unable to parse this extension!');
+    return null;
+  };
 
 // manage the background pages
-const backgroundPages = {};
+const backgroundPages: BackgroundPages = {};
 
-const startBackgroundPages = (manifest) => {
+const startBackgroundPages = (manifest: ManifestObject) => {
   if (backgroundPages[manifest.extensionId] || !manifest.background) {
     return;
   }
 
-  let html;
-  let name;
+  let html: string = '';
+  let name: string;
   if (manifest.background) {
     if (manifest.background.page) {
       name = manifest.background.page;
-      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page));
+      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page), 'urf8');
     } else {
       name = '_generated_background_page.html';
-      const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
-      html = Buffer.from(`<html><body>${scripts}</body></html>`);
+      if (manifest.background.scripts) {
+        const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
+        html = Buffer.from(`<html><body>${scripts}</body></html>`, 'utf8');
+      }
     }
 
     const contents = (webContents as any).create({
@@ -298,7 +304,9 @@ app.once('ready', () => {
       for (const srcDirectory of loadedExtensions) {
         // start background pages and set content scripts
         const manifest = getManifestFromPath(srcDirectory);
-        loadExtension(manifest);
+        if (manifest !== null) {
+          loadExtension(manifest);
+        }
       }
     }
   } catch (error) {
@@ -306,15 +314,15 @@ app.once('ready', () => {
   }
 
   // the public API to add/remove extensions
-  (BrowserWindow as any).addExtension = (srcDirectory) => {
+  (BrowserWindow as any).addExtension = (srcDirectory: string): string | void => {
     const manifest = getManifestFromPath(srcDirectory);
-    if (manifest) {
+    if (manifest !== null) {
       loadExtension(manifest);
       return manifest.name;
     }
   };
 
-  (BrowserWindow as any).removeExtension = (name) => {
+  (BrowserWindow as any).removeExtension = (name: string) => {
     const manifest = manifestNameMap[name];
     if (!manifest) {
       return;

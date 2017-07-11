@@ -1,5 +1,7 @@
-import { app, Menu, BrowserWindow } from 'electron';
+import { Menu, BrowserWindow } from 'electron';
 import i18n from '../../i18n';
+
+const globalObjet = global as GlobalObject;
 
 const getTemplate = () => {
   const template = [
@@ -9,12 +11,12 @@ const getTemplate = () => {
         {
           label: i18n.t('file.newTab'),
           accelerator: 'CmdOrCtrl+T',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('new-tab'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab'),
         },
         {
           label: i18n.t('file.closeTab'),
           accelerator: 'CmdOrCtrl+W',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('tab-close'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('tab-close'),
         },
       ],
     },
@@ -62,7 +64,7 @@ const getTemplate = () => {
         {
           label: i18n.t('edit.find'),
           accelerator: 'CmdOrCtrl+F',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('startFindInPage'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('startFindInPage'),
         },
         {
           label: i18n.t('edit.speech.title'),
@@ -85,12 +87,12 @@ const getTemplate = () => {
         {
           label: i18n.t('view.reload'),
           accelerator: 'CmdOrCtrl+R',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('reload'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('reload'),
         },
         {
           label: i18n.t('view.forceReload'),
           accelerator: 'Shift+CmdOrCtrl+R',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('forceReload'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('forceReload'),
         },
         {
           type: 'separator',
@@ -117,12 +119,12 @@ const getTemplate = () => {
         {
           label: i18n.t('view.viewSource'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('viewSource'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('viewSource'),
         },
         {
           label: i18n.t('view.toggleDevTools'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('toggleDevTools'),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('toggleDevTools'),
         },
       ],
     },
@@ -153,31 +155,31 @@ const getTemplate = () => {
       submenu: [
         {
           label: i18n.t('help.reportIssue'),
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('new-tab', {
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab', {
             location: 'https://github.com/qazbnm456/lulumi-browser/issues',
             follow: true,
           }),
         },
         {
           label: i18n.t('help.forceReload'),
-          click: () => BrowserWindow.fromId(global.wid).webContents.reloadIgnoringCache(),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.reloadIgnoringCache(),
         },
         {
           label: i18n.t('help.toggleDevTools'),
-          click: () => BrowserWindow.fromId(global.wid).webContents.toggleDevTools(),
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.toggleDevTools(),
         },
       ],
     },
   ];
 
   if (process.platform === 'darwin') {
-    const appName = app.getName();
+    const appName = require('electron').app.getName();
     template.unshift({
       label: appName,
       submenu: [
         {
           label: i18n.t('app.about', { appName }),
-          click: () => BrowserWindow.fromId(global.wid).webContents.send('new-tab', {
+          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab', {
             location: 'about:lulumi',
             follow: true,
           }),
@@ -216,7 +218,7 @@ const getTemplate = () => {
     });
   }
 
-  return Menu.buildFromTemplate(template);
+  return Menu.buildFromTemplate((template as any));
 };
 
 export default {

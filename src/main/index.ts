@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
@@ -10,26 +9,29 @@ import config from './js/constants/config';
 import promisify from './js/lib/promisify';
 import * as lulumiExtension from '../api/lulumi-extension';
 
+/* tslint:disable:no-console */
+
+const globalObjet = global as GlobalObject;
+
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  // eslint-disable-next-line no-underscore-dangle
-  global.__static = path.resolve(__dirname, '../static');
+  globalObjet.__static = path.resolve(__dirname, '../static');
 }
 
-let mainWindow;
+let mainWindow: Electron.BrowserWindow | null;
 
-let shuttingDown = process.env.BABEL_ENV === 'test';
-const storagePath = process.env.NODE_ENV === 'development'
+let shuttingDown: boolean = process.env.BABEL_ENV === 'test';
+const storagePath: string = process.env.NODE_ENV === 'development'
   ? path.join(config.devUserData, 'lulumi-app-state')
   : path.join(app.getPath('userData'), 'app-state');
-let appStateSaveHandler = null;
+let appStateSaveHandler: any = null;
 
-let setLanguage = false;
+let setLanguage: boolean = false;
 
-let langPath;
+let langPath: string;
 if (process.env.NODE_ENV === 'development') {
   langPath = path.join(config.devUserData, 'lulumi-lang');
 } else if (process.env.BABEL_ENV === 'test') {
@@ -38,23 +40,25 @@ if (process.env.NODE_ENV === 'development') {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
 
-const isDarwin = process.platform === 'darwin';
-const isWindows = process.platform === 'win32';
+const isDarwin: boolean = process.platform === 'darwin';
+const isWindows: boolean = process.platform === 'win32';
 
-const autoHideMenuBarSetting = isDarwin;
-const swipeGesture = isDarwin ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled() : false;
+const autoHideMenuBarSetting: boolean = isDarwin;
+const swipeGesture: boolean = isDarwin
+  ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled()
+  : false;
 
-const winURL = process.env.NODE_ENV === 'development'
+const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
 
-function appStateSave(force = true) {
+function appStateSave(force: boolean = true): void {
   if (mainWindow) {
     mainWindow.webContents.send('request-app-state', force);
   }
 }
 
-function createWindow() {
+function createWindow(): void {
   /**
    * Initial window options
    */
@@ -68,7 +72,7 @@ function createWindow() {
     frame: !isWindows,
   });
 
-  global.wid = mainWindow.id;
+  globalObjet.wid = mainWindow.id;
 
   mainWindow.loadURL(winURL);
 
@@ -97,15 +101,15 @@ function createWindow() {
   });
 
   mainWindow.on('scroll-touch-begin', () => {
-    mainWindow.webContents.send('scroll-touch-begin', swipeGesture);
+    mainWindow!.webContents.send('scroll-touch-begin', swipeGesture);
   });
 
   mainWindow.on('scroll-touch-end', () => {
-    mainWindow.webContents.send('scroll-touch-end');
+    mainWindow!.webContents.send('scroll-touch-end');
   });
 
   mainWindow.on('scroll-touch-edge', () => {
-    mainWindow.webContents.send('scroll-touch-edge');
+    mainWindow!.webContents.send('scroll-touch-edge');
   });
 
   mainWindow.on('closed', () => {
@@ -117,10 +121,9 @@ function createWindow() {
   });
 
   ipcMain.on('request-lang', (event) => {
-    let lang = null;
+    let lang: string = '';
     try {
       lang = readFileSync(langPath, 'utf-8');
-    // eslint-disable-next-line no-empty
     } catch (event) {
       lang = '"en"';
     }
@@ -128,11 +131,11 @@ function createWindow() {
   });
 
   ipcMain.on('request-extension-objects', () => {
-    global.backgroundPages = lulumiExtension.backgroundPages;
-    global.manifestMap = lulumiExtension.manifestMap;
-    mainWindow.webContents.send('response-extension-objects',
-      lulumiExtension.manifestMap,
-    );
+    globalObjet.backgroundPages = lulumiExtension.backgroundPages;
+    globalObjet.manifestMap = lulumiExtension.manifestMap;
+    mainWindow!.webContents.send(
+      'response-extension-objects',
+      lulumiExtension.manifestMap);
     Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
       lulumiExtension.loadCommands(mainWindow, lulumiExtension.manifestMap[manifest]);
     });
@@ -140,11 +143,10 @@ function createWindow() {
 
   ipcMain.on('request-app-state', () => {
     new Promise((resolve, reject) => {
-      let data = null;
+      let data: string = '';
       try {
-        data = readFileSync(storagePath, 'utf-8');
-      // eslint-disable-next-line no-empty
-      } catch (event) {}
+        data = readFileSync(storagePath, 'utf8');
+      } catch (event) { }
 
       try {
         data = JSON.parse(data);
@@ -156,7 +158,7 @@ function createWindow() {
         }
       }
     }).then((data) => {
-      mainWindow.webContents.send('set-app-state', data);
+      mainWindow!.webContents.send('set-app-state', data);
     }).catch(() => console.log('request-app-state error'));
   });
 
@@ -168,17 +170,24 @@ protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 if (process.env.NODE_ENV === 'development') {
   app.on('ready', () => {
     protocol.registerHttpProtocol('lulumi', (request, callback) => {
-      const url = request.url.substr((config.lulumiPagesCustomProtocol).length);
+      const url: string = request.url.substr((config.lulumiPagesCustomProtocol).length);
       const [type, param] = url.split('/');
       if (type === 'about') {
         if (param.indexOf('#') === 0) {
           // '#blablabla'
-          callback({ url: `http://localhost:${require('../../.electron-vue/config').port}/about.html` });
+          callback({
+            url: `http://localhost:${require('../../.electron-vue/config').port}/about.html`,
+            method: request.method,
+          });
         } else {
           // 'blablabla'
-          callback({ url: `http://localhost:${require('../../.electron-vue/config').port}/${param}` });
+          callback({
+            url: `http://localhost:${require('../../.electron-vue/config').port}/${param}`,
+            method: request.method,
+          });
         }
       }
+      // tslint:disable-next-line:align
     }, (error) => {
       if (error) {
         console.error('Failed to register protocol');
@@ -194,12 +203,13 @@ if (process.env.NODE_ENV === 'development') {
       if (type === 'about') {
         if (param.indexOf('#') === 0) {
           // '#blablabla'
-          callback({ path: `${__dirname}/about.html` });
+          callback(`${__dirname}/about.html`);
         } else {
           // 'blablabla'
-          callback({ path: `${__dirname}/${param}` });
+          callback(`${__dirname}/${param}`);
         }
       }
+      // tslint:disable-next-line:align
     }, (error) => {
       if (error) {
         console.error('Failed to register protocol');
@@ -226,19 +236,21 @@ app.on('before-quit', (event) => {
     if (setLanguage) {
       event.preventDefault();
       shuttingDown = false;
-      mainWindow.close();
+      mainWindow!.close();
       return;
     }
     return;
   }
   event.preventDefault();
-  clearInterval(appStateSaveHandler);
-  appStateSaveHandler = null;
+  if (appStateSaveHandler !== null) {
+    clearInterval(appStateSaveHandler);
+    appStateSaveHandler = null;
+  }
   appStateSave(false);
 });
 
 app.on('browser-window-focus', () => {
-  mainWindow.webContents.send('browser-window-focus');
+  mainWindow!.webContents.send('browser-window-focus');
 });
 
 ipcMain.on('response-app-state', (event, data) => {
@@ -268,8 +280,8 @@ ipcMain.on('open-item', (event, path) => {
 });
 
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const type = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
-  const data = {};
+  const type: string = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
+  const data: LulumiObject = {} as LulumiObject;
   if (type === 'about') {
     const versions = process.versions;
 
@@ -334,45 +346,45 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
       [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
-    global.guestData = data;
+    globalObjet.guestData = data;
   }
 });
 
-ipcMain.on('guest-want-data', (event, val) => {
-  const webContentsId = event.sender.id;
+ipcMain.on('guest-want-data', (event: Electron.Event, val: string) => {
+  const webContentsId: number = event.sender.id;
   switch (val) {
     case 'searchEngineProvider':
-      mainWindow.webContents.send('get-search-engine-provider', {
+      mainWindow!.webContents.send('get-search-engine-provider', {
         webContentsId,
       });
       break;
     case 'homepage':
-      mainWindow.webContents.send('get-homepage', {
+      mainWindow!.webContents.send('get-homepage', {
         webContentsId,
       });
       break;
     case 'pdfViewer':
-      mainWindow.webContents.send('get-pdf-viewer', {
+      mainWindow!.webContents.send('get-pdf-viewer', {
         webContentsId,
       });
       break;
     case 'tabConfig':
-      mainWindow.webContents.send('get-tab-config', {
+      mainWindow!.webContents.send('get-tab-config', {
         webContentsId,
       });
       break;
     case 'lang':
-      mainWindow.webContents.send('get-lang', {
+      mainWindow!.webContents.send('get-lang', {
         webContentsId,
       });
       break;
     case 'downloads':
-      mainWindow.webContents.send('get-downloads', {
+      mainWindow!.webContents.send('get-downloads', {
         webContentsId,
       });
       break;
     case 'history':
-      mainWindow.webContents.send('get-history', {
+      mainWindow!.webContents.send('get-history', {
         webContentsId,
       });
       break;
@@ -383,39 +395,39 @@ ipcMain.on('guest-want-data', (event, val) => {
   }
 });
 
-ipcMain.on('set-current-search-engine-provider', (event, val) => {
-  mainWindow.webContents.send('set-search-engine-provider', {
+ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-search-engine-provider', {
     val,
     webContentsId: event.sender.id,
   });
 });
-ipcMain.on('set-homepage', (event, val) => {
-  mainWindow.webContents.send('set-homepage', {
+ipcMain.on('set-homepage', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-homepage', {
     val,
     webContentsId: event.sender.id,
   });
 });
-ipcMain.on('set-pdf-viewer', (event, val) => {
-  mainWindow.webContents.send('set-pdf-viewer', {
+ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-pdf-viewer', {
     val,
     webContentsId: event.sender.id,
   });
 });
-ipcMain.on('set-tab-config', (event, val) => {
-  mainWindow.webContents.send('set-tab-config', {
+ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-tab-config', {
     val,
     webContentsId: event.sender.id,
   });
 });
-ipcMain.on('set-lang', (event, val) => {
-  mainWindow.webContents.send('request-permission', {
+ipcMain.on('set-lang', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('request-permission', {
     webContentsId: event.sender.id,
     permission: 'setLanguage',
     lang: val.lang,
   });
-  ipcMain.once(`response-permission-${event.sender.id}`, (event, data) => {
+  ipcMain.once(`response-permission-${event.sender.id}`, (event: Electron.Event, data) => {
     if (data.accept) {
-      mainWindow.webContents.send('set-lang', {
+      mainWindow!.webContents.send('set-lang', {
         val,
         webContentsId: event.sender.id,
       });
@@ -428,27 +440,27 @@ ipcMain.on('set-lang', (event, val) => {
     }
   });
 });
-ipcMain.on('set-downloads', (event, val) => {
-  mainWindow.webContents.send('set-downloads', {
+ipcMain.on('set-downloads', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-downloads', {
     val,
     webContentsId: event.sender.id,
   });
 });
-ipcMain.on('set-history', (event, val) => {
-  mainWindow.webContents.send('set-history', {
+ipcMain.on('set-history', (event: Electron.Event, val) => {
+  mainWindow!.webContents.send('set-history', {
     val,
     webContentsId: event.sender.id,
   });
 });
 
-let online = true;
-ipcMain.on('online-status-changed', (event, status) => {
+globalObjet.online = true;
+ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
   if (status) {
-    if (online === false && status === true) {
-      online = true;
-      mainWindow.webContents.send('reload');
+    if (globalObjet.online === false && status === true) {
+      globalObjet.online = true;
+      mainWindow!.webContents.send('reload');
     }
   } else {
-    online = false;
+    globalObjet.online = false;
   }
 });

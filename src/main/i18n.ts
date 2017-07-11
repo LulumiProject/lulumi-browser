@@ -23,10 +23,9 @@ if (process.env.NODE_ENV === 'development') {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
 
-let lang = null;
+let lang: string = '';
 try {
-  lang = readFileSync(langPath, 'utf-8');
-// eslint-disable-next-line no-empty
+  lang = readFileSync(langPath, 'utf8');
 } catch (event) {
   lang = '"en"';
 }
@@ -34,7 +33,6 @@ lang = JSON.parse(lang);
 
 Vue.use(VueI18n);
 
-// eslint-disable-next-line camelcase
 export default new VueI18n({
   locale: lang,
   messages: {

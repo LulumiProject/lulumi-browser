@@ -2,12 +2,44 @@
 declare module '*.vue' {
   import Vue from 'vue';
   export default Vue;
-};
+}
+
+// lulumi:// scheme
+interface LulumiObject extends Object {
+  lulumi: object[];
+  preferences: string[][];
+  about: string[][];
+}
 
 // extension api
+interface BackgroundPageObject {
+  html: string;
+  name: string;
+  webContentsId: number;
+}
+interface BackgroundPages {
+  [index: string]: BackgroundPageObject;
+}
+interface ManifestObject extends chrome.runtime.Manifest {
+  extensionId: string;
+  manifest_version?: string;
+  version?: string;
+}
+interface ManifestMap {
+  [index: string]: ManifestObject
+}
+interface ManifestNameMap {
+  [index: string]: ManifestObject
+}
 interface GlobalObject extends NodeJS.Global {
+  online: boolean;
   wid: number;
+  __static: string;
   renderProcessPreferences: Array<any>;
+  backgroundPages: BackgroundPages;
+  manifestMap: ManifestMap;
+  manifestNameMap: ManifestNameMap;
+  guestData: LulumiObject;
 }
 interface CustomBrowserWindow extends Electron.BrowserWindow {
   addExtension(srcDirectory: string): void;

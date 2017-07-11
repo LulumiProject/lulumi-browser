@@ -6,14 +6,14 @@ const lulumiRootPath = process.env.NODE_ENV === 'development'
 const lulumiHelperPath = path.resolve(lulumiRootPath, './helper');
 
 export default {
+  lulumiRootPath,
+  lulumiHelperPath,
   devUserData: `${lulumiRootPath}/userData`,
   testUserData: `${lulumiRootPath}/test/userData`,
   lulumiPagesCustomProtocol: 'lulumi://',
-  lulumiRootPath,
-  lulumiHelperPath,
   lulumiApiPath: `${lulumiHelperPath}/api`,
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: '67dba1f16f4d1b5cc805e3953676ee44b19b6045',
+  lulumiRev: '5f945cf7c402940562bd4fbbfee2c83a53172814',
 };

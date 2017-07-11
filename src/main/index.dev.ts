@@ -5,7 +5,7 @@
  *  environment.
  */
 
-/* eslint-disable */
+/* tslint:disable:no-console */
 
 // Set environment for development
 process.env.NODE_ENV = 'development';
@@ -17,7 +17,7 @@ require('electron-debug')({ showDevTools: true });
 require('electron').app.on('ready', () => {
   const installExtension = require('electron-devtools-installer');
   installExtension.default(installExtension.VUEJS_DEVTOOLS)
-    .then(() => {})
+    .then(() => { })
     .catch((err) => {
       console.log('Unable to install `vue-devtools`: \n', err);
     });
