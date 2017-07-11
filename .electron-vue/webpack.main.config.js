@@ -69,7 +69,8 @@ let mainConfig = {
     path: path.join(__dirname, '../dist')
   },
   plugins: [
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.optimize.ModuleConcatenationPlugin()
   ],
   resolve: {
     alias: {
