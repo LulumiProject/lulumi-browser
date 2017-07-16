@@ -6,6 +6,7 @@
     "target": "es5",
     "noImplicitAny": false,
     "removeComments": false,
+    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
     "noImplicitReturns": true,
