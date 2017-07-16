@@ -23,7 +23,7 @@
         :placeholder="$t('navbar.placeholder')",
         :fetch-suggestions="querySearch",
         v-focus="focused",
-        :value="showLocation(page.location)",
+        :value="value",
         popper-class="my-autocomplete",
         custom-item="url-suggestion")
         el-button(slot="prepend")
@@ -235,6 +235,7 @@
     @Watch('location')
     onLocation(newLocation: string): void {
       if (process.env.NODE_ENV !== 'testing') {
+        this.showLocation(newLocation);
         const currentLocation = url.parse(newLocation, true);
         const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
         const newElement = document.getElementById('securityLocation');
@@ -288,14 +289,15 @@
       });
       return results;
     }
-    showLocation(location: string): string {
+    showLocation(location: string): void {
       if (location === undefined || location.startsWith('lulumi-extension')) {
-        return '';
+        this.value = '';
+        return;
       }
       let newLocation = decodeURIComponent(location);
       newLocation = urlUtil.getLocationIfError(newLocation);
       newLocation = urlUtil.getLocationIfPDF(newLocation);
-      return urlUtil.getLocationIfAbout(newLocation).url;
+      this.value = urlUtil.getLocationIfAbout(newLocation).url;
     }
     onGoBackMouseDown(): void {
       this.handler = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);

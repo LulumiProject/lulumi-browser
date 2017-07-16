@@ -1,7 +1,9 @@
 {
+  "compilerOptions": {
+    "experimentalDecorators": true
+  },
   "include": [
-    "./src/**/*",
-    "./helper/**/*"
+    "./src/**/*"
   ],
   "exclude":[
     "./src/typings/*"

@@ -76,7 +76,7 @@ let mainConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.js', '.vue', '.json']
   },
   target: 'electron-main'
 }

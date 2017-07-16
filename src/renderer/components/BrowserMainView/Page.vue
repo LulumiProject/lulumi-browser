@@ -130,6 +130,7 @@
       const webview = this.$refs.webview as Electron.WebviewTag;
       const webviewEvents = {
         'load-commit': 'onLoadCommit',
+        'did-frame-finish-load': 'onDidFrameFinishLoad',
         'did-start-loading': 'onDidStartLoading',
         'did-stop-loading': 'onDidStopLoading',
         'did-finish-load': 'onDidFinishLoad',

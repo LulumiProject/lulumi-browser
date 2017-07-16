@@ -7,7 +7,6 @@
     "noImplicitAny": false,
     "removeComments": false,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "sourceMap": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

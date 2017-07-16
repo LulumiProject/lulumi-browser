@@ -163,7 +163,7 @@ let rendererConfig = {
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.ts', '.js', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
   target: 'electron-renderer'
 }
@@ -307,7 +307,7 @@ let aboutConfig = {
       'i18n': path.join(__dirname, '../helper/i18n'),
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['.ts', '.js', '.json', '.css', '.less', '.pug']
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
   target: 'web'
 }

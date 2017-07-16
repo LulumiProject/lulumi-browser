@@ -133,6 +133,60 @@ const mutations = {
     state.currentPageIndex = pageIndex;
   },
   // page handlers
+  [types.DID_FRAME_FINISH_LOAD](state, payload) {
+    const webview: Electron.WebviewTag = payload.webview;
+    const pageIndex: number = payload.pageIndex;
+    const url: string = webview.getURL();
+    const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
+
+    if (url !== '') {
+      state.pages[pageIndex].location = decodeURIComponent(url);
+      if (url.match(regexp)) {
+        if (url.match(regexp)![1] === undefined) {
+          const guestUrl = require('url').parse(url);
+          const guestHash = guestUrl.hash.substr(2);
+          state.pages[pageIndex].title
+            = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+        } else {
+          state.pages[pageIndex].statusText = false;
+          state.pages[pageIndex].canGoBack = webview.canGoBack();
+          state.pages[pageIndex].canGoForward = webview.canGoForward();
+          state.pages[pageIndex].isLoading = false;
+        }
+        state.pages[pageIndex].favicon = config.tabConfig.lulumiFavicon;
+      } else {
+        if (state.pages[pageIndex].title === '') {
+          state.pages[pageIndex].title = state.pages[pageIndex].location;
+        }
+        // history
+        if (state.pages[pageIndex].title !== 'error') {
+          if (state.history.length !== 0) {
+            if (state.history[state.history.length - 1].url
+              !== state.pages[pageIndex].location) {
+              const date = timeUtil.getLocaleCurrentTime();
+              state.history.unshift({
+                title: state.pages[pageIndex].title,
+                url: state.pages[pageIndex].location,
+                favicon: config.tabConfig.defaultFavicon,
+                label: date.split(' ')[0],
+                time: date.split(' ')[1],
+              });
+            }
+          } else {
+            const date = timeUtil.getLocaleCurrentTime();
+            state.history.unshift({
+              title: state.pages[pageIndex].title,
+              url: state.pages[pageIndex].location,
+              favicon: config.tabConfig.defaultFavicon,
+              label: date.split(' ')[0],
+              time: date.split(' ')[1],
+            });
+          }
+        }
+      }
+      state.pages[pageIndex].isLoading = false;
+    }
+  },
   [types.DID_START_LOADING](state, payload) {
     const url: string = payload.webview.getURL();
     state.pages[payload.pageIndex].location = decodeURIComponent(url);
@@ -146,36 +200,29 @@ const mutations = {
     state.pages[payload.pageIndex].canRefresh = true;
   },
   [types.DID_STOP_LOADING](state, payload) {
+    const webview: Electron.WebviewTag = payload.webview;
+    const pageIndex: number = payload.pageIndex;
+    const url: string = webview.getURL();
     const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
-    const url: string = payload.webview.getURL();
+
     if (url !== null) {
-      state.pages[payload.pageIndex].location = decodeURIComponent(url);
-      if (url.match(regexp)) {
-        if (url.match(regexp)![1] === undefined) {
-          const guestUrl = require('url').parse(url);
-          const guestHash = guestUrl.hash.substr(2);
-          state.pages[payload.pageIndex].title
-            = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
-          state.pages[payload.pageIndex].location = decodeURIComponent(url);
-        } else {
-          state.pages[payload.pageIndex].statusText = false;
-          state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
-          state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-          state.pages[payload.pageIndex].isLoading = false;
+      if (!url.match(regexp)) {
+        if (!state.pages[pageIndex].favicon) {
+          state.pages[pageIndex].favicon = config.tabConfig.defaultFavicon;
         }
-        state.pages[payload.pageIndex].favicon = config.tabConfig.lulumiFavicon;
-      } else {
-        if (!state.pages[payload.pageIndex].title) {
-          state.pages[payload.pageIndex].title = state.pages[payload.pageIndex].location;
-        }
-        if (!state.pages[payload.pageIndex].favicon) {
-          state.pages[payload.pageIndex].favicon = config.tabConfig.defaultFavicon;
+        // update favicon of the certain history
+        if (state.pages[pageIndex].title !== 'error') {
+          for (let i = 0; i < ((state.history.length < 10) ? state.history.length : 10); i += 1) {
+            if (state.history[i].url === decodeURIComponent(url)) {
+              state.history[i].favicon = state.pages[pageIndex].favicon;
+            }
+          }
         }
       }
-      state.pages[payload.pageIndex].statusText = false;
-      state.pages[payload.pageIndex].canGoBack = payload.webview.canGoBack();
-      state.pages[payload.pageIndex].canGoForward = payload.webview.canGoForward();
-      state.pages[payload.pageIndex].isLoading = false;
+      state.pages[pageIndex].statusText = false;
+      state.pages[pageIndex].canGoBack = webview.canGoBack();
+      state.pages[pageIndex].canGoForward = webview.canGoForward();
+      state.pages[pageIndex].isLoading = false;
     }
   },
   [types.DID_FAIL_LOAD](state, payload) {
@@ -185,36 +232,8 @@ const mutations = {
     }
   },
   [types.PAGE_TITLE_SET](state, payload) {
-    const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
-    const url: string = state.pages[payload.pageIndex].location;
-    state.pages[payload.pageIndex].title = payload.webview.getTitle();
-    if (!url.match(regexp)) {
-      // history
-      if (state.pages[payload.pageIndex].title !== 'error') {
-        if (state.history.length !== 0) {
-          if (state.history[state.history.length - 1].url
-            !== state.pages[payload.pageIndex].location) {
-            const date = timeUtil.getLocaleCurrentTime();
-            state.history.unshift({
-              title: state.pages[payload.pageIndex].title,
-              url: state.pages[payload.pageIndex].location,
-              favicon: state.pages[payload.pageIndex].favicon,
-              label: date.split(' ')[0],
-              time: date.split(' ')[1],
-            });
-          }
-        } else {
-          const date = timeUtil.getLocaleCurrentTime();
-          state.history.unshift({
-            title: state.pages[payload.pageIndex].title,
-            url: state.pages[payload.pageIndex].location,
-            favicon: state.pages[payload.pageIndex].favicon,
-            label: date.split(' ')[0],
-            time: date.split(' ')[1],
-          });
-        }
-      }
-    }
+    const webview: Electron.WebviewTag = payload.webview;
+    state.pages[payload.pageIndex].title = webview.getTitle();
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     state.pages[payload.pageIndex].statusText

@@ -24,13 +24,15 @@ if (process.env.NODE_ENV !== 'development') {
 let mainWindow: Electron.BrowserWindow | null;
 
 let shuttingDown: boolean = process.env.BABEL_ENV === 'test';
-const storagePath: string = process.env.NODE_ENV === 'development'
-  ? path.join(config.devUserData, 'lulumi-app-state')
-  : path.join(app.getPath('userData'), 'app-state');
-let appStateSaveHandler: any = null;
 
-let setLanguage: boolean = false;
-
+let storagePath: string;
+if (process.env.NODE_ENV === 'development') {
+  storagePath = path.join(config.devUserData, 'lulumi-app-state');
+} else if (process.env.BABEL_ENV === 'test') {
+  storagePath = path.join(config.testUserData, 'lulumi-app-state');
+} else {
+  storagePath = path.join(app.getPath('userData'), 'app-state');
+}
 let langPath: string;
 if (process.env.NODE_ENV === 'development') {
   langPath = path.join(config.devUserData, 'lulumi-lang');
@@ -39,6 +41,9 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
+
+let appStateSaveHandler: any = null;
+let setLanguage: boolean = false;
 
 const isDarwin: boolean = process.platform === 'darwin';
 const isWindows: boolean = process.platform === 'win32';
@@ -143,7 +148,7 @@ function createWindow(): void {
 
   ipcMain.on('request-app-state', () => {
     new Promise((resolve, reject) => {
-      let data: string = '';
+      let data: string = '""';
       try {
         data = readFileSync(storagePath, 'utf8');
       } catch (event) { }
@@ -152,14 +157,12 @@ function createWindow(): void {
         data = JSON.parse(data);
         resolve(data);
       } catch (event) {
-        if (data) {
-          reject();
-          console.log(`could not parse data: ${data}, ${event}`);
-        }
+        reject();
+        console.error(`could not parse data from ${storagePath}, ${event}`);
       }
     }).then((data) => {
       mainWindow!.webContents.send('set-app-state', data);
-    }).catch(() => console.log('request-app-state error'));
+    }).catch(() => console.error('request-app-state error'));
   });
 
   // save app-state every 5 mins

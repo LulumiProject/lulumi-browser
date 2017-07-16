@@ -209,6 +209,21 @@
       this.contextMenus[`'${webContentsId}'`] = [menuItems];
     }
     // pageHandlers
+    onLoadCommit(event: Electron.LoadCommitEvent, pageIndex: number): void {
+      if (event.isMainFrame) {
+        const navbar = this.$refs.navbar;
+        (navbar as any).showLocation(event.url);
+      }
+    }
+    onDidFrameFinishLoad(event: Electron.DidFrameFinishLoadEvent, pageIndex: number): void {
+      if (event.isMainFrame) {
+        const webview = this.getWebView(pageIndex);
+        this.$store.dispatch('didFrameFinishLoad', {
+          pageIndex,
+          webview,
+        });
+      }
+    }
     onDidStartLoading(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('didStartLoading', {
@@ -1160,7 +1175,7 @@
 
       webFrame.setVisualZoomLevelLimits(1, 1);
       ipc.on('set-app-state', (event, newState) => {
-        if (newState && Object.keys(newState).length !== 0) {
+        if (newState && newState.pages.length !== 0) {
           this.$store.dispatch('setAppState', newState);
         } else {
           this.onNewTab('about:newtab');

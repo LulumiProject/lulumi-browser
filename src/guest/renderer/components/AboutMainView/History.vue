@@ -150,25 +150,27 @@
     width: 100vw;
   }
   a.history-list__item-link {
+    flex: 5;
     background-size: 0;
+    padding-right: 100px;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: 50%;
   }
   a.history-list__item-link:hover {
     color: green;
   }
   .history-list__item-time {
+    width: 50px;
     color: gray;
     padding-right: 30px;
   }
   .history-list__item-name {
+    width: 400px;
     color: #48576a;
     padding: 0 4px;
     transition: color .3s;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 300px;
   }
 </style>

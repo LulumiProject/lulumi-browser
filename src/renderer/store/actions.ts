@@ -15,6 +15,9 @@ export const actions = {
     commit(types.CLICK_TAB, pageIndex);
   },
 
+  didFrameFinishLoad({ commit }, payload) {
+    commit(types.DID_FRAME_FINISH_LOAD, payload);
+  },
   didStartLoading({ commit }, payload) {
     commit(types.DID_START_LOADING, payload);
   },
