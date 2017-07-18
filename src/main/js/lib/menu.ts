@@ -1,7 +1,8 @@
+import { api } from 'lulumi';
 import { Menu, BrowserWindow } from 'electron';
 import i18n from '../../i18n';
 
-const globalObjet = global as GlobalObject;
+const globalObjet = global as api.GlobalObject;
 
 const getTemplate = () => {
   const template = [

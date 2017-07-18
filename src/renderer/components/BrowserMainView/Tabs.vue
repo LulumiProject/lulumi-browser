@@ -43,22 +43,7 @@
 
   import BrowserMainView from '../BrowserMainView.vue';
 
-  interface PageObject {
-    pid: number;
-    location: string;
-    statusText: boolean;
-    favicon: string | null;
-    title: string | null;
-    isLoading: boolean;
-    isSearching: boolean;
-    canGoBack: boolean;
-    canGoForward: boolean;
-    canRefresh: boolean;
-    error: boolean;
-    hasMedia: boolean;
-    isAudioMuted: boolean;
-    pageActionMapping: object;
-  }
+  import { store } from 'lulumi';
 
   declare const __static: string;
 
@@ -89,7 +74,7 @@
   export default class Tabs extends Vue {
     sortable: any;
 
-    get pages(): Array<PageObject> {
+    get pages(): Array<store.PageObject> {
       return this.$store.getters.pages;
     }
     get currentPageIndex(): number {

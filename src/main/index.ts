@@ -9,9 +9,11 @@ import config from './js/constants/config';
 import promisify from './js/lib/promisify';
 import * as lulumiExtension from '../api/lulumi-extension';
 
+import { api, scheme } from 'lulumi';
+
 /* tslint:disable:no-console */
 
-const globalObjet = global as GlobalObject;
+const globalObjet = global as api.GlobalObject;
 
 /**
  * Set `__static` path to static files in production
@@ -73,6 +75,7 @@ function createWindow(): void {
     minWidth: 320,
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
+    fullscreenWindowTitle: true,
     autoHideMenuBar: autoHideMenuBarSetting,
     frame: !isWindows,
   });
@@ -284,7 +287,7 @@ ipcMain.on('open-item', (event, path) => {
 
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type: string = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
-  const data: LulumiObject = {} as LulumiObject;
+  const data: scheme.LulumiObject = {} as scheme.LulumiObject;
   if (type === 'about') {
     const versions = process.versions;
 

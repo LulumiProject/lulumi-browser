@@ -22,33 +22,7 @@
 
   import Notification from './Notification.vue';
 
-  interface PageObject {
-    pid: number;
-    location: string;
-    statusText: boolean;
-    favicon: string | null;
-    title: string | null;
-    isLoading: boolean;
-    isSearching: boolean;
-    canGoBack: boolean;
-    canGoForward: boolean;
-    canRefresh: boolean;
-    error: boolean;
-    hasMedia: boolean;
-    isAudioMuted: boolean;
-    pageActionMapping: object;
-  }
-  interface FindInPageObject {
-    container?: HTMLElement;
-    input: HTMLElement;
-    counter: HTMLElement;
-    previous: HTMLElement;
-    next: HTMLElement;
-    endButton: HTMLElement;
-    activeWebview: Electron.WebviewTag;
-    start(): void;
-    end(): void;
-  }
+  import { page, store } from 'lulumi';
 
   @Component({
     props: [
@@ -60,7 +34,7 @@
     },
   })
   export default class Page extends Vue {
-    dummyPageObject: PageObject = {
+    dummyPageObject: store.PageObject = {
       pid: -1,
       location: '',
       statusText: false,
@@ -84,10 +58,10 @@
     isActive: boolean;
     pageIndex: number;
 
-    findinpage: FindInPageObject;
+    findinpage: page.FindInPageObject;
     
-    get page(): PageObject {
-      const page: PageObject = this.$store.getters.pages[this.pageIndex];
+    get page(): store.PageObject {
+      const page: store.PageObject = this.$store.getters.pages[this.pageIndex];
       if (typeof page === 'undefined') {
         return this.dummyPageObject;
       }

@@ -1,3 +1,4 @@
+import { api } from 'lulumi';
 import { app, BrowserWindow, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
@@ -12,15 +13,15 @@ import './extensions/listeners';
 /* tslint:disable:no-console */
 /* tslint:disable:max-line-length */
 
-const globalObjet = global as GlobalObject;
+const globalObjet = global as api.GlobalObject;
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
 globalObjet.renderProcessPreferences = [];
 // extensionId => manifest
-const manifestMap: ManifestMap = {};
+const manifestMap: api.ManifestMap = {};
 // name => manifest
-const manifestNameMap: ManifestNameMap = {};
+const manifestNameMap: api.ManifestNameMap = {};
 
 const generateExtensionIdFromName = name => punycode.toASCII(name).replace(/[\W_]+/g, '-').toLowerCase();
 
@@ -30,9 +31,9 @@ const isWindowOrWebView = (webContents) => {
 };
 
 // Create or get manifest object from |srcDirectory|.
-const getManifestFromPath: (srcDirectory: string) => ManifestObject | null =
-  (srcDirectory: string): ManifestObject | null => {
-    let manifest: ManifestObject;
+const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
+  (srcDirectory: string): api.ManifestObject | null => {
+    let manifest: api.ManifestObject;
     let manifestContent: string;
 
     try {
@@ -74,9 +75,9 @@ const getManifestFromPath: (srcDirectory: string) => ManifestObject | null =
   };
 
 // manage the background pages
-const backgroundPages: BackgroundPages = {};
+const backgroundPages: api.BackgroundPages = {};
 
-const startBackgroundPages = (manifest: ManifestObject) => {
+const startBackgroundPages = (manifest: api.ManifestObject) => {
   if (backgroundPages[manifest.extensionId] || !manifest.background) {
     return;
   }

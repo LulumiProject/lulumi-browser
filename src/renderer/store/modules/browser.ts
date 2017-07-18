@@ -1,9 +1,10 @@
 import * as types from '../mutation-types';
 import config from '../../js/constants/config';
 import urlUtil from '../../js/lib/url-util';
+import { store } from 'lulumi';
 import timeUtil from '../../js/lib/time-util';
 
-const state: State = {
+const state: store.State = {
   pid: 0,
   pages: [],
   tabsOrder: [],
@@ -21,7 +22,7 @@ const state: State = {
   lastOpenedTabs: [],
 };
 
-function createPageObject(url: string | null = null): PageObject {
+function createPageObject(url: string | null = null): store.PageObject {
   return {
     pid: 0,
     location: url || state.tabConfig.defaultUrl,

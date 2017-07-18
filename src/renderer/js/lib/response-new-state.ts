@@ -1,7 +1,10 @@
 import { ipcRenderer } from 'electron';
+import { store } from 'lulumi';
+
+/* tslint:disable:max-line-length */
 
 export default
-  (getters, newStart: number, newPages: PageObjectList, newCurrentPageIndex: number, downloads) => {
+  (getters, newStart: number, newPages: store.PageObjectList, newCurrentPageIndex: number, downloads) => {
     ipcRenderer.send('response-app-state', {
       ready: true,
       newState: {

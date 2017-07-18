@@ -1,6 +1,7 @@
+import { api } from 'lulumi';
 import { BrowserWindow, dialog, ipcMain, webContents } from 'electron';
 
-const globalObjet = global as GlobalObject;
+const globalObjet = global as api.GlobalObject;
 
 ipcMain.on('open-dev-tools', (event, webContentsId) => {
   if (webContentsId) {

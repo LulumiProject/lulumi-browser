@@ -1,6 +1,7 @@
 import fetchJsonp from 'fetch-jsonp';
+import { renderer } from 'lulumi';
 
-export default (provider: string, autocomplete: string, results: SuggestionObject[]) => {
+export default (provider: string, autocomplete: string, results: renderer.SuggestionObject[]) => {
   if (provider === 'Google') {
     fetchJsonp(autocomplete)
       .then(response => response.json())

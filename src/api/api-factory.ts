@@ -1,4 +1,5 @@
 import Event from './extensions/event';
+import { store } from 'lulumi';
 import Tab from './extensions/tab';
 
 /* tslint:disable:max-line-length */
@@ -12,7 +13,7 @@ function findOrCreate(tabId: number, vueInstance: any) {
   if (tab === undefined) {
     tab = new Tab(tabId);
 
-    const object: PageObject = vueInstance.getPageObject(tabId);
+    const object: store.PageObject = vueInstance.getPageObject(tabId);
     if (object) {
       tab.update(object.location, object.title, object.favicon);
       tabArray[tab.id] = tab;

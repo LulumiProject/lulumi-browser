@@ -1,11 +1,7 @@
-interface SuggestionObject {
-  title: string;
-  value: string;
-  icon: string;
-}
+import { renderer } from 'lulumi';
 
 // Top 500 alexa sites sorted by popularity
-const recommendTopSite: SuggestionObject[] = [
+const recommendTopSite: renderer.SuggestionObject[] = [
   {
     title: 'Gmail',
     value: 'gmail.com',

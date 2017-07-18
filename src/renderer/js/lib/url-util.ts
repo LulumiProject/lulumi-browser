@@ -1,4 +1,5 @@
 import config from '../constants/config';
+import { renderer } from 'lulumi';
 
 // characters, then : with optional //
 const rscheme: RegExp = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
@@ -282,7 +283,7 @@ const urlUtil = {
    * @param {string} url
    * @return {object}
    */
-  getLocationIfAbout(url: string): AboutLocationObject {
+  getLocationIfAbout(url: string): renderer.AboutLocationObject {
     if (url.startsWith(config.lulumiPagesCustomProtocol)) {
       const guestUrl = require('url').parse(url);
       const guestHash = guestUrl.hash.substr(2);

@@ -35,7 +35,7 @@
             span {{ $t('navbar.indicator.insecure') }}
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
-          :key="extension")
+          :key="extension.extensionId")
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
           img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                         :src="loadIcon(extension)",
@@ -82,32 +82,7 @@
 
   import BrowserMainView from '../BrowserMainView.vue';
 
-  interface PageObject {
-    pid: number;
-    location: string;
-    statusText: boolean;
-    favicon: string | null;
-    title: string | null;
-    isLoading: boolean;
-    isSearching: boolean;
-    canGoBack: boolean;
-    canGoForward: boolean;
-    canRefresh: boolean;
-    error: boolean;
-    hasMedia: boolean;
-    isAudioMuted: boolean;
-    pageActionMapping: object;
-  }
-  interface SearchEngineObject {
-    name: string;
-    search: string;
-    autocomplete: string;
-  }
-  interface SuggestionObject {
-    title?: string;
-    value: string;
-    icon: string;
-  }
+  import { renderer, store } from 'lulumi';
 
   Vue.component('url-suggestion', {
     functional: true,
@@ -160,7 +135,7 @@
     },
   })
   export default class Navbar extends Vue {
-    dummyPageObject: PageObject = {
+    dummyPageObject: store.PageObject = {
       pid: -1,
       location: '',
       statusText: false,
@@ -182,12 +157,12 @@
     secure: boolean = false;
     focused: boolean = false;
     value: string = '';
-    suggestions: Array<SuggestionObject> = recommendTopSite;
+    suggestions: Array<renderer.SuggestionObject> = recommendTopSite;
     extensions: any[] = [];
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
     
-    get page(): PageObject {
+    get page(): store.PageObject {
       if (this.$store.getters.pages.length === 0) {
         return this.dummyPageObject;
       }
@@ -208,7 +183,7 @@
       }
       return this.$store.getters.pages[this.$store.getters.currentPageIndex].location;
     }
-    get currentSearchEngine(): SearchEngineObject {
+    get currentSearchEngine(): store.SearchEngineObject {
       return this.$store.getters.currentSearchEngine;
     }
     get fuse(): Fuse {
@@ -327,7 +302,7 @@
       }
     }
     querySearch(queryString: string, cb: Function): void {
-      const suggestions: Array<SuggestionObject> = this.suggestions;
+      const suggestions: Array<renderer.SuggestionObject> = this.suggestions;
       let results =
         queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
       results.push({

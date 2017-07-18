@@ -32,34 +32,7 @@
   import Event from '../../api/extensions/event';
   import Tab from '../../api/extensions/tab';
 
-  interface Alarm {
-    handler: any;
-    periodInMinutes: number;
-  }
-  interface AlarmArray {
-    [index: string]: Alarm;
-  }
-  interface PageObject {
-    pid: number;
-    location: string;
-    statusText: boolean;
-    favicon: string | null;
-    title: string | null;
-    isLoading: boolean;
-    isSearching: boolean;
-    canGoBack: boolean;
-    canGoForward: boolean;
-    canRefresh: boolean;
-    error: boolean;
-    hasMedia: boolean;
-    isAudioMuted: boolean;
-    pageActionMapping: object;
-  }
-  interface LastOpenedTabObject {
-    title?: string;
-    url: string;
-    favicon: string | null;
-  }
+  import { browserMainView, store } from 'lulumi';
 
   @Component({
     name: 'browser-main',
@@ -72,7 +45,7 @@
     },
   })
   export default class BrowserMainView extends Vue {
-    dummyPageObject: PageObject = {
+    dummyPageObject: store.PageObject = {
       pid: -1,
       location: '',
       statusText: false,
@@ -101,7 +74,7 @@
     onUpdatedEvent: Event = new Event();
     onCreatedEvent: Event = new Event();
     onRemovedEvent: Event = new Event();
-    alarms: AlarmArray = {};
+    alarms: browserMainView.AlarmArray = {};
     onActivatedEvent: Event = new Event();
     onAlarmEvent: Event = new Event();
     onBeforeNavigate: Event = new Event();
@@ -110,13 +83,13 @@
     onCompleted: Event = new Event();
     onDOMContentLoaded: Event = new Event();
 
-    get page(): PageObject {
+    get page(): store.PageObject {
       if (this.$store.getters.pages.length === 0) {
         return this.dummyPageObject;
       }
       return this.$store.getters.pages[this.$store.getters.currentPageIndex];
     }
-    get pages(): Array<PageObject> {
+    get pages(): Array<store.PageObject> {
       return this.$store.getters.pages;
     }
     get tabsOrder(): Array<number> {
@@ -140,7 +113,7 @@
       const index: number = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
       return this.$refs[`page-${index}`][0];
     }
-    getPageObject(i?: number): PageObject {
+    getPageObject(i?: number): store.PageObject {
       const index: number = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
       return this.$store.getters.pages[index];
     }
@@ -158,14 +131,14 @@
       });
       return out;
     }
-    lastOpenedTabs(): LastOpenedTabObject[] {
+    lastOpenedTabs(): browserMainView.LastOpenedTabObject[] {
       return this.$store.getters.lastOpenedTabs.slice(0, 8);
     }
     // lulumi.alarms
-    getAlarm(name): Alarm {
+    getAlarm(name): browserMainView.Alarm {
       return this.alarms[name];
     }
-    getAllAlarm(): AlarmArray {
+    getAllAlarm(): browserMainView.AlarmArray {
       return this.alarms;
     }
     clearAlarm(name: string): boolean {
@@ -888,7 +861,7 @@
       const common = document.getElementById('browser-navbar__common');
 
       if (navbar !== null && common !== null) {
-        const lastOpenedTabs: LastOpenedTabObject[] = [];
+        const lastOpenedTabs: store.LastOpenedTabObject[] = [];
         this.lastOpenedTabs().forEach((tab) => {
           lastOpenedTabs.push(new MenuItem({
             label: tab.title,

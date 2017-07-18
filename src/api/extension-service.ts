@@ -649,8 +649,19 @@ export default class ExtensionService {
   update() {
     (this.instance as any).$electron
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
-        this.manifestMap = manifestMap;
-        this.registerAction();
+        if (Object.keys(this.manifestMap).length === 0) {
+          initializeExtensionApi(apiFactory(this.instance)).then((restoreOriginalModuleLoader) => {
+            if (restoreOriginalModuleLoader) {
+              this.triggerOnReady();
+              this.register();
+              this.manifestMap = manifestMap;
+              this.registerAction();
+            }
+          });
+        } else {
+          this.manifestMap = manifestMap;
+          this.registerAction();
+        }
       });
     (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
   }
