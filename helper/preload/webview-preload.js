@@ -13,7 +13,8 @@ const matchesPattern = (pattern) => {
   }
 
   const regexp = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
-  return location.href.match(regexp);
+  const url = `${location.protocol}//${location.host}${location.pathname}`;
+  return url.match(regexp);
 };
 
 // Run the code with lulumi API integrated.
@@ -55,17 +56,7 @@ const runStylesheet = (extensionId, url, code) => {
 // run injected scripts
 // https://developer.chrome.com/extensions/content_scripts
 const injectContentScript = (extensionId, script) => {
-  let flag = false;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const match of script.matches) {
-    if (matchesPattern(match)) {
-      flag = false;
-      break;
-    }
-    flag = true;
-  }
-
-  if (flag) {
+  if (!script.matches.some(matchesPattern)) {
     return;
   }
 
