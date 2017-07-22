@@ -35,8 +35,24 @@ const offlineError = {
 // list: https://code.google.com/p/chromium/codesearch#chromium/src/net/base/net_error_list.h&sq=package:chromium&type=cs
 const errorCodes = {
   '-21': offlineError, // network changed
+  '-100': {
+    name: 'This website is not available',
+    message: 'The connection was closed',
+  },
+  '-101': {
+    name: 'This website is not available',
+    message: 'The connection was reset',
+  },
+  '-102': {
+    name: 'This website is not available',
+    message: 'The connection attempt was refused',
+  },
+  '-103': {
+    name: 'This website is not available',
+    message: 'The connection timed out',
+  },
   '-104': {
-    message: "Min couldn't connect to the website.",
+    message: 'Lulumi-browser couldn\'t connect to the website.',
   },
   '-105': websiteNotFound,
   '-106': offlineError,
