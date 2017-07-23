@@ -15,5 +15,5 @@ export default {
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: '81eb4791abc71379a71af625a83fdd80a0f89794',
+  lulumiRev: '2edeb32952230e95f6e8b54b5dddda1eece124c8',
 };
