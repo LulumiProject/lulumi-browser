@@ -37,13 +37,13 @@
       div.block(v-for="extension in extensions",
           :key="extension.extensionId")
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
-          img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
-                        :src="loadIcon(extension)",
-                        :class="showOrNot(extension)",
-                        :title="showTitle(extension)",
-                        @click.prevent="sendIPC($event, extension)",
-                        @contextmenu.prevent="onContextmenu(extension)",
-                        slot="reference")
+          el-badge.badge(:ref="`badge-${extension.extensionId}`", :value="badgeTextArray[extension.extensionId].text", slot="reference")
+            img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
+                          :src="loadIcon(extension)",
+                          :class="showOrNot(extension)",
+                          :title="showTitle(extension)",
+                          @click.prevent="sendIPC($event, extension)",
+                          @contextmenu.prevent="onContextmenu(extension)")
           webview(:ref="`webview-${extension.extensionId}`")
     .common-group
       a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
@@ -69,12 +69,13 @@
   import Fuse from 'fuse.js';
   import Sortable from 'sortablejs';
 
-  import { Button, Popover } from 'element-ui';
+  import { Badge, Button, Popover } from 'element-ui';
   import IViewIcon from 'iview/src/components/icon';
 
   import Event from '../../../api/extensions/event';
 
   import '../../css/el-autocomplete';
+  import '../../css/el-badge';
   import '../../css/el-input';
   import urlUtil from '../../js/lib/url-util';
   // import urlSuggestion from '../../js/lib/url-suggestion';
@@ -129,6 +130,7 @@
     },
     components: {
       'awesome-icon': AwesomeIcon,
+      'el-badge': Badge,
       'el-button': Button,
       'el-popover': Popover,
       'iview-icon': IViewIcon,
@@ -161,6 +163,7 @@
     extensions: any[] = [];
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
+    badgeTextArray = {};
     
     get page(): store.PageObject {
       if (this.$store.getters.pages.length === 0) {
@@ -333,6 +336,9 @@
     }
     setBrowserActionIcon(extensionId: string, path: string): void {
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+    }
+    setBrowserActionBadgeText(extensionId: string, details): void {
+      (Vue as any).set(this.badgeTextArray, extensionId, details);
     }
     setPageActionIcon(extensionId: string, path: string): void {
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
@@ -612,21 +618,23 @@
         -webkit-user-select: none;
       }
 
-      .extension {
-        width: 16px;
-        padding: 5px;
-        border-radius: 3px;
+      .badge {
+        .extension {
+          width: 16px;
+          padding: 5px;
+          border-radius: 3px;
 
-        &:hover {
-          background-color: rgb(210, 210, 210);
-        }
+          &:hover {
+            background-color: rgb(210, 210, 210);
+          }
 
-        &:active {
-          background-color: rgb(200, 200, 200);
-        }
+          &:active {
+            background-color: rgb(200, 200, 200);
+          }
 
-        &.disabled {
-          opacity: 0.3;
+          &.disabled {
+            opacity: 0.3;
+          }
         }
       }
     }

@@ -138,6 +138,8 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   let storagePath;
   let localStorage;
 
+  const messages = remote.getGlobal('manifestMap')[thisExtensionId].messages;
+
   if (LocalStorage) {
     storagePath = process.env.NODE_ENV === 'development'
       ? path.join(path.resolve('./userData'), 'lulumi-local-storage')
@@ -174,6 +176,10 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-browser-action-set-icon',
         thisExtensionId, lulumi.runtime.getManifest().startPage, details);
+    },
+    setBadgeText: (details) => {
+      ipcRenderer.send('lulumi-browser-action-set-badge-text',
+        thisExtensionId, details);
     },
     onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
@@ -434,17 +440,18 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       if (keys !== null) {
         if (keys.constructor === Object) {
           ks = [];
-          Object.keys(keys).forEach(key => (ks.push(key)));
+          Object.keys(keys).forEach((key) => {
+            ks.push(key);
+            ret[key] = keys[key];
+          });
         } else if (keys.constructor === String) {
           ks = [keys];
         } else if (keys.constructor === Array) {
           ks = keys;
         }
         ks.forEach((key) => {
-            ret[key] = JSON.parse(localStorage.getItem(key));
-            if (ret[key] === null) {
-              ret[key] = undefined;
-            }
+            const tmp = JSON.parse(localStorage.getItem(key));
+            ret[key] = (tmp !== null) ? tmp : ret[key];
         });
       } else {
         localStorage._keys.forEach((key) => {
@@ -642,6 +649,27 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       });
       lulumi.contextMenus.handleMenuItems(null, null);
       ipcRenderer.send('lulumi-context-menus-remove-all', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
+    },
+  };
+
+  lulumi.i18n = {
+    getAcceptLanguages: (callback) => {
+      if (callback) {
+        callback(navigator.languages);
+      }
+    },
+    getMessage: (messageName, substitutions) => {
+      return (typeof messages[messageName] === 'undefined')
+        ? ""
+        : messages[messageName].message;
+    },
+    getUILanguage: () => {
+      return navigator.language;
+    },
+    detectLanguage: (text, callback) => {
+      if (callback) {
+        callback([]); // TODO: wait for electron 1.8.x
+      }
     },
   };
 

@@ -39,6 +39,11 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${details.path}`);
       }
     },
+    setBadgeText: (extensionId: string, details: chrome.browserAction.BadgeTextDetails): void => {
+      if (details.hasOwnProperty('text')) {
+        vueInstance.$refs.navbar.setBrowserActionBadgeText(extensionId, details);
+      }
+    },
     onClicked: (webContentsId: number): Event => {
       let id = vueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {

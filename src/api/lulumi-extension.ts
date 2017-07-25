@@ -55,9 +55,27 @@ const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
     if (!manifestNameMap[manifest.name]) {
       const extensionId = generateExtensionIdFromName(manifest.name);
       manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
+
+      let messages = {};
+      if (manifest.default_locale) {
+        try {
+          messages = JSON.parse(fs.readFileSync(
+            path.join(srcDirectory, '_locales', manifest.default_locale, 'messages.json'), 'utf8'));
+        } catch (readError) {
+          console.warn(`${manifest.name}: Reading messages.json failed.`);
+          console.warn(readError.stack || readError);
+        }
+      }
+      messages = Object.assign({
+        '@@extension_id': { message: extensionId },
+        '@@ui_locale': { message: manifest.default_locale || 'en' },
+        // tslint:disable-next-line:align
+      }, messages);
+
       Object.assign(manifest, {
         srcDirectory,
         extensionId,
+        messages,
         startPage: url.format({
           protocol: 'lulumi-extension',
           slashes: true,

@@ -1,83 +1,82 @@
 import { ipcMain, session } from 'electron';
-import { runInNewContext } from 'vm';
 
 /* tslint:disable:max-line-length */
 
-const webRequestMapping = {
-  onBeforeRequest: {},
-  onBeforeSendHeaders: {},
-  onSendHeaders: {},
-  onHeadersReceived: {},
-  onResponseStarted: {},
-  onBeforeRedirect: {},
-  onCompleted: {},
-  onErrorOccurred: {},
-};
-
-
-const register = (eventName: string, digest: string, filter, func: string): void => {
-  webRequestMapping[eventName][digest] = runInNewContext(`eval(${func})`, {});
+const register = (eventName: string, eventLispCaseName: string, sender: Electron.WebContents, digest: string, filter): void => {
   if (typeof session.defaultSession !== 'undefined') {
+    if (process.env.NODE_ENV === 'development') {
+      filter.urls.push('*://localhost:9080/*');
+    }
     session.defaultSession.webRequest[eventName](filter, (details, callback) => {
-      callback(webRequestMapping[eventName][digest](details));
+      details.type = details.resourceType;
+      details.tabId = 0;
+
+      sender.send(`lulumi-web-request-${eventLispCaseName}-intercepted`, details);
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response`, (event: Electron.Event, response) => {
+        if (response) {
+          callback(response);
+        } else {
+          callback({ cancel: false });
+        }
+      });
     });
   }
 };
 
-const unregister = (eventName: string): void => {
+const unregister = (eventName: string, eventLispCaseName: string, sender: Electron.WebContents): void => {
   if (typeof session.defaultSession !== 'undefined') {
     session.defaultSession.webRequest[eventName]({}, null);
   }
 };
 
 const webRequest = () => {
-  ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onBeforeRequest', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onBeforeRequest', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-before-request', (): void => {
-    unregister('onBeforeRequest');
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-request', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onBeforeRequest', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-before-send-headers', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onBeforeSendHeaders', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-before-send-headers', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onBeforeSendHeaders', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-before-send-headers', (): void => {
-    unregister('onBeforeSendHeaders');
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-send-headers', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onBeforeSendHeaders', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-send-headers', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onSendHeaders', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-send-headers', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onSendHeaders', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-send-headers', (): void => {
-    unregister('onSendHeaders');
+  ipcMain.on('lulumi-web-request-remove-listener-on-send-headers', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onSendHeaders', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-headers-received', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onHeadersReceived', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-headers-received', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onHeadersReceived', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-headers-received', (): void => {
-    unregister('onHeadersReceived');
+  ipcMain.on('lulumi-web-request-remove-listener-on-headers-received', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onHeadersReceived', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-response-started', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onResponseStarted', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-response-started', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onResponseStarted', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-response-started', (): void => {
-    unregister('onResponseStarted');
+  ipcMain.on('lulumi-web-request-remove-listener-on-response-started', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onResponseStarted', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-before-redirect', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onBeforeRedirect', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-before-redirect', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onBeforeRedirect', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-before-redirect', (): void => {
-    unregister('onBeforeRedirect');
+  ipcMain.on('lulumi-web-request-remove-listener-on-before-redirect', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onBeforeRedirect', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-completed', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onCompleted', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-completed', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onCompleted', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-completed', (): void => {
-    unregister('onCompleted');
+  ipcMain.on('lulumi-web-request-remove-listener-on-completed', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onCompleted', eventLispCaseName, event.sender);
   });
-  ipcMain.on('lulumi-web-request-add-listener-on-error-occurred', (event: Electron.Event, digest: string, filter, func: string): void => {
-    register('onErrorOccurred', digest, filter, func);
+  ipcMain.on('lulumi-web-request-add-listener-on-error-occurred', (event: Electron.Event, eventLispCaseName: string, digest: string, filter): void => {
+    register('onErrorOccurred', eventLispCaseName, event.sender, digest, filter);
   });
-  ipcMain.on('lulumi-web-request-remove-listener-on-error-occurred', (): void => {
-    unregister('onErrorOccurred');
+  ipcMain.on('lulumi-web-request-remove-listener-on-error-occurred', (event: Electron.Event, eventLispCaseName: string): void => {
+    unregister('onErrorOccurred', eventLispCaseName, event.sender);
   });
 };
 

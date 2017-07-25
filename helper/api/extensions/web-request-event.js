@@ -26,7 +26,10 @@ class Event {
   addListener(callback, filter = {}, opt_extraInfoSpec = []) {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
-    ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, digest, filter, callback.toString());
+    ipcRenderer.on(`lulumi-${this.scope}-${this.event}-intercepted`, (event, details) => {
+      ipcRenderer.send(`lulumi-${this.scope}-${this.event}-response`, callback(details));
+    })
+    ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, this.event, digest, filter);
   }
 
   removeListener(callback) {
@@ -34,8 +37,9 @@ class Event {
     const index = this.listeners.indexOf(digest);
     if (index !== -1) {
       this.listeners.splice(index, 1);
+      ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted`);
     }
-    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`);
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event);
   }
 }
 

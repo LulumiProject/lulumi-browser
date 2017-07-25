@@ -60,7 +60,9 @@ class Port {
   }
 
   postMessage (message) {
-    remote.webContents.fromId(this.webContentsId).send(`lulumi-runtime-port-${this.extensionId}`, message);
+    process.nextTick(() => {
+      remote.webContents.fromId(this.webContentsId).send(`lulumi-runtime-port-${this.extensionId}`, message);
+    });
   }
 
   _onDisconnect () {
