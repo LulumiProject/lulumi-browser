@@ -33,7 +33,8 @@ class Port {
 
   _init() {
     ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}`, (event, message) => {
-      this.onMessage.emit(message);
+      // https://developer.chrome.com/extensions/runtime#property-Port-onMessage
+      this.onMessage.emit(message, this);
     });
     if (this.responseScriptType) {
       remote.webContents.fromId(this.webContentsId).send('lulumi-runtime-before-connect', this.extensionId, this.connectInfo, this.scriptType);
@@ -68,7 +69,8 @@ class Port {
   _onDisconnect () {
     this.disconnected = true;
     ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}`);
-    this.onDisconnect.emit();
+    // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
+    this.onDisconnect.emit(this);
   }
 }
 

@@ -325,9 +325,9 @@
       this.onNewTab(event.url, true);
       if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
         this.onCreatedNavigationTarget.emit({
-          sourceFrameId: 0,
-          parentFrameId: -1,
+          sourceTabId: pageIndex,
           sourceProcessId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
+          sourceFrameId: 0,
           timeStamp: Date.now(),
           url: event.url,
           tabId: this.pages.length - 1,
@@ -499,12 +499,11 @@
       });
       this.getPage(pageIndex).onMessageEvent.listeners = [];
       this.onBeforeNavigate.emit({
+        tabId: pageIndex,
+        url: event.url,
         frameId: 0,
         parentFrameId: -1,
-        processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: pageIndex,
         timeStamp: Date.now(),
-        url: event.url,
       });
     }
     onDidNavigate(event: Electron.DidNavigateEvent, pageIndex: number): void {
