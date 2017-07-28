@@ -533,11 +533,13 @@
         extension.click();
       });
 
-      ipc.on('add-extension-result', () => {
-        (this.$parent as BrowserMainView).extensionService.update();
-        this.$forceUpdate();
+      ipc.on('add-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
+        if (result === 'OK') {
+          (this.$parent as BrowserMainView).extensionService.update();
+          this.$forceUpdate();
+        }
       });
-      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, result: string) => {
+      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
         if (result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();

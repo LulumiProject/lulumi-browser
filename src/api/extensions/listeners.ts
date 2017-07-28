@@ -12,25 +12,30 @@ ipcMain.on('add-extension', (event) => {
   const window = BrowserWindow.fromId(globalObjet.wid);
   dialog.showOpenDialog({ properties: ['openDirectory'] }, (dirs) => {
     if (dirs) {
-      // an array of diretory paths chosen by the user will be returned, but we only want one path
-      (BrowserWindow as any).addExtension(dirs[0]);
+      let result: string = 'OK';
+      try {
+        // an array of diretory paths chosen by the user will be returned, but we only want one path
+        (BrowserWindow as any).addExtension(dirs[0]);
+      } catch (readError) {
+        result = readError.message;
+      }
 
-      window.webContents.send('add-extension-result', dirs[0]);
-      event.sender.send('add-extension-result', dirs[0]);
+      window.webContents.send('add-extension-result', result);
+      event.sender.send('add-extension-result', result);
     }
   });
 });
 ipcMain.on('remove-extension', (event, name) => {
   const window = BrowserWindow.fromId(globalObjet.wid);
+  let result: string = 'OK';
   try {
     (BrowserWindow as any).removeExtension(name);
-
-    window.webContents.send('remove-extension-result', 'OK');
-    event.sender.send('remove-extension-result', 'OK');
   } catch (removeError) {
-    window.webContents.send('remove-extension-result', removeError);
-    event.sender.send('remove-extension-result', removeError);
+    result = removeError.message;
   }
+
+  window.webContents.send('remove-extension-result', result);
+  event.sender.send('remove-extension-result', result);
 });
 
 ipcMain.on('lulumi-env-app-name', (event) => {
