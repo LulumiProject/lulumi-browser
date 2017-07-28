@@ -550,6 +550,10 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
             checked: menuItem.checked,
           };
           lulumi.tabs.get(tabId, tab => onclick(info, tab));
+          
+          if (scriptType === 'event') {
+            lulumi.tabs.get(tabId, tab => lulumi.contextMenus.onClicked.emit(info, tab));
+          }
         });
       }
     },
@@ -650,6 +654,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       lulumi.contextMenus.handleMenuItems(null, null);
       ipcRenderer.send('lulumi-context-menus-remove-all', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
     },
+    onClicked: (scriptType === 'event') ? new Event() : 'Event scripts only',
   };
 
   lulumi.i18n = {
