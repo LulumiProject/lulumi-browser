@@ -139,8 +139,13 @@ function createWindow(): void {
   });
 
   ipcMain.on('request-extension-objects', () => {
+    // load persisted extensions
+    lulumiExtension.loadExtensions();
+
+    // assign extension objects to global variables
     globalObjet.backgroundPages = lulumiExtension.backgroundPages;
     globalObjet.manifestMap = lulumiExtension.manifestMap;
+
     mainWindow!.webContents.send(
       'response-extension-objects',
       lulumiExtension.manifestMap);

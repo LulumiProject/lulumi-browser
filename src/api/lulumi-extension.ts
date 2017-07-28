@@ -14,6 +14,7 @@ import './extensions/listeners';
 /* tslint:disable:max-line-length */
 
 const globalObjet = global as api.GlobalObject;
+let loaded = false;
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
@@ -311,27 +312,7 @@ app.on('will-quit', () => {
   }
 });
 
-// we can not use protocol or BrowserWindow until app is ready
 app.once('ready', () => {
-  // load persisted extensions
-  loadedExtensionsPath = process.env.NODE_ENV === 'development'
-    ? path.join(config.devUserData, 'lulumi-extensions')
-    : path.join(app.getPath('userData'), 'extensions');
-  try {
-    const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
-    if (Array.isArray(loadedExtensions)) {
-      for (const srcDirectory of loadedExtensions) {
-        // start background pages and set content scripts
-        const manifest = getManifestFromPath(srcDirectory);
-        if (manifest !== null) {
-          loadExtension(manifest);
-        }
-      }
-    }
-  } catch (error) {
-    // ignore error
-  }
-
   // the public API to add/remove extensions
   (BrowserWindow as any).addExtension = (srcDirectory: string): string | void => {
     const manifest = getManifestFromPath(srcDirectory);
@@ -363,9 +344,36 @@ app.once('ready', () => {
   };
 });
 
+// we can not use protocol or BrowserWindow until app is ready,
+// and hopefully, this function will be called after app is ready
+const loadExtensions = () => {
+  if (!loaded) {
+    // load persisted extensions
+    loadedExtensionsPath = process.env.NODE_ENV === 'development'
+      ? path.join(config.devUserData, 'lulumi-extensions')
+      : path.join(app.getPath('userData'), 'extensions');
+    try {
+      const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
+      if (Array.isArray(loadedExtensions)) {
+        for (const srcDirectory of loadedExtensions) {
+          // start background pages and set content scripts
+          const manifest = getManifestFromPath(srcDirectory);
+          if (manifest !== null) {
+            loadExtension(manifest);
+          }
+        }
+      }
+    } catch (error) {
+      // ignore error
+    }
+    loaded = true;
+  }
+};
+
 export {
   manifestMap,
   manifestNameMap,
   backgroundPages,
   loadCommands,
+  loadExtensions,
 };
