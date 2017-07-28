@@ -35,10 +35,7 @@ class Event {
 
   removeListener(callback) {
     const digest = callback.toString().hashCode();
-    const index = this.listeners.indexOf(digest);
-    if (index !== -1) {
-      this.listeners.splice(index, 1);
-    }
+    this.listeners = this.listeners.filter(c => (c !== digest));
     ipcRenderer.removeAllListeners(`lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`);
     ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, digest);
   }

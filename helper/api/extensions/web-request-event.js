@@ -26,20 +26,23 @@ class Event {
   addListener(callback, filter = {}, opt_extraInfoSpec = []) {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
-    ipcRenderer.on(`lulumi-${this.scope}-${this.event}-intercepted`, (event, details) => {
-      ipcRenderer.send(`lulumi-${this.scope}-${this.event}-response`, callback(details));
+    ipcRenderer.on(`lulumi-${this.scope}-${this.event}-intercepted-${digest}`, (event, details) => {
+      ipcRenderer.send(`lulumi-${this.scope}-${this.event}-response-${digest}`, callback(details));
     })
     ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, this.event, digest, filter);
   }
 
   removeListener(callback) {
     const digest = callback.toString().hashCode();
-    const index = this.listeners.indexOf(digest);
-    if (index !== -1) {
-      this.listeners.splice(index, 1);
-      ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted`);
-    }
-    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event);
+    this.listeners = this.listeners.filter(c => (c !== digest));
+    ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted-${digest}`);
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event, false);
+  }
+
+  removeAllListeners() {
+    this.listeners.forEach(l => ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted-${l}`));
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event, true);
+    this.listeners = [];
   }
 }
 

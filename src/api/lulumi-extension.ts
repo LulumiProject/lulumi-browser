@@ -1,5 +1,5 @@
 import { api } from 'lulumi';
-import { app, BrowserWindow, nativeImage, webContents } from 'electron';
+import { app, BrowserWindow, ipcMain, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
 import fs from 'fs';
@@ -136,8 +136,15 @@ const removeBackgroundPages = (manifest) => {
     return;
   }
 
-  (webContents.fromId(backgroundPages[manifest.extensionId].webContentsId) as any).destroy();
-  delete backgroundPages[manifest.extensionId];
+  const toBeRemovedwebContents
+    = (webContents.fromId(backgroundPages[manifest.extensionId].webContentsId) as Electron.WebContents);
+
+  ipcMain.once(`lulumi-extension-${manifest.extensionId}-clean-done`, () => {
+    (toBeRemovedwebContents as any).destroy();
+    delete backgroundPages[manifest.extensionId];
+  });
+  // notify the extension that itself is going to be removed
+  toBeRemovedwebContents.send(`lulumi-extension-${manifest.extensionId}-going-removed`);
 };
 
 const loadCommands = (mainWindow, manifest) => {

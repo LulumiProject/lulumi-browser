@@ -9,10 +9,7 @@ class Event {
   }
 
   removeListener(callback: Function): void {
-    const index: number = this.listeners.indexOf(callback);
-    if (index !== -1) {
-      this.listeners.splice(index, 1);
-    }
+    this.listeners = this.listeners.filter(c => (c !== callback));
   }
 
   emit(...args): void {

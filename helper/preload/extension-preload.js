@@ -2,21 +2,18 @@ const { ipcRenderer, remote } = require('electron');
 const { LocalStorage } = require('node-localstorage');
 
 process.once('loaded', () => {
-  const inject = (extensionId) => {
-    const context = {};
-    require('../api/inject-to').injectTo(extensionId, 'event', context, LocalStorage);
-    global.lulumi = context.lulumi;
-    global.chrome = global.lulumi;
-  };
-
-  // read the renderer process preferences to see if we need to inject scripts
-  const preferences = remote.getGlobal('renderProcessPreferences');
-  if (preferences) {
-    preferences.forEach(pref => inject(pref.extensionId));
-  }
+  const extensionId = global.location.hostname;
+  const context = {};
+  require('../api/inject-to').injectTo(extensionId, 'event', context, LocalStorage);
+  global.lulumi = context.lulumi;
+  global.chrome = global.lulumi;
 
   global.ipcRenderer = ipcRenderer;
 
+  ipcRenderer.once(`lulumi-extension-${extensionId}-going-removed`, (event) => {
+    Object.values(global.lulumi.webRequest).forEach(v => v.removeAllListener());
+    ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
+  });
   ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {
     if (external) {
       global.lulumi.runtime.onMessageExternal.emit(message, sender);
