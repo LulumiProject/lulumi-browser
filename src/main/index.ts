@@ -131,7 +131,7 @@ function createWindow(): void {
   ipcMain.on('request-lang', (event) => {
     let lang: string = '';
     try {
-      lang = readFileSync(langPath, 'utf-8');
+      lang = readFileSync(langPath, 'utf8');
     } catch (event) {
       lang = '"en"';
     }

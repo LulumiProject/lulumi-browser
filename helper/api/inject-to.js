@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { ipcRenderer, remote } = require('electron');
 const specs = require('lulumi').specs;
 const path = require('path');
@@ -138,7 +139,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   let storagePath;
   let localStorage;
 
-  const messages = remote.getGlobal('manifestMap')[thisExtensionId].messages;
+  const manifest = remote.getGlobal('manifestMap')[thisExtensionId];
 
   if (LocalStorage) {
     storagePath = process.env.NODE_ENV === 'development'
@@ -251,7 +252,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   lulumi.runtime = {
     id: thisExtensionId,
     port: null,
-    getManifest: () => remote.getGlobal('manifestMap')[thisExtensionId],
+    getManifest: () => manifest,
     getURL: path => url.format({
       protocol: 'lulumi-extension',
       slashes: true,
@@ -393,6 +394,9 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
           callback(result);
         }
       });
+      if (details.hasOwnProperty('file')) {
+        details.code = fs.readFileSync(path.join(manifest.srcDirectory, details.file), 'utf8');
+      }
       ipcRenderer.send('lulumi-tabs-execute-script', tabId, details);
     },
     insertCSS: (tabId, details = {}, callback) => {
@@ -401,6 +405,9 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
           callback(result);
         }
       });
+      if (details.hasOwnProperty('file')) {
+        details.code = fs.readFileSync(path.join(manifest.srcDirectory, details.file), 'utf8');
+      }
       ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
     },
     sendMessage: (tabId, message, responseCallback) => {
@@ -664,9 +671,9 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       }
     },
     getMessage: (messageName, substitutions) => {
-      return (typeof messages[messageName] === 'undefined')
+      return (typeof manifest.messages[messageName] === 'undefined')
         ? ""
-        : messages[messageName].message;
+        : manifest.messages[messageName].message;
     },
     getUILanguage: () => {
       return navigator.language;
