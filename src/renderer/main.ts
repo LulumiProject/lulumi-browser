@@ -79,14 +79,6 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         }
       });
     },
-    handleComposition(event) {
-      if (event.type === 'compositionend') {
-        (this as any).isOnComposition = false;
-        (this as any).handleChange(event.data);
-      } else {
-        (this as any).isOnComposition = true;
-      }
-    },
     handleChange(value) {
       this.$emit('input', value);
       if ((this as any).isOnComposition || (!(this as any).triggerOnFocus && !value)) {
