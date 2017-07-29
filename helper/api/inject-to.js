@@ -372,6 +372,14 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-tabs-reload', tabId, reloadProperties);
     },
+    create: (createProperties = { windowId: 0 }, callback) => {
+      ipcRenderer.once('lulumi-tabs-create-result', (event, result) => {
+        if (callback) {
+          callback(result);
+        }
+      });
+      ipcRenderer.send('lulumi-tabs-create', createProperties);
+    },
     remove: (tabIds, callback) => {
       ipcRenderer.once('lulumi-tabs-remove-result', (event, result) => {
         if (callback) {

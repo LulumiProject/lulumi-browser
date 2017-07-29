@@ -30,7 +30,6 @@
 
   import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
-  import Tab from '../../api/extensions/tab';
 
   import { browserMainView, store } from 'lulumi';
 
@@ -627,7 +626,7 @@
           });
         }
       }
-      this.onCreatedEvent.emit(new Tab(this.currentPageIndex, false));
+      this.onCreatedEvent.emit(this.extensionService.getTab(this.currentPageIndex));
     }
     onTabDuplicate(pageIndex: number): void {
       this.onNewTab(this.pages[pageIndex].location);
@@ -636,7 +635,7 @@
       this.$store.dispatch('clickTab', pageIndex);
     }
     onTabClose(pageIndex: number): void {
-      this.onRemovedEvent.emit(new Tab(pageIndex, false));
+      this.onRemovedEvent.emit(this.extensionService.getTab(pageIndex));
       this.$store.dispatch('closeTab', pageIndex);
       this.$nextTick(() => {
         this.$store.dispatch('setTabsOrder', (this.$refs.tabs as Tabs).sortable.toArray());

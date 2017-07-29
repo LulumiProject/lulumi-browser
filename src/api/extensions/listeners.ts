@@ -273,6 +273,13 @@ ipcMain.on('lulumi-tabs-reload', (event, tabId, reloadProperties) => {
     webContentsId: event.sender.id,
   });
 });
+ipcMain.on('lulumi-tabs-create', (event, createProperties) => {
+  const window = BrowserWindow.fromId(globalObjet.wid);
+  window.webContents.send('lulumi-tabs-create', {
+    createProperties,
+    webContentsId: event.sender.id,
+  });
+});
 ipcMain.on('lulumi-tabs-remove', (event, tabIds) => {
   const window = BrowserWindow.fromId(globalObjet.wid);
   window.webContents.send('lulumi-tabs-remove', {

@@ -6,31 +6,34 @@ import Tab from './extensions/tab';
 
 const tabArray: Tab[] = [];
 
-function findAndUpdateOrCreate(vueInstance: any, tabId?: number, tabIndex?: number): Tab {
-  let tab: Tab = new Tab(-1);
+function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
+  let tab: Tab = new Tab(-1, false);
   if (typeof tabId !== 'undefined') {
     if (tabId === -1) {
       return tab;
     } else if (tabId === 0) {
       if (typeof tabIndex === 'undefined') {
-        tab = new Tab(vueInstance.$store.getters.currentPageIndex, true);
+        tab = new Tab(vueInstance.$store.getters.currentPageIndex, active);
         const object: store.PageObject = vueInstance.getPageObject(tab.index);
         tab.update(object.location, object.title, object.favicon);
         tabArray[tab.index] = tab;
       } else {
         tab = tabArray[tabIndex];
         if (tab === undefined) {
-          tab = new Tab(tabIndex);
+          tab = new Tab(tabIndex, active);
           const object: store.PageObject = vueInstance.getPageObject(tabIndex);
           tab.update(object.location, object.title, object.favicon);
           tabArray[tabIndex] = tab;
         } else {
-          tabArray.map(tab => tab.hightlight(false));
           const tmpTab = tabArray[tabIndex];
-          tmpTab.hightlight();
           const object: store.PageObject = vueInstance.getPageObject(tmpTab.index);
           tmpTab.update(object.location, object.title, object.favicon);
         }
+      }
+      if (active) {
+        tabArray.map(tab => tab.activate(false));
+        tabArray[tab.index].activate(true);
+        vueInstance.$nextTick(() => vueInstance.onTabClick(tab.index));
       }
       return tab;
     } else {
@@ -38,12 +41,17 @@ function findAndUpdateOrCreate(vueInstance: any, tabId?: number, tabIndex?: numb
       if (index === -1) {
         return tab;
       }
+      if (active) {
+        tabArray.map(tab => tab.activate(false));
+        tabArray[index].activate(true);
+        vueInstance.$nextTick(() => vueInstance.onTabClick(index));
+      }
       return tabArray[index];
     }
   } else {
     tabArray.length = 0;
     vueInstance.$store.getters.pages.forEach((page, index) => {
-      tabArray.push(new Tab(index, (index === vueInstance.$store.getters.currentPageIndex)));
+      tabArray.push(findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index));
       const object = vueInstance.getPageObject(index);
       tabArray[index].update(object.location, object.title, object.favicon);
     });
@@ -104,7 +112,7 @@ export default (vueInstance: any) => {
       const backgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
-        .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findAndUpdateOrCreate(vueInstance, 0, tabIndex) }));
+        .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findAndUpdateOrCreate(vueInstance, false, 0, tabIndex) }));
     },
     onMessage: (webContentsId: number): Event | undefined => {
       const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
@@ -117,18 +125,18 @@ export default (vueInstance: any) => {
 
   const tabs = {
     get: (tabId: number): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       return tab;
     },
     getCurrent: (): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, 0, vueInstance.$store.getters.currentPageIndex);
+      const tab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.currentPageIndex);
       return tab;
     },
     duplicate: (tabId: number): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       vueInstance.onTabDuplicate(tab.index);
 
-      const duplicateTab = new Tab(vueInstance.$store.getters.pages.length - 1, false);
+      const duplicateTab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.pages.length - 1);
 
       const object = vueInstance.getPageObject(duplicateTab.index);
       duplicateTab.update(object.location, object.title, object.favicon);
@@ -136,7 +144,7 @@ export default (vueInstance: any) => {
       return duplicateTab;
     },
     query: (queryInfo: chrome.tabs.QueryInfo): Tab[] => {
-      findAndUpdateOrCreate(vueInstance);
+      findAndUpdateOrCreate(vueInstance, false);
       if (Object.keys(queryInfo).length === 0) {
         return tabArray;
       } else {
@@ -150,58 +158,69 @@ export default (vueInstance: any) => {
       }
     },
     update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (updateProperties.hasOwnProperty('url')) {
         vueInstance.getPage(tab.index).$refs.webview.loadURL(updateProperties.url);
       }
       if (updateProperties.hasOwnProperty('active')) {
         if (updateProperties.active) {
-          vueInstance.onTabClick(tab.index);
+          findAndUpdateOrCreate(vueInstance, true, tabId);
         }
       }
       if (updateProperties.hasOwnProperty('highlighted')) {
         if (updateProperties.highlighted) {
-          vueInstance.onTabClick(tab.index);
-          tab.hightlight();
+          findAndUpdateOrCreate(vueInstance, true, tabId);
         }
       }
       return tab;
     },
     reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties = { bypassCache: false }): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (reloadProperties.bypassCache) {
         vueInstance.getPage(tab.index).$refs.webview.reloadIgnoringCache();
       } else {
         vueInstance.getPage(tab.index).$refs.webview.reload();
       }
     },
+    create: (createProperties: chrome.tabs.CreateProperties = { windowId: 0 }): Tab => {
+      let tab: Tab = findAndUpdateOrCreate(vueInstance, false, -1);
+      if (createProperties.hasOwnProperty('url')) {
+        if (createProperties.hasOwnProperty('active')) {
+          vueInstance.onNewTab(createProperties.url, createProperties.active);
+        } else {
+          vueInstance.onNewTab(createProperties.url);
+        }
+        tab = findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
+      }
+      return tab;
+    },
     remove: (tabIds: number[] | number): void => {
       const targetTabIds = Array.isArray(tabIds) ? tabIds : [tabIds];
       targetTabIds.forEach((tabId) => {
-        const tab = findAndUpdateOrCreate(vueInstance, tabId);
+        const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
         vueInstance.onTabClose(tab.index);
       });
     },
     detectLanguage: (tabId: number, webContentsId: number): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
         ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
       `);
     },
     executeScript: (tabId: number, details: chrome.tabs.InjectDetails = {}): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (details.hasOwnProperty('code')) {
         vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(details.code, false);
       }
     },
     insertCSS: (tabId, details: chrome.tabs.InjectDetails = {}): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (details.hasOwnProperty('code')) {
         vueInstance.getPage(tab.index).$refs.webview.insertCSS(details.code);
       }
     },
     sendMessage: (tabId: number, message: any): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       vueInstance.getPage(tab.index).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },
     onActivated: vueInstance.onActivatedEvent,
@@ -246,7 +265,7 @@ export default (vueInstance: any) => {
 
   const webNavigation = {
     getFrame: (details: chrome.webNavigation.GetFrameDetails, webContentsId: number): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, details.tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
       if (details.processId === processId) {
         vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
@@ -295,7 +314,7 @@ export default (vueInstance: any) => {
       }
     },
     getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, details.tabId);
+      const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
       vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
         String.prototype.hashCode = function() {

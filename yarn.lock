@@ -5431,9 +5431,9 @@ lru-cache@^4.0.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-lulumi@^0.0.19:
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.19.tgz#e68516d60df8606eb24cdf1fc27ad6695c78c31e"
+lulumi@^0.0.20:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/lulumi/-/lulumi-0.0.20.tgz#77655a039cca057055584836d53afe5966d2dc2a"
 
 macaddress@^0.2.8:
   version "0.2.8"

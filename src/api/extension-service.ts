@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import Tab from './extensions/tab';
 import url from 'url';
 import Vue from 'vue';
 
@@ -308,6 +309,14 @@ export default class ExtensionService {
         webContents.send(
           'lulumi-tabs-reload-result',
           require('lulumi').tabs.reload(data.tabId, data.reloadProperties));
+      }
+    });
+    ipc.on('lulumi-tabs-create', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send(
+          'lulumi-tabs-create-result',
+          require('lulumi').tabs.create(data.createProperties));
       }
     });
     ipc.on('lulumi-tabs-remove', (event, data) => {
@@ -652,6 +661,16 @@ export default class ExtensionService {
         require('lulumi').webNavigation.onCreatedNavigationTarget.emit(data.args);
       }
     });
+    ipc.on('lulumi-web-request-intercepted', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const details = data.details;
+        details.tabId = 0;
+        webContents.send(
+          `lulumi-web-request-${data.eventLispCaseName}-intercepted-${data.digest}`,
+          details);
+      }
+    });
   }
 
   update() {
@@ -709,5 +728,13 @@ export default class ExtensionService {
     });
 
     vue.$refs.navbar.extensions = manifest;
+  }
+
+  getTab(pageIndex: number): Tab {
+    try {
+      return require('lulumi').tabs.get(pageIndex);
+    } catch (err) {
+      return new Tab(-1, false);
+    }
   }
 }

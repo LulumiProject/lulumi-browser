@@ -1,6 +1,9 @@
-import { ipcMain, session } from 'electron';
+import { api } from 'lulumi';
+import { BrowserWindow, ipcMain, session } from 'electron';
 
 /* tslint:disable:max-line-length */
+
+const globalObjet = global as api.GlobalObject;
 
 const register = (eventName: string, eventLispCaseName: string, sender: Electron.WebContents, digest: string, filter): void => {
   if (typeof session.defaultSession !== 'undefined') {
@@ -9,9 +12,15 @@ const register = (eventName: string, eventLispCaseName: string, sender: Electron
     }
     session.defaultSession.webRequest[eventName](filter, (details, callback) => {
       details.type = details.resourceType;
-      details.tabId = 0;
 
-      sender.send(`lulumi-web-request-${eventLispCaseName}-intercepted-${digest}`, details);
+      const window = BrowserWindow.fromId(globalObjet.wid);
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        details,
+        webContentsId: sender.id,
+      });
+      ipcMain.setMaxListeners(0);
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
         if (response) {
           callback(response);

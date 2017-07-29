@@ -19,13 +19,13 @@ class Tab {
   width: number;
   height: number;
   sessionId: number;
-  constructor(index: number, highlighted: boolean = true) {
+  constructor(index: number, active: boolean) {
     this.id = (nextId += 1); // 頁籤的標識符。(某些狀況可能會沒有id)
     this.index = index; // 頁籤在所在窗口中的索引，從 0 開始。
     this.windowId = 0; // 頁籤所在窗口的標識符。
     this.openerTabId; // 使用哪個已存在的頁籤打開指定的網址。
-    this.highlighted = highlighted; // 頁籤是否為高亮狀態。
-    this.active = remote.getCurrentWindow().isFocused(); // 頁籤是否是窗口中的活動頁籤。 （因為視窗不一定是focus的狀態。）
+    this.highlighted = active; // 頁籤是否為高亮狀態。
+    this.active = active; // 頁籤是否是窗口中的活動頁籤。 （因為視窗不一定是focus的狀態。）
     this.pinned = false; // 頁籤是否固定。(指定為tue的頁籤，不能移動，也沒有關閉鈕)
     this.url; // 頁籤中顯示的 URL。需要 "tabs" 權限
     this.title; // 頁籤的標題，如果頁籤正在加載它也可能是空字符串。需要 "tabs" 權限
@@ -46,6 +46,11 @@ class Tab {
 
   hightlight(highlighted: boolean = true) {
     this.highlighted = highlighted;
+  }
+
+  activate(active: boolean = true) {
+    this.hightlight(active);
+    this.active = active;
   }
 }
 
