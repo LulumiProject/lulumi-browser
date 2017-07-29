@@ -6,24 +6,49 @@ import Tab from './extensions/tab';
 
 const tabArray: Tab[] = [];
 
-function findOrCreate(tabId: number, vueInstance: any) {
-  let tab: Tab = (tabId === null)
-    ? new Tab(vueInstance.$store.getters.currentPageIndex, true)
-    : tabArray[tabId];
-  if (tab === undefined) {
-    tab = new Tab(tabId);
-
-    const object: store.PageObject = vueInstance.getPageObject(tabId);
-    if (object) {
-      tab.update(object.location, object.title, object.favicon);
-      tabArray[tab.id] = tab;
+function findAndUpdateOrCreate(vueInstance: any, tabId?: number, tabIndex?: number): Tab {
+  let tab: Tab = new Tab(-1);
+  if (typeof tabId !== 'undefined') {
+    if (tabId === -1) {
+      return tab;
+    } else if (tabId === 0) {
+      if (typeof tabIndex === 'undefined') {
+        tab = new Tab(vueInstance.$store.getters.currentPageIndex, true);
+        const object: store.PageObject = vueInstance.getPageObject(tab.index);
+        tab.update(object.location, object.title, object.favicon);
+        tabArray[tab.index] = tab;
+      } else {
+        tab = tabArray[tabIndex];
+        if (tab === undefined) {
+          tab = new Tab(tabIndex);
+          const object: store.PageObject = vueInstance.getPageObject(tabIndex);
+          tab.update(object.location, object.title, object.favicon);
+          tabArray[tabIndex] = tab;
+        } else {
+          tabArray.map(tab => tab.hightlight(false));
+          const tmpTab = tabArray[tabIndex];
+          tmpTab.hightlight();
+          const object: store.PageObject = vueInstance.getPageObject(tmpTab.index);
+          tmpTab.update(object.location, object.title, object.favicon);
+        }
+      }
+      return tab;
+    } else {
+      const index = tabArray.findIndex(tab => (tab.id === tabId));
+      if (index === -1) {
+        return tab;
+      }
+      return tabArray[index];
     }
   } else {
-    tabArray.forEach((tab) => {
-      tab.hightlight(tab.id === vueInstance.$store.getters.currentPageIndex);
+    tabArray.length = 0;
+    vueInstance.$store.getters.pages.forEach((page, index) => {
+      tabArray.push(new Tab(index, (index === vueInstance.$store.getters.currentPageIndex)));
+      const object = vueInstance.getPageObject(index);
+      tabArray[index].update(object.location, object.title, object.favicon);
     });
+    return tab;
   }
-  return tab;
 }
 
 // vueInstance is an instance of BrowserMainView
@@ -71,136 +96,113 @@ export default (vueInstance: any) => {
   const runtime = {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
-      const tabId = vueInstance.$store.getters.mappings[webContentsId];
-      if (tabId === undefined) {
+      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
+      if (tabIndex === undefined) {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       }
       const backgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
-        .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findOrCreate(tabId, vueInstance) }));
+        .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findAndUpdateOrCreate(vueInstance, 0, tabIndex) }));
     },
     onMessage: (webContentsId: number): Event | undefined => {
-      let id = vueInstance.$store.getters.mappings[webContentsId];
-      if (id === undefined) {
-        id = 0;
+      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
+      if (tabIndex === undefined) {
+        return undefined;
       }
-
-      const page = vueInstance.getPage(id);
-      if (page) {
-        return vueInstance.getPage(id).onMessageEvent;
-      }
-      return undefined;
+      return vueInstance.getPage(tabIndex).onMessageEvent;
     },
   };
 
   const tabs = {
     get: (tabId: number): Tab => {
-      const tab = findOrCreate(tabId, vueInstance);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
       return tab;
     },
     getCurrent: (): Tab => {
-      const tab = new Tab(vueInstance.$store.getters.currentPageIndex, true);
-      tabArray[tab.id] = tab;
-
-      const object = vueInstance.getPageObject(tab.id);
-      tab.update(object.location, object.title, object.favicon);
+      const tab = findAndUpdateOrCreate(vueInstance, 0, vueInstance.$store.getters.currentPageIndex);
       return tab;
     },
     duplicate: (tabId: number): Tab => {
-      const tab = findOrCreate(tabId, vueInstance);
-      vueInstance.onTabDuplicate(tab.id);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      vueInstance.onTabDuplicate(tab.index);
 
       const duplicateTab = new Tab(vueInstance.$store.getters.pages.length - 1, false);
 
-      const object = vueInstance.getPageObject(duplicateTab.id);
+      const object = vueInstance.getPageObject(duplicateTab.index);
       duplicateTab.update(object.location, object.title, object.favicon);
-      tabArray[duplicateTab.id] = duplicateTab;
+      tabArray[duplicateTab.index] = duplicateTab;
       return duplicateTab;
     },
     query: (queryInfo: chrome.tabs.QueryInfo): Tab[] => {
-      if (queryInfo.hasOwnProperty('active')) {
-        if (queryInfo.active) {
-          const found = tabArray.findIndex(tab => tab.active);
-          if (found !== -1) {
-            return [tabArray[found]];
+      findAndUpdateOrCreate(vueInstance);
+      if (Object.keys(queryInfo).length === 0) {
+        return tabArray;
+      } else {
+        const tabs: Tab[] = [];
+        tabArray.forEach((tab) => {
+          if (Object.keys(queryInfo).every(k => (queryInfo[k] === tab[k]))) {
+            tabs.push(tab);
           }
-
-          const tab = new Tab(vueInstance.$store.getters.currentPageIndex, true);
-          tabArray[tab.id] = tab;
-
-          const object = vueInstance.getPageObject(tab.id);
-          tab.update(object.location, object.title, object.favicon);
-          tabArray[tab.id] = tab;
-          return [tab];
-        }
+        });
+        return tabs;
       }
-      const pages = vueInstance.$store.getters.pages;
-      const tabs: Tab[] = [];
-      let object;
-      pages.forEach((page, index) => {
-        tabs.push(new Tab(index, (index === vueInstance.$store.getters.currentPageIndex)));
-
-        object = vueInstance.getPageObject(index);
-        tabs[tabs.length - 1].update(object.location, object.title, object.favicon);
-      });
-      return tabs;
     },
     update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): Tab => {
-      const tab = findOrCreate(tabId, vueInstance);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
       if (updateProperties.hasOwnProperty('url')) {
-        vueInstance.getPage(tab.id).$refs.webview.loadURL(updateProperties.url);
+        vueInstance.getPage(tab.index).$refs.webview.loadURL(updateProperties.url);
       }
       if (updateProperties.hasOwnProperty('active')) {
         if (updateProperties.active) {
-          vueInstance.onTabClick(tab.id);
+          vueInstance.onTabClick(tab.index);
         }
       }
       if (updateProperties.hasOwnProperty('highlighted')) {
         if (updateProperties.highlighted) {
-          vueInstance.onTabClick(tab.id);
+          vueInstance.onTabClick(tab.index);
           tab.hightlight();
         }
       }
-
-      const object = vueInstance.getPageObject(tabId);
-      tab.update(object.location, object.title, object.favicon);
       return tab;
     },
     reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties = { bypassCache: false }): void => {
-      const tab = findOrCreate(tabId, vueInstance);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
       if (reloadProperties.bypassCache) {
-        vueInstance.getPage(tab.id).$refs.webview.reloadIgnoringCache();
+        vueInstance.getPage(tab.index).$refs.webview.reloadIgnoringCache();
       } else {
-        vueInstance.getPage(tab.id).$refs.webview.reload();
+        vueInstance.getPage(tab.index).$refs.webview.reload();
       }
     },
     remove: (tabIds: number[] | number): void => {
       const targetTabIds = Array.isArray(tabIds) ? tabIds : [tabIds];
-      targetTabIds.forEach(tabId => vueInstance.onTabClose(tabId));
+      targetTabIds.forEach((tabId) => {
+        const tab = findAndUpdateOrCreate(vueInstance, tabId);
+        vueInstance.onTabClose(tab.index);
+      });
     },
     detectLanguage: (tabId: number, webContentsId: number): void => {
-      const tab = findOrCreate(tabId, vueInstance);
-      vueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
         ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
       `);
     },
     executeScript: (tabId: number, details: chrome.tabs.InjectDetails = {}): void => {
-      const tab = findOrCreate(tabId, vueInstance);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
       if (details.hasOwnProperty('code')) {
-        vueInstance.getPage(tab.id).$refs.webview.executeJavaScript(details.code, false);
+        vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(details.code, false);
       }
     },
     insertCSS: (tabId, details: chrome.tabs.InjectDetails = {}): void => {
-      const tab = findOrCreate(tabId, vueInstance);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
       if (details.hasOwnProperty('code')) {
-        vueInstance.getPage(tab.id).$refs.webview.insertCSS(details.code);
+        vueInstance.getPage(tab.index).$refs.webview.insertCSS(details.code);
       }
     },
     sendMessage: (tabId: number, message: any): void => {
-      const tab = findOrCreate(tabId, vueInstance);
-      vueInstance.getPage(tab.id).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
+      const tab = findAndUpdateOrCreate(vueInstance, tabId);
+      vueInstance.getPage(tab.index).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
     },
     onActivated: vueInstance.onActivatedEvent,
     onUpdated: vueInstance.onUpdatedEvent,
@@ -244,10 +246,10 @@ export default (vueInstance: any) => {
 
   const webNavigation = {
     getFrame: (details: chrome.webNavigation.GetFrameDetails, webContentsId: number): void => {
-      const tab = findOrCreate(details.tabId, vueInstance);
-      const processId = vueInstance.getWebView(tab.id).getWebContents().getOSProcessId();
+      const tab = findAndUpdateOrCreate(vueInstance, details.tabId);
+      const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
       if (details.processId === processId) {
-        vueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+        vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
           String.prototype.hashCode = function() {
             var hash = 0, i, chr;
             if (this.length === 0) return hash;
@@ -293,9 +295,9 @@ export default (vueInstance: any) => {
       }
     },
     getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
-      const tab = findOrCreate(details.tabId, vueInstance);
-      const processId = vueInstance.getWebView(tab.id).getWebContents().getOSProcessId();
-      vueInstance.getPage(tab.id).$refs.webview.executeJavaScript(`
+      const tab = findAndUpdateOrCreate(vueInstance, details.tabId);
+      const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
+      vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
         String.prototype.hashCode = function() {
           var hash = 0, i, chr;
           if (this.length === 0) return hash;

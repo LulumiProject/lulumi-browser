@@ -1,5 +1,7 @@
 import { remote } from 'electron';
 
+let nextId = 0;
+
 // Refs: http://ithelp.ithome.com.tw/articles/10188558
 class Tab {
   id: number;
@@ -17,9 +19,9 @@ class Tab {
   width: number;
   height: number;
   sessionId: number;
-  constructor(tabId: number, highlighted: boolean = true) {
-    this.id = tabId; // 頁籤的標識符。(某些狀況可能會沒有id)
-    this.index = tabId; // 頁籤在所在窗口中的索引，從 0 開始。
+  constructor(index: number, highlighted: boolean = true) {
+    this.id = (nextId += 1); // 頁籤的標識符。(某些狀況可能會沒有id)
+    this.index = index; // 頁籤在所在窗口中的索引，從 0 開始。
     this.windowId = 0; // 頁籤所在窗口的標識符。
     this.openerTabId; // 使用哪個已存在的頁籤打開指定的網址。
     this.highlighted = highlighted; // 頁籤是否為高亮狀態。
