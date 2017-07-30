@@ -13,7 +13,11 @@ class Event {
 
   emit(...args) {
     for (const listener of this.listeners) {
-      listener(...args);
+      try {
+        listener(...args);
+      } catch (err) {
+        this.removeListener(listener);
+      }
     }
   }
 }
