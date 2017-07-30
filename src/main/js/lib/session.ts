@@ -7,9 +7,6 @@ import { BrowserWindow, ipcMain, session } from 'electron';
 const globalObjet = global as api.GlobalObject;
 
 const register = (eventName: string, sess: Electron.Session, eventLispCaseName: string, sender: Electron.WebContents, digest: string, filter): void => {
-  if (process.env.NODE_ENV === 'development') {
-    filter.urls.push('*://localhost:9080/*');
-  }
   sess.webRequest[eventName](filter, (details, callback) => {
     details.type = details.resourceType;
     details.tabId = (sess as any).id;
@@ -136,23 +133,42 @@ const registerScheme = (partition: string, scheme: string): void => {
     });
   }
   */
-  sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
-    const path = require('path').resolve(__dirname, '../../../../dist');
-    const url: string = request.url.substr(scheme.length);
-    const [type, param] = url.split('/');
-    if (type === 'about') {
-      if (param.indexOf('#') === 0) {
-        callback(`${path}/about.html`);
-      } else {
-        callback(`${path}/${param}`);
+  if (process.env.NODE_ENV === 'development') {
+    sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
+      const path = require('path').resolve(__dirname, '../../../../dist');
+      const url: string = request.url.substr(scheme.length);
+      const [type, param] = url.split('/');
+      if (type === 'about') {
+        if (param.indexOf('#') === 0) {
+          callback(`${path}/about.html`);
+        } else {
+          callback(`${path}/${param}`);
+        }
       }
-    }
-    // tslint:disable-next-line:align
-  }, (error) => {
-    if (error) {
-      console.error('Failed to register protocol');
-    }
-  });
+      // tslint:disable-next-line:align
+    }, (error) => {
+      if (error) {
+        console.error('Failed to register protocol');
+      }
+    });
+  } else {
+    sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
+      const url: string = request.url.substr(scheme.length);
+      const [type, param] = url.split('/');
+      if (type === 'about') {
+        if (param.indexOf('#') === 0) {
+          callback(`${__dirname}/about.html`);
+        } else {
+          callback(`${__dirname}/${param}`);
+        }
+      }
+      // tslint:disable-next-line:align
+    }, (error) => {
+      if (error) {
+        console.error('Failed to register protocol');
+      }
+    });
+  }
 };
 
 export default {
