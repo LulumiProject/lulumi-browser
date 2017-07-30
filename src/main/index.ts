@@ -83,11 +83,8 @@ function createWindow(): void {
   globalObjet.wid = mainWindow.id;
 
   mainWindow.loadURL(winURL);
-
   menu.init();
-  session.webRequest();
-  session.onWillDownload(mainWindow, config);
-  session.setPermissionRequestHandler(mainWindow);
+
   if (process.env.NODE_ENV !== 'development') {
     autoUpdater.init();
     autoUpdater.listen(mainWindow);
@@ -96,6 +93,10 @@ function createWindow(): void {
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.contextIsolation = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
+    session.registerScheme(params.partition, config.lulumiPagesCustomProtocol);
+    session.onWillDownload(params.partition, mainWindow!, config.lulumiPDFJSPath);
+    session.setPermissionRequestHandler(params.partition, mainWindow!);
+
     const regexp = new RegExp('^lulumi-extension://.+/popup.html$');
     if (params.src.startsWith('lulumi-extension://')) {
       if (params.src.match(regexp)) {
@@ -178,57 +179,7 @@ function createWindow(): void {
 }
 
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
-if (process.env.NODE_ENV === 'development') {
-  app.on('ready', () => {
-    protocol.registerHttpProtocol('lulumi', (request, callback) => {
-      const url: string = request.url.substr((config.lulumiPagesCustomProtocol).length);
-      const [type, param] = url.split('/');
-      if (type === 'about') {
-        if (param.indexOf('#') === 0) {
-          // '#blablabla'
-          callback({
-            url: `http://localhost:${require('../../.electron-vue/config').port}/about.html`,
-            method: request.method,
-          });
-        } else {
-          // 'blablabla'
-          callback({
-            url: `http://localhost:${require('../../.electron-vue/config').port}/${param}`,
-            method: request.method,
-          });
-        }
-      }
-      // tslint:disable-next-line:align
-    }, (error) => {
-      if (error) {
-        console.error('Failed to register protocol');
-      }
-    });
-    createWindow();
-  });
-} else {
-  app.on('ready', () => {
-    protocol.registerFileProtocol('lulumi', (request, callback) => {
-      const url = request.url.substr((config.lulumiPagesCustomProtocol).length);
-      const [type, param] = url.split('/');
-      if (type === 'about') {
-        if (param.indexOf('#') === 0) {
-          // '#blablabla'
-          callback(`${__dirname}/about.html`);
-        } else {
-          // 'blablabla'
-          callback(`${__dirname}/${param}`);
-        }
-      }
-      // tslint:disable-next-line:align
-    }, (error) => {
-      if (error) {
-        console.error('Failed to register protocol');
-      }
-    });
-    createWindow();
-  });
-}
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

@@ -3,7 +3,11 @@
     transition(name="notification")
       #notification(v-show="showNotification && isActive")
         notification
-    webview(plugins, :element-loading-text="$t('page.loading')", ref="webview", :class="isActive ? 'active' : 'hidden'")
+    webview(plugins,
+            :element-loading-text="$t('page.loading')",
+            ref="webview",
+            :class="isActive ? 'active' : 'hidden'",
+            :partition="partitionId")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", :placeholder="$t('page.findInPage.placeholder')")
       span(ref="findinpageCount")
@@ -14,7 +18,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Watch, Vue } from 'vue-property-decorator';
+  import { Component, Vue, Watch } from 'vue-property-decorator';
 
   import urlUtil from '../../js/lib/url-util';
 
@@ -28,6 +32,7 @@
     props: [
       'isActive',
       'pageIndex',
+      'partitionId',
     ],
     components: {
       Notification,

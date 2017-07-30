@@ -4,7 +4,12 @@
       tabs(ref="tabs")
       navbar(ref="navbar")
     swipeArrow
-    page(v-for="(page, index) in pages", :isActive="index == currentPageIndex", :pageIndex="index", :ref="`page-${index}`", :key="`page-${page.pid}`")
+    page(v-for="(page, index) in pages",
+        :isActive="index === currentPageIndex",
+        :pageIndex="index",
+        :ref="`page-${index}`",
+        :key="`page-${page.pid}`",
+        :partitionId="`${index}`")
     #footer
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}

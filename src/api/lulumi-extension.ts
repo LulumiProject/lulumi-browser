@@ -290,8 +290,8 @@ const lulumiExtensionHandler = (request, callback) => {
   });
 };
 
-app.on(('session-created' as any), (sess) => {
-  ((sess as any).protocol as Electron.Protocol).registerBufferProtocol('lulumi-extension', lulumiExtensionHandler, (error) => {
+app.on(('session-created' as any), (sess: Electron.Session) => {
+  sess.protocol.registerBufferProtocol('lulumi-extension', lulumiExtensionHandler, (error) => {
     if (error) {
       console.error(`Unable to register lulumi-extension protocol: ${error}`);
     }
