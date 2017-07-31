@@ -14,16 +14,14 @@ export default class ExtensionService {
     this.instance = vueInstance;
     (this.instance as any).$electron
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
-        if (Object.keys(manifestMap).length !== 0) {
-          initializeExtensionApi(apiFactory(this.instance)).then((restoreOriginalModuleLoader) => {
-            if (restoreOriginalModuleLoader) {
-              this.triggerOnReady();
-              this.register();
-              this.manifestMap = manifestMap;
-              this.registerAction();
-            }
-          });
-        }
+        initializeExtensionApi(apiFactory(this.instance)).then((restoreOriginalModuleLoader) => {
+          if (restoreOriginalModuleLoader) {
+            this.triggerOnReady();
+            this.register();
+            this.manifestMap = manifestMap;
+            this.registerAction();
+          }
+        });
       });
     (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
   }
@@ -673,22 +671,11 @@ export default class ExtensionService {
     });
   }
 
-  update() {
+  update(): void {
     (this.instance as any).$electron
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
-        if (Object.keys(this.manifestMap).length === 0) {
-          initializeExtensionApi(apiFactory(this.instance)).then((restoreOriginalModuleLoader) => {
-            if (restoreOriginalModuleLoader) {
-              this.triggerOnReady();
-              this.register();
-              this.manifestMap = manifestMap;
-              this.registerAction();
-            }
-          });
-        } else {
-          this.manifestMap = manifestMap;
-          this.registerAction();
-        }
+        this.manifestMap = manifestMap;
+        this.registerAction();
       });
     (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
   }

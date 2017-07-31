@@ -534,18 +534,20 @@
         extension.click();
       });
 
-      ipc.on('add-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
-        if (result === 'OK') {
+      ipc.on('add-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+        if (data.result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
+          ipc.send('extension-added', data.name);
         }
       });
-      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
-        if (result === 'OK') {
+      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+        if (data.result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
+          ipc.send('extension-removed', data.name);
         } else {
-          alert(result);
+          alert(data.result);
         }
       });
     }

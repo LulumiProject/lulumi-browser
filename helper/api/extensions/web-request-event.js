@@ -36,12 +36,12 @@ class Event {
     const digest = callback.toString().hashCode();
     this.listeners = this.listeners.filter(c => (c !== digest));
     ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted-${digest}`);
-    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event, false);
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event);
   }
 
   removeAllListeners() {
     this.listeners.forEach(l => ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted-${l}`));
-    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event, true);
+    ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.event);
     this.listeners = [];
   }
 }

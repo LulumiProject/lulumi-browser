@@ -321,24 +321,25 @@ app.on('will-quit', () => {
 
 app.once('ready', () => {
   // the public API to add/remove extensions
-  (BrowserWindow as any).addExtension = (srcDirectory: string): string | void => {
+  (BrowserWindow as any).addExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);
     if (manifest !== null) {
       loadExtension(manifest);
       return manifest.name;
+    } else {
+      return '';
     }
   };
 
-  (BrowserWindow as any).removeExtension = (name: string) => {
+  (BrowserWindow as any).removeExtension = (name: string): string => {
     const manifest = manifestNameMap[name];
-    if (!manifest) {
-      return;
+    if (manifest) {
+      removeBackgroundPages(manifest);
+      removeRenderProcessPreferences(manifest);
+      delete manifestMap[manifest.extensionId];
+      delete manifestNameMap[name];
     }
-
-    removeBackgroundPages(manifest);
-    removeRenderProcessPreferences(manifest);
-    delete manifestMap[manifest.extensionId];
-    delete manifestNameMap[name];
+    return name;
   };
 
   (BrowserWindow as any).getExtensions = () => {

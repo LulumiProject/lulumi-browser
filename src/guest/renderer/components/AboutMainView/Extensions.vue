@@ -74,22 +74,22 @@
       ipcRenderer.send('open-dev-tools', webContentsId);
     }
     addExtension(): void {
-      ipcRenderer.once('add-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
-        if (result === 'OK') {
+      ipcRenderer.once('add-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+        if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(result);
+          (this as any).$message.error(data.result);
         }
       });
       ipcRenderer.send('add-extension');
     }
     removeExtension(extensionId: string): void {
       const id = this.findId(extensionId);
-      ipcRenderer.once('remove-extension-result', (event: Electron.IpcMessageEvent, result: string): void => {
-        if (result === 'OK') {
+      ipcRenderer.once('remove-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+        if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(result);
+          (this as any).$message.error(data.result);
         }
       });
       ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);

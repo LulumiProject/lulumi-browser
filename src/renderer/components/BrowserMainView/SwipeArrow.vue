@@ -26,7 +26,7 @@
         if ((this.$parent as BrowserMainView).onWheel) {
           (this.$parent as BrowserMainView).onWheel(event);
         }
-      }, true);
+      }, ({ passive: true, capture: true } as any));
     }
   };
 </script>

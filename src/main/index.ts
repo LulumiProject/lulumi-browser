@@ -178,6 +178,7 @@ function createWindow(): void {
   appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
 }
 
+session.registerWebRequestListeners();
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', createWindow);
 
