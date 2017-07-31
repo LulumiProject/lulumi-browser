@@ -7,7 +7,7 @@
             :element-loading-text="$t('page.loading')",
             ref="webview",
             :class="isActive ? 'active' : 'hidden'",
-            :partition="partitionId")
+            :partition="nonReactivePartitionId")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", :placeholder="$t('page.findInPage.placeholder')")
       span(ref="findinpageCount")
@@ -75,6 +75,7 @@
     get currentPageIndex() {
       return this.$store.getters.currentPageIndex;
     }
+
     navigateTo(location) {
       if (this.$refs.webview) {
         (this.$refs.webview as Electron.WebviewTag).setAttribute('src', urlUtil.getUrlFromInput(location));
@@ -98,6 +99,7 @@
         (this.findinpage.input as HTMLInputElement).select();
       }
     }
+
     @Watch('isActive')
     onIsActive(newState: string): void {
       if (newState && !this.hidden) {
@@ -105,6 +107,9 @@
       }
     }
 
+    beforeMount() {
+      (this as any).nonReactivePartitionId = (this as any).partitionId;
+    }
     mounted() {
       const webview = this.$refs.webview as Electron.WebviewTag;
       const webviewEvents = {

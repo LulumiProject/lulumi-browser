@@ -93,7 +93,7 @@ function createWindow(): void {
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.contextIsolation = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
-    session.registerScheme(params.partition, config.lulumiPagesCustomProtocol);
+    session.registerScheme(params.partition, config.lulumiPagesCustomProtocol, config.delayedInit);
     session.onWillDownload(params.partition, mainWindow!, config.lulumiPDFJSPath);
     session.setPermissionRequestHandler(params.partition, mainWindow!);
 
@@ -178,9 +178,11 @@ function createWindow(): void {
   appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
 }
 
-session.registerWebRequestListeners();
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
-app.on('ready', createWindow);
+app.on('ready', () => {
+  session.registerWebRequestListeners();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

@@ -6,6 +6,7 @@ const lulumiRootPath = process.env.NODE_ENV === 'development'
 const lulumiHelperPath = path.resolve(lulumiRootPath, './helper');
 
 export default {
+  delayedInit: 3000,
   lulumiRootPath,
   lulumiHelperPath,
   devUserData: `${lulumiRootPath}/userData`,
@@ -15,5 +16,5 @@ export default {
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: 'e712c1447b9541ac32c1c08817ad76282946f0dd',
+  lulumiRev: 'a9f6a40e12ac2417e6012ee3abeb3a9328fd9d35',
 };

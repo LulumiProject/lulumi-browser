@@ -162,15 +162,17 @@ const registerWebRequestListeners = (): void => {
   });
 };
 
-const registerWebRequest = (sess: Electron.Session): void => {
-  Object.keys(webRequestMapping).forEach((k) => {
-    const v = webRequestMapping[k];
-    if (webRequestMapping[k].command === 'register') {
-      register(k, sess, v.eventLispCaseName, v.id, v.digest, v.filter);
-    } else {
-      unregister(k, sess);
-    }
-  });
+const registerWebRequest = (sess: Electron.Session, delayedInit: number): void => {
+  setTimeout(() => {
+    Object.keys(webRequestMapping).forEach((k) => {
+      const v = webRequestMapping[k];
+      if (webRequestMapping[k].command === 'register') {
+        register(k, sess, v.eventLispCaseName, v.id, v.digest, v.filter);
+      } else {
+        unregister(k, sess);
+      }
+    });
+  }, delayedInit);
   ipcMain.on('extension-added', (event: Electron.Event, name: string) => {
     setTimeout(() => {
       Object.keys(webRequestMapping).forEach((k) => {
@@ -181,7 +183,7 @@ const registerWebRequest = (sess: Electron.Session): void => {
           unregister(k, sess);
         }
       });
-    }, 1000);
+    }, delayedInit);
   });
   ipcMain.on('extension-removed', (event: Electron.Event, name: string) => {
     Object.keys(webRequestMapping).forEach((k) => {
@@ -190,10 +192,10 @@ const registerWebRequest = (sess: Electron.Session): void => {
   });
 };
 
-const registerScheme = (partition: string, scheme: string): void => {
+const registerScheme = (partition: string, scheme: string, delayedInit: number): void => {
   const sess = session.fromPartition(partition, { cache: true });
   (sess as any).id = partition;
-  registerWebRequest(sess);
+  registerWebRequest(sess, delayedInit);
   if (process.env.NODE_ENV === 'development') {
     sess.protocol.registerBufferProtocol('lulumi', (request, callback) => {
       const url: string = request.url.substr(scheme.length);
