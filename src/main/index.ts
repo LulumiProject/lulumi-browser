@@ -97,12 +97,12 @@ function createWindow(): void {
     session.onWillDownload(params.partition, mainWindow!, config.lulumiPDFJSPath);
     session.setPermissionRequestHandler(params.partition, mainWindow!);
 
-    const regexp = new RegExp('^lulumi-extension://.+/popup.html$');
+    const regexp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {
       if (params.src.match(regexp)) {
-        webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
-      } else {
         webPreferences.preload = path.join(config.lulumiPreloadPath, 'extension-preload.js');
+      } else {
+        webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
       webPreferences.preload = path.join(config.lulumiPreloadPath, 'webview-preload.js');
