@@ -83,7 +83,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       this.$emit('input', value);
       if ((this as any).isOnComposition || (!(this as any).triggerOnFocus && !value)) {
         (this as any).lastQueryString = '';
-        (this as any).suggestions = [];
+        (this as any).suggestions.length = 0;
         return;
       }
       (this as any).getData(value);

@@ -213,7 +213,7 @@
 
     @Watch('location')
     onLocation(newLocation: string): void {
-      if (process.env.NODE_ENV !== 'testing') {
+      if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
         this.showLocation(newLocation);
         const currentLocation = url.parse(newLocation, true);
         const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
@@ -241,9 +241,9 @@
             newElement.removeEventListener('click', this.clickHandler, false);
             originalInput.removeEventListener('blur', this.blurHandler, false);
           }
-          (this.$refs.input as any).suggestions = [];
         }
       }
+      (this.$refs.input as any).suggestions.length = 0;
     }
 
     selectPortion(event): void {
@@ -273,6 +273,10 @@
         this.value = '';
         return;
       }
+      if (this.focused) {
+        this.value = '';
+        return;
+      }
       let newLocation = decodeURIComponent(location);
       newLocation = urlUtil.getLocationIfError(newLocation);
       newLocation = urlUtil.getLocationIfPDF(newLocation);
@@ -298,6 +302,7 @@
       this.value = val;
     }
     onSelect(event): void {
+      this.focused = false;
       if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
         (this.$parent as BrowserMainView).onEnterLocation(
           `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
@@ -512,6 +517,16 @@
         newElement.style.display = 'none';
         (originalInput.parentElement as any).append(newElement);
 
+        originalInput.addEventListener('click', () => {
+          this.focused = true;
+        })
+        originalInput.addEventListener('blur', () => {
+          setTimeout(() => {
+            this.focused = false;
+            (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+              .style.display = 'none';
+          }, 50);
+        })
         this.clickHandler = () => {
           newElement.style.display = 'none';
           (originalInput as HTMLInputElement).style.display = 'block';
