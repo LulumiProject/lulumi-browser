@@ -1,31 +1,14 @@
 import fetchJsonp from 'fetch-jsonp';
-import { renderer } from 'lulumi';
 
-export default (provider: string, autocomplete: string, results: renderer.SuggestionObject[]) => {
+export default (provider: string, autocomplete: string): Promise<Object[]> => {
   if (provider === 'Google') {
-    fetchJsonp(autocomplete)
+    return fetchJsonp(autocomplete)
       .then(response => response.json())
-      .then(data => data[1])
-      .then((entries) => {
-        entries.forEach((entry) => {
-          results.push({
-            value: entry[0],
-            icon: 'search',
-          });
-        });
-      });
+      .then(data => data[1]);
   } else if (provider === 'Bing') {
-    fetchJsonp(`${autocomplete}&JsonType=callback`, { jsonpCallback: 'JsonCallback' })
+    return fetchJsonp(`${autocomplete}&JsonType=callback`, { jsonpCallback: 'JsonCallback' })
       .then(response => response.json())
-      .then(data => data[1])
-      .then((entries) => {
-        entries.forEach((entry) => {
-          results.push({
-            value: entry,
-            icon: 'search',
-          });
-        });
-      });
+      .then(data => data[1].map(d => [d]));
   }
-  return results;
+  return Promise.resolve([]);
 };

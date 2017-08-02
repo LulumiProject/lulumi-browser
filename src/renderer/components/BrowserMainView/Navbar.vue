@@ -81,7 +81,7 @@
   import '../../css/el-badge';
   import '../../css/el-input';
   import urlUtil from '../../js/lib/url-util';
-  // import urlSuggestion from '../../js/lib/url-suggestion';
+  import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
   import BrowserMainView from '../BrowserMainView.vue';
@@ -258,8 +258,8 @@
         el.selectionEnd = el.value.length;
       }
     }
-    unique(source): object[] {
-      const results: object[] = [];
+    unique(source: renderer.SuggestionObject[]): renderer.SuggestionObject[] {
+      const results: renderer.SuggestionObject[] = [];
       const seen: Set<string> = new Set();
 
       source.forEach((s) => {
@@ -313,7 +313,7 @@
       }
     }
     querySearch(queryString: string, cb: Function): void {
-      const suggestions: Array<renderer.SuggestionObject> = this.suggestions;
+      const suggestions: renderer.SuggestionObject[] = this.suggestions;
       let results =
         queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
       results.push({
@@ -327,17 +327,24 @@
           icon: 'document',
         });
       }
-      /*
-      results = urlSuggestion(
-        this.currentSearchEngine.name,
-        `${this.currentSearchEngine.autocomplete}${this.value}`,
-        results);
-      setTimeout(() => cb(results), 100);
-      */
       // fuse results
       const fuse = this.fuse;
       results = results.concat(fuse.search(queryString.toLowerCase()));
-      cb(this.unique(results));
+
+      // autocomplete suggestions
+      urlSuggestion(this.currentSearchEngine.name,
+                    `${this.currentSearchEngine.autocomplete}${this.value}`)
+        .then((final) => {
+          final.forEach((entry) => {
+            results.push({
+              title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
+              value: entry[0],
+              icon: 'search',
+            });
+          })
+          cb(this.unique(results));
+        });
+
     }
     createFilter(queryString: string): (suggestion: any) => boolean {
       return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
