@@ -1,6 +1,7 @@
 import { api } from 'lulumi';
 import { Menu, BrowserWindow } from 'electron';
 import i18n from '../../i18n';
+const { openProcessManager } = require('electron-process-manager');
 
 const globalObjet = global as api.GlobalObject;
 
@@ -148,6 +149,13 @@ const getTemplate = () => {
           label: i18n.t('window.front'),
           role: 'front',
         } : {},
+        process.platform === 'darwin' ? {
+          type: 'separator',
+        } : {},
+        {
+          label: i18n.t('window.processManager'),
+          click: () => openProcessManager(),
+        },
       ],
     },
     {

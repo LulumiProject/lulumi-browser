@@ -2975,6 +2975,10 @@ electron-packager@^8.7.2:
     sanitize-filename "^1.6.0"
     semver "^5.3.0"
 
+electron-process-manager@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.0.4.tgz#b1b2e7a7b29c6cac539dde41909aeb1609a7e413"
+
 electron-rebuild@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.6.0.tgz#e8d26f4d8e9fe5388df35864b3658e5cfd4dcb7e"

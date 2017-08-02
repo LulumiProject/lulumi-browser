@@ -47,6 +47,7 @@ export const appMenu = {
     minimize: '最小化',
     close: '關閉視窗',
     front: '全部移至最上層',
+    processManager: '工作管理員',
   },
   help: {
     title: '說明',

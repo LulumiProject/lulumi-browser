@@ -31,6 +31,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "electron-localshortcut": "^2.0.2",
+    "electron-process-manager": "^0.0.4",
     "fetch-jsonp": "^1.1.1",
     "fuse.js": "^3.0.5",
     "lulumi": "^0.0.20",

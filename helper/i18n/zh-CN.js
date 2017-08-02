@@ -47,6 +47,7 @@ export const appMenu = {
     minimize: 'Minimize',
     close: 'Close Window',
     front: 'Bring All to Front',
+    processManager: 'Process Manager',
   },
   help: {
     title: 'Help',
