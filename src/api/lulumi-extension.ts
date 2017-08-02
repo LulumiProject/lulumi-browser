@@ -132,19 +132,18 @@ const startBackgroundPages = (manifest: api.ManifestObject) => {
 };
 
 const removeBackgroundPages = (manifest) => {
-  if (!backgroundPages[manifest.extensionId]) {
-    return;
+  const extension = backgroundPages[manifest.extensionId];
+  if (extension) {
+    const toBeRemovedwebContents
+      = (webContents.fromId(extension.webContentsId) as Electron.WebContents);
+
+    ipcMain.once(`lulumi-extension-${manifest.extensionId}-clean-done`, () => {
+      (toBeRemovedwebContents as any).destroy();
+      delete backgroundPages[manifest.extensionId];
+    });
+    // notify the extension that itself is going to be removed
+    toBeRemovedwebContents.send(`lulumi-extension-${manifest.extensionId}-going-removed`);
   }
-
-  const toBeRemovedwebContents
-    = (webContents.fromId(backgroundPages[manifest.extensionId].webContentsId) as Electron.WebContents);
-
-  ipcMain.once(`lulumi-extension-${manifest.extensionId}-clean-done`, () => {
-    (toBeRemovedwebContents as any).destroy();
-    delete backgroundPages[manifest.extensionId];
-  });
-  // notify the extension that itself is going to be removed
-  toBeRemovedwebContents.send(`lulumi-extension-${manifest.extensionId}-going-removed`);
 };
 
 const loadCommands = (mainWindow, manifest) => {
@@ -160,8 +159,11 @@ const loadCommands = (mainWindow, manifest) => {
             } else if (command === '_execute_browser_action') {
               BrowserWindow.fromId(globalObjet.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
             } else {
-              webContents.fromId(backgroundPages[manifest.extensionId].webContentsId)
-                .send('lulumi-commands-triggered', command);
+              const extension = backgroundPages[manifest.extensionId];
+              if (extension) {
+                webContents.fromId(extension.webContentsId)
+                  .send('lulumi-commands-triggered', command);
+              }
             }
           }
         });
@@ -346,7 +348,9 @@ app.once('ready', () => {
     const extensions = {};
     Object.keys(manifestNameMap).forEach((name) => {
       const manifest = manifestNameMap[name];
-      extensions[name] = { name: manifest.name, version: manifest.version };
+      if (manifest) {
+        extensions[name] = { name: manifest.name, version: manifest.version };
+      }
     });
     return extensions;
   };

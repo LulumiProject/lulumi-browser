@@ -38,7 +38,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   methods: {
     setInputSelection(input, startPos, endPos) {
       input.focus();
-      if (typeof input.selectionStart !== 'undefined') {
+      if (input.selectionStart !== undefined) {
         input.selectionStart = startPos;
         input.selectionEnd = endPos;
       } else if ((document as any).selection && (document as any).selection.createRange) {

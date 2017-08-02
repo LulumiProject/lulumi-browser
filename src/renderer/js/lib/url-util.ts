@@ -67,7 +67,7 @@ const urlUtil = {
   },
 
   canParseURL(input: string): boolean {
-    if (typeof window === 'undefined') {
+    if (window === undefined) {
       return true;
     }
     try {

@@ -67,7 +67,7 @@
     
     get page(): store.PageObject {
       const page: store.PageObject = this.$store.getters.pages[this.pageIndex];
-      if (typeof page === 'undefined') {
+      if (page === undefined) {
         return this.dummyPageObject;
       }
       return page;

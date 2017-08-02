@@ -110,15 +110,15 @@
     }
 
     getWebView(i?: number): Electron.WebviewTag {
-      const index: number = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
+      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
       return this.$refs[`page-${index}`][0].$refs.webview;
     }
     getPage(i?: number): Page {
-      const index: number = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
+      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
       return this.$refs[`page-${index}`][0];
     }
     getPageObject(i?: number): store.PageObject {
-      const index: number = (typeof i === 'undefined') ? this.$store.getters.currentPageIndex : i;
+      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
       return this.$store.getters.pages[index];
     }
     historyMappings() {
@@ -139,22 +139,15 @@
       return this.$store.getters.lastOpenedTabs.slice(0, 8);
     }
     // lulumi.alarms
-    getAlarm(name): browserMainView.Alarm {
+    getAlarm(name): browserMainView.Alarm | undefined {
       return this.alarms[name];
     }
     getAllAlarm(): browserMainView.AlarmArray {
       return this.alarms;
     }
     clearAlarm(name: string): boolean {
-      if (this.alarms[name] && this.alarms[name].handler) {
-        if (this.alarms[name].periodInMinutes) {
-          clearInterval(this.alarms[name].handler);
-        }
-      }
-      return delete this.alarms[name];
-    }
-    clearAllAlarm(): void {
-      Object.values(this.alarms).forEach((alarm) => {
+      const alarm = this.getAlarm(name);
+      if (alarm) {
         if (alarm.handler) {
           if (alarm.periodInMinutes) {
             clearInterval(alarm.handler);
@@ -162,25 +155,37 @@
             clearTimeout(alarm.handler);
           }
         }
-      });
+        Vue.delete(this.alarms, name);
+        return true;
+      }
+      return false;
+    }
+    clearAllAlarm(): void {
+      Object.keys(this.getAllAlarm()).forEach(name => (this.clearAlarm(name)));
       this.alarms = {};
     }
     createAlarm(name: string, alarmInfo): void {
-      this.clearAlarm(name);
+      let alarm: browserMainView.Alarm = {
+        handler: () => {},
+      };
       let timeout;
-      this.alarms[name] = alarmInfo;
+
+      this.clearAlarm(name);
+
       if (alarmInfo.when) {
         timeout = alarmInfo.when - Date.now();
       } else if (alarmInfo.delayInMinutes) {
         timeout = alarmInfo.delayInMinutes * 60 * 1000;
       }
       if (alarmInfo.periodInMinutes) {
-        this.alarms[name].handler
-          = setInterval(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
+        alarm.handler
+          = setInterval(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
+        alarm.periodInMinutes = alarmInfo.periodInMinutes;
       } else {
-        this.alarms[name].handler
-          = setTimeout(() => this.onAlarmEvent.emit(this.alarms[name]), timeout);
+        alarm.handler
+          = setTimeout(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
       }
+      Vue.set(this.alarms, name, alarm);
     }
     addContextMenus(menuItems, webContentsId: number): void {
       this.contextMenus[`'${webContentsId}'`] = [menuItems];

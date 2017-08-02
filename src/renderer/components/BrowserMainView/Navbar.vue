@@ -221,7 +221,7 @@
         const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
         const newElement = document.getElementById('securityLocation');
         if (newElement !== null) {
-          if (typeof currentLocation.href !== 'undefined' && (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:')) {
+          if (currentLocation.href !== undefined && (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:')) {
             this.secure = true;
             const newLocation
               = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
@@ -346,15 +346,18 @@
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
     }
     setBrowserActionBadgeText(extensionId: string, details): void {
-      if (typeof this.badgeTextArray[extensionId] === 'undefined') {
+      if (this.badgeTextArray[extensionId] === undefined) {
         Vue.set(this.badgeTextArray, extensionId, []);
       }
-      if (details.hasOwnProperty('tabId')) {
-        Vue.set(this.badgeTextArray[extensionId],
-                `${require('lulumi').tabs.get(details.tabId).index}`,
-                details.text);
-      } else {
-        Vue.set(this.badgeTextArray[extensionId], '-1', details.text);
+      const badge = this.badgeTextArray[extensionId];
+      if (badge) {
+        if (details.hasOwnProperty('tabId')) {
+          Vue.set(badge,
+                  `${require('lulumi').tabs.get(details.tabId).index}`,
+                  details.text);
+        } else {
+          Vue.set(badge, '-1', details.text);
+        }
       }
     }
     showBrowserActionBadgeText(extensionId: string): string | number {
@@ -590,8 +593,11 @@
       (this.$parent as BrowserMainView).onRemovedEvent.addListener((tabId) => {
         const tab = require('lulumi').tabs.get(tabId);
         Object.keys(this.badgeTextArray).forEach((k) => {
-          if (this.badgeTextArray[k][tab.index]) {
-            Vue.delete(this.badgeTextArray[k], `${tab.index}`);
+          const badge = this.badgeTextArray[k];
+          if (badge) {
+            if (badge[tab.index]) {
+              Vue.delete(badge, `${tab.index}`);
+            }
           }
         });
       });

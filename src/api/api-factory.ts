@@ -1,5 +1,5 @@
 import Event from './extensions/event';
-import { store } from 'lulumi';
+import { api, store } from 'lulumi';
 import Tab from './extensions/tab';
 
 /* tslint:disable:max-line-length */
@@ -8,11 +8,11 @@ const tabArray: Tab[] = [];
 
 function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
   let tab: Tab = new Tab(-1, -1, false);
-  if (typeof tabId !== 'undefined') {
+  if (tabId !== undefined) {
     if (tabId === -1) {
       return tab;
     } else if (tabId === 0) {
-      if (typeof tabIndex === 'undefined') {
+      if (tabIndex === undefined) {
         tab = new Tab(vueInstance.$store.getters.pid, vueInstance.$store.getters.currentPageIndex, active);
         const object: store.PageObject = vueInstance.getPageObject(tab.index);
         tab.update(object.location, object.title, object.favicon);
@@ -102,15 +102,17 @@ export default (vueInstance: any) => {
   const runtime = {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
-      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
-      if (tabIndex === undefined) {
+      const tabIndex: number = vueInstance.$store.getters.mappings[webContentsId];
+      if (typeof tabIndex === 'undefined') {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       }
-      const backgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
+      const backgroundPages: api.BackgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
-      vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
-        .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findAndUpdateOrCreate(vueInstance, false, 0, tabIndex) }));
+      if (extension) {
+        vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
+          .send('lulumi-runtime-send-message', external, message, (webContents ? { url: webContents.getURL() } : { tab: findAndUpdateOrCreate(vueInstance, false, 0, tabIndex) }));
+      }
     },
     onMessage: (webContentsId: number): Event | undefined => {
       const tabIndex = vueInstance.$store.getters.mappings[webContentsId];

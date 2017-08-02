@@ -22,7 +22,7 @@ declare module 'lulumi' {
       webContentsId: number;
     }
     export interface BackgroundPages {
-      [index: string]: BackgroundPageObject;
+      [index: string]: BackgroundPageObject | undefined;
     }
     export interface ManifestObject extends chrome.runtime.Manifest {
       extensionId: string;
@@ -30,10 +30,10 @@ declare module 'lulumi' {
       version?: string;
     }
     export interface ManifestMap {
-      [index: string]: ManifestObject
+      [index: string]: ManifestObject | undefined;
     }
     export interface ManifestNameMap {
-      [index: string]: ManifestObject
+      [index: string]: ManifestObject | undefined;
     }
     export interface GlobalObject extends NodeJS.Global {
       online: boolean;
@@ -69,7 +69,7 @@ declare module 'lulumi' {
       pageActionMapping: object;
     }
     export interface PageObjectList extends Array<PageObject> {
-      [index: number]: PageObject;
+      [index: number]: PageObject | undefined;
       length: number;
     }
     export interface TabConfig {
@@ -123,10 +123,10 @@ declare module 'lulumi' {
     // BrowserMainView.vue
     export interface Alarm {
       handler: any;
-      periodInMinutes: number;
+      periodInMinutes?: number;
     }
     export interface AlarmArray {
-      [index: string]: Alarm;
+      [index: string]: Alarm | undefined;
     }
     export interface LastOpenedTabObject {
       title?: string;
@@ -153,7 +153,7 @@ declare module 'lulumi' {
   export namespace navbar {
     // Navbar.vue
     export interface BadgeTextArray {
-      [index: string]: string[];
+      [index: string]: string[] | undefined;
     }
   }
 }

@@ -57,7 +57,7 @@
               animation: 150,
               ghostClass: 'ghost',
               onUpdate() {
-                if (typeof vnode.context !== 'undefined') {
+                if (vnode.context !== undefined) {
                   vnode.context.$store.dispatch('setTabsOrder', this.toArray());
                 }
               },
