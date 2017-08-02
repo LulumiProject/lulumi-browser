@@ -7,26 +7,25 @@ import Tab from './extensions/tab';
 const tabArray: Tab[] = [];
 
 function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
-  let tab: Tab = new Tab(-1, false);
+  let tab: Tab = new Tab(-1, -1, false);
   if (typeof tabId !== 'undefined') {
     if (tabId === -1) {
       return tab;
     } else if (tabId === 0) {
       if (typeof tabIndex === 'undefined') {
-        tab = new Tab(vueInstance.$store.getters.currentPageIndex, active);
+        tab = new Tab(vueInstance.$store.getters.pid, vueInstance.$store.getters.currentPageIndex, active);
         const object: store.PageObject = vueInstance.getPageObject(tab.index);
         tab.update(object.location, object.title, object.favicon);
         tabArray[tab.index] = tab;
       } else {
         tab = tabArray[tabIndex];
+        const object: store.PageObject = vueInstance.getPageObject(tabIndex);
         if (tab === undefined) {
-          tab = new Tab(tabIndex, active);
-          const object: store.PageObject = vueInstance.getPageObject(tabIndex);
+          tab = new Tab(object.pid, tabIndex, active);
           tab.update(object.location, object.title, object.favicon);
           tabArray[tabIndex] = tab;
         } else {
           const tmpTab = tabArray[tabIndex];
-          const object: store.PageObject = vueInstance.getPageObject(tmpTab.index);
           tmpTab.update(object.location, object.title, object.favicon);
         }
       }
@@ -51,9 +50,8 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
   } else {
     tabArray.length = 0;
     vueInstance.$store.getters.pages.forEach((page, index) => {
-      tabArray.push(findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index));
-      const object = vueInstance.getPageObject(index);
-      tabArray[index].update(object.location, object.title, object.favicon);
+      findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index);
+      tabArray[index].update(page.location, page.title, page.favicon);
     });
     return tab;
   }

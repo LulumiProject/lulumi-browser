@@ -717,11 +717,10 @@ export default class ExtensionService {
     vue.$refs.navbar.extensions = manifest;
   }
 
-  getTab(pageIndex: number): Tab {
-    try {
-      return require('lulumi').tabs.get(pageIndex);
-    } catch (err) {
-      return new Tab(-1, false);
+  getTab(pageIndex: number, remove: boolean = false): Tab {
+    if (remove) {
+      return new Tab((this.instance as any).getPageObject(pageIndex).pid, -1, false);
     }
+    return require('lulumi').tabs.query({ index: pageIndex })[0];
   }
 }

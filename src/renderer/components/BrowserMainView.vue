@@ -9,7 +9,7 @@
         :pageIndex="index",
         :ref="`page-${index}`",
         :key="`page-${page.pid}`",
-        :partitionId="`${index}`")
+        :partitionId="`${page.pid}`")
     #footer
       transition(name="extend")
         .browser-page-status(v-show="page.statusText") {{ page.statusText }}
@@ -640,7 +640,10 @@
       this.$store.dispatch('clickTab', pageIndex);
     }
     onTabClose(pageIndex: number): void {
-      this.onRemovedEvent.emit(this.extensionService.getTab(pageIndex));
+      this.onRemovedEvent.emit(this.extensionService.getTab(pageIndex, true).id, {
+        windowId: 0,
+        isWindowClosing: false,
+      });
       this.$store.dispatch('closeTab', pageIndex);
       this.$nextTick(() => {
         this.$store.dispatch('setTabsOrder', (this.$refs.tabs as Tabs).sortable.toArray());

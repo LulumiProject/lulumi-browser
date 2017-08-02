@@ -294,8 +294,8 @@ describe('BrowserMainView.vue', () => {
 
   describe('Navbar.vue (integrated)', () => {
     it('shows the corresponding url to the webview', () => {
-      const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
-      expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);
+      const page = vm.getPageObject(0);
+      expect(vm.$el.querySelector('webview.active').src).to.equal(page.location);
     });
 
     it('has four controls in .control-group', () => {
@@ -307,9 +307,9 @@ describe('BrowserMainView.vue', () => {
   });
 
   describe('Page.vue (integrated)', () => {
-    it('shows the corresponding url to the webview', () => {
-      const urlInput = vm.$el.querySelector('.el-input .el-input__inner');
-      expect(vm.$el.querySelector('webview.active').src).to.equal(urlInput.value);
+    it('reveals itself when it\'s the current page', () => {
+      const pageVm = vm.getPage(0);
+      expect(pageVm.isActive).to.equal((vm.currentPageIndex === 0));
     });
   });
 });

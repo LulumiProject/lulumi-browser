@@ -149,4 +149,11 @@ declare module 'lulumi' {
       end(): void;
     }
   }
+
+  export namespace navbar {
+    // Navbar.vue
+    export interface BadgeTextArray {
+      [index: string]: string[];
+    }
+  }
 }

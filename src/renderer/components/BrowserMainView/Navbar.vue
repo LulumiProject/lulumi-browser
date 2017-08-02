@@ -37,7 +37,9 @@
       div.block(v-for="extension in extensions",
           :key="extension.extensionId")
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
-          el-badge.badge(:ref="`badge-${extension.extensionId}`", :value="badgeTextArray[extension.extensionId].text", slot="reference")
+          el-badge.badge(:ref="`badge-${extension.extensionId}`",
+                         :value="showBrowserActionBadgeText(extension.extensionId)",
+                         slot="reference")
             img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                           :src="loadIcon(extension)",
                           :class="showOrNot(extension)",
@@ -84,7 +86,7 @@
 
   import BrowserMainView from '../BrowserMainView.vue';
 
-  import { renderer, store } from 'lulumi';
+  import { navbar, renderer, store } from 'lulumi';
 
   Vue.component('url-suggestion', {
     functional: true,
@@ -164,7 +166,7 @@
     extensions: any[] = [];
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
-    badgeTextArray = {};
+    badgeTextArray: navbar.BadgeTextArray = {};
     
     get page(): store.PageObject {
       if (this.$store.getters.pages.length === 0) {
@@ -344,7 +346,26 @@
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
     }
     setBrowserActionBadgeText(extensionId: string, details): void {
-      (Vue as any).set(this.badgeTextArray, extensionId, details);
+      if (typeof this.badgeTextArray[extensionId] === 'undefined') {
+        Vue.set(this.badgeTextArray, extensionId, []);
+      }
+      if (details.hasOwnProperty('tabId')) {
+        Vue.set(this.badgeTextArray[extensionId],
+                `${require('lulumi').tabs.get(details.tabId).index}`,
+                details.text);
+      } else {
+        Vue.set(this.badgeTextArray[extensionId], '-1', details.text);
+      }
+    }
+    showBrowserActionBadgeText(extensionId: string): string | number {
+      const badge = this.badgeTextArray[extensionId];
+      if (badge) {
+        if (badge[this.currentPageIndex]) {
+          return badge[this.currentPageIndex];
+        }
+        return badge[-1];
+      }
+      return '';
     }
     setPageActionIcon(extensionId: string, path: string): void {
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
@@ -564,6 +585,15 @@
         } else {
           alert(data.result);
         }
+      });
+
+      (this.$parent as BrowserMainView).onRemovedEvent.addListener((tabId) => {
+        const tab = require('lulumi').tabs.get(tabId);
+        Object.keys(this.badgeTextArray).forEach((k) => {
+          if (this.badgeTextArray[k][tab.index]) {
+            Vue.delete(this.badgeTextArray[k], `${tab.index}`);
+          }
+        });
       });
     }
   };
