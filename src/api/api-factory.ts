@@ -75,6 +75,11 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setBrowserActionBadgeText(extensionId, details);
       }
     },
+    setBadgeBackgroundColor: (extensionId: string, details: chrome.browserAction.BadgeBackgroundColorDetails): void => {
+      if (details.hasOwnProperty('color')) {
+        vueInstance.$refs.navbar.setBrowserActionBadgeBackgroundColor(extensionId, details);
+      }
+    },
     onClicked: (webContentsId: number): Event => {
       let id = vueInstance.$store.getters.mappings[webContentsId];
       if (id === undefined) {

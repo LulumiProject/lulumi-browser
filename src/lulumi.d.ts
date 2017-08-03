@@ -155,5 +155,8 @@ declare module 'lulumi' {
     export interface BadgeTextArray {
       [index: string]: string[] | undefined;
     }
+    export interface BadgeBackgroundColorArray {
+      [index: string]: string[] | undefined;
+    }
   }
 }

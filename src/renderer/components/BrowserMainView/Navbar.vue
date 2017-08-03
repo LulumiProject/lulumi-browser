@@ -39,6 +39,7 @@
         el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
           el-badge.badge(:ref="`badge-${extension.extensionId}`",
                          :value="showBrowserActionBadgeText(extension.extensionId)",
+                         :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)"
                          slot="reference")
             img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                           :src="loadIcon(extension)",
@@ -167,6 +168,7 @@
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
     badgeTextArray: navbar.BadgeTextArray = {};
+    badgeBackgroundColorArray: navbar.BadgeBackgroundColorArray = {};
     
     get page(): store.PageObject {
       if (this.$store.getters.pages.length === 0) {
@@ -374,6 +376,35 @@
           return badge[this.currentPageIndex];
         }
         return badge[-1];
+      }
+      return '';
+    }
+    setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
+      if (this.badgeBackgroundColorArray[extensionId] === undefined) {
+        Vue.set(this.badgeBackgroundColorArray, extensionId, []);
+      }
+      const badge = this.badgeBackgroundColorArray[extensionId];
+      if (badge) {
+        if (details.hasOwnProperty('tabId')) {
+          Vue.set(badge,
+                  `${require('lulumi').tabs.get(details.tabId).index}`,
+                  details.color);
+        } else {
+          Vue.set(badge, '-1', details.color);
+        }
+      }
+    }
+    showBrowserActionBadgeBackgroundColor(extensionId: string): string | number {
+      const badge = this.badgeBackgroundColorArray[extensionId];
+      if (this.$refs[`badge-${extensionId}`]) {
+        if (badge) {
+          if (badge[this.currentPageIndex]) {
+            this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[this.currentPageIndex];
+            return badge[this.currentPageIndex];
+          }
+          this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[-1];
+          return badge[-1];
+        }
       }
       return '';
     }
@@ -601,6 +632,14 @@
         const tab = require('lulumi').tabs.get(tabId);
         Object.keys(this.badgeTextArray).forEach((k) => {
           const badge = this.badgeTextArray[k];
+          if (badge) {
+            if (badge[tab.index]) {
+              Vue.delete(badge, `${tab.index}`);
+            }
+          }
+        });
+        Object.keys(this.badgeBackgroundColorArray).forEach((k) => {
+          const badge = this.badgeBackgroundColorArray[k];
           if (badge) {
             if (badge[tab.index]) {
               Vue.delete(badge, `${tab.index}`);

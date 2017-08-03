@@ -62,6 +62,14 @@ export default class ExtensionService {
           require('lulumi').browserAction.setBadgeText(data.extensionId, data.details));
       }
     });
+    ipc.on('lulumi-browser-action-set-badge-background-color', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send(
+          'lulumi-browser-action-set-badge-background-color-result',
+          require('lulumi').browserAction.setBadgeBackgroundColor(data.extensionId, data.details));
+      }
+    });
     ipc.on('lulumi-browser-action-add-listener-on-message', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
