@@ -20,27 +20,63 @@ const webRequestMapping = {
   onErrorOccurred: {},
 };
 
-const register = (eventName: string, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
-  sess.webRequest[eventName](filter, (details, callback) => {
-    details.type = details.resourceType;
-    details.tabId = (sess as any).id;
+const register = (eventName: any, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
+  if ((eventName === 'onBeforeRequest') || (eventName === 'onBeforeSendHeaders')) {
+    sess.webRequest[eventName](filter, (details, callback) => {
+      details.type = details.resourceType;
+      details.tabId = (sess as any).id;
 
-    ipcMain.setMaxListeners(0);
-    ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
-      if (response) {
-        callback(response);
-      } else {
-        callback({ cancel: false });
-      }
+      ipcMain.setMaxListeners(0);
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
+        if (response) {
+          callback(response);
+        } else {
+          callback({ cancel: false });
+        }
+      });
+      const window = BrowserWindow.fromId(globalObjet.wid);
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        details,
+        webContentsId: id,
+      });
     });
-    const window = BrowserWindow.fromId(globalObjet.wid);
-    window.webContents.send('lulumi-web-request-intercepted', {
-      eventLispCaseName,
-      digest,
-      details,
-      webContentsId: id,
+  } else if (eventName === 'onHeadersReceived') {
+    sess.webRequest[eventName](filter, (details, callback) => {
+      details.type = details.resourceType;
+      details.tabId = (sess as any).id;
+
+      ipcMain.setMaxListeners(0);
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
+        if (response) {
+          callback(response);
+        } else {
+          callback({ cancel: false });
+        }
+      });
+      const window = BrowserWindow.fromId(globalObjet.wid);
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        details,
+        webContentsId: id,
+      });
     });
-  });
+  } else {
+    sess.webRequest[eventName](filter, (details) => {
+      details.type = details.resourceType;
+      details.tabId = (sess as any).id;
+
+      const window = BrowserWindow.fromId(globalObjet.wid);
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        details,
+        webContentsId: id,
+      });
+    });
+  }
 };
 
 const unregister = (eventName: string, sess: Electron.Session): void => {
