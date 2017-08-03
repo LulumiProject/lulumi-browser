@@ -694,14 +694,14 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
   };
 
   lulumi.webRequest = {
-    onBeforeRequest: new webRequestEvent('web-request', 'on-before-request'),
-    onBeforeSendHeaders: new webRequestEvent('web-request', 'on-before-send-headers'),
-    onSendHeaders: new webRequestEvent('web-request', 'on-send-headers'),
-    onHeadersReceived: new webRequestEvent('web-request', 'on-headers-received'),
-    onResponseStarted: new webRequestEvent('web-request', 'on-response-started'),
-    onBeforeRedirect: new webRequestEvent('web-request', 'on-before-redirect'),
-    onCompleted: new webRequestEvent('web-request', 'on-completed'),
-    onErrorOccurred: new webRequestEvent('web-request', 'on-error-occurred'),
+    onBeforeRequest: new webRequestEvent(manifest.name, 'web-request', 'on-before-request'),
+    onBeforeSendHeaders: new webRequestEvent(manifest.name, 'web-request', 'on-before-send-headers'),
+    onSendHeaders: new webRequestEvent(manifest.name, 'web-request', 'on-send-headers'),
+    onHeadersReceived: new webRequestEvent(manifest.name, 'web-request', 'on-headers-received'),
+    onResponseStarted: new webRequestEvent(manifest.name, 'web-request', 'on-response-started'),
+    onBeforeRedirect: new webRequestEvent(manifest.name, 'web-request', 'on-before-redirect'),
+    onCompleted: new webRequestEvent(manifest.name, 'web-request', 'on-completed'),
+    onErrorOccurred: new webRequestEvent(manifest.name, 'web-request', 'on-error-occurred'),
   };
 
   lulumi.webNavigation = {
