@@ -220,7 +220,7 @@
         frameId: 0,
         parentFrameId: -1,
         processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: pageIndex,
+        tabId: this.getPageObject(pageIndex).pid,
         timeStamp: Date.now(),
         url: webview.getURL(),
       });
@@ -248,7 +248,7 @@
         frameId: 0,
         parentFrameId: -1,
         processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: pageIndex,
+        tabId: this.getPageObject(pageIndex).pid,
         timeStamp: Date.now(),
         url: location,
       });
@@ -334,12 +334,12 @@
       this.onNewTab(event.url, true);
       if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
         this.onCreatedNavigationTarget.emit({
-          sourceTabId: pageIndex,
+          sourceTabId: this.getPageObject(pageIndex).pid,
           sourceProcessId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
           sourceFrameId: 0,
           timeStamp: Date.now(),
           url: event.url,
-          tabId: this.pages.length - 1,
+          tabId: this.$store.getters.pid,
         });
       }
     }
@@ -508,7 +508,7 @@
       });
       this.getPage(pageIndex).onMessageEvent.listeners = [];
       this.onBeforeNavigate.emit({
-        tabId: pageIndex,
+        tabId: this.getPageObject(pageIndex).pid,
         url: event.url,
         frameId: 0,
         parentFrameId: -1,
@@ -520,7 +520,7 @@
         frameId: 0,
         parentFrameId: -1,
         processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: pageIndex,
+        tabId: this.getPageObject(pageIndex).pid,
         timeStamp: Date.now(),
         url: event.url,
       });
@@ -1175,7 +1175,7 @@
 
       ipc.on('browser-window-focus', () => {
         this.onActivatedEvent.emit({
-          tabId: this.currentPageIndex,
+          tabId: this.getPageObject(this.currentPageIndex).pid,
           windowId: 0,
         });
       });

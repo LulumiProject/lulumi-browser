@@ -25,13 +25,14 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
           tab.update(object.location, object.title, object.favicon);
           tabArray[tabIndex] = tab;
         } else {
-          const tmpTab = tabArray[tabIndex];
-          tmpTab.update(object.location, object.title, object.favicon);
+          tabArray[tabIndex].update(object.location, object.title, object.favicon);
+          tab = tabArray[tabIndex];
         }
       }
-      if (active) {
+      if ((tab.index !== -1) && active) {
         tabArray.map(tab => tab.activate(false));
         tabArray[tab.index].activate(true);
+        tab = tabArray[tab.index];
         vueInstance.$nextTick(() => vueInstance.onTabClick(tab.index));
       }
       return tab;

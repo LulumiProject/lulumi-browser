@@ -396,7 +396,7 @@
     }
     showBrowserActionBadgeBackgroundColor(extensionId: string): string | number {
       const badge = this.badgeBackgroundColorArray[extensionId];
-      if (this.$refs[`badge-${extensionId}`]) {
+      if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
         if (badge) {
           if (badge[this.currentPageIndex]) {
             this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[this.currentPageIndex];

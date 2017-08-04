@@ -23,7 +23,15 @@ const webRequestMapping = {
 const register = (eventName: any, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
   if ((eventName === 'onBeforeRequest') || (eventName === 'onBeforeSendHeaders')) {
     sess.webRequest[eventName](filter, (details, callback) => {
-      details.type = details.resourceType;
+      if (details.resourceType === 'mainFrame') {
+        details.type = 'main_frame';
+      } else if (details.resourceType === 'subFrame') {
+        details.type = 'sub_frame';
+      } else if (details.resourceType === 'cspReport') {
+        details.type = 'csp_report';
+      } else {
+        details.type = details.resourceType;
+      }
       details.tabId = (sess as any).id;
 
       ipcMain.setMaxListeners(0);
@@ -250,7 +258,7 @@ const registerWebRequest = (sess: Electron.Session, delayedInit: number): void =
 
 const registerScheme = (partition: string, scheme: string, delayedInit: number): void => {
   const sess = session.fromPartition(partition, { cache: true });
-  (sess as any).id = partition;
+  (sess as any).id = parseInt(partition, 10);
   registerWebRequest(sess, delayedInit);
   if (process.env.NODE_ENV === 'development') {
     sess.protocol.registerBufferProtocol('lulumi', (request, callback) => {
