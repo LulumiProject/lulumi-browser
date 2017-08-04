@@ -7,7 +7,6 @@ import apiFactory, { initializeExtensionApi } from './api-factory';
 
 export default class ExtensionService {
   newtabOverrides: string = '';
-  ready: boolean = false;
   manifestMap: object = {};
   instance: Vue;
   constructor(vueInstance) {
@@ -16,7 +15,7 @@ export default class ExtensionService {
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
         initializeExtensionApi(apiFactory(this.instance)).then((restoreOriginalModuleLoader) => {
           if (restoreOriginalModuleLoader) {
-            this.triggerOnReady();
+            this.notifyParentWhenReady();
             this.register();
             this.manifestMap = manifestMap;
             this.registerAction();
@@ -26,8 +25,8 @@ export default class ExtensionService {
     (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
   }
 
-  triggerOnReady() {
-    this.ready = true;
+  notifyParentWhenReady() {
+    (this.instance as any).ready = true;
   }
 
   register() {

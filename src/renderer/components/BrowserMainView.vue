@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component, Watch, Vue } from 'vue-property-decorator';
 
   import url from 'url';
 
@@ -74,6 +74,7 @@
     startTime: number = 0;
     showDownloadBar: boolean = false;
     extensionService: ExtensionService;
+    ready: boolean = false;
     contextMenus: object = {};
     onUpdatedEvent: Event = new Event();
     onCreatedEvent: Event = new Event();
@@ -107,6 +108,13 @@
     }
     get pdfViewer(): string {
       return this.$store.getters.pdfViewer;
+    }
+
+    @Watch('ready')
+    onReady(ready: boolean): void {
+      if (ready) {
+        (this as any).$electron.ipcRenderer.send('request-app-state');
+      }
     }
 
     getWebView(i?: number): Electron.WebviewTag {
@@ -1165,6 +1173,7 @@
           this.onNewTab('about:newtab');
         }
       });
+      this.extensionService = new ExtensionService(this);
     }
     mounted() {
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
@@ -1352,10 +1361,6 @@
       window.addEventListener('online', updateOnlineStatus);
       window.addEventListener('offline', updateOnlineStatus);
       updateOnlineStatus();
-
-      this.extensionService = new ExtensionService(this);
-
-      ipc.send('request-app-state');
     }
   };
 </script>

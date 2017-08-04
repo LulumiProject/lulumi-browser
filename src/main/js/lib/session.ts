@@ -223,16 +223,14 @@ const registerWebRequestListeners = (): void => {
 };
 
 const registerWebRequest = (sess: Electron.Session, delayedInit: number): void => {
-  setTimeout(() => {
-    Object.keys(webRequestMapping).forEach((k) => {
-      const v = webRequestMapping[k];
-      if (v.command === 'register') {
-        register(k, sess, v.eventLispCaseName, v.id, v.digest, v.filter);
-      } else {
-        unregister(k, sess);
-      }
-    });
-  }, delayedInit);
+  Object.keys(webRequestMapping).forEach((k) => {
+    const v = webRequestMapping[k];
+    if (v.command === 'register') {
+      register(k, sess, v.eventLispCaseName, v.id, v.digest, v.filter);
+    } else {
+      unregister(k, sess);
+    }
+  });
   ipcMain.on('extension-added', (event: Electron.Event, extensionName: string) => {
     setTimeout(() => {
       Object.keys(webRequestMapping).forEach((k) => {
