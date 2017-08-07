@@ -12,6 +12,7 @@ export const appMenu = {
   file: {
     title: 'File',
     newTab: 'New Tab',
+    newWindow: 'New Window',
     closeTab: 'Close Tab',
   },
   edit: {

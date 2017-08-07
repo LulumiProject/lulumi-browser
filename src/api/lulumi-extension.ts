@@ -155,9 +155,9 @@ const loadCommands = (mainWindow, manifest) => {
         localshortcut.register(mainWindow, suggested_key.default, () => {
           if (commands[command].suggested_key) {
             if (command === '_execute_page_action') {
-              BrowserWindow.fromId(globalObjet.wid).webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+              BrowserWindow.getFocusedWindow().webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
             } else if (command === '_execute_browser_action') {
-              BrowserWindow.fromId(globalObjet.wid).webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+              BrowserWindow.getFocusedWindow().webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
             } else {
               const extension = backgroundPages[manifest.extensionId];
               if (extension) {

@@ -7,7 +7,7 @@ import 'iview/dist/styles/iview.css';
 
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import store from '../shared/store/rendererStore';
 import i18n from './i18n';
 
 Vue.use(Electron);

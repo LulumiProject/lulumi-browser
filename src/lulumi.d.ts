@@ -37,7 +37,6 @@ declare module 'lulumi' {
     }
     export interface GlobalObject extends NodeJS.Global {
       online: boolean;
-      wid: number;
       __static: string;
       renderProcessPreferences: any[];
       backgroundPages: BackgroundPages;
@@ -90,6 +89,7 @@ declare module 'lulumi' {
     export interface State {
       pid: number;
       pages: PageObjectList;
+      windowIds: number[];
       tabsOrder: number[];
       currentPageIndex: number;
       searchEngine: SearchEngineObject[];

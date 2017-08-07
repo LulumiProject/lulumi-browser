@@ -4,6 +4,8 @@ export const CREATE_TAB = 'CREATE_TAB';
 export const CLOSE_TAB = 'CLOSE_TAB';
 export const CLICK_TAB = 'CLICK_TAB';
 
+export const NEW_WINDOW = 'NEW_WINDOW';
+
 export const DID_FRAME_FINISH_LOAD = 'DID_FRAME_FINISH_LOAD';
 export const DID_START_LOADING = 'DID_START_LOADING';
 export const DOM_READY = 'DOM_READY';

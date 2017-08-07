@@ -12,7 +12,8 @@
             span(v-if="file.state !== 'progressing'", class="el-icon-close", @click="setDownloads(index)")
             el-progress(:status="checkStateForProgress(file.state)", :text-inside="true", :percentage="percentage(file)", :stroke-width="18", class="download-list__item-progress")
             a(class="download-list__item-name download-list__item-link", :href="`${file.url}`")
-              i(class="el-icon-document") {{ file.name }}
+              i(class="el-icon-document")
+                span(style="font-family: initial;") {{ file.name }}
             el-button-group
               el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="small", icon="caret-right", @click="resumeDownload(file.startTime)")
               el-button(:disabled="file.state !== 'progressing'", v-else, :plain="true", type="warning", size="small", icon="minus", @click="pauseDownload(file.startTime)")
@@ -52,7 +53,7 @@
       clearInterval(this.handler);
     }
     percentage(file: File): number {
-      return (file.getReceivedBytes / file.totalBytes) * 100;
+      return Math.floor((file.getReceivedBytes / file.totalBytes) * 100);
     }
     setDownloads(index: number): void {
       if (index !== -1) {

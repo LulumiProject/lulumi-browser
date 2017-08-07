@@ -11,6 +11,9 @@ export const getters = {
   pages(state: BrowserState): store.PageObjectList {
     return state.browser.pages;
   },
+  windowIds(state: BrowserState): number[] {
+    return state.browser.windowIds;
+  },
   tabsOrder(state: BrowserState) {
     return state.browser.tabsOrder;
   },

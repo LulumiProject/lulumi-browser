@@ -23,7 +23,7 @@ if (process.env.NODE_ENV !== 'development') {
   globalObjet.__static = path.resolve(__dirname, '../static');
 }
 
-let mainWindow: Electron.BrowserWindow | null;
+const Windows = require('../shared/store/mainStore').default;
 
 let shuttingDown: boolean = process.env.BABEL_ENV === 'test';
 
@@ -60,12 +60,17 @@ const winURL: string = process.env.NODE_ENV === 'development'
   : `file://${__dirname}/index.html`;
 
 function appStateSave(force: boolean = true): void {
-  if (mainWindow) {
-    mainWindow.webContents.send('request-app-state', force);
+  if (Windows.length !== 0) {
+    Object.values(Windows)[0].webContents.send('request-app-state', force);
+  } else {
+    shuttingDown = true;
+    app.quit();
   }
 }
 
 function createWindow(): void {
+  let mainWindow: Electron.BrowserWindow;
+
   /**
    * Initial window options
    */
@@ -79,8 +84,6 @@ function createWindow(): void {
     autoHideMenuBar: autoHideMenuBarSetting,
     frame: !isWindows,
   });
-
-  globalObjet.wid = mainWindow.id;
 
   mainWindow.loadURL(winURL);
   menu.init();
@@ -122,7 +125,6 @@ function createWindow(): void {
   });
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
     if (setLanguage) {
       createWindow();
       setLanguage = false;
@@ -147,7 +149,7 @@ function createWindow(): void {
     globalObjet.backgroundPages = lulumiExtension.backgroundPages;
     globalObjet.manifestMap = lulumiExtension.manifestMap;
 
-    mainWindow!.webContents.send(
+    mainWindow.webContents.send(
       'response-extension-objects',
       lulumiExtension.manifestMap);
     Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
@@ -156,6 +158,7 @@ function createWindow(): void {
   });
 
   ipcMain.on('request-app-state', () => {
+    mainWindow.webContents.send('new-window-added', mainWindow.id);
     new Promise((resolve, reject) => {
       let data: string = '""';
       try {
@@ -170,8 +173,123 @@ function createWindow(): void {
         console.error(`could not parse data from ${storagePath}, ${event}`);
       }
     }).then((data) => {
-      mainWindow!.webContents.send('set-app-state', data);
+      mainWindow.webContents.send('set-app-state', data);
     }).catch(() => console.error('request-app-state error'));
+  });
+
+  ipcMain.on('guest-want-data', (event: Electron.Event, val: string) => {
+    const webContentsId: number = event.sender.id;
+    switch (val) {
+      case 'searchEngineProvider':
+        mainWindow.webContents.send('get-search-engine-provider', {
+          webContentsId,
+        });
+        break;
+      case 'homepage':
+        mainWindow.webContents.send('get-homepage', {
+          webContentsId,
+        });
+        break;
+      case 'pdfViewer':
+        mainWindow.webContents.send('get-pdf-viewer', {
+          webContentsId,
+        });
+        break;
+      case 'tabConfig':
+        mainWindow.webContents.send('get-tab-config', {
+          webContentsId,
+        });
+        break;
+      case 'lang':
+        mainWindow.webContents.send('get-lang', {
+          webContentsId,
+        });
+        break;
+      case 'downloads':
+        mainWindow.webContents.send('get-downloads', {
+          webContentsId,
+        });
+        break;
+      case 'history':
+        mainWindow.webContents.send('get-history', {
+          webContentsId,
+        });
+        break;
+      case 'extensions':
+        break;
+      default:
+        break;
+    }
+  });
+
+  ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-search-engine-provider', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('set-homepage', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-homepage', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-pdf-viewer', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-tab-config', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('set-lang', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('request-permission', {
+      webContentsId: event.sender.id,
+      permission: 'setLanguage',
+      lang: val.lang,
+    });
+    ipcMain.once(`response-permission-${event.sender.id}`, (event: Electron.Event, data) => {
+      if (data.accept) {
+        mainWindow.webContents.send('set-lang', {
+          val,
+          webContentsId: event.sender.id,
+        });
+        promisify(writeFile, langPath, JSON.stringify(val.lang))
+          .then(() => {
+            setLanguage = true;
+            menu.setLocale(val.lang);
+            app.quit();
+          });
+      }
+    });
+  });
+  ipcMain.on('set-downloads', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-downloads', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+  ipcMain.on('set-history', (event: Electron.Event, val) => {
+    mainWindow.webContents.send('set-history', {
+      val,
+      webContentsId: event.sender.id,
+    });
+  });
+
+  globalObjet.online = true;
+  ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
+    if (status) {
+      if (globalObjet.online === false && status === true) {
+        globalObjet.online = true;
+        mainWindow.webContents.send('reload');
+      }
+    } else {
+      globalObjet.online = false;
+    }
   });
 
   // save app-state every 5 mins
@@ -180,8 +298,9 @@ function createWindow(): void {
 
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', () => {
+  (BrowserWindow as any).createWindow = createWindow;
   session.registerWebRequestListeners();
-  createWindow();
+  (BrowserWindow as any).createWindow();
 });
 
 app.on('window-all-closed', () => {
@@ -191,7 +310,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (mainWindow === null) {
+  if (Windows.length === 0) {
     createWindow();
   }
 });
@@ -201,7 +320,7 @@ app.on('before-quit', (event) => {
     if (setLanguage) {
       event.preventDefault();
       shuttingDown = false;
-      mainWindow!.close();
+      BrowserWindow.getAllWindows().forEach(window => window.close());
       return;
     }
     return;
@@ -212,10 +331,6 @@ app.on('before-quit', (event) => {
     appStateSaveHandler = null;
   }
   appStateSave(false);
-});
-
-app.on('browser-window-focus', () => {
-  mainWindow!.webContents.send('browser-window-focus');
 });
 
 ipcMain.on('response-app-state', (event, data) => {
@@ -312,120 +427,5 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
     globalObjet.guestData = data;
-  }
-});
-
-ipcMain.on('guest-want-data', (event: Electron.Event, val: string) => {
-  const webContentsId: number = event.sender.id;
-  switch (val) {
-    case 'searchEngineProvider':
-      mainWindow!.webContents.send('get-search-engine-provider', {
-        webContentsId,
-      });
-      break;
-    case 'homepage':
-      mainWindow!.webContents.send('get-homepage', {
-        webContentsId,
-      });
-      break;
-    case 'pdfViewer':
-      mainWindow!.webContents.send('get-pdf-viewer', {
-        webContentsId,
-      });
-      break;
-    case 'tabConfig':
-      mainWindow!.webContents.send('get-tab-config', {
-        webContentsId,
-      });
-      break;
-    case 'lang':
-      mainWindow!.webContents.send('get-lang', {
-        webContentsId,
-      });
-      break;
-    case 'downloads':
-      mainWindow!.webContents.send('get-downloads', {
-        webContentsId,
-      });
-      break;
-    case 'history':
-      mainWindow!.webContents.send('get-history', {
-        webContentsId,
-      });
-      break;
-    case 'extensions':
-      break;
-    default:
-      break;
-  }
-});
-
-ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-search-engine-provider', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.on('set-homepage', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-homepage', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-pdf-viewer', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-tab-config', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.on('set-lang', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('request-permission', {
-    webContentsId: event.sender.id,
-    permission: 'setLanguage',
-    lang: val.lang,
-  });
-  ipcMain.once(`response-permission-${event.sender.id}`, (event: Electron.Event, data) => {
-    if (data.accept) {
-      mainWindow!.webContents.send('set-lang', {
-        val,
-        webContentsId: event.sender.id,
-      });
-      promisify(writeFile, langPath, JSON.stringify(val.lang))
-        .then(() => {
-          setLanguage = true;
-          menu.setLocale(val.lang);
-          app.quit();
-        });
-    }
-  });
-});
-ipcMain.on('set-downloads', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-downloads', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-ipcMain.on('set-history', (event: Electron.Event, val) => {
-  mainWindow!.webContents.send('set-history', {
-    val,
-    webContentsId: event.sender.id,
-  });
-});
-
-globalObjet.online = true;
-ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
-  if (status) {
-    if (globalObjet.online === false && status === true) {
-      globalObjet.online = true;
-      mainWindow!.webContents.send('reload');
-    }
-  } else {
-    globalObjet.online = false;
   }
 });

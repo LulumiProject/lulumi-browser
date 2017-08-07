@@ -1,7 +1,4 @@
-import { api } from 'lulumi';
 import { BrowserWindow, dialog, ipcMain, webContents } from 'electron';
-
-const globalObjet = global as api.GlobalObject;
 
 ipcMain.on('open-dev-tools', (event, webContentsId) => {
   if (webContentsId) {
@@ -9,7 +6,7 @@ ipcMain.on('open-dev-tools', (event, webContentsId) => {
   }
 });
 ipcMain.on('add-extension', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   dialog.showOpenDialog({ properties: ['openDirectory'] }, (dirs) => {
     if (dirs) {
       let name = '';
@@ -33,7 +30,7 @@ ipcMain.on('add-extension', (event) => {
   });
 });
 ipcMain.on('remove-extension', (event, name) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   let result: string = 'OK';
   try {
     (BrowserWindow as any).removeExtension(name);
@@ -52,20 +49,20 @@ ipcMain.on('remove-extension', (event, name) => {
 });
 
 ipcMain.on('lulumi-env-app-name', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-env-app-name', {
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-env-app-version', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-env-app-version', {
     webContentsId: event.sender.id,
   });
 });
 
 ipcMain.on('lulumi-browser-action-set-icon', (event, extensionId, startPage, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-browser-action-set-icon', {
     extensionId,
     startPage,
@@ -74,7 +71,7 @@ ipcMain.on('lulumi-browser-action-set-icon', (event, extensionId, startPage, det
   });
 });
 ipcMain.on('lulumi-browser-action-set-badge-text', (event, extensionId, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-browser-action-set-badge-text', {
     extensionId,
     details,
@@ -82,7 +79,7 @@ ipcMain.on('lulumi-browser-action-set-badge-text', (event, extensionId, details)
   });
 });
 ipcMain.on('lulumi-browser-action-set-badge-background-color', (event, extensionId, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-browser-action-set-badge-background-color', {
     extensionId,
     details,
@@ -90,7 +87,7 @@ ipcMain.on('lulumi-browser-action-set-badge-background-color', (event, extension
   });
 });
 ipcMain.once('lulumi-browser-action-on-message', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-browser-action-add-listener-on-message', (event, digest) => {
     window.webContents.send('lulumi-browser-action-add-listener-on-message', {
       digest,
@@ -113,7 +110,7 @@ ipcMain.once('lulumi-browser-action-on-message', (event) => {
 });
 
 ipcMain.on('lulumi-page-action-set-icon', (event, extensionId, startPage, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-page-action-set-icon', {
     extensionId,
     startPage,
@@ -122,7 +119,7 @@ ipcMain.on('lulumi-page-action-set-icon', (event, extensionId, startPage, detail
   });
 });
 ipcMain.on('lulumi-page-action-show', (event, tabId, extensionId, enabled) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-page-action-show', {
     tabId,
     extensionId,
@@ -131,7 +128,7 @@ ipcMain.on('lulumi-page-action-show', (event, tabId, extensionId, enabled) => {
   });
 });
 ipcMain.on('lulumi-page-action-hide', (event, tabId, extensionId, enabled) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-page-action-hide', {
     tabId,
     extensionId,
@@ -140,7 +137,7 @@ ipcMain.on('lulumi-page-action-hide', (event, tabId, extensionId, enabled) => {
   });
 });
 ipcMain.once('lulumi-page-action-on-message', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-page-action-add-listener-on-message', (event, digest) => {
     window.webContents.send('lulumi-page-action-add-listener-on-message', {
       digest,
@@ -163,33 +160,33 @@ ipcMain.once('lulumi-page-action-on-message', (event) => {
 });
 
 ipcMain.on('lulumi-alarms-get', (event, name) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-alarms-get', {
     name,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-alarms-get-all', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-alarms-get-all', {
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-alarms-clear', (event, name) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-alarms-clear', {
     name,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-alarms-clear-all', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-alarms-clear-all', {
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-alarms-create', (event, name, alarmInfo) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-alarms-create', {
     name,
     alarmInfo,
@@ -197,7 +194,7 @@ ipcMain.on('lulumi-alarms-create', (event, name, alarmInfo) => {
   });
 });
 ipcMain.once('lulumi-alarms-on-alarm', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-alarms-add-listener-on-alarm', (event, digest) => {
     window.webContents.send('lulumi-alarms-add-listener-on-alarm', {
       digest,
@@ -220,7 +217,7 @@ ipcMain.once('lulumi-alarms-on-alarm', (event) => {
 });
 
 ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message, external) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-runtime-send-message', {
     extensionId,
     message,
@@ -229,7 +226,7 @@ ipcMain.on('lulumi-runtime-send-message', (event, extensionId, message, external
   });
 });
 ipcMain.once('lulumi-runtime-on-message', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-runtime-add-listener-on-message', (event, digest) => {
     window.webContents.send('lulumi-runtime-add-listener-on-message', {
       digest,
@@ -252,34 +249,34 @@ ipcMain.once('lulumi-runtime-on-message', (event) => {
 });
 
 ipcMain.on('lulumi-tabs-get', (event, tabId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-get', {
     tabId,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-get-current', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-get-current', {
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-duplicate', (event, tabId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-duplicate', {
     tabId,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-query', (event, queryInfo) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-query', {
     queryInfo,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-update', (event, tabId, updateProperties) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-update', {
     tabId,
     updateProperties,
@@ -287,7 +284,7 @@ ipcMain.on('lulumi-tabs-update', (event, tabId, updateProperties) => {
   });
 });
 ipcMain.on('lulumi-tabs-reload', (event, tabId, reloadProperties) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-reload', {
     tabId,
     reloadProperties,
@@ -295,35 +292,35 @@ ipcMain.on('lulumi-tabs-reload', (event, tabId, reloadProperties) => {
   });
 });
 ipcMain.on('lulumi-tabs-create', (event, createProperties) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-create', {
     createProperties,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-remove', (event, tabIds) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-remove', {
     tabIds,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-detect-language', (event, tabId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-detect-language', {
     tabId,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-tabs-detect-language-result', (event, value, webContentsId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-detect-language-result', {
     value,
     webContentsId,
   });
 });
 ipcMain.on('lulumi-tabs-execute-script', (event, tabId, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-execute-script', {
     tabId,
     details,
@@ -331,7 +328,7 @@ ipcMain.on('lulumi-tabs-execute-script', (event, tabId, details) => {
   });
 });
 ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-insert-css', {
     tabId,
     details,
@@ -339,7 +336,7 @@ ipcMain.on('lulumi-tabs-insert-css', (event, tabId, details) => {
   });
 });
 ipcMain.on('lulumi-tabs-send-message', (event, tabId, message) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-tabs-send-message', {
     tabId,
     message,
@@ -347,7 +344,7 @@ ipcMain.on('lulumi-tabs-send-message', (event, tabId, message) => {
   });
 });
 ipcMain.once('lulumi-tabs-on-activated', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-tabs-add-listener-on-activated', (event, digest) => {
     window.webContents.send('lulumi-tabs-add-listener-on-activated', {
       digest,
@@ -368,7 +365,7 @@ ipcMain.once('lulumi-tabs-on-activated', (event) => {
   });
 });
 ipcMain.once('lulumi-tabs-on-updated', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-tabs-add-listener-on-updated', (event, digest) => {
     window.webContents.send('lulumi-tabs-add-listener-on-updated', {
       digest,
@@ -389,7 +386,7 @@ ipcMain.once('lulumi-tabs-on-updated', (event) => {
   });
 });
 ipcMain.once('lulumi-tabs-on-created', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-tabs-add-listener-on-created', (event, digest) => {
     window.webContents.send('lulumi-tabs-add-listener-on-created', {
       digest,
@@ -410,7 +407,7 @@ ipcMain.once('lulumi-tabs-on-created', (event) => {
   });
 });
 ipcMain.once('lulumi-tabs-on-removed', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-tabs-add-listener-on-removed', (event, digest) => {
     window.webContents.send('lulumi-tabs-add-listener-on-removed', {
       digest,
@@ -432,7 +429,7 @@ ipcMain.once('lulumi-tabs-on-removed', (event) => {
 });
 
 ipcMain.once('lulumi-storage-on-changed', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-storage-add-listener-on-changed', (event, digest) => {
     window.webContents.send('lulumi-storage-add-listener-on-changed', {
       digest,
@@ -454,21 +451,21 @@ ipcMain.once('lulumi-storage-on-changed', (event) => {
 });
 
 ipcMain.on('lulumi-context-menus-create', (event, menuItems) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-context-menus-create', {
     menuItems,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-context-menus-remove', (event, menuItems) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-context-menus-remove', {
     menuItems,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-context-menus-remove-all', (event, menuItems) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-context-menus-remove-all', {
     menuItems,
     webContentsId: event.sender.id,
@@ -476,35 +473,35 @@ ipcMain.on('lulumi-context-menus-remove-all', (event, menuItems) => {
 });
 
 ipcMain.on('lulumi-web-navigation-get-frame', (event, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-web-navigation-get-frame', {
     details,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-web-navigation-get-frame-result', (event, details, webContentsId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-web-navigation-get-frame-result', {
     details,
     webContentsId,
   });
 });
 ipcMain.on('lulumi-web-navigation-get-all-frames', (event, details) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-web-navigation-get-all-frames', {
     details,
     webContentsId: event.sender.id,
   });
 });
 ipcMain.on('lulumi-web-navigation-get-all-frames-result', (event, details, webContentsId) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   window.webContents.send('lulumi-web-navigation-get-all-frames-result', {
     details,
     webContentsId,
   });
 });
 ipcMain.once('lulumi-web-navigation-on-before-navigate', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, digest) => {
     window.webContents.send('lulumi-web-navigation-add-listener-on-before-navigate', {
       digest,
@@ -525,7 +522,7 @@ ipcMain.once('lulumi-web-navigation-on-before-navigate', (event) => {
   });
 });
 ipcMain.once('lulumi-web-navigation-on-committed', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-web-navigation-add-listener-on-committed', (event, digest) => {
     window.webContents.send('lulumi-web-navigation-add-listener-on-committed', {
       digest,
@@ -546,7 +543,7 @@ ipcMain.once('lulumi-web-navigation-on-committed', (event) => {
   });
 });
 ipcMain.once('lulumi-web-navigation-on-dom-content-loaded', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-web-navigation-add-listener-on-dom-content-loaded', (event, digest) => {
     window.webContents.send('lulumi-web-navigation-add-listener-on-dom-content-loaded', {
       digest,
@@ -567,7 +564,7 @@ ipcMain.once('lulumi-web-navigation-on-dom-content-loaded', (event) => {
   });
 });
 ipcMain.once('lulumi-web-navigation-on-completed', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-web-navigation-add-listener-on-completed', (event, digest) => {
     window.webContents.send('lulumi-web-navigation-add-listener-on-completed', {
       digest,
@@ -588,7 +585,7 @@ ipcMain.once('lulumi-web-navigation-on-completed', (event) => {
   });
 });
 ipcMain.once('lulumi-web-navigation-on-created-navigation-target', (event) => {
-  const window = BrowserWindow.fromId(globalObjet.wid);
+  const window = BrowserWindow.getFocusedWindow();
   ipcMain.on('lulumi-web-navigation-add-listener-on-created-navigation-target', (event, digest) => {
     window.webContents.send('lulumi-web-navigation-add-listener-on-created-navigation-target', {
       digest,

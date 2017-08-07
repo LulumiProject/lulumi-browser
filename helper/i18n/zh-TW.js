@@ -12,6 +12,7 @@ export const appMenu = {
   file: {
     title: '檔案',
     newTab: '新增分頁',
+    newWindow: '新增視窗',
     closeTab: '關閉分頁',
   },
   edit: {

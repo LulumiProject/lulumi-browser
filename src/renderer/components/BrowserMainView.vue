@@ -12,7 +12,7 @@
         :partitionId="`${page.pid}`")
     #footer
       transition(name="extend")
-        .browser-page-status(v-show="page.statusText") {{ page.statusText }}
+        .browser-page-status(v-show="page.statusText") {{ decodeURIComponent(page.statusText) }}
       download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar")
 </template>
 
@@ -210,7 +210,9 @@
         const webview = this.getWebView(pageIndex);
         this.$store.dispatch('didFrameFinishLoad', {
           pageIndex,
-          webview,
+          location: webview.getURL(),
+          canGoBack: webview.canGoBack(),
+          canGoForward: webview.canGoForward(),
         });
       }
     }
@@ -218,11 +220,11 @@
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('didStartLoading', {
         pageIndex,
-        webview,
+        location: webview.getURL(),
       });
       this.$store.dispatch('updateMappings', {
-        webContentsId: webview.getWebContents().id,
         pageIndex,
+        webContentsId: webview.getWebContents().id,
       });
       this.onCommitted.emit({
         frameId: 0,
@@ -241,7 +243,8 @@
         if (this.pdfViewer === 'pdf-viewer') {
           this.$store.dispatch('domReady', {
             pageIndex,
-            webview,
+            canGoBack: webview.canGoBack(),
+            canGoForward: webview.canGoForward(),
           });
         } else {
           webview.getWebContents().downloadURL(parsedURL.query.src);
@@ -249,7 +252,8 @@
       } else {
         this.$store.dispatch('domReady', {
           pageIndex,
-          webview,
+          canGoBack: webview.canGoBack(),
+          canGoForward: webview.canGoForward(),
         });
       }
       this.onDOMContentLoaded.emit({
@@ -265,21 +269,23 @@
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('didStopLoading', {
         pageIndex,
-        webview,
+        location: webview.getURL(),
+        canGoBack: webview.canGoBack(),
+        canGoForward: webview.canGoForward(),
       });
     }
-    onDidFailLoad(event, pageIndex: number): void {
+    onDidFailLoad(event: Electron.DidFailLoadEvent, pageIndex: number): void {
       this.$store.dispatch('didFailLoad', {
         pageIndex,
-        isMainFrame: (event as Electron.DidFailLoadEvent).isMainFrame,
+        isMainFrame: event.isMainFrame,
       });
       const appPath = process.env.NODE_ENV === 'development'
         ? process.cwd()
         : (this as any).$electron.remote.app.getAppPath();
       let errorPage = `file://${appPath}/helper/pages/error/index.html`;
-      errorPage += `?ec=${encodeURIComponent(event.errorCode)}`;
-      errorPage += `&url=${encodeURIComponent(event.target.getURL())}`;
-      if (event.errorCode !== -3 && event.validatedURL === event.target.getURL()) {
+      errorPage += `?ec=${encodeURIComponent((event as any).errorCode)}`;
+      errorPage += `&url=${encodeURIComponent((event as any).target.getURL())}`;
+      if ((event as any).errorCode !== -3 && (event as any).validatedURL === (event as any).target.getURL()) {
         this.getPage(pageIndex).navigateTo(
           `${errorPage}`);
       }
@@ -297,20 +303,20 @@
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('pageTitleSet', {
         pageIndex,
-        webview,
+        title: webview.getTitle(),
       });
     }
     onUpdateTargetUrl(event: Electron.UpdateTargetUrlEvent, pageIndex: number): void {
       this.$store.dispatch('updateTargetUrl', {
         pageIndex,
-        url: event.url,
+        location: event.url,
       });
     }
     onMediaStartedPlaying(event: Electron.Event, pageIndex: number): void {
       const webview = this.getWebView(pageIndex);
       this.$store.dispatch('mediaStartedPlaying', {
         pageIndex,
-        webview,
+        isAudioMuted: webview.isAudioMuted(),
       });
     }
     onMediaPaused(event: Electron.Event, pageIndex: number): void {
@@ -326,7 +332,7 @@
     onPageFaviconUpdated(event: Electron.PageFaviconUpdatedEvent, pageIndex: number): void {
       this.$store.dispatch('pageFaviconUpdated', {
         pageIndex,
-        url: event.favicons[0],
+        location: event.favicons[0],
       });
     }
     onEnterHtmlFullScreen(): void {
@@ -412,13 +418,13 @@
       if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
         this.$store.dispatch('createDownloadTask', {
           name: data.name,
-          url: data.url,
+          location: data.url,
           totalBytes: data.totalBytes,
           isPaused: data.isPaused,
           canResume: data.canResume,
           startTime: data.startTime,
           getReceivedBytes: 0,
-          state: data.state,
+          dataState: data.dataState,
           style: '',
         });
       }
@@ -430,25 +436,25 @@
         savePath: data.savePath,
         isPaused: data.isPaused,
         canResume: data.canResume,
-        state: data.state,
+        dataState: data.dataState,
       });
     }
     onCompleteDownloadsProgress(event: Electron.Event, data): void {
       this.$store.dispatch('completeDownloadsProgress', {
         name: data.name,
         startTime: data.startTime,
-        state: data.state,
+        dataState: data.dataState,
       });
       const download =
         this.$store.getters.downloads.filter(download => download.startTime === data.startTime);
       if (download.length) {
         let option: any;
-        if (data.state === 'completed') {
+        if (data.dataState === 'completed') {
           option = {
             title: 'Success',
             body: `${data.name} download successfully!`,
           };
-        } else if (data.state === 'cancelled') {
+        } else if (data.dataState === 'cancelled') {
           option = {
             title: 'Cancelled',
             body: `${data.name} has been cancelled!`,
@@ -511,9 +517,7 @@
       this.onWebviewContextMenu(event);
     }
     onWillNavigate(event: Electron.WillNavigateEvent, pageIndex: number): void {
-      this.$store.dispatch('clearPageAction', {
-        pageIndex,
-      });
+      this.$store.dispatch('clearPageAction', pageIndex);
       this.getPage(pageIndex).onMessageEvent.listeners = [];
       this.onBeforeNavigate.emit({
         tabId: this.getPageObject(pageIndex).pid,
@@ -634,17 +638,21 @@
       if (location) {
         if (location.startsWith('about:')) {
           this.$store.dispatch('createTab', {
-            url: urlResource.aboutUrls(location),
+            location: urlResource.aboutUrls(location),
+            isURL: true,
             follow: true,
           });
         } else {
           this.$store.dispatch('createTab', {
-            url: location,
+            location,
+            isURL: urlUtil.isURL(location),
             follow,
           });
         }
       }
-      this.onCreatedEvent.emit(this.extensionService.getTab(this.currentPageIndex));
+      setTimeout(() => {
+        this.onCreatedEvent.emit(this.extensionService.getTab(this.currentPageIndex));
+      }, 1000);
     }
     onTabDuplicate(pageIndex: number): void {
       this.onNewTab(this.pages[pageIndex].location);
@@ -657,10 +665,8 @@
         windowId: 0,
         isWindowClosing: false,
       });
-      this.$store.dispatch('closeTab', pageIndex);
-      this.$nextTick(() => {
-        this.$store.dispatch('setTabsOrder', (this.$refs.tabs as Tabs).sortable.toArray());
-      });
+      this.$store.dispatch('setTabsOrder', (this.$refs.tabs as Tabs).sortable.toArray());
+      this.$nextTick(() => this.$store.dispatch('closeTab', pageIndex));
     }
     // navHandlers
     onClickHome(): void {
@@ -1182,11 +1188,8 @@
         document.body.classList.add('darwin');
       }
 
-      ipc.on('browser-window-focus', () => {
-        this.onActivatedEvent.emit({
-          tabId: this.getPageObject(this.currentPageIndex).pid,
-          windowId: 0,
-        });
+      ipc.on('new-window-added', (event, windowId) => {
+        this.$store.dispatch('newWindow', windowId);
       });
 
       ipc.on('startFindInPage', () => {

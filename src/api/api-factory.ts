@@ -33,7 +33,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
         tabArray.map(tab => tab.activate(false));
         tabArray[tab.index].activate(true);
         tab = tabArray[tab.index];
-        vueInstance.$nextTick(() => vueInstance.onTabClick(tab.index));
+        vueInstance.onTabClick(tab.index);
       }
       return tab;
     } else {
@@ -44,16 +44,19 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
       if (active) {
         tabArray.map(tab => tab.activate(false));
         tabArray[index].activate(true);
-        vueInstance.$nextTick(() => vueInstance.onTabClick(index));
+        vueInstance.onTabClick(index);
       }
       return tabArray[index];
     }
   } else {
-    tabArray.length = 0;
-    vueInstance.$store.getters.pages.forEach((page, index) => {
-      findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index);
-      tabArray[index].update(page.location, page.title, page.favicon);
-    });
+    setTimeout(() => {
+      tabArray.length = 0;
+      vueInstance.$store.getters.pages.forEach((page, index) => {
+        findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index);
+        tabArray[index].update(page.location, page.title, page.favicon);
+      });
+      // tslint:disable-next-line:align
+    }, 1000);
     return tab;
   }
 }

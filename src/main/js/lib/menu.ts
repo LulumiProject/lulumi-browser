@@ -1,9 +1,6 @@
-import { api } from 'lulumi';
 import { Menu, BrowserWindow } from 'electron';
 import i18n from '../../i18n';
 const { openProcessManager } = require('electron-process-manager');
-
-const globalObjet = global as api.GlobalObject;
 
 const getTemplate = () => {
   const template = [
@@ -13,12 +10,20 @@ const getTemplate = () => {
         {
           label: i18n.t('file.newTab'),
           accelerator: 'CmdOrCtrl+T',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
         },
+        {
+          label: i18n.t('file.newWindow'),
+          accelerator: 'CmdOrCtrl+N',
+          click: (BrowserWindow as any).createWindow,
+        },
+        process.platform === 'darwin' ? {
+          type: 'separator',
+        } : {},
         {
           label: i18n.t('file.closeTab'),
           accelerator: 'CmdOrCtrl+W',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('tab-close'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
         },
       ],
     },
@@ -66,7 +71,7 @@ const getTemplate = () => {
         {
           label: i18n.t('edit.find'),
           accelerator: 'CmdOrCtrl+F',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('startFindInPage'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
         },
         {
           label: i18n.t('edit.speech.title'),
@@ -89,12 +94,12 @@ const getTemplate = () => {
         {
           label: i18n.t('view.reload'),
           accelerator: 'CmdOrCtrl+R',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('reload'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('reload'),
         },
         {
           label: i18n.t('view.forceReload'),
           accelerator: 'Shift+CmdOrCtrl+R',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('forceReload'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('forceReload'),
         },
         {
           type: 'separator',
@@ -121,12 +126,12 @@ const getTemplate = () => {
         {
           label: i18n.t('view.viewSource'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('viewSource'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('viewSource'),
         },
         {
           label: i18n.t('view.toggleDevTools'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('toggleDevTools'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('toggleDevTools'),
         },
       ],
     },
@@ -164,18 +169,18 @@ const getTemplate = () => {
       submenu: [
         {
           label: i18n.t('help.reportIssue'),
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab', {
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
             location: 'https://github.com/qazbnm456/lulumi-browser/issues',
             follow: true,
           }),
         },
         {
           label: i18n.t('help.forceReload'),
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.reloadIgnoringCache(),
+          click: () => BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
         },
         {
           label: i18n.t('help.toggleDevTools'),
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.toggleDevTools(),
+          click: () => BrowserWindow.getFocusedWindow().webContents.toggleDevTools(),
         },
       ],
     },
@@ -188,7 +193,7 @@ const getTemplate = () => {
       submenu: [
         {
           label: i18n.t('app.about', { appName }),
-          click: () => BrowserWindow.fromId(globalObjet.wid).webContents.send('new-tab', {
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
             location: 'about:lulumi',
             follow: true,
           }),

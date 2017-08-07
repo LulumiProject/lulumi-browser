@@ -1,4 +1,3 @@
-import { api } from 'lulumi';
 import axios from 'axios';
 import { BrowserWindow, ipcMain, session } from 'electron';
 
@@ -6,8 +5,6 @@ import { BrowserWindow, ipcMain, session } from 'electron';
 /* tslint:disable:no-console */
 /* tslint:disable:object-shorthand-properties-first */
 /* tslint:disable:align */
-
-const globalObjet = global as api.GlobalObject;
 
 const webRequestMapping = {
   onBeforeRequest: {},
@@ -42,7 +39,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           callback({ cancel: false });
         }
       });
-      const window = BrowserWindow.fromId(globalObjet.wid);
+      const window = BrowserWindow.getFocusedWindow();
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,
@@ -63,7 +60,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           callback({ cancel: false });
         }
       });
-      const window = BrowserWindow.fromId(globalObjet.wid);
+      const window = BrowserWindow.getFocusedWindow();
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,
@@ -76,7 +73,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       details.type = details.resourceType;
       details.tabId = (sess as any).id;
 
-      const window = BrowserWindow.fromId(globalObjet.wid);
+      const window = BrowserWindow.getFocusedWindow();
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,
@@ -333,7 +330,7 @@ export default {
           url: item.getURL(),
           isPaused: item.isPaused(),
           canResume: item.canResume(),
-          state: 'init',
+          dataState: 'init',
         });
 
         ipcMain.on('pause-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
@@ -354,12 +351,12 @@ export default {
 
         item.on('updated', (event: Electron.Event, state: string) => {
           mainWindow.webContents.send('update-downloads-progress', {
-            state,
             startTime: item.getStartTime(),
             getReceivedBytes: item.getReceivedBytes(),
             savePath: item.getSavePath(),
             isPaused: item.isPaused(),
             canResume: item.canResume(),
+            dataState: state,
           });
         });
 
@@ -368,9 +365,9 @@ export default {
           ipcMain.removeAllListeners('resume-downloads-progress');
           ipcMain.removeAllListeners('cancel-downloads-progress');
           mainWindow.webContents.send('complete-downloads-progress', {
-            state,
             name: item.getFilename(),
             startTime: item.getStartTime(),
+            dataState: state,
           });
         });
       }

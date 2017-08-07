@@ -4,20 +4,20 @@
       ul(class="download-list")
         el-popover(placement="top-start", width="178", trigger="hover", popper-class="download-list__popper"
           v-for="(file, index) in files", :key="index")
-          div {{ showState(file.state) }}
-          el-button-group(v-show="checkStateForButtonGroup(file.state)")
-            el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="mini", icon="caret-right", @click="resumeDownload(file.startTime)")
-            el-button(:disabled="file.state !== 'progressing'", v-else, :plain="true", type="warning", size="mini", icon="minus", @click="pauseDownload(file.startTime)")
-            el-button(:disabled="file.state !== 'progressing'", :plain="true", type="danger", size="mini", icon="circle-close", @click="cancelDownload(file.startTime)")
-            el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="mini", icon="document", @click="showItemInFolder(file.savePath)")
+          div {{ showState(file.dataState) }}
+          el-button-group(v-show="checkStateForButtonGroup(file.dataState)")
+            el-button(:disabled="file.dataState !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="mini", icon="caret-right", @click="resumeDownload(file.startTime)")
+            el-button(:disabled="file.dataState !== 'progressing'", v-else, :plain="true", type="warning", size="mini", icon="minus", @click="pauseDownload(file.startTime)")
+            el-button(:disabled="file.dataState !== 'progressing'", :plain="true", type="danger", size="mini", icon="circle-close", @click="cancelDownload(file.startTime)")
+            el-button(:disabled="file.dataState === 'cancelled'", :plain="true", type="info", size="mini", icon="document", @click="showItemInFolder(file.savePath)")
           li(class="download-list__item", slot="reference")
             div(class="download-list__item-panel")
               div(class="ellipsis")
                 img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
                 a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
                   | {{ file.name }}
-              span(class="download-list__item-description") {{ file.state === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: showState(file.state) }}
-            el-progress(:status="checkStateForProgress(file.state)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
+              span(class="download-list__item-description") {{ file.dataState === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: showState(file.dataState) }}
+            el-progress(:status="checkStateForProgress(file.dataState)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
       span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
 
@@ -49,8 +49,8 @@
       },
     },
     methods: {
-      showState(state) {
-        return this.$t(`downloads.state.${state}`);
+      showState(dataState) {
+        return this.$t(`downloads.state.${dataState}`);
       },
       prettyReceivedSize(size) {
         return prettySize.process(size);
