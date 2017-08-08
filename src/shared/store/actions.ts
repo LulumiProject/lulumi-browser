@@ -7,89 +7,121 @@ export const actions = {
     commit(types.INCREMENT_PID);
   },
 
-  createTab({ commit }, { location, isURL, follow }) {
+  createTab({ commit }, { windowId, location, isURL, follow }) {
     commit(types.CREATE_TAB, {
+      windowId,
       location,
       isURL,
       follow,
     });
   },
-  closeTab({ commit }, pageIndex) {
-    commit(types.CLOSE_TAB, { pageIndex });
+  closeTab({ commit }, { windowId, pageId, tabIndex }) {
+    commit(types.CLOSE_TAB, {
+      windowId,
+      pageId,
+      tabIndex,
+    });
   },
-  clickTab({ commit }, pageIndex) {
-    commit(types.CLICK_TAB, { pageIndex });
+  closeAllTab({ commit }, windowId) {
+    commit(types.CLOSE_ALL_TAB, { windowId });
+  },
+  clickTab({ commit }, { windowId, pageId, tabIndex }) {
+    commit(types.CLICK_TAB, {
+      windowId,
+      pageId,
+      tabIndex,
+    });
   },
 
-  newWindow({ commit }, windowId) {
-    commit(types.NEW_WINDOW, { windowId });
-  },
-
-  didFrameFinishLoad({ commit }, { pageIndex, location, canGoBack, canGoForward }) {
+  didFrameFinishLoad({ commit }, { windowId, pageId, tabIndex, location, canGoBack, canGoForward }) {
     commit(types.DID_FRAME_FINISH_LOAD, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       location,
       canGoBack,
       canGoForward,
     });
   },
-  didStartLoading({ commit }, { pageIndex, location }) {
+  didStartLoading({ commit }, { windowId, pageId, tabIndex, location }) {
     commit(types.DID_START_LOADING, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       location,
     });
   },
-  domReady({ commit }, { pageIndex, canGoBack, canGoForward }) {
+  domReady({ commit }, { windowId, pageId, tabIndex, canGoBack, canGoForward }) {
     commit(types.DOM_READY, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       canGoBack,
       canGoForward,
     });
   },
-  didStopLoading({ commit }, { pageIndex, location, canGoBack, canGoForward }) {
+  didStopLoading({ commit }, { windowId, pageId, tabIndex, location, canGoBack, canGoForward }) {
     commit(types.DID_STOP_LOADING, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       location,
       canGoBack,
       canGoForward,
     });
   },
-  didFailLoad({ commit }, { pageIndex, isMainFrame }) {
+  didFailLoad({ commit }, { windowId, pageId, tabIndex, isMainFrame }) {
     commit(types.DID_FAIL_LOAD, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       isMainFrame,
     });
   },
-  pageTitleSet({ commit }, { pageIndex, title }) {
+  pageTitleSet({ commit }, { windowId, pageId, tabIndex, title }) {
     commit(types.PAGE_TITLE_SET, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       title,
     });
   },
-  updateTargetUrl({ commit }, { pageIndex, location }) {
+  updateTargetUrl({ commit }, { windowId, pageId, tabIndex, location }) {
     commit(types.UPDATE_TARGET_URL, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       location,
     });
   },
-  mediaStartedPlaying({ commit }, { pageIndex, isAudioMuted }) {
+  mediaStartedPlaying({ commit }, { windowId, pageId, tabIndex, isAudioMuted }) {
     commit(types.MEDIA_STARTED_PLAYING, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       isAudioMuted,
     });
   },
-  mediaPaused({ commit }, pageIndex) {
-    commit(types.MEDIA_PAUSED, { pageIndex });
+  mediaPaused({ commit }, { windowId, pageId, tabIndex }) {
+    commit(types.MEDIA_PAUSED, {
+      windowId,
+      pageId,
+      tabIndex,
+    });
   },
-  toggleAudio({ commit }, { pageIndex, muted }) {
+  toggleAudio({ commit }, { windowId, pageId, tabIndex, muted }) {
     commit(types.TOGGLE_AUDIO, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       muted,
     });
   },
-  pageFaviconUpdated({ commit }, { pageIndex, location }) {
+  pageFaviconUpdated({ commit }, { windowId, pageId, tabIndex, location }) {
     commit(types.PAGE_FAVICON_UPDATED, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       location,
     });
   },
@@ -115,18 +147,25 @@ export const actions = {
   setHistory({ commit }, val) {
     commit(types.SET_HISTORY, { val });
   },
-  setTabsOrder({ commit }, tabsOrder) {
-    commit(types.SET_TABS_ORDER, { tabsOrder });
+  setTabsOrder({ commit }, { windowId, tabsOrder }) {
+    commit(types.SET_TABS_ORDER, {
+      windowId,
+      tabsOrder,
+    });
   },
-  setPageAction({ commit }, { pageIndex, extensionId, enabled }) {
+  setPageAction({ commit }, { pageId, extensionId, enabled }) {
     commit(types.SET_PAGE_ACTION, {
-      pageIndex,
+      pageId,
       extensionId,
       enabled,
     });
   },
-  clearPageAction({ commit }, pageIndex) {
-    commit(types.CLEAR_PAGE_ACTION, { pageIndex });
+  clearPageAction({ commit }, { windowId, pageId, tabIndex }) {
+    commit(types.CLEAR_PAGE_ACTION, {
+      windowId,
+      pageId,
+      tabIndex,
+    });
   },
   createDownloadTask({ commit }, { name, location, totalBytes, isPaused, canResume, startTime, getReceivedBytes, dataState, style }) {
     commit(types.CREATE_DOWNLOAD_TASK, {
@@ -169,9 +208,11 @@ export const actions = {
     });
   },
 
-  updateMappings({ commit }, { pageIndex, webContentsId }) {
+  updateMappings({ commit }, { windowId, pageId, tabIndex, webContentsId }) {
     commit(types.UPDATE_MAPPINGS, {
-      pageIndex,
+      windowId,
+      pageId,
+      tabIndex,
       webContentsId,
     });
   },

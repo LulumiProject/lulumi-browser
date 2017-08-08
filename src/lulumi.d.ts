@@ -53,6 +53,7 @@ declare module 'lulumi' {
     // store
     export interface PageObject {
       pid: number;
+      windowId: number;
       location: string;
       statusText: boolean;
       favicon: string | null;
@@ -66,10 +67,6 @@ declare module 'lulumi' {
       hasMedia: boolean;
       isAudioMuted: boolean;
       pageActionMapping: object;
-    }
-    export interface PageObjectList extends Array<PageObject> {
-      [index: number]: PageObject | undefined;
-      length: number;
     }
     export interface TabConfig {
       defaultUrl: string;
@@ -88,10 +85,9 @@ declare module 'lulumi' {
     }
     export interface State {
       pid: number;
-      pages: PageObjectList;
-      windowIds: number[];
-      tabsOrder: number[];
-      currentPageIndex: number;
+      pages: PageObject[];
+      tabsOrder: number[][];
+      currentTabIndexes: number[];
       searchEngine: SearchEngineObject[];
       currentSearchEngine: SearchEngineObject;
       homepage: string;

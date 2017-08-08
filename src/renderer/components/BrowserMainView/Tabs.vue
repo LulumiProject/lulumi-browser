@@ -1,7 +1,7 @@
 <template lang="pug">
   #chrome-tabs-shell(@dblclick.self="onDoubleClick")
     .chrome-tabs(v-sortable="")
-      div(v-for="(page, index) in pages", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentPageIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${page.pid}`")
+      div(v-for="(page, index) in pages", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${page.pid}`")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
@@ -58,7 +58,10 @@
               ghostClass: 'ghost',
               onUpdate() {
                 if (vnode.context !== undefined) {
-                  vnode.context.$store.dispatch('setTabsOrder', this.toArray());
+                  vnode.context.$store.dispatch('setTabsOrder', {
+                    windowId: (vnode.context as Tabs).windowId,
+                    tabsOrder: this.toArray(),
+                  });
                 }
               },
             });
@@ -74,11 +77,14 @@
   export default class Tabs extends Vue {
     sortable: any;
 
-    get pages(): Array<store.PageObject> {
-      return this.$store.getters.pages;
+    get windowId(): number {
+      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
     }
-    get currentPageIndex(): number {
-      return this.$store.getters.currentPageIndex;
+    get currentTabIndex(): number {
+      return this.$store.getters.currentTabIndexes[this.windowId];
+    }
+    get pages(): Array<store.PageObject> {
+      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
     }
 
     loadDefaultFavicon(event: Electron.Event) {
@@ -152,7 +158,7 @@
       });
       ipc.on('tab-close', () => {
         if ((this.$parent as BrowserMainView).onTabClose) {
-          (this.$parent as BrowserMainView).onTabClose(this.currentPageIndex);
+          (this.$parent as BrowserMainView).onTabClose(this.currentTabIndex);
         }
       });
     }

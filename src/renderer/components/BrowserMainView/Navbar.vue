@@ -143,6 +143,7 @@
   export default class Navbar extends Vue {
     dummyPageObject: store.PageObject = {
       pid: -1,
+      windowId: -1,
       location: '',
       statusText: false,
       favicon: null,
@@ -170,26 +171,32 @@
     badgeTextArray: navbar.BadgeTextArray = {};
     badgeBackgroundColorArray: navbar.BadgeBackgroundColorArray = {};
     
+    get windowId(): number {
+      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+    }
+    get currentTabIndex(): number {
+      return this.$store.getters.currentTabIndexes[this.windowId];
+    }
+    get pages(): Array<store.PageObject> {
+      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    }
     get page(): store.PageObject {
-      if (this.$store.getters.pages.length === 0) {
+      if (this.pages.length === 0) {
         return this.dummyPageObject;
       }
-      return this.$store.getters.pages[this.$store.getters.currentPageIndex];
-    }
-    get currentPageIndex():number {
-      return this.$store.getters.currentPageIndex;
+      return this.pages[this.currentTabIndex];
     }
     get pageActionMapping(): object {
-      if (this.$store.getters.pages.length === 0) {
+      if (this.pages.length === 0) {
         return {};
       }
-      return this.$store.getters.pages[this.$store.getters.currentPageIndex].pageActionMapping;
+      return this.pages[this.currentTabIndex].pageActionMapping;
     }
     get location(): string {
-      if (this.$store.getters.pages.length === 0) {
+      if (this.pages.length === 0) {
         return '';
       }
-      return this.$store.getters.pages[this.$store.getters.currentPageIndex].location;
+      return this.pages[this.currentTabIndex].location;
     }
     get currentSearchEngine(): store.SearchEngineObject {
       return this.$store.getters.currentSearchEngine;
@@ -372,8 +379,8 @@
     showBrowserActionBadgeText(extensionId: string): string | number {
       const badge = this.badgeTextArray[extensionId];
       if (badge) {
-        if (badge[this.currentPageIndex]) {
-          return badge[this.currentPageIndex];
+        if (badge[this.currentTabIndex]) {
+          return badge[this.currentTabIndex];
         }
         return badge[-1];
       }
@@ -398,9 +405,9 @@
       const badge = this.badgeBackgroundColorArray[extensionId];
       if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
         if (badge) {
-          if (badge[this.currentPageIndex]) {
-            this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[this.currentPageIndex];
-            return badge[this.currentPageIndex];
+          if (badge[this.currentTabIndex]) {
+            this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[this.currentTabIndex];
+            return badge[this.currentTabIndex];
           }
           this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[-1];
           return badge[-1];
@@ -531,7 +538,7 @@
             }
             if (extension.webContentsId) {
               (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-                .send('lulumi-page-action-clicked', { id: this.currentPageIndex });
+                .send('lulumi-page-action-clicked', { id: this.currentTabIndex });
             }
           }
         } else if (isBrowserAction) {
@@ -546,7 +553,7 @@
           }
           if (extension.webContentsId) {
             (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-              .send('lulumi-browser-action-clicked', { id: this.currentPageIndex });
+              .send('lulumi-browser-action-clicked', { id: this.currentTabIndex });
           }
         }
       }

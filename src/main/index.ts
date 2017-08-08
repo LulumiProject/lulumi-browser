@@ -11,8 +11,6 @@ import * as lulumiExtension from '../api/lulumi-extension';
 
 import { api, scheme } from 'lulumi';
 
-/* tslint:disable:no-console */
-
 const globalObjet = global as api.GlobalObject;
 
 /**
@@ -22,8 +20,6 @@ const globalObjet = global as api.GlobalObject;
 if (process.env.NODE_ENV !== 'development') {
   globalObjet.__static = path.resolve(__dirname, '../static');
 }
-
-const Windows = require('../shared/store/mainStore').default;
 
 let shuttingDown: boolean = process.env.BABEL_ENV === 'test';
 
@@ -59,9 +55,23 @@ const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
 
-function appStateSave(force: boolean = true): void {
-  if (Windows.length !== 0) {
-    Object.values(Windows)[0].webContents.send('request-app-state', force);
+const mainStore = require('../shared/store/mainStore').default;
+mainStore.register(storagePath, swipeGesture);
+const windows = mainStore.getWindows();
+
+function appStateSave(soft: boolean = true): void {
+  if (windows.length !== 0) {
+    mainStore.saveAppState(soft)
+      .then((state) => {
+        if (state) {
+          promisify(writeFile, storagePath, state).then(() => {
+            if (appStateSaveHandler === null) {
+              shuttingDown = true;
+              app.quit();
+            }
+          });
+        }
+      });
   } else {
     shuttingDown = true;
     app.quit();
@@ -112,193 +122,26 @@ function createWindow(): void {
     }
   });
 
-  mainWindow.on('scroll-touch-begin', () => {
-    mainWindow!.webContents.send('scroll-touch-begin', swipeGesture);
-  });
-
-  mainWindow.on('scroll-touch-end', () => {
-    mainWindow!.webContents.send('scroll-touch-end');
-  });
-
-  mainWindow.on('scroll-touch-edge', () => {
-    mainWindow!.webContents.send('scroll-touch-edge');
-  });
-
   mainWindow.on('closed', () => {
     if (setLanguage) {
       createWindow();
       setLanguage = false;
     }
-  });
-
-  ipcMain.on('request-lang', (event) => {
-    let lang: string = '';
-    try {
-      lang = readFileSync(langPath, 'utf8');
-    } catch (event) {
-      lang = '"en"';
-    }
-    event.returnValue = JSON.parse(lang);
-  });
-
-  ipcMain.on('request-extension-objects', () => {
-    // load persisted extensions
-    lulumiExtension.loadExtensions();
-
-    // assign extension objects to global variables
-    globalObjet.backgroundPages = lulumiExtension.backgroundPages;
-    globalObjet.manifestMap = lulumiExtension.manifestMap;
-
-    mainWindow.webContents.send(
-      'response-extension-objects',
-      lulumiExtension.manifestMap);
-    Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
-      lulumiExtension.loadCommands(mainWindow, lulumiExtension.manifestMap[manifest]);
-    });
-  });
-
-  ipcMain.on('request-app-state', () => {
-    mainWindow.webContents.send('new-window-added', mainWindow.id);
-    new Promise((resolve, reject) => {
-      let data: string = '""';
-      try {
-        data = readFileSync(storagePath, 'utf8');
-      } catch (event) { }
-
-      try {
-        data = JSON.parse(data);
-        resolve(data);
-      } catch (event) {
-        reject();
-        console.error(`could not parse data from ${storagePath}, ${event}`);
-      }
-    }).then((data) => {
-      mainWindow.webContents.send('set-app-state', data);
-    }).catch(() => console.error('request-app-state error'));
-  });
-
-  ipcMain.on('guest-want-data', (event: Electron.Event, val: string) => {
-    const webContentsId: number = event.sender.id;
-    switch (val) {
-      case 'searchEngineProvider':
-        mainWindow.webContents.send('get-search-engine-provider', {
-          webContentsId,
-        });
-        break;
-      case 'homepage':
-        mainWindow.webContents.send('get-homepage', {
-          webContentsId,
-        });
-        break;
-      case 'pdfViewer':
-        mainWindow.webContents.send('get-pdf-viewer', {
-          webContentsId,
-        });
-        break;
-      case 'tabConfig':
-        mainWindow.webContents.send('get-tab-config', {
-          webContentsId,
-        });
-        break;
-      case 'lang':
-        mainWindow.webContents.send('get-lang', {
-          webContentsId,
-        });
-        break;
-      case 'downloads':
-        mainWindow.webContents.send('get-downloads', {
-          webContentsId,
-        });
-        break;
-      case 'history':
-        mainWindow.webContents.send('get-history', {
-          webContentsId,
-        });
-        break;
-      case 'extensions':
-        break;
-      default:
-        break;
-    }
-  });
-
-  ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-search-engine-provider', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('set-homepage', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-homepage', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-pdf-viewer', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-tab-config', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('set-lang', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('request-permission', {
-      webContentsId: event.sender.id,
-      permission: 'setLanguage',
-      lang: val.lang,
-    });
-    ipcMain.once(`response-permission-${event.sender.id}`, (event: Electron.Event, data) => {
-      if (data.accept) {
-        mainWindow.webContents.send('set-lang', {
-          val,
-          webContentsId: event.sender.id,
-        });
-        promisify(writeFile, langPath, JSON.stringify(val.lang))
-          .then(() => {
-            setLanguage = true;
-            menu.setLocale(val.lang);
-            app.quit();
-          });
-      }
-    });
-  });
-  ipcMain.on('set-downloads', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-downloads', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-  ipcMain.on('set-history', (event: Electron.Event, val) => {
-    mainWindow.webContents.send('set-history', {
-      val,
-      webContentsId: event.sender.id,
-    });
-  });
-
-  globalObjet.online = true;
-  ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
-    if (status) {
-      if (globalObjet.online === false && status === true) {
-        globalObjet.online = true;
-        mainWindow.webContents.send('reload');
-      }
-    } else {
-      globalObjet.online = false;
-    }
+    mainWindow.removeAllListeners('will-attach-webview');
+    mainWindow.removeAllListeners('closed');
+    (mainWindow as any) = null;
   });
 
   // save app-state every 5 mins
   appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
 }
 
+// register createWindow method to BrowserWindow
+(BrowserWindow as any).createWindow = createWindow;
+
+// register 'lulumi://' and 'lulumi-extension://' as standard protocols
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', () => {
-  (BrowserWindow as any).createWindow = createWindow;
   session.registerWebRequestListeners();
   (BrowserWindow as any).createWindow();
 });
@@ -310,7 +153,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (Windows.length === 0) {
+  if (windows.length === 0) {
     createWindow();
   }
 });
@@ -320,9 +163,17 @@ app.on('before-quit', (event) => {
     if (setLanguage) {
       event.preventDefault();
       shuttingDown = false;
-      BrowserWindow.getAllWindows().forEach(window => window.close());
+      Object.values(windows).forEach((window) => {
+        window.removeAllListeners('close');
+        window.close();
+        delete windows[window.id];
+      });
       return;
     }
+    Object.values(windows).forEach((window) => {
+      window.removeAllListeners('close');
+      delete windows[window.id];
+    });
     return;
   }
   event.preventDefault();
@@ -333,32 +184,21 @@ app.on('before-quit', (event) => {
   appStateSave(false);
 });
 
-ipcMain.on('response-app-state', (event, data) => {
-  if (data.ready) {
-    promisify(writeFile, storagePath, JSON.stringify(data.newState))
-      .then(() => {
-        if (appStateSaveHandler === null) {
-          shuttingDown = true;
-          app.quit();
-        }
-      });
-  } else {
-    app.exit(0);
-  }
-});
-
+// show the item on host
 ipcMain.on('show-item-in-folder', (event, path) => {
   if (path) {
     shell.showItemInFolder(path);
   }
 });
 
+// open the item on host
 ipcMain.on('open-item', (event, path) => {
   if (path) {
     shell.openItem(path);
   }
 });
 
+// load preference things into global when users accessing 'lulumi://' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type: string = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
   const data: scheme.LulumiObject = {} as scheme.LulumiObject;
@@ -427,5 +267,162 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
     globalObjet.guestData = data;
+  }
+});
+
+// about:* pages are eager to getting preference datas
+ipcMain.on('guest-want-data', (event: Electron.Event, val: string) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  const webContentsId: number = event.sender.id;
+  switch (val) {
+    case 'searchEngineProvider':
+      window.webContents.send('get-search-engine-provider', {
+        webContentsId,
+      });
+      break;
+    case 'homepage':
+      window.webContents.send('get-homepage', {
+        webContentsId,
+      });
+      break;
+    case 'pdfViewer':
+      window.webContents.send('get-pdf-viewer', {
+        webContentsId,
+      });
+      break;
+    case 'tabConfig':
+      window.webContents.send('get-tab-config', {
+        webContentsId,
+      });
+      break;
+    case 'lang':
+      window.webContents.send('get-lang', {
+        webContentsId,
+      });
+      break;
+    case 'downloads':
+      window.webContents.send('get-downloads', {
+        webContentsId,
+      });
+      break;
+    case 'history':
+      window.webContents.send('get-history', {
+        webContentsId,
+      });
+      break;
+    case 'extensions':
+      break;
+    default:
+      break;
+  }
+});
+
+ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-search-engine-provider', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('set-homepage', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-homepage', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-pdf-viewer', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-tab-config', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('set-lang', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('request-permission', {
+    webContentsId: event.sender.id,
+    permission: 'setLanguage',
+    lang: val.lang,
+  });
+  ipcMain.once(`response-permission-${event.sender.id}`, (event: Electron.Event, data) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (data.accept) {
+      window.webContents.send('set-lang', {
+        val,
+        webContentsId: event.sender.id,
+      });
+      promisify(writeFile, langPath, JSON.stringify(val.lang))
+        .then(() => {
+          setLanguage = true;
+          menu.setLocale(val.lang);
+          app.quit();
+        });
+    }
+  });
+});
+ipcMain.on('set-downloads', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-downloads', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+ipcMain.on('set-history', (event: Electron.Event, val) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.webContents.send('set-history', {
+    val,
+    webContentsId: event.sender.id,
+  });
+});
+
+// load the lang file
+ipcMain.on('request-lang', (event) => {
+  let lang: string = '';
+  try {
+    lang = readFileSync(langPath, 'utf8');
+  } catch (event) {
+    lang = '"en"';
+  }
+  event.returnValue = JSON.parse(lang);
+});
+
+// load extension objects for each BrowserWindow instance
+ipcMain.on('request-extension-objects', (event: Electron.Event) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+
+  // load persisted extensions
+  lulumiExtension.loadExtensions();
+
+  // assign extension objects to global variables
+  globalObjet.backgroundPages = lulumiExtension.backgroundPages;
+  globalObjet.manifestMap = lulumiExtension.manifestMap;
+
+  window.webContents.send(
+    'response-extension-objects',
+    lulumiExtension.manifestMap);
+  Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
+    lulumiExtension.loadCommands(window, lulumiExtension.manifestMap[manifest]);
+  });
+});
+
+// reload each BrowserView when we plug in our cable
+globalObjet.online = true;
+ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  if (status) {
+    if (globalObjet.online === false && status === true) {
+      globalObjet.online = true;
+      window.webContents.send('reload');
+    }
+  } else {
+    globalObjet.online = false;
   }
 });

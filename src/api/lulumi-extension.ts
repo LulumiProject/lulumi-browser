@@ -146,13 +146,13 @@ const removeBackgroundPages = (manifest) => {
   }
 };
 
-const loadCommands = (mainWindow, manifest) => {
+const loadCommands = (window: Electron.BrowserWindow, manifest) => {
   const commands = manifest.commands;
   if (commands) {
     Object.keys(commands).forEach((command) => {
       const suggested_key = commands[command].suggested_key;
       if (suggested_key) {
-        localshortcut.register(mainWindow, suggested_key.default, () => {
+        localshortcut.register(window, suggested_key.default, () => {
           if (commands[command].suggested_key) {
             if (command === '_execute_page_action') {
               BrowserWindow.getFocusedWindow().webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);

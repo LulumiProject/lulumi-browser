@@ -8,17 +8,14 @@ export const getters = {
   pid(state: BrowserState): number {
     return state.browser.pid;
   },
-  pages(state: BrowserState): store.PageObjectList {
+  pages(state: BrowserState): store.PageObject[] {
     return state.browser.pages;
-  },
-  windowIds(state: BrowserState): number[] {
-    return state.browser.windowIds;
   },
   tabsOrder(state: BrowserState) {
     return state.browser.tabsOrder;
   },
-  currentPageIndex(state: BrowserState) {
-    return state.browser.currentPageIndex;
+  currentTabIndexes(state: BrowserState) {
+    return state.browser.currentTabIndexes;
   },
   searchEngine(state: BrowserState) {
     return state.browser.searchEngine;

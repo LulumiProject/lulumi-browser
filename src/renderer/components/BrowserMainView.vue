@@ -5,8 +5,9 @@
       navbar(ref="navbar")
     swipeArrow
     page(v-for="(page, index) in pages",
-        :isActive="index === currentPageIndex",
-        :pageIndex="index",
+        :isActive="index === currentTabIndex",
+        :tabIndex="index",
+        :pageId="page.pid",
         :ref="`page-${index}`",
         :key="`page-${page.pid}`",
         :partitionId="`${page.pid}`")
@@ -30,8 +31,6 @@
   import urlUtil from '../js/lib/url-util';
   import imageUtil from '../js/lib/image-util';
   import urlResource from '../js/lib/url-resource';
-  import tabsOrdering from '../js/lib/tabs-ordering';
-  import responseNewState from '../js/lib/response-new-state';
 
   import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
@@ -51,6 +50,7 @@
   export default class BrowserMainView extends Vue {
     dummyPageObject: store.PageObject = {
       pid: -1,
+      windowId: -1,
       location: '',
       statusText: false,
       favicon: null,
@@ -88,20 +88,23 @@
     onCompleted: Event = new Event();
     onDOMContentLoaded: Event = new Event();
 
-    get page(): store.PageObject {
-      if (this.$store.getters.pages.length === 0) {
-        return this.dummyPageObject;
-      }
-      return this.$store.getters.pages[this.$store.getters.currentPageIndex];
+    get windowId(): number {
+      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+    }
+    get currentTabIndex(): number {
+      return this.$store.getters.currentTabIndexes[this.windowId];
     }
     get pages(): Array<store.PageObject> {
-      return this.$store.getters.pages;
+      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    }
+    get page(): store.PageObject {
+      if (this.pages.length === 0) {
+        return this.dummyPageObject;
+      }
+      return this.pages[this.currentTabIndex];
     }
     get tabsOrder(): Array<number> {
-      return this.$store.getters.tabsOrder;
-    }
-    get currentPageIndex(): number {
-      return this.$store.getters.currentPageIndex;
+      return this.$store.getters.tabsOrder[this.windowId];
     }
     get homepage(): string {
       return this.$store.getters.homepage;
@@ -118,16 +121,16 @@
     }
 
     getWebView(i?: number): Electron.WebviewTag {
-      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
+      const index: number = (i === undefined) ? this.currentTabIndex : i;
       return this.$refs[`page-${index}`][0].$refs.webview;
     }
     getPage(i?: number): Page {
-      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
+      const index: number = (i === undefined) ? this.currentTabIndex : i;
       return this.$refs[`page-${index}`][0];
     }
     getPageObject(i?: number): store.PageObject {
-      const index: number = (i === undefined) ? this.$store.getters.currentPageIndex : i;
-      return this.$store.getters.pages[index];
+      const index: number = (i === undefined) ? this.currentTabIndex : i;
+      return this.pages[index];
     }
     historyMappings() {
       const history = this.$store.getters.history;
@@ -199,50 +202,58 @@
       this.contextMenus[`'${webContentsId}'`] = [menuItems];
     }
     // pageHandlers
-    onLoadCommit(event: Electron.LoadCommitEvent, pageIndex: number): void {
+    onLoadCommit(event: Electron.LoadCommitEvent): void {
       if (event.isMainFrame) {
         const navbar = this.$refs.navbar;
         (navbar as any).showLocation(event.url);
       }
     }
-    onDidFrameFinishLoad(event: Electron.DidFrameFinishLoadEvent, pageIndex: number): void {
+    onDidFrameFinishLoad(event: Electron.DidFrameFinishLoadEvent, tabIndex: number, pageId: number): void {
       if (event.isMainFrame) {
-        const webview = this.getWebView(pageIndex);
+        const webview = this.getWebView(tabIndex);
         this.$store.dispatch('didFrameFinishLoad', {
-          pageIndex,
+          windowId: this.windowId,
+          pageId,
+          tabIndex,
           location: webview.getURL(),
           canGoBack: webview.canGoBack(),
           canGoForward: webview.canGoForward(),
         });
       }
     }
-    onDidStartLoading(event: Electron.Event, pageIndex: number): void {
-      const webview = this.getWebView(pageIndex);
+    onDidStartLoading(event: Electron.Event, tabIndex: number, pageId: number): void {
+      const webview = this.getWebView(tabIndex);
       this.$store.dispatch('didStartLoading', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         location: webview.getURL(),
       });
       this.$store.dispatch('updateMappings', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         webContentsId: webview.getWebContents().id,
       });
       this.onCommitted.emit({
         frameId: 0,
         parentFrameId: -1,
-        processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: this.getPageObject(pageIndex).pid,
+        processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+        tabId: this.getPageObject(tabIndex).pid,
         timeStamp: Date.now(),
         url: webview.getURL(),
       });
     }
-    onDomReady(event: Electron.Event, pageIndex: number): void {
-      const webview = this.getWebView(pageIndex);
+    onDomReady(event: Electron.Event, tabIndex: number, pageId: number): void {
+      const webview = this.getWebView(tabIndex);
       const location = webview.getURL();
       const parsedURL = url.parse(location, true);
       if (parsedURL.protocol === 'chrome:' && parsedURL.hostname === 'pdf-viewer') {
         if (this.pdfViewer === 'pdf-viewer') {
           this.$store.dispatch('domReady', {
-            pageIndex,
+            windowId: this.windowId,
+            pageId,
+            tabIndex,
             canGoBack: webview.canGoBack(),
             canGoForward: webview.canGoForward(),
           });
@@ -251,7 +262,9 @@
         }
       } else {
         this.$store.dispatch('domReady', {
-          pageIndex,
+          windowId: this.windowId,
+          pageId,
+          tabIndex,
           canGoBack: webview.canGoBack(),
           canGoForward: webview.canGoForward(),
         });
@@ -259,24 +272,28 @@
       this.onDOMContentLoaded.emit({
         frameId: 0,
         parentFrameId: -1,
-        processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: this.getPageObject(pageIndex).pid,
+        processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+        tabId: this.getPageObject(tabIndex).pid,
         timeStamp: Date.now(),
         url: location,
       });
     }
-    onDidStopLoading(event: Electron.Event, pageIndex: number): void {
-      const webview = this.getWebView(pageIndex);
+    onDidStopLoading(event: Electron.Event, tabIndex: number, pageId: number): void {
+      const webview = this.getWebView(tabIndex);
       this.$store.dispatch('didStopLoading', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         location: webview.getURL(),
         canGoBack: webview.canGoBack(),
         canGoForward: webview.canGoForward(),
       });
     }
-    onDidFailLoad(event: Electron.DidFailLoadEvent, pageIndex: number): void {
+    onDidFailLoad(event: Electron.DidFailLoadEvent, tabIndex: number, pageId: number): void {
       this.$store.dispatch('didFailLoad', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         isMainFrame: event.isMainFrame,
       });
       const appPath = process.env.NODE_ENV === 'development'
@@ -286,7 +303,7 @@
       errorPage += `?ec=${encodeURIComponent((event as any).errorCode)}`;
       errorPage += `&url=${encodeURIComponent((event as any).target.getURL())}`;
       if ((event as any).errorCode !== -3 && (event as any).validatedURL === (event as any).target.getURL()) {
-        this.getPage(pageIndex).navigateTo(
+        this.getPage(tabIndex).navigateTo(
           `${errorPage}`);
       }
     }
@@ -299,39 +316,53 @@
         }
       }
     }
-    onPageTitleSet(event: Electron.PageTitleUpdatedEvent, pageIndex: number): void {
-      const webview = this.getWebView(pageIndex);
+    onPageTitleSet(event: Electron.PageTitleUpdatedEvent, tabIndex: number, pageId: number): void {
+      const webview = this.getWebView(tabIndex);
       this.$store.dispatch('pageTitleSet', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         title: webview.getTitle(),
       });
     }
-    onUpdateTargetUrl(event: Electron.UpdateTargetUrlEvent, pageIndex: number): void {
+    onUpdateTargetUrl(event: Electron.UpdateTargetUrlEvent, tabIndex: number, pageId: number): void {
       this.$store.dispatch('updateTargetUrl', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         location: event.url,
       });
     }
-    onMediaStartedPlaying(event: Electron.Event, pageIndex: number): void {
-      const webview = this.getWebView(pageIndex);
+    onMediaStartedPlaying(event: Electron.Event, tabIndex: number, pageId: number): void {
+      const webview = this.getWebView(tabIndex);
       this.$store.dispatch('mediaStartedPlaying', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         isAudioMuted: webview.isAudioMuted(),
       });
     }
-    onMediaPaused(event: Electron.Event, pageIndex: number): void {
-      this.$store.dispatch('mediaPaused', pageIndex);
+    onMediaPaused(event: Electron.Event, tabIndex: number, pageId: number): void {
+      this.$store.dispatch('mediaPaused', {
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
+      });
     }
-    onToggleAudio(event: Electron.Event, pageIndex: number, muted: boolean): void {
-      this.getWebView(pageIndex).setAudioMuted(muted);
+    onToggleAudio(event: Electron.Event, tabIndex: number, muted: boolean): void {
+      this.getWebView(tabIndex).setAudioMuted(muted);
       this.$store.dispatch('toggleAudio', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId: this.getPageObject(tabIndex).pid,
+        tabIndex,
         muted,
       });
     }
-    onPageFaviconUpdated(event: Electron.PageFaviconUpdatedEvent, pageIndex: number): void {
+    onPageFaviconUpdated(event: Electron.PageFaviconUpdatedEvent, tabIndex: number, pageId: number): void {
       this.$store.dispatch('pageFaviconUpdated', {
-        pageIndex,
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
         location: event.favicons[0],
       });
     }
@@ -344,12 +375,12 @@
       nav.style.display = 'block';
       this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
     }
-    onNewWindow(event: Electron.NewWindowEvent, pageIndex: number): void {
+    onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       this.onNewTab(event.url, true);
       if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
         this.onCreatedNavigationTarget.emit({
-          sourceTabId: this.getPageObject(pageIndex).pid,
-          sourceProcessId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
+          sourceTabId: this.getPageObject(tabIndex).pid,
+          sourceProcessId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
           sourceFrameId: 0,
           timeStamp: Date.now(),
           url: event.url,
@@ -516,23 +547,27 @@
     onContextMenu(event: Electron.Event): void {
       this.onWebviewContextMenu(event);
     }
-    onWillNavigate(event: Electron.WillNavigateEvent, pageIndex: number): void {
-      this.$store.dispatch('clearPageAction', pageIndex);
-      this.getPage(pageIndex).onMessageEvent.listeners = [];
+    onWillNavigate(event: Electron.WillNavigateEvent, tabIndex: number, pageId: number): void {
+      this.$store.dispatch('clearPageAction', {
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
+      });
+      this.getPage(tabIndex).onMessageEvent.listeners = [];
       this.onBeforeNavigate.emit({
-        tabId: this.getPageObject(pageIndex).pid,
+        tabId: this.getPageObject(tabIndex).pid,
         url: event.url,
         frameId: 0,
         parentFrameId: -1,
         timeStamp: Date.now(),
       });
     }
-    onDidNavigate(event: Electron.DidNavigateEvent, pageIndex: number): void {
+    onDidNavigate(event: Electron.DidNavigateEvent, tabIndex: number): void {
       this.onCompleted.emit({
         frameId: 0,
         parentFrameId: -1,
-        processId: this.getWebView(pageIndex).getWebContents().getOSProcessId(),
-        tabId: this.getPageObject(pageIndex).pid,
+        processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+        tabId: this.getPageObject(tabIndex).pid,
         timeStamp: Date.now(),
         url: event.url,
       });
@@ -638,12 +673,14 @@
       if (location) {
         if (location.startsWith('about:')) {
           this.$store.dispatch('createTab', {
+            windowId: this.windowId,
             location: urlResource.aboutUrls(location),
             isURL: true,
             follow: true,
           });
         } else {
           this.$store.dispatch('createTab', {
+            windowId: this.windowId,
             location,
             isURL: urlUtil.isURL(location),
             follow,
@@ -651,22 +688,36 @@
         }
       }
       setTimeout(() => {
-        this.onCreatedEvent.emit(this.extensionService.getTab(this.currentPageIndex));
-      }, 1000);
+        const pageId: number = this.getPageObject(this.currentTabIndex).pid;
+        this.onCreatedEvent.emit(this.extensionService.getTab(pageId));
+      }, 300);
     }
-    onTabDuplicate(pageIndex: number): void {
-      this.onNewTab(this.pages[pageIndex].location);
+    onTabDuplicate(tabIndex: number): void {
+      this.onNewTab(this.pages[tabIndex].location);
     }
-    onTabClick(pageIndex: number): void {
-      this.$store.dispatch('clickTab', pageIndex);
+    onTabClick(tabIndex: number): void {
+      const pageId: number = this.getPageObject(tabIndex).pid;
+      this.$store.dispatch('clickTab', {
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
+      });
     }
-    onTabClose(pageIndex: number): void {
-      this.onRemovedEvent.emit(this.extensionService.getTab(pageIndex, true).id, {
-        windowId: 0,
+    onTabClose(tabIndex: number): void {
+      const pageId: number = this.getPageObject(tabIndex).pid;
+      this.onRemovedEvent.emit(this.extensionService.getTab(pageId, true).id, {
+        windowId: this.windowId,
         isWindowClosing: false,
       });
-      this.$store.dispatch('setTabsOrder', (this.$refs.tabs as Tabs).sortable.toArray());
-      this.$nextTick(() => this.$store.dispatch('closeTab', pageIndex));
+      this.$store.dispatch('closeTab', {
+        windowId: this.windowId,
+        pageId,
+        tabIndex,
+      });
+      setTimeout(() => this.$store.dispatch('setTabsOrder', {
+        windowId: this.windowId,
+        tabsOrder: (this.$refs.tabs as Tabs).sortable.toArray(),
+      }), 300);
     }
     // navHandlers
     onClickHome(): void {
@@ -730,7 +781,7 @@
       this.getPage().navigateTo(newLocation);
     }
     // onTabContextMenu
-    onTabContextMenu(event: Electron.Event, pageIndex: number): void {
+    onTabContextMenu(event: Electron.Event, tabIndex: number): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
 
@@ -742,7 +793,7 @@
       menu.append(new MenuItem({
         label: this.$t('tabs.contextMenu.duplicateTab'),
         click: () => {
-          this.onTabDuplicate(pageIndex);
+          this.onTabDuplicate(tabIndex);
         },
       }));
       menu.append(new MenuItem({ type: 'separator' }));
@@ -750,7 +801,7 @@
         label: this.$t('tabs.contextMenu.closeTab'),
         accelerator: 'CmdOrCtrl+W',
         click: () => {
-          this.onTabClose(pageIndex);
+          this.onTabClose(tabIndex);
         },
       }));
 
@@ -960,7 +1011,7 @@
                   (this as any).$electron.remote.webContents.fromId(menuItem.webContentsId)
                     .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}`,
                       params,
-                      this.currentPageIndex,
+                      this.currentTabIndex,
                       menuItem,
                       BrowserWindow,
                     );
@@ -973,7 +1024,7 @@
                       (this as any).$electron.remote.webContents.fromId(sub.webContentsId)
                         .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}`,
                           params,
-                          this.currentPageIndex,
+                          this.currentTabIndex,
                           menuItem,
                           BrowserWindow,
                         );
@@ -1171,14 +1222,15 @@
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       const webFrame: Electron.WebFrame = (this as any).$electron.webFrame;
 
-      webFrame.setVisualZoomLevelLimits(1, 1);
-      ipc.on('set-app-state', (event, newState) => {
-        if (newState && newState.pages.length !== 0) {
-          this.$store.dispatch('setAppState', newState);
-        } else {
-          this.onNewTab('about:newtab');
-        }
+      ipc.once('window-close', () => {
+        this.$store.dispatch('closeAllTab', this.windowId);
+        ipc.send('window-close');
       });
+
+      webFrame.setVisualZoomLevelLimits(1, 1);
+      if (this.pages.length === 0) {
+        this.onNewTab('about:newtab');
+      }
       this.extensionService = new ExtensionService(this);
     }
     mounted() {
@@ -1188,12 +1240,8 @@
         document.body.classList.add('darwin');
       }
 
-      ipc.on('new-window-added', (event, windowId) => {
-        this.$store.dispatch('newWindow', windowId);
-      });
-
       ipc.on('startFindInPage', () => {
-        this.getPage(this.currentPageIndex).findInPage();
+        this.getPage(this.currentTabIndex).findInPage();
       });
 
       ipc.on('open-pdf', (event, data) => {
@@ -1290,53 +1338,26 @@
         }
       });
 
-      ipc.on('request-app-state', (event, force) => {
-        const newStart = Math.ceil(Math.random() * 10000);
-        const newPages = tabsOrdering(this.pages, this.$refs.tabs, newStart, this.tabsOrder);
-        const newCurrentPageIndex = this.tabsOrder.indexOf(this.currentPageIndex) === -1
-          ? this.currentPageIndex
-          : this.tabsOrder.indexOf(this.currentPageIndex);
+      ipc.on('about-to-quit', () => {
         const downloads = this.$store.getters.downloads;
         const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
         if (pendingDownloads.length !== 0) {
-          if (force) {
-            responseNewState(
-              this.$store.getters,
-              newStart,
-              newPages,
-              newCurrentPageIndex,
-              downloads.filter(download => download.state !== 'progressing'),
-            );
-          } else {
-            (this as any).$electron.remote.dialog.showMessageBox({
-              type: 'warning',
-              title: 'Warning',
-              message: 'You still have some files progressing.',
-              buttons: ['Abort and Leave', 'Cancel'],
-            }, (index) => {
-              if (index === 0) {
-                pendingDownloads.forEach((download) => {
-                  (this as any).$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
-                });
-                responseNewState(
-                  this.$store.getters,
-                  newStart,
-                  newPages,
-                  newCurrentPageIndex,
-                  this.$store.getters.downloads,
-                );
-              }
-            });
-          }
-        } else {
-          responseNewState(
-            this.$store.getters,
-            newStart,
-            newPages,
-            newCurrentPageIndex,
-            downloads,
-          );
+          (this as any).$electron.remote.dialog.showMessageBox({
+            type: 'warning',
+            title: 'Warning',
+            message: 'You still have some files progressing.',
+            buttons: ['Abort and Leave', 'Cancel'],
+          }, (index) => {
+            if (index === 0) {
+              pendingDownloads.forEach((download) => {
+                (this as any).$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
+              });
+              ipc.send('okay-to-quit', true);
+            } else {
+              ipc.send('okay-to-quit', false);
+            }
+          });
         }
       });
 

@@ -31,7 +31,8 @@
   @Component({
     props: [
       'isActive',
-      'pageIndex',
+      'tabIndex',
+      'pageId',
       'partitionId',
     ],
     components: {
@@ -41,6 +42,7 @@
   export default class Page extends Vue {
     dummyPageObject: store.PageObject = {
       pid: -1,
+      windowId: -1,
       location: '',
       statusText: false,
       favicon: null,
@@ -61,19 +63,26 @@
     onMessageEvent: Event = new Event();
 
     isActive: boolean;
-    pageIndex: number;
+    tabIndex: number;
+    pageId: number;
+    partitionId: number;
 
     findinpage: page.FindInPageObject;
     
+    get windowId(): number {
+      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+    }
+    get currentTabIndex(): number {
+      return this.$store.getters.currentTabIndexes[this.windowId];
+    }
+    get pages(): Array<store.PageObject> {
+      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    }
     get page(): store.PageObject {
-      const page: store.PageObject = this.$store.getters.pages[this.pageIndex];
-      if (page === undefined) {
+      if (this.pages.length === 0) {
         return this.dummyPageObject;
       }
-      return page;
-    }
-    get currentPageIndex() {
-      return this.$store.getters.currentPageIndex;
+      return this.pages[this.tabIndex];
     }
 
     navigateTo(location) {
@@ -84,7 +93,7 @@
     webviewHandler(self, fnName) {
       return (event) => {
         if (self.$parent[fnName]) {
-          self.$parent[fnName](event, this.pageIndex);
+          self.$parent[fnName](event, this.tabIndex, this.pageId);
         }
       };
     }

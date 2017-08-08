@@ -13,7 +13,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
       return tab;
     } else if (tabId === 0) {
       if (tabIndex === undefined) {
-        tab = new Tab(vueInstance.$store.getters.pid, vueInstance.$store.getters.currentPageIndex, active);
+        tab = new Tab(vueInstance.$store.getters.pid, vueInstance.currentPageIndex, active);
         const object: store.PageObject = vueInstance.getPageObject(tab.index);
         tab.update(object.location, object.title, object.favicon);
         tabArray[tab.index] = tab;
@@ -52,7 +52,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
     setTimeout(() => {
       tabArray.length = 0;
       vueInstance.$store.getters.pages.forEach((page, index) => {
-        findAndUpdateOrCreate(vueInstance, (index === vueInstance.$store.getters.currentPageIndex), 0, index);
+        findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentPageIndex), 0, index);
         tabArray[index].update(page.location, page.title, page.favicon);
       });
       // tslint:disable-next-line:align
@@ -138,7 +138,7 @@ export default (vueInstance: any) => {
       return tab;
     },
     getCurrent: (): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.currentPageIndex);
+      const tab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.currentPageIndex);
       return tab;
     },
     duplicate: (tabId: number): Tab => {

@@ -9,6 +9,7 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
   pid: number,
   pages: {
     pid: number,
+    windowId: number,
     location: string,
     statusText: boolean,
     favicon: string | null,
@@ -27,7 +28,7 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
       },
     },
   },
-  currentPageIndex: number,
+  currentTabIndexes: number[],
   currentSearchEngine: {
     name: string, // 'Google', 'Bing'
     search: string, // 'https://www.google.com/search?q='

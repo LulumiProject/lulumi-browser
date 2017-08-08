@@ -117,7 +117,7 @@ export default class ExtensionService {
     ipc.on('lulumi-page-action-show', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         vue.$store.dispatch('setPageAction', {
-          pageIndex: data.tabId,
+          pagePid: data.tabId,
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
@@ -127,7 +127,7 @@ export default class ExtensionService {
     ipc.on('lulumi-page-action-hide', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         vue.$store.dispatch('setPageAction', {
-          pageIndex: data.tabId,
+          pagePid: data.tabId,
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
@@ -724,10 +724,10 @@ export default class ExtensionService {
     vue.$refs.navbar.extensions = manifest;
   }
 
-  getTab(pageIndex: number, remove: boolean = false): Tab {
+  getTab(pageId: number, remove: boolean = false): Tab {
     if (remove) {
-      return new Tab((this.instance as any).getPageObject(pageIndex).pid, -1, false);
+      return new Tab(pageId, -1, false);
     }
-    return require('lulumi').tabs.query({ index: pageIndex })[0];
+    return require('lulumi').tabs.get(pageId);
   }
 }
