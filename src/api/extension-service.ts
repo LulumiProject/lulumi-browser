@@ -117,7 +117,7 @@ export default class ExtensionService {
     ipc.on('lulumi-page-action-show', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         vue.$store.dispatch('setPageAction', {
-          pagePid: data.tabId,
+          pageId: data.tabId,
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
@@ -127,7 +127,7 @@ export default class ExtensionService {
     ipc.on('lulumi-page-action-hide', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         vue.$store.dispatch('setPageAction', {
-          pagePid: data.tabId,
+          pageId: data.tabId,
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
