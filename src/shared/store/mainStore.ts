@@ -24,7 +24,11 @@ const broadcastMutations = (store) => {
   store.subscribe((mutation) => {
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
-      windows[id].webContents.send('vuex-apply-mutation', mutation);
+      if (typeof windows[id] !== 'number') {
+        windows[id].webContents.send('vuex-apply-mutation', mutation);
+      } else {
+        delete windows[id];
+      }
     });
   });
 };
@@ -97,11 +101,11 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       reject();
       console.error(`could not parse data from ${storagePath}, ${event}`);
     }
-  }).then((data) => {
-    if (data) {
-      store.dispatch('setAppState', data);
+  }).then((state) => {
+    if (state) {
+      store.dispatch('setAppState', state);
     }
-  }).catch(() => console.error(`Failed to load ${storagePath}!`));
+  }).catch(() => console.error(`Failed to load appState from ${storagePath}!`));
 };
 
 const tabsMapping = (pages: store.PageObject[], tabsOrder: number[]): number[] => {
@@ -118,10 +122,13 @@ const tabsMapping = (pages: store.PageObject[], tabsOrder: number[]): number[] =
   return newOrder;
 };
 
-function tabsOrdering(newStart: number): store.PageObject[] {
-  let newPid = newStart;
+function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.PageObject[] {
+  let newPid: number = newStart;
   let newPages: store.PageObject[] = [];
-  Object.keys(windows).forEach((key, windowId) => {
+  let windowId: number = bumpWindowIdsBy === 0
+    ? (1 + bumpWindowIdsBy)
+    : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
+  Object.keys(windows).forEach((key) => {
     const tmpPages: store.PageObject[] = [];
     const id = parseInt(key, 10);
     const oldPages: store.PageObject[]
@@ -138,7 +145,7 @@ function tabsOrdering(newStart: number): store.PageObject[] {
     }
     tmpPages.forEach((page) => {
       page.pid = (newPid += 1);
-      page.windowId = (windowId + 1);
+      page.windowId = windowId;
       if (page.location.startsWith('about:')) {
         page.location = urlResource.aboutUrls(page.location);
       }
@@ -147,21 +154,26 @@ function tabsOrdering(newStart: number): store.PageObject[] {
       }
     });
     newPages = newPages.concat(tmpPages);
+    windowId += 1;
   });
   return newPages;
 }
 
-function tabIndexesOrdering(): number[] {
+function tabIndexesOrdering(bumpWindowIdsBy: number): number[] {
   const newCurrentTabIndexes: number[] = [];
-  Object.keys(windows).forEach((key, windowId) => {
+  let windowId: number = bumpWindowIdsBy === 0
+    ? (1 + bumpWindowIdsBy)
+    : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
+  Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const pages: store.PageObject[]
       = store.getters.pages.filter(page => page.windowId === id);
     const tabsOrder: number[] = tabsMapping(pages, store.getters.tabsOrder[id]);
     const currentTabIndex: number = store.getters.currentTabIndexes[id];
-    newCurrentTabIndexes[(windowId + 1)] = tabsOrder.indexOf(currentTabIndex) === -1
+    newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
       ? currentTabIndex
       : tabsOrder.indexOf(currentTabIndex);
+    windowId += 1;
   });
   return newCurrentTabIndexes;
 }
@@ -181,10 +193,10 @@ function collect(getters, newStart: number, newPages: store.PageObject[], newCur
   };
 }
 
-function saveAppState(soft: boolean = true): Promise<any> {
+function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promise<any> {
   const newStart = Math.ceil(Math.random() * 10000);
-  const newPages = tabsOrdering(newStart);
-  const newCurrentTabIndexes = tabIndexesOrdering();
+  const newPages = tabsOrdering(newStart, bumpWindowIdsBy);
+  const newCurrentTabIndexes = tabIndexesOrdering(bumpWindowIdsBy);
   const downloads = store.getters.downloads;
   const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
@@ -206,8 +218,17 @@ function saveAppState(soft: boolean = true): Promise<any> {
     collect(store.getters, newStart, newPages, newCurrentTabIndexes, downloads)));
 }
 
+function bumpWindowIds(bumpWindowIdsBy: number) {
+  saveAppState(true, bumpWindowIdsBy).then((state) => {
+    if (state) {
+      store.dispatch('setAppState', JSON.parse(state));
+    }
+  });
+}
+
 export default {
   register,
   saveAppState,
+  bumpWindowIds,
   getWindows: () => windows,
 };

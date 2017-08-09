@@ -34,10 +34,10 @@
     }
 
     mounted() {
-      ipcRenderer.send('guest-want-data', 'pdfViewer');
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.pdfViewer = ret.pdfViewer;
       });
+      ipcRenderer.send('guest-want-data', 'pdfViewer');
     }
     beforeDestroy() {
       ipcRenderer.removeAllListeners('guest-here-your-data');

@@ -33,11 +33,36 @@ export const actions = {
     });
   },
 
+  didStartLoading({ commit }, { windowId, pageId, tabIndex, location }) {
+    commit(types.DID_START_LOADING, {
+      windowId,
+      pageId,
+      tabIndex,
+      location,
+    });
+  },
   loadCommit({ commit }, { windowId, pageId, tabIndex }) {
     commit(types.LOAD_COMMIT, {
       windowId,
       pageId,
       tabIndex,
+    });
+  },
+  pageTitleSet({ commit }, { windowId, pageId, tabIndex, title }) {
+    commit(types.PAGE_TITLE_SET, {
+      windowId,
+      pageId,
+      tabIndex,
+      title,
+    });
+  },
+  domReady({ commit }, { windowId, pageId, tabIndex, canGoBack, canGoForward }) {
+    commit(types.DOM_READY, {
+      windowId,
+      pageId,
+      tabIndex,
+      canGoBack,
+      canGoForward,
     });
   },
   didFrameFinishLoad({ commit }, { windowId, pageId, tabIndex, location, canGoBack, canGoForward }) {
@@ -50,21 +75,12 @@ export const actions = {
       canGoForward,
     });
   },
-  didStartLoading({ commit }, { windowId, pageId, tabIndex, location }) {
-    commit(types.DID_START_LOADING, {
+  pageFaviconUpdated({ commit }, { windowId, pageId, tabIndex, location }) {
+    commit(types.PAGE_FAVICON_UPDATED, {
       windowId,
       pageId,
       tabIndex,
       location,
-    });
-  },
-  domReady({ commit }, { windowId, pageId, tabIndex, canGoBack, canGoForward }) {
-    commit(types.DOM_READY, {
-      windowId,
-      pageId,
-      tabIndex,
-      canGoBack,
-      canGoForward,
     });
   },
   didStopLoading({ commit }, { windowId, pageId, tabIndex, location, canGoBack, canGoForward }) {
@@ -83,14 +99,6 @@ export const actions = {
       pageId,
       tabIndex,
       isMainFrame,
-    });
-  },
-  pageTitleSet({ commit }, { windowId, pageId, tabIndex, title }) {
-    commit(types.PAGE_TITLE_SET, {
-      windowId,
-      pageId,
-      tabIndex,
-      title,
     });
   },
   updateTargetUrl({ commit }, { windowId, pageId, tabIndex, location }) {
@@ -122,14 +130,6 @@ export const actions = {
       pageId,
       tabIndex,
       muted,
-    });
-  },
-  pageFaviconUpdated({ commit }, { windowId, pageId, tabIndex, location }) {
-    commit(types.PAGE_FAVICON_UPDATED, {
-      windowId,
-      pageId,
-      tabIndex,
-      location,
     });
   },
 

@@ -80,7 +80,7 @@ declare module 'lulumi' {
     }
     export interface LastOpenedTabObject {
       title: string;
-      url: string;
+      location: string;
       favicon: string | null;
     }
     export interface State {
@@ -123,11 +123,6 @@ declare module 'lulumi' {
     }
     export interface AlarmArray {
       [index: string]: Alarm | undefined;
-    }
-    export interface LastOpenedTabObject {
-      title?: string;
-      url: string;
-      favicon: string | null;
     }
   }
 

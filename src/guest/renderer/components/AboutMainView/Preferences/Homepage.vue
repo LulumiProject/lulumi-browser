@@ -26,10 +26,10 @@
     }
 
     mounted() {
-      ipcRenderer.send('guest-want-data', 'homepage');
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.homepage = ret.homepage;
       });
+      ipcRenderer.send('guest-want-data', 'homepage');
     }
     beforeDestroy() {
       ipcRenderer.removeAllListeners('guest-here-your-data');

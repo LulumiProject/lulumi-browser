@@ -23,7 +23,8 @@ const state: store.State = {
   lastOpenedTabs: [],
 };
 
-function createPageObject(wid: number, url: string | null = null): store.PageObject {
+// tslint:disable-next-line:max-line-length
+function createPageObject(state: store.State, wid: number, url: string | null = null): store.PageObject {
   return {
     pid: 0,
     windowId: wid,
@@ -58,12 +59,12 @@ const mutations = {
     let newUrl: string | null = null;
     if (isURL) {
       newUrl = location;
-      state.pages.push(createPageObject(windowId, newUrl));
+      state.pages.push(createPageObject(state, windowId, newUrl));
     } else if (location) {
       newUrl = `${config.currentSearchEngine.search}${location}`;
-      state.pages.push(createPageObject(windowId, newUrl));
+      state.pages.push(createPageObject(state, windowId, newUrl));
     } else {
-      state.pages.push(createPageObject(windowId));
+      state.pages.push(createPageObject(state, windowId));
     }
     const last = state.pages.filter(page => page.windowId === windowId).length - 1;
     state.pages[state.pages.length - 1].pid = state.pid;
@@ -87,7 +88,7 @@ const mutations = {
       if (state.pages[pageIndex].title !== 'error') {
         state.lastOpenedTabs.unshift({
           title: state.pages[pageIndex].title,
-          url: state.pages[pageIndex].location,
+          location: state.pages[pageIndex].location,
           favicon: state.pages[pageIndex].favicon,
         });
       }
@@ -95,7 +96,7 @@ const mutations = {
       if (pages.length === 1) {
         Vue.delete(state.pages, pageIndex);
         state.pid += 1;
-        state.pages.push(createPageObject(windowId));
+        state.pages.push(createPageObject(state, windowId));
         state.pages[state.pages.length - 1].pid = state.pid;
         Vue.set(state.currentTabIndexes, windowId, 0);
       } else {
@@ -162,6 +163,20 @@ const mutations = {
     state.currentTabIndexes[windowId] = tabIndex;
   },
   // page handlers
+  [types.DID_START_LOADING](state, payload) {
+    // const windowId: number = payload.windowId;
+    const pageId: number = payload.pageId;
+    // const tabIndex: number = payload.tabIndex;
+    const location: string = payload.location;
+
+    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
+
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].location = location;
+      state.pages[pageIndex].isLoading = true;
+      state.pages[pageIndex].error = false;
+    }
+  },
   [types.LOAD_COMMIT](state, payload) {
     // const windowId: number = payload.windowId;
     const pageId: number = payload.pageId;
@@ -169,7 +184,34 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].hasMedia = false;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].hasMedia = false;
+    }
+  },
+  [types.PAGE_TITLE_SET](state, payload) {
+    // const windowId: number = payload.windowId;
+    const pageId: number = payload.pageId;
+    // const tabIndex: number = payload.tabIndex;
+    const title: string = payload.title;
+
+    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
+
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].title = title;
+    }
+  },
+  [types.DOM_READY](state, payload) {
+    // const windowId: number = payload.windowId;
+    const pageId: number = payload.pageId;
+    // const tabIndex: number = payload.tabIndex;
+
+    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
+
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].canGoBack = payload.canGoBack;
+      state.pages[pageIndex].canGoForward = payload.canGoForward;
+      state.pages[pageIndex].canRefresh = true;
+    }
   },
   [types.DID_FRAME_FINISH_LOAD](state, payload) {
     // const windowId: number = payload.windowId;
@@ -180,7 +222,7 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    if (location !== '') {
+    if (state.pages[pageIndex] && location !== '') {
       state.pages[pageIndex].location = location;
       if (location.match(regexp)) {
         if (location.match(regexp)![1] === undefined) {
@@ -228,7 +270,7 @@ const mutations = {
       state.pages[pageIndex].isLoading = false;
     }
   },
-  [types.DID_START_LOADING](state, payload) {
+  [types.PAGE_FAVICON_UPDATED](state, payload) {
     // const windowId: number = payload.windowId;
     const pageId: number = payload.pageId;
     // const tabIndex: number = payload.tabIndex;
@@ -236,20 +278,9 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].location = location;
-    state.pages[pageIndex].isLoading = true;
-    state.pages[pageIndex].error = false;
-  },
-  [types.DOM_READY](state, payload) {
-    // const windowId: number = payload.windowId;
-    const pageId: number = payload.pageId;
-    // const tabIndex: number = payload.tabIndex;
-
-    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
-
-    state.pages[pageIndex].canGoBack = payload.canGoBack;
-    state.pages[pageIndex].canGoForward = payload.canGoForward;
-    state.pages[pageIndex].canRefresh = true;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].favicon = location;
+    }
   },
   [types.DID_STOP_LOADING](state, payload) {
     // const windowId: number = payload.windowId;
@@ -260,7 +291,7 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    if (location !== null) {
+    if (state.pages[pageIndex] && location !== null) {
       if (!location.match(regexp)) {
         if (!state.pages[pageIndex].favicon) {
           state.pages[pageIndex].favicon = config.tabConfig.defaultFavicon;
@@ -288,20 +319,10 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    if (isMainFrame) {
+    if (state.pages[pageIndex] && isMainFrame) {
       state.pages[pageIndex].title = 'error';
       state.pages[pageIndex].error = true;
     }
-  },
-  [types.PAGE_TITLE_SET](state, payload) {
-    // const windowId: number = payload.windowId;
-    const pageId: number = payload.pageId;
-    // const tabIndex: number = payload.tabIndex;
-    const title: string = payload.title;
-
-    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
-
-    state.pages[pageIndex].title = title;
   },
   [types.UPDATE_TARGET_URL](state, payload) {
     // const windowId: number = payload.windowId;
@@ -311,7 +332,9 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].statusText = location;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].statusText = location;
+    }
   },
   [types.MEDIA_STARTED_PLAYING](state, payload) {
     // const windowId: number = payload.windowId;
@@ -321,8 +344,10 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].hasMedia = true;
-    state.pages[pageIndex].isAudioMuted = isAudioMuted;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].hasMedia = true;
+      state.pages[pageIndex].isAudioMuted = isAudioMuted;
+    }
   },
   [types.MEDIA_PAUSED](state, payload) {
     // const windowId: number = payload.windowId;
@@ -331,7 +356,9 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].hasMedia = false;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].hasMedia = false;
+    }
   },
   [types.TOGGLE_AUDIO](state, payload) {
     // const windowId: number = payload.windowId;
@@ -341,17 +368,9 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].isAudioMuted = muted;
-  },
-  [types.PAGE_FAVICON_UPDATED](state, payload) {
-    // const windowId: number = payload.windowId;
-    const pageId: number = payload.pageId;
-    // const tabIndex: number = payload.tabIndex;
-    const location: string = payload.location;
-
-    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
-
-    state.pages[pageIndex].favicon = location;
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].isAudioMuted = muted;
+    }
   },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state, { val }) {
@@ -364,7 +383,8 @@ const mutations = {
     state.pdfViewer = val.pdfViewer;
   },
   [types.SET_TAB_CONFIG](state, { val }) {
-    state.tabConfig = val;
+    Vue.set(state.tabConfig, 'defaultFavicon', val.defaultFavicon);
+    Vue.set(state.tabConfig.dummyPageObject, 'location', val.defaultLocation);
   },
   [types.SET_LANG](state, { val }) {
     state.lang = val.lang;
@@ -409,7 +429,9 @@ const mutations = {
 
     const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.pages[pageIndex].pageActionMapping = {};
+    if (state.pages[pageIndex]) {
+      state.pages[pageIndex].pageActionMapping = {};
+    }
   },
   // downloads handlers
   [types.CREATE_DOWNLOAD_TASK](state, payload) {

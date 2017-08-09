@@ -15,7 +15,7 @@
 
   @Component
   export default class Language extends Vue {
-    options: Array<object> = [
+    options: object[] = [
       {
         value: 'en',
         label: 'English',
@@ -41,11 +41,11 @@
     }
 
     mounted() {
-      ipcRenderer.send('guest-want-data', 'lang');
       ipcRenderer.on('guest-here-your-data', (event, ret) => {
         this.lang = ret.lang;
         this.currentLang = ret.lang;
       });
+      ipcRenderer.send('guest-want-data', 'lang');
     }
     beforeDestroy() {
       ipcRenderer.removeAllListeners('guest-here-your-data');

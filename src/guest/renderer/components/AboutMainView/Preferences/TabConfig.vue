@@ -5,7 +5,7 @@
       el-input(
         placeholder="Input default opening location you want",
         @change="setTabConfig",
-        v-model.trim="defaultUrl",
+        v-model.trim="defaultLocation",
         :autofocus="true",
         ref="input")
         template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.location') }}
@@ -28,22 +28,22 @@
 
   @Component
   export default class TabConfig extends Vue {
-    defaultUrl: string = '';
+    defaultLocation: string = '';
     defaultFavicon: string = '';
 
     setTabConfig(): void {
       ipcRenderer.send('set-tab-config', {
-        defaultUrl: this.defaultUrl,
+        defaultLocation: this.defaultLocation,
         defaultFavicon: this.defaultFavicon,
       });
     }
 
     mounted() {
-      ipcRenderer.send('guest-want-data', 'tabConfig');
       ipcRenderer.on('guest-here-your-data', (event, tabConfig) => {
-        this.defaultUrl = tabConfig.defaultUrl;
+        this.defaultLocation = tabConfig.dummyPageObject.location;
         this.defaultFavicon = tabConfig.defaultFavicon;
       });
+      ipcRenderer.send('guest-want-data', 'tabConfig');
     }
     beforeDestroy() {
       ipcRenderer.removeAllListeners('guest-here-your-data');
