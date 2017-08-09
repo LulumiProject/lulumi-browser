@@ -69,7 +69,7 @@ declare module 'lulumi' {
       pageActionMapping: object;
     }
     export interface TabConfig {
-      defaultUrl: string;
+      dummyPageObject: PageObject;
       defaultFavicon: string;
       lulumiFavicon: string;
     }

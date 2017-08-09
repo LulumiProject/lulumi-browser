@@ -27,7 +27,7 @@ function createPageObject(wid: number, url: string | null = null): store.PageObj
   return {
     pid: 0,
     windowId: wid,
-    location: url || state.tabConfig.defaultUrl,
+    location: url || state.tabConfig.dummyPageObject.location,
     statusText: false,
     favicon: null,
     title: null,
@@ -162,6 +162,15 @@ const mutations = {
     state.currentTabIndexes[windowId] = tabIndex;
   },
   // page handlers
+  [types.LOAD_COMMIT](state, payload) {
+    // const windowId: number = payload.windowId;
+    const pageId: number = payload.pageId;
+    // const tabIndex: number = payload.tabIndex;
+
+    const pageIndex = state.pages.findIndex(page => page.pid === pageId);
+
+    state.pages[pageIndex].hasMedia = false;
+  },
   [types.DID_FRAME_FINISH_LOAD](state, payload) {
     // const windowId: number = payload.windowId;
     const pageId: number = payload.pageId;

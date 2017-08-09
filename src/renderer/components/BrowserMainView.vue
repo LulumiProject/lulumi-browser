@@ -1,11 +1,12 @@
 <template lang="pug">
   div
     #nav
-      tabs(ref="tabs")
-      navbar(ref="navbar")
+      tabs(ref="tabs", :windowId="windowId")
+      navbar(ref="navbar", :windowId="windowId")
     swipeArrow
     page(v-for="(page, index) in pages",
         :isActive="index === currentTabIndex",
+        :windowId="windowId",
         :tabIndex="index",
         :pageId="page.pid",
         :ref="`page-${index}`",
@@ -48,23 +49,7 @@
     },
   })
   export default class BrowserMainView extends Vue {
-    dummyPageObject: store.PageObject = {
-      pid: -1,
-      windowId: -1,
-      location: '',
-      statusText: false,
-      favicon: null,
-      title: null,
-      isLoading: false,
-      isSearching: false,
-      canGoBack: false,
-      canGoForward: false,
-      canRefresh: false,
-      error: false,
-      hasMedia: false,
-      isAudioMuted: false,
-      pageActionMapping: {},
-    };
+    windowIdByBlurEvent: number = 0;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
     isSwipeOnEdge: boolean = false;
@@ -88,8 +73,15 @@
     onCompleted: Event = new Event();
     onDOMContentLoaded: Event = new Event();
 
+    get dummyPageObject(): store.PageObject {
+      return this.$store.getters.tabConfig.dummyPageObject;
+    }
     get windowId(): number {
-      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+      const window: Electron.BrowserWindow = (this as any).$electron.remote.BrowserWindow.getFocusedWindow();
+      if (window) {
+        return window.id;
+      }
+      return this.windowIdByBlurEvent;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
@@ -202,10 +194,15 @@
       this.contextMenus[`'${webContentsId}'`] = [menuItems];
     }
     // pageHandlers
-    onLoadCommit(event: Electron.LoadCommitEvent): void {
+    onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, pageId: number): void {
       if (event.isMainFrame) {
         const navbar = this.$refs.navbar;
         (navbar as any).showLocation(event.url);
+        this.$store.dispatch('loadCommit', {
+          windowId: this.windowId,
+          pageId,
+          tabIndex,
+        });
       }
     }
     onDidFrameFinishLoad(event: Electron.DidFrameFinishLoadEvent, tabIndex: number, pageId: number): void {
@@ -312,7 +309,7 @@
         if (this.extensionService.newtabOverrides !== '') {
           (event.target as any).send('newtab', this.extensionService.newtabOverrides);
         } else {
-          (event.target as any).send('newtab', this.$store.getters.tabConfig.defaultUrl);
+          (event.target as any).send('newtab', this.$store.getters.tabConfig.dummyPageObject.location);
         }
       }
     }
@@ -688,8 +685,10 @@
         }
       }
       setTimeout(() => {
-        const pageId: number = this.getPageObject(this.currentTabIndex).pid;
-        this.onCreatedEvent.emit(this.extensionService.getTab(pageId));
+        const pageObject: store.PageObject = this.getPageObject(this.currentTabIndex);
+        if (pageObject) {
+          this.onCreatedEvent.emit(this.extensionService.getTab(pageObject.pid));
+        }
       }, 300);
     }
     onTabDuplicate(tabIndex: number): void {
@@ -1222,6 +1221,9 @@
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       const webFrame: Electron.WebFrame = (this as any).$electron.webFrame;
 
+      ipc.on('window-id', (event: Electron.Event, windowId: number) => {
+        this.windowIdByBlurEvent = windowId;
+      });
       ipc.once('window-close', () => {
         this.$store.dispatch('closeAllTab', this.windowId);
         ipc.send('window-close');
@@ -1234,11 +1236,13 @@
       this.extensionService = new ExtensionService(this);
     }
     mounted() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
-
       if (process.platform === 'darwin') {
         document.body.classList.add('darwin');
       }
+      // removed unneeded tabs
+      this.$store.dispatch('closeAllTab', 0);
+
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
       ipc.on('startFindInPage', () => {
         this.getPage(this.currentTabIndex).findInPage();

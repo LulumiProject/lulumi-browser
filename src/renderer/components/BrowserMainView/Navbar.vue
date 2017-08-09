@@ -132,6 +132,9 @@
         },
       },
     },
+    props: [
+      'windowId',
+    ],
     components: {
       'awesome-icon': AwesomeIcon,
       'el-badge': Badge,
@@ -141,23 +144,6 @@
     },
   })
   export default class Navbar extends Vue {
-    dummyPageObject: store.PageObject = {
-      pid: -1,
-      windowId: -1,
-      location: '',
-      statusText: false,
-      favicon: null,
-      title: null,
-      isLoading: false,
-      isSearching: false,
-      canGoBack: false,
-      canGoForward: false,
-      canRefresh: false,
-      error: false,
-      hasMedia: false,
-      isAudioMuted: false,
-      pageActionMapping: {},
-    };
     handler: any;
     clickHandler: any;
     blurHandler: any;
@@ -171,8 +157,10 @@
     badgeTextArray: navbar.BadgeTextArray = {};
     badgeBackgroundColorArray: navbar.BadgeBackgroundColorArray = {};
     
-    get windowId(): number {
-      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+    windowId: number;
+
+    get dummyPageObject(): store.PageObject {
+      return this.$store.getters.tabConfig.dummyPageObject;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];

@@ -191,8 +191,8 @@ const injectContentScripts = (manifest, entry) => {
 
   try {
     entry.contentScripts = manifest.content_scripts.map(contentScriptToEntry);
-  } catch (e) {
-    console.error('Failed to read content scripts', e);
+  } catch (readError) {
+    console.error('Failed to read content scripts', readError);
   }
   return entry;
 };
@@ -221,8 +221,8 @@ const loadIcons = (manifest, entry) => {
     if (manifest.icons) {
       entry.icons = iconsToEntry(manifest.icons);
     }
-  } catch (e) {
-    console.error('Failed to load icons', e);
+  } catch (readError) {
+    console.error('Failed to load icons', readError);
   }
   return entry;
 };

@@ -21,7 +21,10 @@
       span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+  import VueI18n from 'vue-i18n';
+
   import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
 
   import '../../css/el-progress';
@@ -29,88 +32,91 @@
   import prettySize from '../../js/lib/pretty-size';
   import imageUtil from '../../js/lib/image-util';
 
-  export default {
+  import BrowserMainView from '../BrowserMainView.vue';
+
+  @Component({
     components: {
       'el-button-group': ButtonGroup,
       'el-button': Button,
       'el-progress': Progress,
       'el-popover': Popover,
     },
-    computed: {
-      files() {
-        let tmpFiles = [];
-        if (this.$store.getters.downloads.length !== 0) {
-          tmpFiles = this.$store.getters.downloads.filter(download => download.style !== 'hidden');
-          tmpFiles.forEach((file) => {
-            file.totalSize = prettySize.process(file.totalBytes);
-          });
-        }
-        return tmpFiles;
-      },
-    },
-    methods: {
-      showState(dataState) {
-        return this.$t(`downloads.state.${dataState}`);
-      },
-      prettyReceivedSize(size) {
-        return prettySize.process(size);
-      },
-      percentage(file) {
-        return parseInt((file.getReceivedBytes / file.totalBytes) * 100, 10) || 0;
-      },
-      showItemInFolder(savePath) {
-        this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
-      },
-      openItem(savePath) {
-        this.$electron.ipcRenderer.send('open-item', savePath);
-      },
-      checkStateForButtonGroup(state) {
-        switch (state) {
-          case 'cancelled':
-          case 'interrupted':
-            return false;
-          case 'progressing':
-          case 'completed':
-          default:
-            return true;
-        }
-      },
-      checkStateForProgress(state) {
-        switch (state) {
-          case 'progressing':
-            return '';
-          case 'cancelled':
-          case 'interrupted':
-            return 'exception';
-          case 'completed':
-          default:
-            return 'success';
-        }
-      },
-      pauseDownload(startTime) {
-        this.$electron.ipcRenderer.send('pause-downloads-progress', startTime);
-      },
-      resumeDownload(startTime) {
-        this.$electron.ipcRenderer.send('resume-downloads-progress', startTime);
-      },
-      cancelDownload(startTime) {
-        this.$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
-      },
-      closeDownloadBar() {
-        if (this.$parent.onCloseDownloadBar) {
-          this.$parent.onCloseDownloadBar();
-        }
-      },
-      getFileIcon(savePath, index) {
-        if (savePath) {
-          imageUtil.getBase64FromFileIcon(savePath, 'normal').then((dataURL) => {
-            if (document.getElementById(`icon-${index}`)) {
-              document.getElementById(`icon-${index}`).setAttribute('src', dataURL);
-            }
-          });
-        }
-      },
-    },
+  })
+
+  export default class Download extends Vue {
+    get files() {
+      let tmpFiles: object[] = [];
+      if (this.$store.getters.downloads.length !== 0) {
+        tmpFiles = this.$store.getters.downloads.filter(download => download.style !== 'hidden');
+        tmpFiles.forEach((file) => {
+          (file as any).totalSize = prettySize.process((file as any).totalBytes);
+        });
+      }
+      return tmpFiles;
+    }
+
+    showState(dataState: string): VueI18n.LocaleMessage {
+      return this.$t(`downloads.state.${dataState}`);
+    }
+    prettyReceivedSize(size: number): string {
+      return prettySize.process(size);
+    }
+    percentage(file): number {
+      return (file.getReceivedBytes / file.totalBytes) * 100 || 0;
+    }
+    showItemInFolder(savePath: string): void {
+      (this as any).$electron.ipcRenderer.send('show-item-in-folder', savePath);
+    }
+    openItem(savePath: string): void {
+      (this as any).$electron.ipcRenderer.send('open-item', savePath);
+    }
+    checkStateForButtonGroup(state: string): boolean {
+      switch (state) {
+        case 'cancelled':
+        case 'interrupted':
+          return false;
+        case 'progressing':
+        case 'completed':
+        default:
+          return true;
+      }
+    }
+    checkStateForProgress(state: string): string {
+      switch (state) {
+        case 'progressing':
+          return '';
+        case 'cancelled':
+        case 'interrupted':
+          return 'exception';
+        case 'completed':
+        default:
+          return 'success';
+      }
+    }
+    pauseDownload(startTime: number): void {
+      (this as any).$electron.ipcRenderer.send('pause-downloads-progress', startTime);
+    }
+    resumeDownload(startTime: number): void {
+      (this as any).$electron.ipcRenderer.send('resume-downloads-progress', startTime);
+    }
+    cancelDownload(startTime: number): void {
+      (this as any).$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
+    }
+    closeDownloadBar(): void {
+      if ((this.$parent as BrowserMainView).onCloseDownloadBar) {
+        (this.$parent as BrowserMainView).onCloseDownloadBar();
+      }
+    }
+    getFileIcon(savePath: string, index: number): void {
+      if (savePath) {
+        imageUtil.getBase64FromFileIcon(savePath, 'normal').then((dataURL) => {
+          const el = document.getElementById(`icon-${index}`);
+          if (el) {
+            el.setAttribute('src', dataURL);
+          }
+        });
+      }
+    }
   };
 </script>
 

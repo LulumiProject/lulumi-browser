@@ -20,7 +20,23 @@ const homepage = 'https://github.com/qazbnm456/lulumi-browser';
 const pdfViewer = 'pdf-viewer';
 
 const tabConfig = {
-  defaultUrl: 'https://github.com/qazbnm456/lulumi-browser',
+  dummyPageObject: {
+    pid: -1,
+    windowId: -1,
+    location: 'https://github.com/qazbnm456/lulumi-browser',
+    statusText: false,
+    favicon: null,
+    title: null,
+    isLoading: false,
+    isSearching: false,
+    canGoBack: false,
+    canGoForward: false,
+    canRefresh: false,
+    error: false,
+    hasMedia: false,
+    isAudioMuted: false,
+    pageActionMapping: {},
+  },
   defaultFavicon: nativeImage
     .createFromPath(path.join(__static, 'icons', 'document.png'))
     .toDataURL(),

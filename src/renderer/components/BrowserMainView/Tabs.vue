@@ -68,6 +68,9 @@
         },
       },
     },
+    props: [
+      'windowId',
+    ],
     components: {
       'awesome-icon': AwesomeIcon,
       'el-button': Button,
@@ -77,9 +80,8 @@
   export default class Tabs extends Vue {
     sortable: any;
 
-    get windowId(): number {
-      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
-    }
+    windowId: number;
+
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }

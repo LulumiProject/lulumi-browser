@@ -31,6 +31,7 @@
   @Component({
     props: [
       'isActive',
+      'windowId',
       'tabIndex',
       'pageId',
       'partitionId',
@@ -40,37 +41,21 @@
     },
   })
   export default class Page extends Vue {
-    dummyPageObject: store.PageObject = {
-      pid: -1,
-      windowId: -1,
-      location: '',
-      statusText: false,
-      favicon: null,
-      title: null,
-      isLoading: false,
-      isSearching: false,
-      canGoBack: false,
-      canGoForward: false,
-      canRefresh: false,
-      error: false,
-      hasMedia: false,
-      isAudioMuted: false,
-      pageActionMapping: {},
-    };
     hidden: boolean = true;
     requestId: number | null | void = null;
     showNotification: boolean = false;
     onMessageEvent: Event = new Event();
 
     isActive: boolean;
+    windowId: number;
     tabIndex: number;
     pageId: number;
     partitionId: number;
 
     findinpage: page.FindInPageObject;
-    
-    get windowId(): number {
-      return (this as any).$electron.remote.BrowserWindow.getFocusedWindow().id;
+
+    get dummyPageObject(): store.PageObject {
+      return this.$store.getters.tabConfig.dummyPageObject;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];

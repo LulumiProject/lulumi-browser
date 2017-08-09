@@ -33,6 +33,13 @@ export const actions = {
     });
   },
 
+  loadCommit({ commit }, { windowId, pageId, tabIndex }) {
+    commit(types.LOAD_COMMIT, {
+      windowId,
+      pageId,
+      tabIndex,
+    });
+  },
   didFrameFinishLoad({ commit }, { windowId, pageId, tabIndex, location, canGoBack, canGoForward }) {
     commit(types.DID_FRAME_FINISH_LOAD, {
       windowId,

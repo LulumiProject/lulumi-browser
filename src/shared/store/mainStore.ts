@@ -40,6 +40,7 @@ const store = new Vuex.Store({
 const register = (storagePath: string, swipeGesture: boolean): void => {
   ipcMain.on('vuex-connect', (event: Electron.Event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
+    window.setMaxListeners(0);
 
     window.on('scroll-touch-begin', () => {
       window.webContents.send('scroll-touch-begin', swipeGesture);
@@ -51,6 +52,10 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
     window.on('scroll-touch-edge', () => {
       window.webContents.send('scroll-touch-edge');
+    });
+
+    window.on('blur', () => {
+      window.webContents.send('window-id', window.id);
     });
 
     window.on('close', (event: Electron.Event) => {
