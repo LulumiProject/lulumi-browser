@@ -85,14 +85,14 @@
     }
     removeExtension(extensionId: string): void {
       const id = this.findId(extensionId);
-      ipcRenderer.once('remove-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+      ipcRenderer.once('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
           (this as any).$message.error(data.result);
         }
       });
-      ipcRenderer.send('remove-extension', window.renderProcessPreferences[id].name);
+      ipcRenderer.send('remove-lulumi-extension', window.renderProcessPreferences[id].name);
     }
   };
 </script>

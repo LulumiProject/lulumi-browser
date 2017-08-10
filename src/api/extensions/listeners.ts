@@ -29,7 +29,7 @@ ipcMain.on('add-lulumi-extension', (event) => {
     }
   });
 });
-ipcMain.on('remove-extension', (event, name) => {
+ipcMain.on('remove-lulumi-extension', (event, name) => {
   const window = BrowserWindow.getFocusedWindow();
   let result: string = 'OK';
   try {
@@ -38,11 +38,11 @@ ipcMain.on('remove-extension', (event, name) => {
     result = removeError.message;
   }
 
-  window.webContents.send('remove-extension-result', {
+  window.webContents.send('remove-lulumi-extension-result', {
     name,
     result,
   });
-  event.sender.send('remove-extension-result', {
+  event.sender.send('remove-lulumi-extension-result', {
     name,
     result,
   });
