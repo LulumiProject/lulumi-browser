@@ -688,18 +688,17 @@ export default class ExtensionService {
   }
 
   registerAction() {
-    const vue: any = this.instance;
     const manifest: object[] = [];
-    const remote = vue.$electron.remote;
+    const remote = (this.instance as any).$electron.remote;
     const backgroundPages = remote.getGlobal('backgroundPages');
 
     this.newtabOverrides = '';
-    vue.$nextTick(() => {
+    this.instance.$nextTick(() => {
       Object.keys(this.manifestMap).forEach((extension) => {
         const ext = this.manifestMap[extension];
         if (ext !== null) {
           Vue.set(
-            vue.$refs.navbar.badgeTextArray,
+            (this.instance.$refs.navbar as any).badgeTextArray,
             ext.extensionId,
             { text: undefined });
           if (backgroundPages[extension]) {
@@ -721,7 +720,7 @@ export default class ExtensionService {
       });
     });
 
-    vue.$refs.navbar.extensions = manifest;
+    (this.instance.$refs.navbar as any).extensions = manifest;
   }
 
   getTab(pageId: number, remove: boolean = false): Tab {

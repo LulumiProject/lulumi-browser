@@ -228,7 +228,7 @@ const registerWebRequest = (sess: Electron.Session, delayedInit: number): void =
       unregister(k, sess);
     }
   });
-  ipcMain.on('extension-added', (event: Electron.Event, extensionName: string) => {
+  ipcMain.on('lululmi-extension-added', (event: Electron.Event, extensionName: string) => {
     setTimeout(() => {
       Object.keys(webRequestMapping).forEach((k) => {
         const v = webRequestMapping[k];
@@ -242,7 +242,7 @@ const registerWebRequest = (sess: Electron.Session, delayedInit: number): void =
       });
     }, delayedInit);
   });
-  ipcMain.on('extension-removed', (event: Electron.Event, extensionName: string) => {
+  ipcMain.on('lululmi-extension-removed', (event: Electron.Event, extensionName: string) => {
     Object.keys(webRequestMapping).forEach((k) => {
       if (webRequestMapping[k].extensionName === extensionName) {
         unregister(k, sess);

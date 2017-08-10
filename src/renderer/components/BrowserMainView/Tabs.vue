@@ -18,7 +18,7 @@
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
-      div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab('about:newtab')")
+      div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab(windowId, 'about:newtab', false)")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
         .chrome-tab-bg(style="padding-right: 10px;")
@@ -152,9 +152,9 @@
       ipc.on('new-tab', (event, payload) => {
         if ((this.$parent as BrowserMainView).onNewTab) {
           if (payload) {
-            (this.$parent as BrowserMainView).onNewTab(payload.location, payload.follow);
+            (this.$parent as BrowserMainView).onNewTab(this.windowId, payload.location, payload.follow);
           } else {
-            (this.$parent as BrowserMainView).onNewTab('about:newtab');
+            (this.$parent as BrowserMainView).onNewTab(this.windowId, 'about:newtab', false);
           }
         }
       });

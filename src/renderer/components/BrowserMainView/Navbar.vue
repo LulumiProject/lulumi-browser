@@ -355,7 +355,7 @@
       }
       const badge = this.badgeTextArray[extensionId];
       if (badge) {
-        if (details.hasOwnProperty('tabId')) {
+        if (details.tabId) {
           Vue.set(badge,
                   `${require('lulumi').tabs.get(details.tabId).index}`,
                   details.text);
@@ -380,7 +380,7 @@
       }
       const badge = this.badgeBackgroundColorArray[extensionId];
       if (badge) {
-        if (details.hasOwnProperty('tabId')) {
+        if (details.tabId) {
           Vue.set(badge,
                   `${require('lulumi').tabs.get(details.tabId).index}`,
                   details.color);
@@ -408,9 +408,9 @@
     }
     loadIcon(extension: any): string | undefined {
       try {
-        const isPageAction = extension.hasOwnProperty('page_action');
-        const isBrowserAction = extension.hasOwnProperty('browser_action');
-        const manifestIcon = extension.hasOwnProperty('icons');
+        const isPageAction = extension.page_action;
+        const isBrowserAction = extension.browser_action;
+        const manifestIcon = extension.icons;
         let icons = false;
         if (isPageAction) {
           icons = extension.page_action.default_icon;
@@ -436,7 +436,7 @@
       }
     }
     showOrNot(extension: any): string {
-      const isPageAction = extension.hasOwnProperty('page_action');
+      const isPageAction = extension.page_action;
       if (isPageAction) {
         if (this.pageActionMapping[extension.extensionId]) {
           if (this.pageActionMapping[extension.extensionId].enabled) {
@@ -448,8 +448,8 @@
       return 'enabled';
     }
     showPopupOrNot(extension: any): boolean {
-      const isPageAction = extension.hasOwnProperty('page_action');
-      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      const isPageAction = extension.page_action;
+      const isBrowserAction = extension.browser_action;
       if (isPageAction) {
         if (this.pageActionMapping[extension.extensionId]) {
           if (this.pageActionMapping[extension.extensionId].enabled) {
@@ -468,8 +468,8 @@
       return true;
     }
     showTitle(extension: any): string {
-      const isPageAction = extension.hasOwnProperty('page_action');
-      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      const isPageAction = extension.page_action;
+      const isBrowserAction = extension.browser_action;
       if (isPageAction) {
         return extension.page_action.default_title;
       } else if (isBrowserAction) {
@@ -478,8 +478,8 @@
       return '';
     }
     sendIPC(event: Electron.Event, extension: any): void {
-      const isPageAction = extension.hasOwnProperty('page_action');
-      const isBrowserAction = extension.hasOwnProperty('browser_action');
+      const isPageAction = extension.page_action;
+      const isBrowserAction = extension.browser_action;
       if (isPageAction || isBrowserAction) {
         const webview = this.$refs[`webview-${extension.extensionId}`][0];
         webview.addEventListener('context-menu', (event) => {
@@ -606,18 +606,18 @@
         extension.click();
       });
 
-      ipc.on('add-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+      ipc.on('add-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
         if (data.result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
-          ipc.send('extension-added', data.name);
+          ipc.send('lulumi-extension-added', data.name);
         }
       });
-      ipc.on('remove-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+      ipc.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
         if (data.result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
-          ipc.send('extension-removed', data.name);
+          ipc.send('lulumi-extension-removed', data.name);
         } else {
           alert(data.result);
         }

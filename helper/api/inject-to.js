@@ -266,12 +266,13 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
     sendMessage: (extensionId, message, responseCallback) => {
       if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
         && (typeof message === 'function')
-        && (typeof responseCallback !== 'function')) {
+        && (responseCallback === undefined)) {
         // sendMessage(message, responseCallback)
         lulumi.runtime.sendMessage(thisExtensionId, extensionId, message);
         return;
       } else if (((typeof extensionId === 'string') || (typeof extensionId === 'object'))
-        && (message === undefined)) {
+        && (message === undefined)
+        && (responseCallback === undefined)) {
         // sendMessage(message)
         lulumi.runtime.sendMessage(thisExtensionId, extensionId, () => {});
         return;
@@ -368,7 +369,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-tabs-update', tabId, updateProperties);
     },
-    reload: (tabId, reloadProperties = { bypassCache: false }, callback) => {
+    reload: (tabId, reloadProperties = {}, callback) => {
       ipcRenderer.once('lulumi-tabs-reload-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -376,7 +377,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       });
       ipcRenderer.send('lulumi-tabs-reload', tabId, reloadProperties);
     },
-    create: (createProperties = { windowId: 0 }, callback) => {
+    create: (createProperties = {}, callback) => {
       ipcRenderer.once('lulumi-tabs-create-result', (event, result) => {
         if (callback) {
           callback(result);

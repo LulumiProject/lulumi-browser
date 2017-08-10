@@ -70,17 +70,17 @@ export default (vueInstance: any) => {
 
   const browserAction = {
     setIcon: (extensionId: string, startPage: string, details: chrome.browserAction.TabIconDetails): void => {
-      if (details.hasOwnProperty('path')) {
+      if (details.path) {
         vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${details.path}`);
       }
     },
     setBadgeText: (extensionId: string, details: chrome.browserAction.BadgeTextDetails): void => {
-      if (details.hasOwnProperty('text')) {
+      if (details.text) {
         vueInstance.$refs.navbar.setBrowserActionBadgeText(extensionId, details);
       }
     },
     setBadgeBackgroundColor: (extensionId: string, details: chrome.browserAction.BadgeBackgroundColorDetails): void => {
-      if (details.hasOwnProperty('color')) {
+      if (details.color) {
         vueInstance.$refs.navbar.setBrowserActionBadgeBackgroundColor(extensionId, details);
       }
     },
@@ -95,7 +95,7 @@ export default (vueInstance: any) => {
 
   const pageAction = {
     setIcon: (extensionId: string, startPage: string, details: chrome.pageAction.IconDetails): void => {
-      if (details.hasOwnProperty('path')) {
+      if (details.path) {
         vueInstance.$refs.navbar.setPageActionIcon(extensionId, `${startPage}/${details.path}`);
       }
     },
@@ -112,7 +112,7 @@ export default (vueInstance: any) => {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
       const tabIndex: number = vueInstance.$store.getters.mappings[webContentsId];
-      if (typeof tabIndex === 'undefined') {
+      if (tabIndex === undefined) {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       }
@@ -166,24 +166,17 @@ export default (vueInstance: any) => {
         return tabs;
       }
     },
-    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): Tab => {
+    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties): Tab => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (updateProperties.hasOwnProperty('url')) {
+      if (updateProperties.url) {
         vueInstance.getPage(tab.index).$refs.webview.loadURL(updateProperties.url);
       }
-      if (updateProperties.hasOwnProperty('active')) {
-        if (updateProperties.active) {
-          findAndUpdateOrCreate(vueInstance, true, tabId);
-        }
-      }
-      if (updateProperties.hasOwnProperty('highlighted')) {
-        if (updateProperties.highlighted) {
-          findAndUpdateOrCreate(vueInstance, true, tabId);
-        }
+      if (updateProperties.active) {
+        findAndUpdateOrCreate(vueInstance, true, tabId);
       }
       return tab;
     },
-    reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties = { bypassCache: false }): void => {
+    reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (reloadProperties.bypassCache) {
         vueInstance.getPage(tab.index).$refs.webview.reloadIgnoringCache();
@@ -191,16 +184,12 @@ export default (vueInstance: any) => {
         vueInstance.getPage(tab.index).$refs.webview.reload();
       }
     },
-    create: (createProperties: chrome.tabs.CreateProperties = { windowId: 0 }): Tab => {
+    create: (createProperties: chrome.tabs.CreateProperties): Tab => {
       let tab: Tab = findAndUpdateOrCreate(vueInstance, false, -1);
-      if (createProperties.hasOwnProperty('url')) {
-        if (createProperties.hasOwnProperty('active')) {
-          vueInstance.onNewTab(createProperties.url, createProperties.active);
-        } else {
-          vueInstance.onNewTab(createProperties.url);
-        }
-        tab = findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
+      if (createProperties.url) {
+        vueInstance.onNewTab(createProperties.windowId, createProperties.url, createProperties.active);
       }
+      tab = findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
       return tab;
     },
     remove: (tabIds: number[] | number): void => {
@@ -218,13 +207,13 @@ export default (vueInstance: any) => {
     },
     executeScript: (tabId: number, details: chrome.tabs.InjectDetails = {}): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (details.hasOwnProperty('code')) {
+      if (details.code) {
         vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(details.code, false);
       }
     },
     insertCSS: (tabId, details: chrome.tabs.InjectDetails = {}): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (details.hasOwnProperty('code')) {
+      if (details.code) {
         vueInstance.getPage(tab.index).$refs.webview.insertCSS(details.code);
       }
     },
