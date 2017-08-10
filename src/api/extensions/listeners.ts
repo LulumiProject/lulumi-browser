@@ -5,7 +5,7 @@ ipcMain.on('open-dev-tools', (event, webContentsId) => {
     webContents.fromId(webContentsId).openDevTools();
   }
 });
-ipcMain.on('add-extension', (event) => {
+ipcMain.on('add-lulumi-extension', (event) => {
   const window = BrowserWindow.getFocusedWindow();
   dialog.showOpenDialog({ properties: ['openDirectory'] }, (dirs) => {
     if (dirs) {
@@ -13,16 +13,16 @@ ipcMain.on('add-extension', (event) => {
       let result: string = 'OK';
       try {
         // an array of diretory paths chosen by the user will be returned, but we only want one path
-        name = (BrowserWindow as any).addExtension(dirs[0]);
+        name = (BrowserWindow as any).addLulumiExtension(dirs[0]);
       } catch (readError) {
         result = readError.message;
       }
 
-      window.webContents.send('add-extension-result', {
+      window.webContents.send('add-lulumi-extension-result', {
         name,
         result,
       });
-      event.sender.send('add-extension-result', {
+      event.sender.send('add-lulumi-extension-result', {
         name,
         result,
       });
@@ -33,7 +33,7 @@ ipcMain.on('remove-extension', (event, name) => {
   const window = BrowserWindow.getFocusedWindow();
   let result: string = 'OK';
   try {
-    (BrowserWindow as any).removeExtension(name);
+    (BrowserWindow as any).removeLulumiExtension(name);
   } catch (removeError) {
     result = removeError.message;
   }

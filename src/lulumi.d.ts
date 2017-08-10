@@ -45,7 +45,7 @@ declare module 'lulumi' {
       guestData: LulumiObject;
     }
     export interface CustomBrowserWindow extends Electron.BrowserWindow {
-      addExtension(srcDirectory: string): void;
+      addLulumiExtension(srcDirectory: string): void;
     }
   }
 

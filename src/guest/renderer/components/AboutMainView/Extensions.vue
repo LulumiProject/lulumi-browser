@@ -4,7 +4,7 @@
       el-col(:span="12")
         h1 {{ $t('about.extensionsPage.title') }}
       el-col(:span="6", :offset="3")
-        el-button(type="info", @click="addExtension") {{ $t('about.extensionsPage.add') }}
+        el-button(type="info", @click="addLulumiExtension") {{ $t('about.extensionsPage.add') }}
     el-row
       el-col(:span="24")
         ul(class="extensions-list")
@@ -73,15 +73,15 @@
     openDevTools(webContentsId: number): void {
       ipcRenderer.send('open-dev-tools', webContentsId);
     }
-    addExtension(): void {
-      ipcRenderer.once('add-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+    addLulumiExtension(): void {
+      ipcRenderer.once('add-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
           (this as any).$message.error(data.result);
         }
       });
-      ipcRenderer.send('add-extension');
+      ipcRenderer.send('add-lulumi-extension');
     }
     removeExtension(extensionId: string): void {
       const id = this.findId(extensionId);

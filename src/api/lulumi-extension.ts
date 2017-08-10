@@ -323,7 +323,7 @@ app.on('will-quit', () => {
 
 app.once('ready', () => {
   // the public API to add/remove extensions
-  (BrowserWindow as any).addExtension = (srcDirectory: string): string => {
+  (BrowserWindow as any).addLulumiExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);
     if (manifest !== null) {
       loadExtension(manifest);
@@ -333,7 +333,7 @@ app.once('ready', () => {
     }
   };
 
-  (BrowserWindow as any).removeExtension = (name: string): string => {
+  (BrowserWindow as any).removeLulumiExtension = (name: string): string => {
     const manifest = manifestNameMap[name];
     if (manifest) {
       removeBackgroundPages(manifest);
@@ -344,7 +344,7 @@ app.once('ready', () => {
     return name;
   };
 
-  (BrowserWindow as any).getExtensions = () => {
+  (BrowserWindow as any).getLulumiExtensions = () => {
     const extensions = {};
     Object.keys(manifestNameMap).forEach((name) => {
       const manifest = manifestNameMap[name];
