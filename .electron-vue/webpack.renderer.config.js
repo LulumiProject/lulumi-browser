@@ -159,6 +159,7 @@ let rendererConfig = {
       'src': path.join(__dirname, '../src'),
       'components': path.join(__dirname, '../src/renderer/components'),
       'renderer': path.join(__dirname, '../src/renderer'),
+      'shared': path.join(__dirname, '../src/shared'),
       'i18n': path.join(__dirname, '../helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.esm.js'

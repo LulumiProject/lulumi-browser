@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
 import fs from 'fs';
 import path from 'path';
-import punycode from 'punycode';
+import nanoid from 'nanoid';
 import url from 'url';
 
 import config from '../main/js/constants/config';
@@ -24,7 +24,7 @@ const manifestMap: api.ManifestMap = {};
 // name => manifest
 const manifestNameMap: api.ManifestNameMap = {};
 
-const generateExtensionIdFromName = name => punycode.toASCII(name).replace(/[\W_]+/g, '-').toLowerCase();
+const generateExtensionIdFromName = nanoid;
 
 const isWindowOrWebView = (webContents) => {
   const type = webContents.getType();
@@ -54,7 +54,7 @@ const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
     }
 
     if (!manifestNameMap[manifest.name]) {
-      const extensionId = generateExtensionIdFromName(manifest.name);
+      const extensionId = generateExtensionIdFromName();
       manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
 
       let messages = {};

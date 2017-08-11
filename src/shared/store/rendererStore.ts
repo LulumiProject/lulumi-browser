@@ -8,14 +8,16 @@ import modules from './modules';
 
 Vue.use(Vuex);
 
-const state = ipcRenderer.sendSync('vuex-connect');
+if (process.env.NODE_ENV !== 'testing') {
+  const state = ipcRenderer.sendSync('vuex-connect');
 
-Object.keys(modules).forEach((module) => {
-  modules[module].state = {
-    ...modules[module].state,
-    ...state[module],
-  };
-});
+  Object.keys(modules).forEach((module) => {
+    modules[module].state = {
+      ...modules[module].state,
+      ...state[module],
+    };
+  });
+}
 
 const store = new Vuex.Store({
   actions,
@@ -24,26 +26,28 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
-interface CustomStore {
-  dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
-}
-
-(store as CustomStore).dispatch = function (type, ...payload) {
-  let newType = type;
-  let newPayload = payload;
-  if (typeof type === 'object' && type.type && arguments.length === 1) {
-    newPayload = [type.payload];
-    newType = type.type;
+if (process.env.NODE_ENV !== 'testing') {
+  interface CustomStore {
+    dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
   }
 
-  ipcRenderer.send('vuex-action', {
-    type: newType,
-    payload: newPayload,
-  });
-};
+  (store as CustomStore).dispatch = function (type, ...payload) {
+    let newType = type;
+    let newPayload = payload;
+    if (typeof type === 'object' && type.type && arguments.length === 1) {
+      newPayload = [type.payload];
+      newType = type.type;
+    }
 
-ipcRenderer.on('vuex-apply-mutation', (event, mutation) => {
-  store.commit(mutation.type, mutation.payload);
-});
+    ipcRenderer.send('vuex-action', {
+      type: newType,
+      payload: newPayload,
+    });
+  };
+
+  ipcRenderer.on('vuex-apply-mutation', (event, mutation) => {
+    store.commit(mutation.type, mutation.payload);
+  });
+}
 
 export default store;

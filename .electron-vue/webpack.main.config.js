@@ -74,6 +74,7 @@ let mainConfig = {
   ],
   resolve: {
     alias: {
+      'shared': path.join(__dirname, '../src/shared'),
       'vue$': 'vue/dist/vue.esm.js'
     },
     extensions: ['.ts', '.js', '.vue', '.json']

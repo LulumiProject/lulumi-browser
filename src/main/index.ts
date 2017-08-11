@@ -21,12 +21,12 @@ if (process.env.NODE_ENV !== 'development') {
   globalObjet.__static = path.resolve(__dirname, '../static');
 }
 
-let shuttingDown: boolean = process.env.BABEL_ENV === 'test';
+let shuttingDown: boolean = process.env.NODE_ENV === 'testing';
 
 let storagePath: string;
 if (process.env.NODE_ENV === 'development') {
   storagePath = path.join(config.devUserData, 'lulumi-app-state');
-} else if (process.env.BABEL_ENV === 'test') {
+} else if (process.env.NODE_ENV === 'testing') {
   storagePath = path.join(config.testUserData, 'lulumi-app-state');
 } else {
   storagePath = path.join(app.getPath('userData'), 'app-state');
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 let langPath: string;
 if (process.env.NODE_ENV === 'development') {
   langPath = path.join(config.devUserData, 'lulumi-lang');
-} else if (process.env.BABEL_ENV === 'test') {
+} else if (process.env.NODE_ENV === 'testing') {
   langPath = path.join(config.testUserData, 'lulumi-lang');
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
@@ -132,8 +132,10 @@ function createWindow(): void {
     (mainWindow as any) = null;
   });
 
-  // save app-state every 5 mins
-  appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
+  if (process.env.NODE_ENV !== 'testing') {
+    // save app-state every 5 mins
+    appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
+  }
 }
 
 // register createWindow method to BrowserWindow

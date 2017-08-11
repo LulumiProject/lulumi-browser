@@ -114,7 +114,7 @@ process.once('document-start', () => {
 });
 
 process.once('loaded', () => {
-  if (process.env.BABEL_ENV === 'test') {
+  if (process.env.NODE_ENV === 'testing') {
     global.require = requireTmp;
   }
 

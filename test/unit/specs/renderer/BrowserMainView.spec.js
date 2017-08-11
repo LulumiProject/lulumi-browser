@@ -6,7 +6,7 @@ import BrowserMainView from 'components/BrowserMainView';
 import config from 'renderer/js/constants/config';
 
 import router from 'renderer/router';
-import store from 'renderer/store';
+import store from 'shared/store';
 
 import { name } from 'src/../.electron-vue/config';
 
@@ -19,8 +19,8 @@ Vue.config.productionTip = false;
 Vue.config.devtools = false;
 
 // Customize Autocomplete component to match out needs
-const CustomAutocomplete = Vue.extend(Autocomplete);
-const GoodCustomAutocomplete = CustomAutocomplete.extend({
+const customAutocomplete = Vue.extend(Autocomplete);
+const goodCustomAutocomplete = customAutocomplete.extend({
   data() {
     return {
       lastQueryString: '',
@@ -78,19 +78,11 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
         }
       });
     },
-    handleComposition(event) {
-      if (event.type === 'compositionend') {
-        this.isOnComposition = false;
-        this.handleChange(event.value);
-      } else {
-        this.isOnComposition = true;
-      }
-    },
     handleChange(value) {
       this.$emit('input', value);
       if (this.isOnComposition || (!this.triggerOnFocus && !value)) {
         this.lastQueryString = '';
-        this.suggestions = [];
+        this.suggestions.length = 0;
         return;
       }
       this.getData(value);
@@ -104,8 +96,8 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
     },
     handleKeyEnter(event) {
       if (this.suggestionVisible
-            && this.highlightedIndex >= 0
-            && this.highlightedIndex < this.suggestions.length) {
+        && this.highlightedIndex >= 0
+        && this.highlightedIndex < this.suggestions.length) {
         this.select(this.suggestions[this.highlightedIndex]);
       } else {
         this.$parent.$parent.onEnterLocation(event.target.value);
@@ -116,18 +108,20 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
       }
     },
     highlight(index) {
+      let newIndex = index;
       if (!this.suggestionVisible || this.loading) {
         return;
       }
       if (index < 0) {
-        index = 0;
+        newIndex = 0;
       }
       if (index >= this.suggestions.length) {
-        index = this.suggestions.length - 1;
+        newIndex = this.suggestions.length - 1;
       }
-      const suggestion = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
+      const suggestion
+        = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
       const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
-      const highlightItem = suggestionList[index];
+      const highlightItem = suggestionList[newIndex];
       const scrollTop = suggestion.scrollTop;
       const offsetTop = highlightItem.offsetTop;
       if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
@@ -136,14 +130,15 @@ const GoodCustomAutocomplete = CustomAutocomplete.extend({
       if (offsetTop < scrollTop) {
         suggestion.scrollTop -= highlightItem.scrollHeight;
       }
-      this.highlightedIndex = index;
-      if (index >= 0) {
-        this.$refs.input.$refs.input.value = this.suggestions[this.highlightedIndex].value;
+      this.highlightedIndex = newIndex;
+      if (newIndex >= 0) {
+        this.$refs.input.$refs.input.value
+          = this.suggestions[this.highlightedIndex].value;
       }
     },
   },
 });
-Vue.component('good-custom-autocomplete', GoodCustomAutocomplete);
+Vue.component('good-custom-autocomplete', goodCustomAutocomplete);
 Vue.component('el-scrollbar', Scrollbar);
 
 let vm;
@@ -155,22 +150,19 @@ describe('BrowserMainView.vue', () => {
       router,
       store,
     }).$mount();
-    // we need at least one active tab
-    vm.$store.dispatch('createTab', {
-      url: undefined,
-      follow: true,
-    });
+    vm.onNewTab(undefined, 'https://github.com/qazbnm456/lulumi-browser', true);
+    vm.onTabClose(0);
     await vm.$nextTick();
   });
 
   describe('functions', () => {
     after(() => {
-      vm.$store.dispatch('closeTab', 0);
+      vm.onTabClose(0);
     });
 
     describe('computed.tabsOrder()', () => {
       it('has no members in tabsOrder initially', () => {
-        expect(vm.tabsOrder).to.be.empty;
+        expect(vm.tabsOrder).to.be.undefined;
       });
     });
 
@@ -187,8 +179,8 @@ describe('BrowserMainView.vue', () => {
     });
 
     describe('methods.getWebView()', () => {
-      it('has the corresponding webview element', () => {
-        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.defaultUrl);
+      it('has the corresponding webview element', async () => {
+        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.dummyPageObject.location);
       });
     });
 
@@ -238,10 +230,10 @@ describe('BrowserMainView.vue', () => {
   describe('Tabs.vue (integrated)', () => {
     it('shows the title of webview.getTitle()', async () => {
       vm.$store.dispatch('pageTitleSet', {
-        pageIndex: 0,
-        webview: {
-          getTitle: () => name,
-        },
+        windowId: -1,
+        pageId: vm.getPageObject().pid,
+        tabIndex: 0,
+        title: name,
       });
       await vm.$nextTick();
       expect(vm.$el.querySelector('.chrome-tab-current .chrome-tab-title').innerHTML).to.equal(name);
@@ -249,10 +241,10 @@ describe('BrowserMainView.vue', () => {
 
     it('shows the volume icon when there exists at least one media in the page, and it\'s playing', async () => {
       vm.$store.dispatch('mediaStartedPlaying', {
-        pageIndex: 0,
-        webview: {
-          isAudioMuted: () => false,
-        },
+        windowId: -1,
+        pageId: vm.getPageObject().pid,
+        tabIndex: 0,
+        isAudioMuted: false,
       });
       await vm.$nextTick();
       expect(vm.$el.querySelector('svg.volume-up')).to.exist;
@@ -260,20 +252,17 @@ describe('BrowserMainView.vue', () => {
 
     it('shows the volume icon when there exists at least one media in the page, and it\'s not playing', async () => {
       vm.$store.dispatch('mediaStartedPlaying', {
-        pageIndex: 0,
-        webview: {
-          isAudioMuted: () => true,
-        },
+        windowId: -1,
+        pageId: vm.getPageObject().pid,
+        tabIndex: 0,
+        isAudioMuted: true,
       });
       await vm.$nextTick();
       expect(vm.$el.querySelector('svg.volume-off')).to.exist;
     });
 
     it('adds one more tab', async () => {
-      vm.$store.dispatch('createTab', {
-        url: 'https://www.youtube.com/',
-        follow: false,
-      });
+      vm.onNewTab(undefined, 'https://github.com/qazbnm456/lulumi-browser', true);
       await vm.$nextTick();
       expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(2);
     });
@@ -285,7 +274,7 @@ describe('BrowserMainView.vue', () => {
     });
 
     it('removes last created tab and moves to adjacent tab', async () => {
-      vm.$store.dispatch('closeTab', 1);
+      vm.onTabClose(1);
       await vm.$nextTick();
       expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(1);
       expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('0');
@@ -309,7 +298,7 @@ describe('BrowserMainView.vue', () => {
   describe('Page.vue (integrated)', () => {
     it('reveals itself when it\'s the current page', () => {
       const pageVm = vm.getPage(0);
-      expect(pageVm.isActive).to.equal((vm.currentPageIndex === 0));
+      expect(pageVm.isActive).to.equal((vm.currentTabIndex === 0));
     });
   });
 });

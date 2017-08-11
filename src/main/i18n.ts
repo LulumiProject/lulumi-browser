@@ -17,7 +17,7 @@ import config from './js/constants/config';
 let langPath;
 if (process.env.NODE_ENV === 'development') {
   langPath = path.join(config.devUserData, 'lulumi-lang');
-} else if (process.env.BABEL_ENV === 'test') {
+} else if (process.env.NODE_ENV === 'testing') {
   langPath = path.join(config.testUserData, 'lulumi-lang');
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
