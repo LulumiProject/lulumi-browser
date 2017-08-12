@@ -94,18 +94,30 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Adjust mainConfig for production settings
+ * Adjust mainConfig for e2e testing settings
  */
-if (process.env.NODE_ENV === 'production') {
+if (process.env.TEST_ENV === 'e2e') {
   mainConfig.plugins.push(
-    new BabiliWebpackPlugin({
-      removeConsole: true,
-      removeDebugger: true
-    }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': '"production"',
+      'process.env.TEST_ENV': '"e2e"'
     })
   )
+} else {
+  /**
+   * Adjust mainConfig for production settings
+   */
+  if (process.env.NODE_ENV === 'production') {
+    mainConfig.plugins.push(
+      new BabiliWebpackPlugin({
+        removeConsole: true,
+        removeDebugger: true
+      }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"production"'
+      })
+    )
+  }
 }
 
 module.exports = mainConfig

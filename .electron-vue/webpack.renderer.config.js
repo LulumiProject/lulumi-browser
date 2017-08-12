@@ -330,36 +330,60 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Adjust rendererConfig and aboutConfig for production settings
+ * Adjust rendererConfig and aboutConfig for e2e testing settings
  */
-if (process.env.NODE_ENV === 'production') {
-  rendererConfig.devtool = ''
-  aboutConfig.devtool = ''
-
+if (process.env.TEST_ENV === 'e2e') {
   rendererConfig.plugins.push(
-    new BabiliWebpackPlugin({
-      removeConsole: true,
-      removeDebugger: true
-    }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': '"production"',
+      'process.env.TEST_ENV': '"e2e"'
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
   )
   aboutConfig.plugins.push(
-    new BabiliWebpackPlugin({
-      removeConsole: true,
-      removeDebugger: true
-    }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': '"production"',
+      'process.env.TEST_ENV': '"e2e"'
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
   )
+} else {
+  /**
+   * Adjust rendererConfig and aboutConfig for production settings
+   */
+  if (process.env.NODE_ENV === 'production') {
+    rendererConfig.devtool = ''
+    aboutConfig.devtool = ''
+
+    rendererConfig.plugins.push(
+      new BabiliWebpackPlugin({
+        removeConsole: true,
+        removeDebugger: true
+      }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"production"'
+      }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
+    )
+    aboutConfig.plugins.push(
+      new BabiliWebpackPlugin({
+        removeConsole: true,
+        removeDebugger: true
+      }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"production"'
+      }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
+    )
+  }
 }
 
 module.exports = [

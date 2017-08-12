@@ -6,7 +6,7 @@ import BrowserMainView from 'components/BrowserMainView';
 import config from 'renderer/js/constants/config';
 
 import router from 'renderer/router';
-import store from 'shared/store';
+import store from 'shared/store/rendererStore';
 
 import { name } from 'src/../.electron-vue/config';
 

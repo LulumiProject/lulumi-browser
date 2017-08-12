@@ -102,7 +102,6 @@ if (preferences) {
 
 const requireTmp = require;
 const moduleTmp = module;
-const nodeEnv = process.env.NODE_ENV;
 const __dirnameTmp = __dirname;
 
 // about:newtab handler
@@ -114,7 +113,7 @@ process.once('document-start', () => {
 });
 
 process.once('loaded', () => {
-  if (process.env.NODE_ENV === 'testing') {
+  if (process.env.TEST_ENV === 'e2e') {
     global.require = requireTmp;
   }
 
@@ -128,13 +127,6 @@ process.once('loaded', () => {
 
     global.require = requireTmp;
     global.module = moduleTmp;
-
-    global.process = {
-      env: {
-        NODE_ENV: nodeEnv,
-      },
-    };
-    global.__dirname = __dirnameTmp;
   }
 
   global.ipcRenderer = ipcRenderer;
