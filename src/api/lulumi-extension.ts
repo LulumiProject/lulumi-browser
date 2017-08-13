@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
 import fs from 'fs';
 import path from 'path';
-import nanoid from 'nanoid';
+import generate from 'nanoid/generate';
 import url from 'url';
 
 import config from '../main/js/constants/config';
@@ -24,7 +24,7 @@ const manifestMap: api.ManifestMap = {};
 // name => manifest
 const manifestNameMap: api.ManifestNameMap = {};
 
-const generateExtensionIdFromName = nanoid;
+const generateExtensionIdFromName = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
 
 const isWindowOrWebView = (webContents) => {
   const type = webContents.getType();

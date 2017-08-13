@@ -165,13 +165,12 @@
     }
     clearAllAlarm(): void {
       Object.keys(this.getAllAlarm()).forEach(name => (this.clearAlarm(name)));
-      this.alarms = {};
     }
     createAlarm(name: string, alarmInfo): void {
       let alarm: browserMainView.Alarm = {
         handler: () => {},
       };
-      let timeout;
+      let timeout: number = 0;
 
       this.clearAlarm(name);
 
@@ -179,16 +178,21 @@
         timeout = alarmInfo.when - Date.now();
       } else if (alarmInfo.delayInMinutes) {
         timeout = alarmInfo.delayInMinutes * 60 * 1000;
+      } else if (alarmInfo.periodInMinutes) {
+        timeout = alarmInfo.periodInMinutes * 60 * 1000;
       }
-      if (alarmInfo.periodInMinutes) {
+      if (timeout !== 0) {
         alarm.handler
-          = setInterval(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
-        alarm.periodInMinutes = alarmInfo.periodInMinutes;
-      } else {
-        alarm.handler
-          = setTimeout(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
+        = setTimeout(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
+        if (alarmInfo.periodInMinutes) {
+          timeout = alarmInfo.periodInMinutes * 60 * 1000;
+          alarm.handler
+            = setInterval(() => this.onAlarmEvent.emit(this.getAlarm(name)), timeout);
+          alarm.periodInMinutes = alarmInfo.periodInMinutes;
+        }
+
+        Vue.set(this.alarms, name, alarm);
       }
-      Vue.set(this.alarms, name, alarm);
     }
     addContextMenus(menuItems, webContentsId: number): void {
       this.contextMenus[`'${webContentsId}'`] = [menuItems];
