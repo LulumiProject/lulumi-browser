@@ -526,7 +526,7 @@
             }
             if (extension.webContentsId) {
               (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-                .send('lulumi-page-action-clicked', { id: this.currentTabIndex });
+                .send('lulumi-page-action-clicked', { id: this.page.pid });
             }
           }
         } else if (isBrowserAction) {
@@ -541,7 +541,7 @@
           }
           if (extension.webContentsId) {
             (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-              .send('lulumi-browser-action-clicked', { id: this.currentTabIndex });
+              .send('lulumi-browser-action-clicked', { id: this.page.pid });
           }
         }
       }

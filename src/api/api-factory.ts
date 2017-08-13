@@ -7,39 +7,46 @@ import Tab from './extensions/tab';
 const tabArray: Tab[] = [];
 
 function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
-  let tab: Tab = new Tab(-1, -1, false);
+  let tabHolder: Tab = new Tab(-1, -1, false);
   if (tabId !== undefined) {
     if (tabId === -1) {
-      return tab;
+      return tabHolder;
     } else if (tabId === 0) {
       if (tabIndex === undefined) {
-        tab = new Tab(vueInstance.$store.getters.pid, vueInstance.currentPageIndex, active);
-        const object: store.PageObject = vueInstance.getPageObject(tab.index);
-        tab.update(object.location, object.title, object.favicon);
-        tabArray[tab.index] = tab;
+        tabHolder = new Tab(vueInstance.$store.getters.pid, vueInstance.currentPageIndex, active);
+        const object: store.PageObject = vueInstance.getPageObject(tabHolder.index);
+        tabHolder.update(object.location, object.title, object.favicon);
+        tabArray[tabHolder.index] = tabHolder;
       } else {
-        tab = tabArray[tabIndex];
+        tabHolder = tabArray[tabIndex];
         const object: store.PageObject = vueInstance.getPageObject(tabIndex);
-        if (tab === undefined) {
-          tab = new Tab(object.pid, tabIndex, active);
-          tab.update(object.location, object.title, object.favicon);
-          tabArray[tabIndex] = tab;
+        if (tabHolder === undefined) {
+          tabHolder = new Tab(object.pid, tabIndex, active);
+          tabHolder.update(object.location, object.title, object.favicon);
+          tabArray[tabIndex] = tabHolder;
         } else {
           tabArray[tabIndex].update(object.location, object.title, object.favicon);
-          tab = tabArray[tabIndex];
+          tabHolder = tabArray[tabIndex];
         }
       }
-      if ((tab.index !== -1) && active) {
+      if ((tabHolder.index !== -1) && active) {
         tabArray.map(tab => tab.activate(false));
-        tabArray[tab.index].activate(true);
-        tab = tabArray[tab.index];
-        vueInstance.onTabClick(tab.index);
+        tabArray[tabHolder.index].activate(true);
+        tabHolder = tabArray[tabHolder.index];
+        vueInstance.onTabClick(tabHolder.index);
       }
-      return tab;
+      return tabHolder;
     } else {
-      const index = tabArray.findIndex(tab => (tab.id === tabId));
+      let index = tabArray.findIndex(tab => (tab.id === tabId));
       if (index === -1) {
-        return tab;
+        index = vueInstance.pages.findIndex(page => (page.pid === tabId));
+        if (index === -1) {
+          return tabHolder;
+        }
+        tabHolder = new Tab(tabId, index, active);
+        const object: store.PageObject = vueInstance.getPageObject(tabHolder.index);
+        tabHolder.update(object.location, object.title, object.favicon);
+        tabArray[index] = tabHolder;
       }
       if (active) {
         tabArray.map(tab => tab.activate(false));
@@ -57,7 +64,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
       });
       // tslint:disable-next-line:align
     }, 1000);
-    return tab;
+    return tabHolder;
   }
 }
 
