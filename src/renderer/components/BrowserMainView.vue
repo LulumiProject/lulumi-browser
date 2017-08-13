@@ -705,7 +705,7 @@
       setTimeout(() => {
         const pageObject: store.PageObject = this.getPageObject(this.currentTabIndex);
         if (pageObject) {
-          this.onCreatedEvent.emit(this.extensionService.getTab(pageObject.pid));
+          this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, pageObject.pid));
         }
       }, 300);
     }
@@ -722,7 +722,7 @@
     }
     onTabClose(tabIndex: number): void {
       const pageId: number = this.getPageObject(tabIndex).pid;
-      this.onRemovedEvent.emit(this.extensionService.getTab(pageId, true).id, {
+      this.onRemovedEvent.emit(this.extensionService.getTab(this.windowId, pageId, true).id, {
         windowId: this.windowId,
         isWindowClosing: false,
       });

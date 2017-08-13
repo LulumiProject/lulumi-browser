@@ -723,9 +723,9 @@ export default class ExtensionService {
     (this.instance.$refs.navbar as any).extensions = manifest;
   }
 
-  getTab(pageId: number, remove: boolean = false): Tab {
+  getTab(windowId: number, pageId: number, remove: boolean = false): Tab {
     if (remove) {
-      return new Tab(pageId, -1, false);
+      return new Tab(windowId, pageId, -1, false);
     }
     return require('lulumi').tabs.get(pageId);
   }

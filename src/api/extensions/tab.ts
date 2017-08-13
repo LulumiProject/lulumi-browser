@@ -17,10 +17,10 @@ class Tab {
   width: number;
   height: number;
   sessionId: number;
-  constructor(id: number, index: number, active: boolean) {
+  constructor(windowid:number, id: number, index: number, active: boolean) {
     this.id = id; // 頁籤的標識符。(某些狀況可能會沒有id)
     this.index = index; // 頁籤在所在窗口中的索引，從 0 開始。
-    this.windowId = 0; // 頁籤所在窗口的標識符。
+    this.windowId = windowid; // 頁籤所在窗口的標識符。
     this.openerTabId; // 使用哪個已存在的頁籤打開指定的網址。
     this.highlighted = active; // 頁籤是否為高亮狀態。
     this.active = active; // 頁籤是否是窗口中的活動頁籤。 （因為視窗不一定是focus的狀態。）

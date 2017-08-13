@@ -7,60 +7,67 @@ import Tab from './extensions/tab';
 const tabArray: Tab[] = [];
 
 function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
-  let tabHolder: Tab = new Tab(-1, -1, false);
+  let tabHolder: Tab = new Tab(0, -1, -1, false);
   if (tabId !== undefined) {
+    // if tabId === -1, we then just return a Tab instance with id = -1
     if (tabId === -1) {
       return tabHolder;
     } else if (tabId === 0) {
+      // if tabId === 0 and tabIndex remains undefined,
+      // we then just create a Tab instance storing the information of current tab
       if (tabIndex === undefined) {
-        tabHolder = new Tab(vueInstance.$store.getters.pid, vueInstance.currentPageIndex, active);
+        tabHolder = new Tab(vueInstance.windowId, vueInstance.$store.getters.pid, vueInstance.currentPageIndex, active);
         const object: store.PageObject = vueInstance.getPageObject(tabHolder.index);
         tabHolder.update(object.location, object.title, object.favicon);
-        tabArray[tabHolder.index] = tabHolder;
+        tabArray[tabHolder.id] = tabHolder;
       } else {
-        tabHolder = tabArray[tabIndex];
+        // however, if tabIndex has a value, then we find or create one
         const object: store.PageObject = vueInstance.getPageObject(tabIndex);
+        if (object === undefined) {
+          return tabHolder;
+        }
+        tabHolder = tabArray[object.pid];
         if (tabHolder === undefined) {
-          tabHolder = new Tab(object.pid, tabIndex, active);
+          tabHolder = new Tab(vueInstance.windowId, object.pid, tabIndex, active);
           tabHolder.update(object.location, object.title, object.favicon);
-          tabArray[tabIndex] = tabHolder;
+          tabArray[object.pid] = tabHolder;
         } else {
-          tabArray[tabIndex].update(object.location, object.title, object.favicon);
-          tabHolder = tabArray[tabIndex];
+          tabArray[object.pid].update(object.location, object.title, object.favicon);
+          tabHolder = tabArray[object.pid];
         }
       }
       if ((tabHolder.index !== -1) && active) {
         tabArray.map(tab => tab.activate(false));
-        tabArray[tabHolder.index].activate(true);
-        tabHolder = tabArray[tabHolder.index];
+        tabArray[tabHolder.id].activate(true);
+        tabHolder = tabArray[tabHolder.id];
         vueInstance.onTabClick(tabHolder.index);
       }
-      return tabHolder;
+      return tabArray[tabHolder.id];
     } else {
-      let index = tabArray.findIndex(tab => (tab.id === tabId));
-      if (index === -1) {
-        index = vueInstance.pages.findIndex(page => (page.pid === tabId));
+      // if we have tabId, then we just find or create one
+      if (tabArray[tabId] === undefined) {
+        const index = vueInstance.pages.findIndex(page => (page.pid === tabId));
         if (index === -1) {
           return tabHolder;
         }
-        tabHolder = new Tab(tabId, index, active);
+        tabHolder = new Tab(vueInstance.windowId, tabId, index, active);
         const object: store.PageObject = vueInstance.getPageObject(tabHolder.index);
         tabHolder.update(object.location, object.title, object.favicon);
-        tabArray[index] = tabHolder;
+        tabArray[tabId] = tabHolder;
       }
       if (active) {
         tabArray.map(tab => tab.activate(false));
-        tabArray[index].activate(true);
-        vueInstance.onTabClick(index);
+        tabArray[tabId].activate(true);
+        vueInstance.onTabClick(tabArray[tabId].index);
       }
-      return tabArray[index];
+      return tabArray[tabId];
     }
   } else {
     setTimeout(() => {
       tabArray.length = 0;
       vueInstance.$store.getters.pages.forEach((page, index) => {
         findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentPageIndex), 0, index);
-        tabArray[index].update(page.location, page.title, page.favicon);
+        tabArray[page.pid].update(page.location, page.title, page.favicon);
       });
       // tslint:disable-next-line:align
     }, 1000);
