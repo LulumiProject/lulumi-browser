@@ -17,7 +17,7 @@ class Tab {
   width: number;
   height: number;
   sessionId: number;
-  constructor(windowid:number, id: number, index: number, active: boolean) {
+  constructor(windowid: number, id: number, index: number, active: boolean) {
     this.id = id; // 頁籤的標識符。(某些狀況可能會沒有id)
     this.index = index; // 頁籤在所在窗口中的索引，從 0 開始。
     this.windowId = windowid; // 頁籤所在窗口的標識符。
