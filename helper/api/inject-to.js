@@ -532,7 +532,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
                 lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].forEach((menuItemIPC) => {
                   ipcRenderer.removeAllListeners([ menuItemIPC ]);
                 });
-                lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId] = [];
+                lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].length = 0;
               }
             });
           }
@@ -542,7 +542,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
               lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].forEach((menuItemIPC) => {
                 ipcRenderer.removeAllListeners([ menuItemIPC ]);
               });
-              lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId] = [];
+              lulumi.contextMenus.menuItemsIPC[lulumi.runtime.id][menuItemIPCId].length = 0;
             });
           }
         }
@@ -580,8 +580,8 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
     handleMenuItems: (createProperties, menuItemId) => {
       if ((createProperties === null) && (menuItemId === null)) {
         if (lulumi.contextMenus.menuItems[lulumi.runtime.id]) {
-          lulumi.contextMenus.menuItems[lulumi.runtime.id] = [];
-          lulumi.contextMenus.contextMenusIPC(null, null, true);
+          lulumi.contextMenus.menuItems[lulumi.runtime.id].length = 0;
+          lulumi.contextMenus.contextMenusIPC(null, null, null, true);
         }
       } else if (createProperties !== null) {
         let flag = true;

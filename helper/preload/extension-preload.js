@@ -11,8 +11,11 @@ process.once('loaded', () => {
   global.ipcRenderer = ipcRenderer;
 
   ipcRenderer.once(`lulumi-extension-${extensionId}-going-removed`, (event) => {
+    // remove all the registered things related to this extension
     Object.values(global.lulumi.webRequest).forEach(v => v.removeAllListeners());
-    ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
+    global.lulumi.contextMenus.removeAll(() => {
+      ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
+    });
   });
   ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {
     if (external) {

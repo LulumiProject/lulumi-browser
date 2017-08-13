@@ -257,7 +257,7 @@ export default (vueInstance: any) => {
       vueInstance.addContextMenus(menuItems, webContentsId);
     },
     removeAll: (menuItems, webContentsId: number): void => {
-      vueInstance.addContextMenus([], webContentsId);
+      vueInstance.addContextMenus(menuItems, webContentsId);
     },
   };
 
