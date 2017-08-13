@@ -546,9 +546,9 @@
         }
       }
     }
-    removeExtension(name: string): void {
+    removeLulumiExtension(name: string): void {
       const ipc = (this as any).$electron.ipcRenderer;
-      ipc.send('remove-extension', name);
+      ipc.send('remove-lulumi-extension', name);
     }
     onContextmenu(extension: any): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
@@ -557,7 +557,7 @@
       menu.append(new MenuItem({
         label: 'Remove extension',
         click: () => {
-          this.removeExtension(extension.name);
+          this.removeLulumiExtension(extension.name);
         },
       }));
 

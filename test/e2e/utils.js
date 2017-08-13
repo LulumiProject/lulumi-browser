@@ -2,7 +2,7 @@ import electron from 'electron';
 import path from 'path';
 import { Application } from 'spectron';
 
-const lululmiWindowUrl = `file://${path.resolve(__dirname, '../../')}/dist/index.html#/`;
+const lulumiWindowUrl = `file://${path.resolve(__dirname, '../../')}/dist/index.html#/`;
 
 const logVerboseEnabled = process.env.LULUMI_TEST_VERBOSE;
 const logVerbose = (string, ...rest) => {
@@ -69,7 +69,7 @@ function addCommands() {
         }).then((urls) => {
           const newHandles = []
           for (let i = 0; i < urls.length; i++) {
-            if (urls[i].startsWith(lululmiWindowUrl)) {
+            if (urls[i].startsWith(lulumiWindowUrl)) {
               newHandles.push(handles[i]);
             }
           }
@@ -93,7 +93,7 @@ function addCommands() {
           const newHandles = [];
           for (let i = 0; i < urls.length; i++) {
             if (!(urls[i].startsWith('chrome-extension') || urls[i].startsWith('lulumi-extension')
-              || urls[i].startsWith(lululmiWindowUrl))) {
+              || urls[i].startsWith(lulumiWindowUrl))) {
               newHandles.push(handles[i]);
             }
           }
@@ -122,7 +122,7 @@ function addCommands() {
   app.client.addCommand('waitForBrowserWindow', () => {
     logVerbose('waitForBrowserWindow()');
     return client.waitUntil(() => {
-      return client.windowByUrl(lululmiWindowUrl).then((response) => {
+      return client.windowByUrl(lulumiWindowUrl).then((response) => {
         logVerbose('waitForBrowserWindow() => ' + JSON.stringify(response));
         return response;
       }, () => {
