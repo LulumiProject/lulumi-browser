@@ -5,6 +5,8 @@ import Vue from 'vue';
 
 import apiFactory, { initializeExtensionApi } from './api-factory';
 
+/* tslint:disable:max-line-length */
+
 export default class ExtensionService {
   newtabOverrides: string = '';
   manifestMap: object = {};
@@ -271,6 +273,38 @@ export default class ExtensionService {
         const onMessageEvent = require('lulumi').runtime.onMessage(data.webContentsId);
         if (onMessageEvent) {
           onMessageEvent.emit(data.message, data.sender);
+        }
+      }
+    });
+    ipc.on('lulumi-runtime-add-listener-on-message-external', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-runtime-add-listener-on-message-external-result-${data.digest}`, args);
+        };
+        const onMessageExternalEvent = require('lulumi').runtime.onMessageExternal(data.webContentsId);
+        if (onMessageExternalEvent) {
+          onMessageExternalEvent.addListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-runtime-remove-listener-on-message-external', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(`lulumi-runtime-add-listener-on-message-external-result-${data.digest}`, args);
+        };
+        const onMessageExternalEvent = require('lulumi').runtime.onMessageExternal(data.webContentsId);
+        if (onMessageExternalEvent) {
+          onMessageExternalEvent.removeListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-runtime-emit-on-message-external', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const onMessageExternalEvent = require('lulumi').runtime.onMessageExternal(data.webContentsId);
+        if (onMessageExternalEvent) {
+          onMessageExternalEvent.emit(data.message, data.sender);
         }
       }
     });

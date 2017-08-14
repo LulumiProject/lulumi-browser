@@ -186,7 +186,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       ipcRenderer.send('lulumi-browser-action-set-badge-background-color',
         thisExtensionId, details);
     },
-    onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('page-action', 'on-clicked'),
+    onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('browser-action', 'on-clicked'),
   };
 
   lulumi.pageAction = {

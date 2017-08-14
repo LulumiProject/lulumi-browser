@@ -144,6 +144,14 @@ export default (vueInstance: any) => {
       }
       return vueInstance.getPage(tabIndex).onMessageEvent;
     },
+    onMessageExternal: (webContentsId: number): Event | undefined => {
+      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
+      if (tabIndex === undefined) {
+        return undefined;
+      }
+      // TODO: fix this
+      return vueInstance.getPage(tabIndex).onMessageEvent;
+    },
   };
 
   const tabs = {

@@ -20,7 +20,6 @@ class Event {
   constructor(scope, event) {
     this.scope = scope;
     this.event = event;
-    ipcRenderer.send(`lulumi-${this.scope}-${this.event}`);
     this.listeners = [];
   }
 
