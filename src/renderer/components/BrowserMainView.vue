@@ -195,7 +195,13 @@
       }
     }
     addContextMenus(menuItems, webContentsId: number): void {
-      this.contextMenus[`'${webContentsId}'`] = [menuItems];
+      if (menuItems) {
+        if (menuItems.length === 0) {
+          Vue.delete((this.contextMenus as any), webContentsId);
+        } else {
+          this.contextMenus[`'${webContentsId}'`] = [menuItems];
+        }
+      }
     }
     // pageHandlers
     onDidStartLoading(event: Electron.Event, tabIndex: number, pageId: number): void {
