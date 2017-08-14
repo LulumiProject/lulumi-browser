@@ -60,7 +60,7 @@ mainStore.register(storagePath, swipeGesture);
 const windows = mainStore.getWindows();
 
 function appStateSave(soft: boolean = true): void {
-  if (windows.length !== 0) {
+  if (Object.keys(windows).length !== 0) {
     mainStore.saveAppState(soft)
       .then((state) => {
         if (state) {
@@ -155,7 +155,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (windows.length === 0) {
+  if (Object.keys(windows).length === 0) {
     createWindow();
   }
 });
