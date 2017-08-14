@@ -240,6 +240,10 @@
     }
     onPageTitleSet(event: Electron.PageTitleUpdatedEvent, tabIndex: number, pageId: number): void {
       const webview = this.getWebView(tabIndex);
+      (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+        windowId: this.windowId,
+        title: webview.getTitle(),
+      });
       this.$store.dispatch('pageTitleSet', {
         windowId: this.windowId,
         pageId,

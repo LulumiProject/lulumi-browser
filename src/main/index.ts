@@ -190,6 +190,14 @@ app.on('before-quit', (event) => {
   appStateSave(false);
 });
 
+// set the title for the focused BrowserWindow
+ipcMain.on('set-browser-window-title', (event, data) => {
+  const window: Electron.BrowserWindow = windows[data.windowId];
+  if (window) {
+    window.setTitle(data.title);
+  }
+});
+
 // show the item on host
 ipcMain.on('show-item-in-folder', (event, path) => {
   if (path) {
