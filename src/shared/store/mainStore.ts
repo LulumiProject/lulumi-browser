@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { BrowserWindow, ipcMain } from 'electron';
-import { readFileSync } from 'fs';
 
 import { actions } from './actions';
 import { getters } from './getters';
@@ -15,6 +14,7 @@ Vue.use(Vuex);
 
 /* tslint:disable:max-line-length */
 /* tslint:disable:no-console */
+/* tslint:disable:object-shorthand-properties-first */
 
 const windows: Electron.BrowserWindow[] = [];
 
@@ -58,8 +58,9 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       window.webContents.send('scroll-touch-edge');
     });
 
-    window.on('blur', () => {
-      window.webContents.send('window-id', window.id);
+    ipcMain.on('window-id', (event: Electron.Event) => {
+      const window = BrowserWindow.fromWebContents(event.sender);
+      event.returnValue = window.id;
     });
 
     window.on('close', (event: Electron.Event) => {
@@ -67,6 +68,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         close = false;
       } else {
         ipcMain.once(('window-close' as any), () => {
+          store.dispatch('closeWindow', window.id);
           delete windows[window.id];
           window.webContents.removeAllListeners('scroll-touch-begin');
           window.webContents.removeAllListeners('scroll-touch-end');
@@ -79,6 +81,26 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       }
     });
 
+    // window state
+    const bounds: Electron.Rectangle = window.getBounds();
+    let windowState: string = 'normal';
+    if (window.isFullScreen()) {
+      windowState = 'fullscreen';
+    } else if (window.isMaximized()) {
+      windowState = 'maximized';
+    } else if (window.isMinimized()) {
+      windowState = 'minimized';
+    }
+    store.dispatch('createWindow', {
+      windowId: window.id,
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      windowState,
+      type: (window.webContents as any).getType(),
+    });
+
     windows[window.id] = window;
     event.returnValue = store.state;
   });
@@ -87,25 +109,33 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     const type: string = action.type;
     store.dispatch(type, ...action.payload);
   });
+};
 
-  new Promise((resolve, reject) => {
-    let data: string = '""';
-    try {
-      data = readFileSync(storagePath, 'utf8');
-    } catch (event) { }
+const dispatch = (state) => {
+  store.dispatch('setAppState', state);
+};
 
-    try {
-      data = JSON.parse(data);
-      resolve(data);
-    } catch (event) {
-      reject();
-      console.error(`could not parse data from ${storagePath}, ${event}`);
+const windowStateSave = (): void => {
+  Object.values(windows).forEach((window) => {
+    const bounds: Electron.Rectangle = window.getBounds();
+    let windowState: string = 'normal';
+    if (window.isFullScreen()) {
+      windowState = 'fullscreen';
+    } else if (window.isMaximized()) {
+      windowState = 'maximized';
+    } else if (window.isMinimized()) {
+      windowState = 'minimized';
     }
-  }).then((state) => {
-    if (state) {
-      store.dispatch('setAppState', state);
-    }
-  }).catch(() => console.error(`Failed to load appState from ${storagePath}!`));
+    store.dispatch('updateWindowProperty', {
+      windowId: window.id,
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      focused: window.isFocused(),
+      windowState,
+    });
+  });
 };
 
 const tabsMapping = (pages: store.PageObject[], tabsOrder: number[]): number[] => {
@@ -178,7 +208,24 @@ function tabIndexesOrdering(bumpWindowIdsBy: number): number[] {
   return newCurrentTabIndexes;
 }
 
-function collect(getters, newStart: number, newPages: store.PageObject[], newCurrentTabIndexes: number[], downloads) {
+function windowsOrdering(bumpWindowIdsBy: number): store.LulumiBrowserWindowProperty[] {
+  const newWindows: store.LulumiBrowserWindowProperty[] = [];
+  let windowId: number = bumpWindowIdsBy === 0
+    ? (1 + bumpWindowIdsBy)
+    : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
+    const index: number = store.getters.windows.findIndex(window => window.windowId === id);
+    const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, oldWindows[index]);
+    tmp.windowId = windowId;
+    newWindows.push(tmp);
+    windowId += 1;
+  });
+  return newWindows;
+}
+
+function collect(getters, newStart: number, newPages: store.PageObject[], newCurrentTabIndexes: number[], newWindows: store.LulumiBrowserWindowProperty[], downloads) {
   return {
     pid: newStart + newPages.length,
     pages: newPages,
@@ -190,6 +237,7 @@ function collect(getters, newStart: number, newPages: store.PageObject[], newCur
     lang: getters.lang,
     downloads: downloads.filter(download => download.state !== 'progressing'),
     history: getters.history,
+    windows: newWindows,
   };
 }
 
@@ -197,25 +245,26 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
   const newStart = Math.ceil(Math.random() * 10000);
   const newPages = tabsOrdering(newStart, bumpWindowIdsBy);
   const newCurrentTabIndexes = tabIndexesOrdering(bumpWindowIdsBy);
+  const newWindows = windowsOrdering(bumpWindowIdsBy);
   const downloads = store.getters.downloads;
   const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
   if (soft) {
     return Promise.resolve(JSON.stringify(
-      collect(store.getters, newStart, newPages, newCurrentTabIndexes, downloads)));
+      collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, downloads)));
   }
   if (pendingDownloads.length !== 0) {
     ipcMain.once('okay-to-quit', (event, okay) => {
       if (okay) {
         return Promise.resolve(JSON.stringify(
-          collect(store.getters, newStart, newPages, newCurrentTabIndexes, this.$store.getters.downloads)));
+          collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
       }
       return Promise.resolve('');
     });
     BrowserWindow.getFocusedWindow().webContents.send('about-to-quit');
   }
   return Promise.resolve(JSON.stringify(
-    collect(store.getters, newStart, newPages, newCurrentTabIndexes, downloads)));
+    collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, downloads)));
 }
 
 function bumpWindowIds(bumpWindowIdsBy: number) {
@@ -228,6 +277,8 @@ function bumpWindowIds(bumpWindowIdsBy: number) {
 
 export default {
   register,
+  dispatch,
+  windowStateSave,
   saveAppState,
   bumpWindowIds,
   getWindows: () => windows,

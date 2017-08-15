@@ -15,7 +15,7 @@ const getTemplate = () => {
         {
           label: i18n.t('file.newWindow'),
           accelerator: 'CmdOrCtrl+N',
-          click: (BrowserWindow as any).createWindow,
+          click: () => (BrowserWindow as any).createWindow(),
         },
         process.platform === 'darwin' ? {
           type: 'separator',

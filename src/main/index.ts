@@ -78,22 +78,26 @@ function appStateSave(soft: boolean = true): void {
   }
 }
 
-function createWindow(): void {
+// tslint:disable-next-line:max-line-length
+function createWindow(options: Electron.BrowserWindowConstructorOptions | undefined = undefined): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
-
-  /**
-   * Initial window options
-   */
-  mainWindow = new BrowserWindow({
-    height: 720,
-    width: 1080,
-    minWidth: 320,
-    minHeight: 500,
-    titleBarStyle: 'hiddenInset',
-    fullscreenWindowTitle: true,
-    autoHideMenuBar: autoHideMenuBarSetting,
-    frame: !isWindows,
-  });
+  if (options) {
+    mainWindow = new BrowserWindow(options);
+  } else {
+    /**
+     * Initial window options
+     */
+    mainWindow = new BrowserWindow({
+      width: 1080,
+      height: 720,
+      minWidth: 320,
+      minHeight: 500,
+      titleBarStyle: 'hiddenInset',
+      fullscreenWindowTitle: true,
+      autoHideMenuBar: autoHideMenuBarSetting,
+      frame: !isWindows,
+    });
+  }
 
   mainWindow.loadURL(winURL);
   menu.init();
@@ -136,6 +140,7 @@ function createWindow(): void {
     // save app-state every 5 mins
     appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
   }
+  return mainWindow;
 }
 
 // register createWindow method to BrowserWindow
@@ -144,8 +149,54 @@ function createWindow(): void {
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', () => {
+  // register webRequest listeners
   session.registerWebRequestListeners();
-  (BrowserWindow as any).createWindow();
+  // load appState
+  let data: string = '""';
+  try {
+    data = readFileSync(storagePath, 'utf8');
+  } catch (readError) {
+    // tslint:disable-next-line:no-console
+    console.error(`could not read data from ${storagePath}, ${readError}`);
+  }
+  try {
+    data = JSON.parse(data);
+    if (data) {
+      let tmpWindow: Electron.BrowserWindow;
+      (data as any).windows.forEach((window) => {
+        tmpWindow = createWindow({
+          width: window.width,
+          height: window.height,
+          minWidth: 320,
+          minHeight: 500,
+          x: window.x,
+          y: window.y,
+          titleBarStyle: 'hiddenInset',
+          fullscreenWindowTitle: true,
+          autoHideMenuBar: autoHideMenuBarSetting,
+          frame: !isWindows,
+        });
+        if (window.focused) {
+          tmpWindow.focus();
+        }
+        if (window.windowState === 'minimized') {
+          tmpWindow.minimize();
+        } else if (window.windowState === 'maximized') {
+          tmpWindow.maximize();
+        } else if (window.windowState === 'fullscreen') {
+          tmpWindow.setFullScreen(true);
+        }
+      });
+      (data as any).windows = [];
+      mainStore.dispatch(data);
+    } else {
+      createWindow();
+    }
+  } catch (parseError) {
+    // tslint:disable-next-line:no-console
+    console.error(`could not parse data from ${storagePath}, ${parseError}`);
+    createWindow();
+  }
 });
 
 app.on('window-all-closed', () => {
@@ -183,6 +234,7 @@ app.on('before-quit', (event) => {
     return;
   }
   event.preventDefault();
+  mainStore.windowStateSave();
   if (appStateSaveHandler !== null) {
     clearInterval(appStateSaveHandler);
     appStateSaveHandler = null;

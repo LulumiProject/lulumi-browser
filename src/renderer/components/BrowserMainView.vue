@@ -49,7 +49,7 @@
     },
   })
   export default class BrowserMainView extends Vue {
-    windowIdByBlurEvent: number = 0;
+    windowId: number = 0;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
     isSwipeOnEdge: boolean = false;
@@ -75,13 +75,6 @@
 
     get dummyPageObject(): store.PageObject {
       return this.$store.getters.tabConfig.dummyPageObject;
-    }
-    get windowId(): number {
-      const window: Electron.BrowserWindow = (this as any).$electron.remote.BrowserWindow.getFocusedWindow();
-      if (window) {
-        return window.id;
-      }
-      return this.windowIdByBlurEvent;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
@@ -723,12 +716,20 @@
       this.onNewTab(this.windowId, this.pages[tabIndex].location, false);
     }
     onTabClick(tabIndex: number): void {
-      const pageId: number = this.getPageObject(tabIndex).pid;
+      const pageObject: store.PageObject = this.getPageObject(tabIndex);
+      const pageId: number = pageObject.pid;
+      const pageTitle: string | null = pageObject.title;
       this.$store.dispatch('clickTab', {
         windowId: this.windowId,
         pageId,
         tabIndex,
       });
+      if (pageTitle) {
+        (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+          windowId: this.windowId,
+          title: pageTitle,
+        });
+      }
     }
     onTabClose(tabIndex: number): void {
       const pageId: number = this.getPageObject(tabIndex).pid;
@@ -1249,15 +1250,14 @@
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       const webFrame: Electron.WebFrame = (this as any).$electron.webFrame;
 
-      ipc.on('window-id', (event: Electron.Event, windowId: number) => {
-        this.windowIdByBlurEvent = windowId;
-      });
       ipc.once('window-close', () => {
         this.$store.dispatch('closeAllTab', this.windowId);
         ipc.send('window-close');
       });
 
       webFrame.setVisualZoomLevelLimits(1, 1);
+
+      this.windowId = ipc.sendSync('window-id');
       if (this.pages.length === 0) {
         this.onNewTab(this.windowId, 'about:newtab', false);
       }

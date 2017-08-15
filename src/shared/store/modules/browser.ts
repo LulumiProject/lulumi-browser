@@ -21,6 +21,7 @@ const state: store.State = {
   permissions: {},
   mappings: [],
   lastOpenedTabs: [],
+  windows: [],
 };
 
 // tslint:disable-next-line:max-line-length
@@ -499,6 +500,50 @@ const mutations = {
     state.lang = newState.lang;
     state.downloads = newState.downloads;
     state.history = newState.history;
+    state.windows = newState.windows;
+  },
+  // window state
+  [types.CREATE_WINDOW](state, payload) {
+    const windowId: number = payload.windowId;
+    const width: number = payload.width;
+    const height: number = payload.height;
+    const x: number = payload.x;
+    const y: number = payload.y;
+    const windowState: string = payload.windowState;
+    const type: string = payload.type;
+    state.windows.push({
+      windowId,
+      width,
+      height,
+      x,
+      y,
+      windowState,
+      type,
+    });
+  },
+  [types.CLOSE_WINDOW](state, { windowId }) {
+    const index: number = state.windows.findIndex(window => (window.windowId === windowId));
+    if (index !== -1) {
+      Vue.delete(state.windows, index);
+    }
+  },
+  [types.UPDATE_WINDOW_PROPERTY](state, payload) {
+    const windowId: number = payload.windowId;
+    const width: number = payload.width;
+    const height: number = payload.height;
+    const x: number = payload.x;
+    const y: number = payload.y;
+    const focused: boolean = payload.focused;
+    const windowState: string = payload.windowState;
+    const index: number = state.windows.findIndex(window => (window.windowId === windowId));
+    if (index !== -1) {
+      Vue.set(state.windows[index], 'width', width);
+      Vue.set(state.windows[index], 'height', height);
+      Vue.set(state.windows[index], 'x', x);
+      Vue.set(state.windows[index], 'y', y);
+      Vue.set(state.windows[index], 'focused', focused);
+      Vue.set(state.windows[index], 'windowState', windowState);
+    }
   },
 };
 

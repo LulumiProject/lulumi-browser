@@ -83,6 +83,11 @@ declare module 'lulumi' {
       location: string;
       favicon: string | null;
     }
+    export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
+      windowId: number;
+      focused: boolean;
+      state: string;
+    }
     export interface State {
       pid: number;
       pages: PageObject[];
@@ -99,6 +104,7 @@ declare module 'lulumi' {
       permissions: object;
       mappings: number[];
       lastOpenedTabs: LastOpenedTabObject[];
+      windows: LulumiBrowserWindowProperty[];
     }
   }
 

@@ -50,4 +50,7 @@ export const getters = {
   mappings(state: BrowserState) {
     return state.browser.mappings;
   },
+  windows(state: BrowserState) {
+    return state.browser.windows;
+  },
 };
