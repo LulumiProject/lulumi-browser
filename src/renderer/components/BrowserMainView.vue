@@ -1257,7 +1257,11 @@
 
       webFrame.setVisualZoomLevelLimits(1, 1);
 
-      this.windowId = ipc.sendSync('window-id');
+      if (process.env.NODE_ENV !== 'testing') {
+        this.windowId = ipc.sendSync('window-id');
+      } else {
+        this.windowId = 0;
+      }
       if (this.pages.length === 0) {
         this.onNewTab(this.windowId, 'about:newtab', false);
       }
