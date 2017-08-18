@@ -39,7 +39,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           callback({ cancel: false });
         }
       });
-      const window = BrowserWindow.getFocusedWindow();
+      const window = BrowserWindow.getAllWindows()[0];
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,
@@ -60,7 +60,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           callback({ cancel: false });
         }
       });
-      const window = BrowserWindow.getFocusedWindow();
+      const window = BrowserWindow.getAllWindows()[0];
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,
@@ -73,7 +73,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       details.type = details.resourceType;
       details.tabId = (sess as any).id;
 
-      const window = BrowserWindow.getFocusedWindow();
+      const window = BrowserWindow.getAllWindows()[0];
       window.webContents.send('lulumi-web-request-intercepted', {
         eventLispCaseName,
         digest,

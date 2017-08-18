@@ -67,7 +67,9 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
       tabArray.length = 0;
       vueInstance.$store.getters.pages.forEach((page, index) => {
         findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentPageIndex), 0, index);
-        tabArray[page.pid].update(page.location, page.title, page.favicon);
+        if (tabArray[page.pid]) {
+          tabArray[page.pid].update(page.location, page.title, page.favicon);
+        }
       });
       // tslint:disable-next-line:align
     }, 1000);
@@ -180,6 +182,10 @@ export default (vueInstance: any) => {
         return tabArray;
       } else {
         const tabs: Tab[] = [];
+        if (queryInfo.currentWindow) {
+          delete queryInfo.currentWindow;
+          queryInfo.windowId = vueInstance.windowId;
+        }
         tabArray.forEach((tab) => {
           if (Object.keys(queryInfo).every(k => (queryInfo[k] === tab[k]))) {
             tabs.push(tab);

@@ -413,13 +413,10 @@ const mutations = {
 
     if (state.pages[pageIndex]) {
       if (state.pages[pageIndex].pageActionMapping[extensionId]) {
-        state.pages[pageIndex]
-          .pageActionMapping[extensionId].enabled = enabled;
+        Vue.set(state.pages[pageIndex].pageActionMapping[extensionId], 'enabled', enabled);
       } else {
-        state.pages[pageIndex]
-          .pageActionMapping[extensionId] = {};
-        state.pages[pageIndex]
-          .pageActionMapping[extensionId].enabled = enabled;
+        Vue.set(state.pages[pageIndex].pageActionMapping, extensionId, {});
+        Vue.set(state.pages[pageIndex].pageActionMapping[extensionId], 'enabled', enabled);
       }
     }
   },
