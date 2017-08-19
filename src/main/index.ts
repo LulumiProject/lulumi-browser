@@ -7,7 +7,6 @@ import session from './js/lib/session';
 import autoUpdater from './js/lib/auto-updater';
 import config from './js/constants/config';
 import promisify from './js/lib/promisify';
-import * as lulumiExtension from '../api/lulumi-extension';
 
 import { api, scheme } from 'lulumi';
 
@@ -55,9 +54,13 @@ const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
 
+// ../shared/store/mainStore.ts
 const mainStore = require('../shared/store/mainStore').default;
 mainStore.register(storagePath, swipeGesture);
 const windows = mainStore.getWindows();
+
+// ../api/lulumi-extension.ts
+const lulumiExtension = require('../api/lulumi-extension').default;
 
 function appStateSave(soft: boolean = true): void {
   if (Object.keys(windows).length !== 0) {

@@ -382,7 +382,7 @@ const loadExtensions = () => {
   }
 };
 
-export {
+export default {
   manifestMap,
   manifestNameMap,
   backgroundPages,
