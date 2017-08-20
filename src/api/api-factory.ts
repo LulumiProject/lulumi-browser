@@ -161,9 +161,14 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       return tab;
     },
-    getCurrent: (): Tab => {
-      const tab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.currentPageIndex);
-      return tab;
+    getCurrent: (guestInstanceId: number): Tab => {
+      const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
+      if (webContents) {
+        const tabIndex = vueInstance.$store.getters.mappings[webContents.id];
+        const tab = findAndUpdateOrCreate(vueInstance, false, 0, tabIndex);
+        return tab;
+      }
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     duplicate: (tabId: number): Tab => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);

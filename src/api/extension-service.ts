@@ -318,7 +318,7 @@ export default class ExtensionService {
     ipc.on('lulumi-tabs-get-current', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-tabs-get-current-result', require('lulumi').tabs.getCurrent());
+        webContents.send('lulumi-tabs-get-current-result', require('lulumi').tabs.getCurrent(data.guestInstanceId));
       }
     });
     ipc.on('lulumi-tabs-duplicate', (event, data) => {

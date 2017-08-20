@@ -5,6 +5,14 @@ const { runInThisContext } = require('vm');
 const { LocalStorage } = require('node-localstorage');
 const stripCssComments = require('strip-css-comments');
 
+let guestInstanceId = -1;
+const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
+if (guestInstanceIndex !== -1) {
+  guestInstanceId = parseInt(
+    process.argv[guestInstanceIndex].substr(
+      process.argv[guestInstanceIndex].indexOf('=') + 1));
+}
+
 // Check whether pattern matches.
 // https://developer.chrome.com/extensions/match_patterns
 const matchesPattern = (pattern) => {
@@ -20,7 +28,7 @@ const matchesPattern = (pattern) => {
 // Run the code with lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
-  require('../api/inject-to').injectTo(extensionId, 'content', context, LocalStorage);
+  require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'content', context, LocalStorage);
   global.lulumi = context.lulumi;
   const wrapper = `\n
     var chrome = lulumi;

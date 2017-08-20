@@ -245,6 +245,11 @@ app.on('before-quit', (event) => {
   appStateSave(false);
 });
 
+// return the number of BrowserWindow
+ipcMain.on('get-window-count', (event: Electron.Event) => {
+  event.returnValue = BrowserWindow.getAllWindows().length;
+});
+
 // set the title for the focused BrowserWindow
 ipcMain.on('set-browser-window-title', (event, data) => {
   const window: Electron.BrowserWindow = windows[data.windowId];

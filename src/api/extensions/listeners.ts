@@ -377,11 +377,12 @@ ipcMain.on('lulumi-tabs-get', (event, tabId) => {
     });
   });
 });
-ipcMain.on('lulumi-tabs-get-current', (event) => {
+ipcMain.on('lulumi-tabs-get-current', (event, guestInstanceId) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
     window.webContents.send('lulumi-tabs-get-current', {
+      guestInstanceId,
       webContentsId: event.sender.id,
     });
   });

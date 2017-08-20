@@ -1,3 +1,4 @@
+const collect = require('collect.js');
 const fs = require('fs');
 const { ipcRenderer, remote } = require('electron');
 const specs = require('lulumi').specs;
@@ -133,7 +134,7 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
 let nextId = 0;
 
 ipcRenderer.setMaxListeners(0);
-exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
+exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, LocalStorage) => {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
   let storagePath;
@@ -151,6 +152,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.env = {
     appName: (callback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-env-app-name-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -159,6 +161,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       ipcRenderer.send('lulumi-env-app-name');
     },
     appVersion: (callback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-env-app-version-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -170,6 +173,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.browserAction = {
     setIcon: (details, callback) => {
+      // TODO: Is it neccessary here?
       ipcRenderer.once('lulumi-browser-action-set-icon-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -191,6 +195,7 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.pageAction = {
     setIcon: (details, callback) => {
+      // TODO: Is it neccessary here?
       ipcRenderer.once('lulumi-page-action-set-icon-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -216,30 +221,55 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.alarms = {
     get: (name, callback) => {
-      ipcRenderer.once('lulumi-alarms-get-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-alarms-get-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-alarms-get-result');
+          if (callback) {
+            callback(collect(results).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-alarms-get', name);
     },
     getAll: (callback) => {
-      ipcRenderer.once('lulumi-alarms-get-all-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = collect({});
+      ipcRenderer.on('lulumi-alarms-get-all-result', (event, result) => {
+        counting += 1;
+        results.merge(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-alarms-get-all-result');
+          if (callback) {
+            callback(results.all());
+          }
         }
       });
       ipcRenderer.send('lulumi-alarms-get-all');
     },
     clear: (name, callback) => {
-      ipcRenderer.once('lulumi-alarms-clear-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-alarms-clear-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-alarms-clear-result');
+          if (callback) {
+            callback(collect(results).every(result => result));
+          }
         }
       });
       ipcRenderer.send('lulumi-alarms-clear', name);
     },
     clearAll: (callback) => {
+      // TODO: Is it neccessary here?
       ipcRenderer.once('lulumi-alarms-clear-all-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -330,20 +360,38 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
 
   lulumi.tabs = {
     get: (tabId, callback) => {
-      ipcRenderer.once('lulumi-tabs-get-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-get-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-get-result');
+          if (callback) {
+            callback(collect(results).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-get', tabId);
     },
     getCurrent: (callback) => {
-      ipcRenderer.once('lulumi-tabs-get-current-result', (event, result) => {
-        if (callback) {
-          callback(result);
-        }
-      });
-      ipcRenderer.send('lulumi-tabs-get-current');
+      if (guestInstanceId !== -1) {
+        const count = ipcRenderer.sendSync('get-window-count');
+        let counting = 0;
+        const results = [];
+        ipcRenderer.on('lulumi-tabs-get-current-result', (event, result) => {
+          counting += 1;
+          results.push(result);
+          if (counting === count) {
+            ipcRenderer.removeAllListeners('lulumi-tabs-get-current-result');
+            if (callback) {
+              callback(collect(results).first());
+            }
+          }
+        });
+        ipcRenderer.send('lulumi-tabs-get-current', guestInstanceId);
+      }
     },
     duplicate: (tabId, callback) => {
       ipcRenderer.once('lulumi-tabs-duplicate-result', (event, result) => {
@@ -354,9 +402,17 @@ exports.injectTo = (thisExtensionId, scriptType, context, LocalStorage) => {
       ipcRenderer.send('lulumi-tabs-duplicate', tabId);
     },
     query: (queryInfo, callback) => {
-      ipcRenderer.once('lulumi-tabs-query-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-query-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-query-result');
+          if (callback) {
+            callback(collect(results).flatten(1).sortBy('windowId').all());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-query', queryInfo);
