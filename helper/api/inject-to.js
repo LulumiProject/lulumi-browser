@@ -386,7 +386,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
           if (counting === count) {
             ipcRenderer.removeAllListeners('lulumi-tabs-get-current-result');
             if (callback) {
-              callback(collect(results).first());
+              callback(collect(results).filter(result => (result.id !== -1)).first());
             }
           }
         });

@@ -97,6 +97,9 @@
     get pdfViewer(): string {
       return this.$store.getters.pdfViewer;
     }
+    get mappings(): number[] {
+      return this.$store.getters.mappings[this.windowId];
+    }
 
     @Watch('ready')
     onReady(ready: boolean): void {

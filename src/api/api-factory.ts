@@ -101,7 +101,7 @@ export default (vueInstance: any) => {
       }
     },
     onClicked: (webContentsId: number): Event => {
-      let id = vueInstance.$store.getters.mappings[webContentsId];
+      let id = vueInstance.mappings[webContentsId];
       if (id === undefined) {
         id = 0;
       }
@@ -116,7 +116,7 @@ export default (vueInstance: any) => {
       }
     },
     onClicked: (webContentsId: number): Event => {
-      let id = vueInstance.$store.getters.mappings[webContentsId];
+      let id = vueInstance.mappings[webContentsId];
       if (id === undefined) {
         id = 0;
       }
@@ -127,7 +127,7 @@ export default (vueInstance: any) => {
   const runtime = {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
-      const tabIndex: number = vueInstance.$store.getters.mappings[webContentsId];
+      const tabIndex: number = vueInstance.mappings[webContentsId];
       if (tabIndex === undefined) {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
@@ -140,14 +140,14 @@ export default (vueInstance: any) => {
       }
     },
     onMessage: (webContentsId: number): Event | undefined => {
-      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
+      const tabIndex = vueInstance.mappings[webContentsId];
       if (tabIndex === undefined) {
         return undefined;
       }
       return vueInstance.getPage(tabIndex).onMessageEvent;
     },
     onMessageExternal: (webContentsId: number): Event | undefined => {
-      const tabIndex = vueInstance.$store.getters.mappings[webContentsId];
+      const tabIndex = vueInstance.mappings[webContentsId];
       if (tabIndex === undefined) {
         return undefined;
       }
@@ -164,7 +164,10 @@ export default (vueInstance: any) => {
     getCurrent: (guestInstanceId: number): Tab => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       if (webContents) {
-        const tabIndex = vueInstance.$store.getters.mappings[webContents.id];
+        const tabIndex = vueInstance.mappings[webContents.id];
+        if (tabIndex === undefined) {
+          return findAndUpdateOrCreate(vueInstance, false, -1);
+        }
         const tab = findAndUpdateOrCreate(vueInstance, false, 0, tabIndex);
         return tab;
       }

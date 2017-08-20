@@ -466,23 +466,25 @@ const mutations = {
     const hostname: string = payload.hostname;
     const permission: string = payload.permission;
     const accept: boolean = payload.accept;
-    if (state.permissions[hostname]) {
-      state.permissions[hostname][permission] = accept;
-    } else {
-      state.permissions[hostname] = {};
-      state.permissions[hostname][permission] = accept;
+    if (state.permissions[hostname] === undefined) {
+      Vue.set(state.permissions, hostname, {});
     }
+
+    Vue.set(state.permissions[hostname], permission, accept);
   },
   // webContentsId => pageIndex mappings
   [types.UPDATE_MAPPINGS](state, payload) {
-    // const windowId: number = payload.windowId;
+    const windowId: number = payload.windowId;
     // const pageId: number = payload.pageId;
     const tabIndex: number = payload.tabIndex;
     const webContentsId: number = payload.webContentsId;
 
     // const pageIndex = state.pages.findIndex(page => page.pid === pageId);
 
-    state.mappings[webContentsId] = tabIndex;
+    if (state.mappings[windowId] === undefined) {
+      Vue.set(state.mappings, windowId, []);
+    }
+    Vue.set(state.mappings[windowId], webContentsId, tabIndex);
   },
   // app state
   [types.SET_APP_STATE](state, { newState }) {
