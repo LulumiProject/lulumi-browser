@@ -159,8 +159,8 @@
       }
       return false;
     }
-    clearAllAlarm(): void {
-      Object.keys(this.getAllAlarm()).forEach(name => (this.clearAlarm(name)));
+    clearAllAlarm(): boolean {
+      return Object.keys(this.getAllAlarm()).every(name => (this.clearAlarm(name)));
     }
     createAlarm(name: string, alarmInfo): void {
       let alarm: browserMainView.Alarm = {

@@ -173,10 +173,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
 
   lulumi.browserAction = {
     setIcon: (details, callback) => {
-      // TODO: Is it neccessary here?
-      ipcRenderer.once('lulumi-browser-action-set-icon-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-browser-action-set-icon-result', () => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-browser-action-set-icon-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       ipcRenderer.send('lulumi-browser-action-set-icon',
@@ -195,10 +200,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
 
   lulumi.pageAction = {
     setIcon: (details, callback) => {
-      // TODO: Is it neccessary here?
-      ipcRenderer.once('lulumi-page-action-set-icon-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-page-action-set-icon-result', () => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-page-action-set-icon-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       ipcRenderer.send('lulumi-page-action-set-icon',
@@ -269,10 +279,17 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-alarms-clear', name);
     },
     clearAll: (callback) => {
-      // TODO: Is it neccessary here?
-      ipcRenderer.once('lulumi-alarms-clear-all-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-alarms-clear-all-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-alarms-clear-all-result');
+          if (callback) {
+            callback(collect(results).every(result => result));
+          }
         }
       });
       ipcRenderer.send('lulumi-alarms-clear-all');
@@ -394,9 +411,17 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       }
     },
     duplicate: (tabId, callback) => {
-      ipcRenderer.once('lulumi-tabs-duplicate-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-duplicate-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-duplicate-result');
+          if (callback) {
+            callback(collect(results).filter(result => (result.id !== -1)).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-duplicate', tabId);
@@ -418,38 +443,71 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-tabs-query', queryInfo);
     },
     update: (tabId, updateProperties = {}, callback) => {
-      ipcRenderer.once('lulumi-tabs-update-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-update-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-update-result');
+          if (callback) {
+            callback(collect(results).filter(result => (result.id !== -1)).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-update', tabId, updateProperties);
     },
     reload: (tabId, reloadProperties = {}, callback) => {
-      ipcRenderer.once('lulumi-tabs-reload-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-reload-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-reload-result');
+          if (callback) {
+            callback(collect(results).filter(result => (result.id !== -1)).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-reload', tabId, reloadProperties);
     },
     create: (createProperties = {}, callback) => {
-      ipcRenderer.once('lulumi-tabs-create-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-create-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-create-result');
+          if (callback) {
+            callback(collect(results).filter(result => (result.id !== -1)).first());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-create', createProperties);
     },
     remove: (tabIds, callback) => {
-      ipcRenderer.once('lulumi-tabs-remove-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-tabs-remove-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-remove-result');
+          if (callback) {
+            callback(collect(results).flatten(1).sortBy('windowId').all());
+          }
         }
       });
       ipcRenderer.send('lulumi-tabs-remove', tabIds);
     },
     detectLanguage: (tabId, callback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-tabs-detect-language-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -458,9 +516,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-tabs-detect-language', tabId);
     },
     executeScript: (tabId, details = {}, callback) => {
-      ipcRenderer.once('lulumi-tabs-execute-script-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-tabs-execute-script-result', () => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-execute-script-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       if (details.hasOwnProperty('file')) {
@@ -469,9 +533,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-tabs-execute-script', tabId, details);
     },
     insertCSS: (tabId, details = {}, callback) => {
-      ipcRenderer.once('lulumi-tabs-insert-css-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-tabs-insert-css-result', () => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-tabs-insert-css-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       if (details.hasOwnProperty('file')) {
@@ -480,6 +550,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
     },
     sendMessage: (tabId, message, responseCallback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-tabs-send-message-result', (event, result) => {
         if (responseCallback) {
           responseCallback(result);
@@ -701,9 +772,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       } else {
         createProperties.id = id;
       }
-      ipcRenderer.once('lulumi-context-menus-create-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-context-menus-create-result', (event) => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-context-menus-create-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       lulumi.contextMenus.handleMenuItems(createProperties, null);
@@ -712,9 +789,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
     },
     remove: (menuItemId, callback) => {
       const id = menuItemId;
-      ipcRenderer.once('lulumi-context-menus-remove-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-context-menus-remove-result', (event) => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-context-menus-remove-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       lulumi.contextMenus.handleMenuItems(null, menuItemId);
@@ -722,9 +805,15 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       return id;
     },
     removeAll: (callback) => {
-      ipcRenderer.once('lulumi-context-menus-remove-all-result', (event, result) => {
-        if (callback) {
-          callback(result);
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      ipcRenderer.on('lulumi-context-menus-remove-all-result', (event) => {
+        counting += 1;
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-context-menus-remove-all-result');
+          if (callback) {
+            callback();
+          }
         }
       });
       lulumi.contextMenus.handleMenuItems(null, null);
@@ -767,6 +856,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
 
   lulumi.webNavigation = {
     getFrame: (details, callback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-web-navigation-get-frame-result', (event, result) => {
         if (callback) {
           callback(result);
@@ -775,6 +865,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       ipcRenderer.send('lulumi-web-navigation-get-frame', details);
     },
     getAllFrames: (details, callback) => {
+      // we only need one window to tell us the result
       ipcRenderer.once('lulumi-web-navigation-get-all-frames-result', (event, result) => {
         if (callback) {
           callback(result);

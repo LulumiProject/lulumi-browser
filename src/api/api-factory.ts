@@ -175,14 +175,17 @@ export default (vueInstance: any) => {
     },
     duplicate: (tabId: number): Tab => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      vueInstance.onTabDuplicate(tab.index);
+      if (tab.windowId === vueInstance.windowId) {
+        vueInstance.onTabDuplicate(tab.index);
 
-      const duplicateTab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.pages.length - 1);
+        const duplicateTab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.pages.length - 1);
 
-      const object = vueInstance.getPageObject(duplicateTab.index);
-      duplicateTab.update(object.location, object.title, object.favicon);
-      tabArray[duplicateTab.index] = duplicateTab;
-      return duplicateTab;
+        const object = vueInstance.getPageObject(duplicateTab.index);
+        duplicateTab.update(object.location, object.title, object.favicon);
+        tabArray[duplicateTab.index] = duplicateTab;
+        return duplicateTab;
+      }
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     query: (queryInfo: chrome.tabs.QueryInfo): Tab[] => {
       findAndUpdateOrCreate(vueInstance, false);
@@ -204,58 +207,77 @@ export default (vueInstance: any) => {
     },
     update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties): Tab => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (updateProperties.url) {
-        vueInstance.getPage(tab.index).$refs.webview.loadURL(updateProperties.url);
+      if (tab.windowId === vueInstance.windowId) {
+        if (updateProperties.url) {
+          vueInstance.getPage(tab.index).$refs.webview.loadURL(updateProperties.url);
+        }
+        if (updateProperties.active) {
+          findAndUpdateOrCreate(vueInstance, true, tabId);
+        }
+        return tab;
       }
-      if (updateProperties.active) {
-        findAndUpdateOrCreate(vueInstance, true, tabId);
-      }
-      return tab;
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (reloadProperties.bypassCache) {
-        vueInstance.getPage(tab.index).$refs.webview.reloadIgnoringCache();
-      } else {
-        vueInstance.getPage(tab.index).$refs.webview.reload();
+      if (tab.windowId === vueInstance.windowId) {
+        if (reloadProperties.bypassCache) {
+          vueInstance.getPage(tab.index).$refs.webview.reloadIgnoringCache();
+        } else {
+          vueInstance.getPage(tab.index).$refs.webview.reload();
+        }
       }
     },
     create: (createProperties: chrome.tabs.CreateProperties): Tab => {
-      let tab: Tab = findAndUpdateOrCreate(vueInstance, false, -1);
-      if (createProperties.url) {
-        vueInstance.onNewTab(createProperties.windowId, createProperties.url, createProperties.active);
+      if (createProperties.windowId === undefined) {
+        createProperties.windowId = vueInstance.$electron.remote.BrowserWindow.getFocusedWindow().id;
       }
-      tab = findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
-      return tab;
+      if (createProperties.windowId && createProperties.windowId === vueInstance.windowId) {
+        if (createProperties.url) {
+          vueInstance.onNewTab(createProperties.windowId, createProperties.url, createProperties.active);
+          return findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
+        }
+      }
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     remove: (tabIds: number[] | number): void => {
       const targetTabIds = Array.isArray(tabIds) ? tabIds : [tabIds];
       targetTabIds.forEach((tabId) => {
         const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-        vueInstance.onTabClose(tab.index);
+        if (tab.windowId === vueInstance.windowId) {
+          vueInstance.onTabClose(tab.index);
+        }
       });
     },
     detectLanguage: (tabId: number, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
-        ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
-      `);
+      if (tab.windowId === vueInstance.windowId) {
+        vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
+          ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
+        `);
+      }
     },
     executeScript: (tabId: number, details: chrome.tabs.InjectDetails = {}): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (details.code) {
-        vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(details.code, false);
+      if (tab.windowId === vueInstance.windowId) {
+        if (details.code) {
+          vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(details.code, false);
+        }
       }
     },
     insertCSS: (tabId, details: chrome.tabs.InjectDetails = {}): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      if (details.code) {
-        vueInstance.getPage(tab.index).$refs.webview.insertCSS(details.code);
+      if (tab.windowId === vueInstance.windowId) {
+        if (details.code) {
+          vueInstance.getPage(tab.index).$refs.webview.insertCSS(details.code);
+        }
       }
     },
     sendMessage: (tabId: number, message: any): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      vueInstance.getPage(tab.index).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
+      if (tab.windowId === vueInstance.windowId) {
+        vueInstance.getPage(tab.index).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
+      }
     },
     onActivated: vueInstance.onActivatedEvent,
     onUpdated: vueInstance.onUpdatedEvent,
@@ -300,8 +322,59 @@ export default (vueInstance: any) => {
   const webNavigation = {
     getFrame: (details: chrome.webNavigation.GetFrameDetails, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
-      const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
-      if (details.processId === processId) {
+      if (tab.windowId === vueInstance.windowId) {
+        const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
+        if (details.processId === processId) {
+          vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
+            String.prototype.hashCode = function() {
+              var hash = 0, i, chr;
+              if (this.length === 0) return hash;
+              for (i = 0; i < this.length; i++) {
+                chr   = this.charCodeAt(i);
+                hash  = ((hash << 5) - hash) + chr;
+                hash |= 0; // Convert to 32bit integer
+              }
+              return hash;
+            };
+
+            var frame = null;
+            var frames = window.frames;
+            var flag = true;
+
+            for (i = 0; i < frames.length; i++) {
+              if (frames[i].location.href.hashCode() === '${details.frameId}') {
+                frame = {
+                  errorOccurred: false,
+                  processId: ${processId},
+                  frameId: frames[i].location.href.hashCode(),
+                  parentFrameId: 0,
+                  url: frames[i].location.href,
+                };
+                flag = false;
+                ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
+                break;
+              }
+            }
+            if (flag) {
+              if (${details.frameId} === 0) {
+                frame = {
+                  errorOccurred: false,
+                  processId: ${processId},
+                  frameId: 0,
+                  parentFrameId: -1,
+                  url: document.location.href,
+                };
+              }
+              ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
+            }
+          `);
+        }
+      }
+    },
+    getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
+      const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
+      if (tab.windowId === vueInstance.windowId) {
+        const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
         vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
           String.prototype.hashCode = function() {
             var hash = 0, i, chr;
@@ -314,75 +387,28 @@ export default (vueInstance: any) => {
             return hash;
           };
 
-          var frame = null;
+          var framesArray = [];
           var frames = window.frames;
-          var flag = true;
 
           for (i = 0; i < frames.length; i++) {
-            if (frames[i].location.href.hashCode() === '${details.frameId}') {
-              frame = {
-                errorOccurred: false,
-                processId: ${processId},
-                frameId: frames[i].location.href.hashCode(),
-                parentFrameId: 0,
-                url: frames[i].location.href,
-              };
-              flag = false;
-              ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
-              break;
-            }
+            framesArray.push({
+              errorOccurred: false,
+              processId: ${processId},
+              frameId: frames[i].location.href.hashCode(),
+              parentFrameId: 0,
+              url: frames[i].location.href,
+            });
           }
-          if (flag) {
-            if (${details.frameId} === 0) {
-              frame = {
-                errorOccurred: false,
-                processId: ${processId},
-                frameId: 0,
-                parentFrameId: -1,
-                url: document.location.href,
-              };
-            }
-            ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
-          }
-        `);
-      }
-    },
-    getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
-      const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
-      const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
-      vueInstance.getPage(tab.index).$refs.webview.executeJavaScript(`
-        String.prototype.hashCode = function() {
-          var hash = 0, i, chr;
-          if (this.length === 0) return hash;
-          for (i = 0; i < this.length; i++) {
-            chr   = this.charCodeAt(i);
-            hash  = ((hash << 5) - hash) + chr;
-            hash |= 0; // Convert to 32bit integer
-          }
-          return hash;
-        };
-
-        var framesArray = [];
-        var frames = window.frames;
-
-        for (i = 0; i < frames.length; i++) {
-          framesArray.push({
+          framesArray.unshift({
             errorOccurred: false,
             processId: ${processId},
-            frameId: frames[i].location.href.hashCode(),
-            parentFrameId: 0,
-            url: frames[i].location.href,
+            frameId: 0,
+            parentFrameId: -1,
+            url: document.location.href,
           });
-        }
-        framesArray.unshift({
-          errorOccurred: false,
-          processId: ${processId},
-          frameId: 0,
-          parentFrameId: -1,
-          url: document.location.href,
-        });
-        ipcRenderer.send('lulumi-web-navigation-get-all-frames-result', framesArray, ${webContentsId});
-      `);
+          ipcRenderer.send('lulumi-web-navigation-get-all-frames-result', framesArray, ${webContentsId});
+        `);
+      }
     },
     onBeforeNavigate: vueInstance.onBeforeNavigate,
     onCommitted: vueInstance.onCommitted,
