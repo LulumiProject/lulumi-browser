@@ -708,15 +708,14 @@
           });
         }
       }
-      setTimeout(() => {
-        const pageObject: store.PageObject = this.getPageObject(this.currentTabIndex);
-        if (pageObject) {
-          this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, pageObject.pid));
-        }
-      }, 300);
+      const pageObject: store.PageObject = this.getPageObject(this.currentTabIndex);
+      if (pageObject) {
+        this.extensionService.updateTabs();
+        this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, pageObject.pid));
+      }
     }
     onTabDuplicate(tabIndex: number): void {
-      this.onNewTab(this.windowId, this.pages[tabIndex].location, false);
+      this.onNewTab(this.windowId, this.pages[tabIndex].location, true);
     }
     onTabClick(tabIndex: number): void {
       const pageObject: store.PageObject = this.getPageObject(tabIndex);

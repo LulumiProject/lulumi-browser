@@ -63,16 +63,13 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number
       return tabArray[tabId];
     }
   } else {
-    setTimeout(() => {
-      tabArray.length = 0;
-      vueInstance.$store.getters.pages.forEach((page, index) => {
-        findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentPageIndex), 0, index);
-        if (tabArray[page.pid]) {
-          tabArray[page.pid].update(page.location, page.title, page.favicon);
-        }
-      });
-      // tslint:disable-next-line:align
-    }, 1000);
+    tabArray.length = 0;
+    vueInstance.$store.getters.pages.forEach((page, index) => {
+      findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentPageIndex), 0, index);
+      if (tabArray[page.pid]) {
+        tabArray[page.pid].update(page.location, page.title, page.favicon);
+      }
+    });
     return tabHolder;
   }
 }
@@ -173,19 +170,15 @@ export default (vueInstance: any) => {
       }
       return findAndUpdateOrCreate(vueInstance, false, -1);
     },
-    duplicate: (tabId: number): Tab => {
+    duplicate: (tabId: number, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
+      const webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       if (tab.windowId === vueInstance.windowId) {
         vueInstance.onTabDuplicate(tab.index);
-
-        const duplicateTab = findAndUpdateOrCreate(vueInstance, false, 0, vueInstance.$store.getters.pages.length - 1);
-
-        const object = vueInstance.getPageObject(duplicateTab.index);
-        duplicateTab.update(object.location, object.title, object.favicon);
-        tabArray[duplicateTab.index] = duplicateTab;
-        return duplicateTab;
+        setTimeout(() => webContents.send('lulumi-tabs-duplicate-result', tabs.get(vueInstance.$store.getters.pid), 100));
+        return;
       }
-      return findAndUpdateOrCreate(vueInstance, false, -1);
+      webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
     query: (queryInfo: chrome.tabs.QueryInfo): Tab[] => {
       findAndUpdateOrCreate(vueInstance, false);
@@ -228,17 +221,19 @@ export default (vueInstance: any) => {
         }
       }
     },
-    create: (createProperties: chrome.tabs.CreateProperties): Tab => {
+    create: (createProperties: chrome.tabs.CreateProperties, webContentsId: number): void => {
+      const webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       if (createProperties.windowId === undefined) {
         createProperties.windowId = vueInstance.$electron.remote.BrowserWindow.getFocusedWindow().id;
       }
       if (createProperties.windowId && createProperties.windowId === vueInstance.windowId) {
         if (createProperties.url) {
           vueInstance.onNewTab(createProperties.windowId, createProperties.url, createProperties.active);
-          return findAndUpdateOrCreate(vueInstance, true, 0, vueInstance.$store.getters.pages.length - 1);
+          setTimeout(() => webContents.send('lulumi-tabs-create-result', tabs.get(vueInstance.$store.getters.pid), 100));
+          return;
         }
       }
-      return findAndUpdateOrCreate(vueInstance, false, -1);
+      webContents.send('lulumi-tabs-create-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
     remove: (tabIds: number[] | number): void => {
       const targetTabIds = Array.isArray(tabIds) ? tabIds : [tabIds];

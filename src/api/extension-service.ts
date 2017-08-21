@@ -323,9 +323,7 @@ export default class ExtensionService {
     });
     ipc.on('lulumi-tabs-duplicate', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(
-          'lulumi-tabs-duplicate-result', require('lulumi').tabs.duplicate(data.tabId));
+        require('lulumi').tabs.duplicate(data.tabId, data.webContentsId);
       }
     });
     ipc.on('lulumi-tabs-query', (event, data) => {
@@ -352,10 +350,7 @@ export default class ExtensionService {
     });
     ipc.on('lulumi-tabs-create', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(
-          'lulumi-tabs-create-result',
-          require('lulumi').tabs.create(data.createProperties));
+        require('lulumi').tabs.create(data.createProperties, data.webContentsId);
       }
     });
     ipc.on('lulumi-tabs-remove', (event, data) => {
@@ -755,6 +750,10 @@ export default class ExtensionService {
     });
 
     (this.instance.$refs.navbar as any).extensions = manifest;
+  }
+
+  updateTabs(): void {
+    require('lulumi').tabs.query({});
   }
 
   getTab(windowId: number, pageId: number, remove: boolean = false): Tab {
