@@ -105,6 +105,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         (this as any).select({
           title: '',
           value: event.target.value,
+          location: event.target.value,
         });
       }
     },
@@ -134,7 +135,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       (this as any).highlightedIndex = newIndex;
       if (newIndex >= 0) {
         (this.$refs.input as any).$refs.input.value
-          = (this as any).suggestions[(this as any).highlightedIndex].value;
+          = (this as any).suggestions[(this as any).highlightedIndex].location;
       }
     },
   },

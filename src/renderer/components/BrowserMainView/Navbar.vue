@@ -189,17 +189,17 @@
     get fuse(): Fuse {
       const results: object[] = [];
       this.$store.getters.history.forEach((history) => {
-        const hostname: string = history.url.replace(/(^\w+:|^)\/\//, '');
+        const part: string = history.url.replace(/(^\w+:|^)\/\//, '');
         results.push({
           title: history.title,
-          value: hostname,
-          location: hostname,
+          value: part,
+          location: part,
           icon: 'document',
         });
       });
       const fuse = new Fuse(results, {
         shouldSort: true,
-        threshold: 0.6,
+        threshold: 0.4,
         includeMatches: true,
         keys: [{
           name: 'value',
@@ -262,8 +262,8 @@
       const seen: Set<string> = new Set();
 
       source.forEach((s) => {
-        if (!seen.has(`${s.icon}:${s.value}`)) {
-          seen.add(`${s.icon}:${s.value}`);
+        if (!seen.has(`${s.icon}:${s.location}`)) {
+          seen.add(`${s.icon}:${s.location}`);
           results.push(s);
         }
       });
@@ -331,16 +331,27 @@
       // fuse results
       const fuse = this.fuse;
       const tmpResults: renderer.SuggestionObject[] = [];
+      const highlightOpen = '<span style="color: #499fff">';
+      const highlightClose = '</span>';
       (fuse.search(queryString.toLowerCase()) as any).forEach((result) => {
         const item = result.item;
         result.matches.forEach((match) => {
           const tmpStr: string = item[match.key];
-          match.indices.forEach((indexPair) => {
-            const tmpSliceRegex = new RegExp(`(${tmpStr.slice(indexPair[0], indexPair[1] + 1)})`);
-            const tmp = Object.assign({}, item);
-            tmp[match.key] = tmpStr.replace(tmpSliceRegex, '<span style="color: #499fff">$1</span>');
-            tmpResults.push(tmp);
+          const tmp = Object.assign({}, item);
+          let replaceStr: string = '';
+          let prefixIndex: number = 0;
+          match.indices.forEach((indexPair, index) => {
+            const target: string = tmpStr.substring(indexPair[0], indexPair[1] + 1);
+            const prefix: string = tmpStr.substring(prefixIndex, indexPair[0]);
+            replaceStr
+              = `${replaceStr}${prefix}${highlightOpen}${target}${highlightClose}`;
+            prefixIndex = indexPair[1] + 1;
+            if (index === match.indices.length - 1) {
+              replaceStr = `${replaceStr}${tmpStr.substring(prefixIndex, tmpStr.length)}`;
+            }
           });
+          tmp[match.key] = replaceStr;
+          tmpResults.push(tmp);
         });
       });
       results = results.concat(tmpResults);
