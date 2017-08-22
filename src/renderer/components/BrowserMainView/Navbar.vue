@@ -97,11 +97,8 @@
         return h('li', ctx.data, [
           h('div', { attrs: { class: 'location' } }, [
             h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-            item.value,
-            h('span', { attrs: { class: 'name' } }, [
-              ' - ',
-              item.title || '',
-            ]),
+            h('span', { domProps: { innerHTML: item.value } }),
+            h('span', { attrs: { class: 'name' }, domProps: { innerHTML: ` - ${item.value}` } }),
           ]),
         ]);
       }
@@ -192,13 +189,18 @@
     get fuse(): Fuse {
       const results: object[] = [];
       this.$store.getters.history.forEach((history) => {
+        const hostname: string = history.url.replace(/(^\w+:|^)\/\//, '');
         results.push({
           title: history.title,
-          value: history.url.replace(/(^\w+:|^)\/\//, ''),
+          value: hostname,
+          location: hostname,
           icon: 'document',
         });
       });
       const fuse = new Fuse(results, {
+        shouldSort: true,
+        threshold: 0.6,
+        includeMatches: true,
         keys: [{
           name: 'value',
           weight: 0.7,
@@ -304,9 +306,9 @@
       this.focused = false;
       if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
         (this.$parent as BrowserMainView).onEnterLocation(
-          `${this.currentSearchEngine.search}${encodeURIComponent(event.value)}`);
+          `${this.currentSearchEngine.search}${encodeURIComponent(event.location)}`);
       } else {
-        (this.$parent as BrowserMainView).onEnterLocation(event.value);
+        (this.$parent as BrowserMainView).onEnterLocation(event.location);
       }
     }
     querySearch(queryString: string, cb: Function): void {
@@ -316,17 +318,32 @@
       results.push({
         title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
         value: this.value,
+        location: this.value,
         icon: 'search',
       });
       if (results.length === 1 && urlUtil.isURL(this.value)) {
         results.unshift({
           value: this.value,
+          location: this.value,
           icon: 'document',
         });
       }
       // fuse results
       const fuse = this.fuse;
-      results = results.concat(fuse.search(queryString.toLowerCase()));
+      const tmpResults: renderer.SuggestionObject[] = [];
+      (fuse.search(queryString.toLowerCase()) as any).forEach((result) => {
+        const item = result.item;
+        result.matches.forEach((match) => {
+          const tmpStr: string = item[match.key];
+          match.indices.forEach((indexPair) => {
+            const tmpSliceRegex = new RegExp(`(${tmpStr.slice(indexPair[0], indexPair[1] + 1)})`);
+            const tmp = Object.assign({}, item);
+            tmp[match.key] = tmpStr.replace(tmpSliceRegex, '<span style="color: #499fff">$1</span>');
+            tmpResults.push(tmp);
+          });
+        });
+      });
+      results = results.concat(tmpResults);
 
       // autocomplete suggestions
       urlSuggestion(this.currentSearchEngine.name,
@@ -336,6 +353,7 @@
             results.push({
               title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
               value: entry[0],
+              location: entry[0],
               icon: 'search',
             });
           })

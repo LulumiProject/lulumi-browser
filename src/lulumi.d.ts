@@ -113,6 +113,7 @@ declare module 'lulumi' {
     export interface SuggestionObject {
       title?: string;
       value: string;
+      location: string;
       icon: string;
     }
     export interface AboutLocationObject {
