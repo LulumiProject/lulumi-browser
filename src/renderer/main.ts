@@ -63,9 +63,10 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           if (el.selectionStart === queryString.length) {
             if ((this as any).lastQueryString !== queryString) {
               const startPos = queryString.length;
-              const endPos = (this as any).suggestions[0].value.length;
+              const endPos = (this as any).suggestions[0].item.location.length;
               (this as any).$nextTick().then(() => {
-                (this as any).$refs.input.$refs.input.value = (this as any).suggestions[0].value;
+                (this as any).$refs.input.$refs.input.value
+                  = (this as any).suggestions[0].item.location;
                 (this as any).setInputSelection(el, startPos, endPos);
                 (this as any).lastQueryString = queryString;
               });
@@ -103,9 +104,11 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       } else {
         (this.$parent.$parent as any).onEnterLocation(event.target.value);
         (this as any).select({
-          title: '',
-          value: event.target.value,
-          location: event.target.value,
+          item: {
+            title: '',
+            value: event.target.value,
+            location: event.target.value,
+          },
         });
       }
     },
@@ -135,7 +138,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       (this as any).highlightedIndex = newIndex;
       if (newIndex >= 0) {
         (this.$refs.input as any).$refs.input.value
-          = (this as any).suggestions[(this as any).highlightedIndex].location;
+          = (this as any).suggestions[(this as any).highlightedIndex].item.location;
       }
     },
   },

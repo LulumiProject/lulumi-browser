@@ -92,20 +92,68 @@
   Vue.component('url-suggestion', {
     functional: true,
     render(h, ctx) {
-      const item = ctx.props.item;
+      const suggestion: renderer.SuggestionObject = ctx.props.item;
+      const item: renderer.SuggestionItem = suggestion.item;
       if (item.title) {
+        if (suggestion.matches) {
+          let renderElementsOfTitle: any[] = [];
+          let renderElementsOfValue: any[] = [];
+          suggestion.matches.forEach((match) => {
+            const renderElements: any[] = [];
+            const key: string = match.key;
+            const tmpStr: string = item[key];
+            let prefixIndex: number = 0;
+            match.indices.forEach((indexPair, index) => {
+              const prefix: string = tmpStr.substring(prefixIndex, indexPair[0]);
+              const target: string = tmpStr.substring(indexPair[0], indexPair[1] + 1);
+              
+              renderElements.push(prefix);
+              renderElements.push(h('span', { style: 'color: #499fff' }, target));
+              prefixIndex = indexPair[1] + 1;
+              if (index === match.indices.length - 1) {
+                renderElements.push(tmpStr.substring(prefixIndex, tmpStr.length));
+              }
+            });
+            if (renderElements.length === 0) {
+              renderElements.push(tmpStr);
+            }
+            if (key === 'title') {
+              renderElementsOfTitle = renderElements;
+            } else  if (key === 'value') {
+              renderElementsOfValue = renderElements;
+            }
+          });
+          if (renderElementsOfTitle.length === 0) {
+            renderElementsOfTitle.push(item.title);
+          } else if (renderElementsOfValue.length === 0) {
+            renderElementsOfValue.push(item.value);
+          }
+          return h('li', ctx.data, [
+            h('div', { attrs: { class: 'location' } }, [
+              h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
+              h('span', renderElementsOfValue),
+              h('span', { attrs: { class: 'name' } }, [
+                ' - ',
+                ...renderElementsOfTitle,
+              ]),
+            ]),
+        ]);
+        }
         return h('li', ctx.data, [
           h('div', { attrs: { class: 'location' } }, [
             h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-            h('span', { domProps: { innerHTML: item.value } }),
-            h('span', { attrs: { class: 'name' }, domProps: { innerHTML: ` - ${item.value}` } }),
+            h('span', item.value),
+            h('span', { attrs: { class: 'name' } }, [
+              ' - ',
+              item.title,
+            ]),
           ]),
         ]);
       }
       return h('li', ctx.data, [
         h('div', { attrs: { class: 'location' } }, [
           h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-          item.value,
+          h('span', item.value),
         ]),
       ]);
     },
@@ -147,7 +195,7 @@
     secure: boolean = false;
     focused: boolean = false;
     value: string = '';
-    suggestions: Array<renderer.SuggestionObject> = recommendTopSite;
+    suggestionItems: renderer.SuggestionItem[] = recommendTopSite;
     extensions: any[] = [];
     onbrowserActionClickedEvent: Event = new Event();
     onpageActionClickedEvent: Event = new Event();
@@ -187,17 +235,17 @@
       return this.$store.getters.currentSearchEngine;
     }
     get fuse(): Fuse {
-      const results: object[] = [];
+      const suggestionItems: renderer.SuggestionItem[] = [];
       this.$store.getters.history.forEach((history) => {
         const part: string = history.url.replace(/(^\w+:|^)\/\//, '');
-        results.push({
+        suggestionItems.push({
           title: history.title,
           value: part,
           location: part,
           icon: 'document',
         });
       });
-      const fuse = new Fuse(results, {
+      const fuse = new Fuse(suggestionItems, {
         shouldSort: true,
         threshold: 0.4,
         includeMatches: true,
@@ -257,17 +305,17 @@
         el.selectionEnd = el.value.length;
       }
     }
-    unique(source: renderer.SuggestionObject[]): renderer.SuggestionObject[] {
-      const results: renderer.SuggestionObject[] = [];
+    unique(suggestions: renderer.SuggestionObject[]): renderer.SuggestionObject[] {
+      const newSuggestions: renderer.SuggestionObject[] = [];
       const seen: Set<string> = new Set();
 
-      source.forEach((s) => {
-        if (!seen.has(`${s.icon}:${s.location}`)) {
-          seen.add(`${s.icon}:${s.location}`);
-          results.push(s);
+      suggestions.forEach((suggestion) => {
+        if (!seen.has(`${suggestion.item.icon}:${suggestion.item.location}`)) {
+          seen.add(`${suggestion.item.icon}:${suggestion.item.location}`);
+          newSuggestions.push(suggestion);
         }
       });
-      return results;
+      return newSuggestions;
     }
     showLocation(location: string): void {
       if (location === undefined || location.startsWith('lulumi-extension')) {
@@ -302,78 +350,62 @@
     onChange(val: string): void {
       this.value = val;
     }
-    onSelect(event): void {
+    onSelect(event: renderer.SuggestionObject): void {
+      const item: renderer.SuggestionItem = event.item;
       this.focused = false;
-      if (event.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
+      if (item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
         (this.$parent as BrowserMainView).onEnterLocation(
-          `${this.currentSearchEngine.search}${encodeURIComponent(event.location)}`);
+          `${this.currentSearchEngine.search}${encodeURIComponent(item.location)}`);
       } else {
-        (this.$parent as BrowserMainView).onEnterLocation(event.location);
+        (this.$parent as BrowserMainView).onEnterLocation(item.location);
       }
     }
     querySearch(queryString: string, cb: Function): void {
-      const suggestions: renderer.SuggestionObject[] = this.suggestions;
-      let results =
-        queryString ? suggestions.filter(this.createFilter(queryString)) : suggestions;
-      results.push({
-        title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
-        value: this.value,
-        location: this.value,
-        icon: 'search',
-      });
-      if (results.length === 1 && urlUtil.isURL(this.value)) {
-        results.unshift({
+      let suggestions: renderer.SuggestionObject[] = [];
+      this.suggestionItems.forEach(item => suggestions.push({ item }));
+      if (queryString) {
+        suggestions = suggestions.filter(this.createFilter(queryString));
+      }
+      suggestions.push({
+        item: {
+          title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
           value: this.value,
           location: this.value,
-          icon: 'document',
+          icon: 'search',
+        },
+      });
+      if (suggestions.length === 1 && urlUtil.isURL(this.value)) {
+        suggestions.unshift({
+          item: {
+            value: this.value,
+            location: this.value,
+            icon: 'document',
+          },
         });
       }
       // fuse results
-      const fuse = this.fuse;
-      const tmpResults: renderer.SuggestionObject[] = [];
-      const highlightOpen = '<span style="color: #499fff">';
-      const highlightClose = '</span>';
-      (fuse.search(queryString.toLowerCase()) as any).forEach((result) => {
-        const item = result.item;
-        result.matches.forEach((match) => {
-          const tmpStr: string = item[match.key];
-          const tmp = Object.assign({}, item);
-          let replaceStr: string = '';
-          let prefixIndex: number = 0;
-          match.indices.forEach((indexPair, index) => {
-            const target: string = tmpStr.substring(indexPair[0], indexPair[1] + 1);
-            const prefix: string = tmpStr.substring(prefixIndex, indexPair[0]);
-            replaceStr
-              = `${replaceStr}${prefix}${highlightOpen}${target}${highlightClose}`;
-            prefixIndex = indexPair[1] + 1;
-            if (index === match.indices.length - 1) {
-              replaceStr = `${replaceStr}${tmpStr.substring(prefixIndex, tmpStr.length)}`;
-            }
-          });
-          tmp[match.key] = replaceStr;
-          tmpResults.push(tmp);
-        });
-      });
-      results = results.concat(tmpResults);
+      suggestions = suggestions.concat(this.fuse.search(queryString.toLowerCase()));
 
       // autocomplete suggestions
       urlSuggestion(this.currentSearchEngine.name,
                     `${this.currentSearchEngine.autocomplete}${this.value}`)
         .then((final) => {
           final.forEach((entry) => {
-            results.push({
-              title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
-              value: entry[0],
-              location: entry[0],
-              icon: 'search',
+            suggestions.push({
+              item: {
+                title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
+                value: entry[0],
+                location: entry[0],
+                icon: 'search',
+              },
             });
           })
-          cb(this.unique(results));
+          cb(this.unique(suggestions));
         });
 
     }
     createFilter(queryString: string): (suggestion: any) => boolean {
-      return suggestion => (suggestion.value.indexOf(queryString.toLowerCase()) === 0);
+      return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
     }
     setBrowserActionIcon(extensionId: string, path: string): void {
       this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);

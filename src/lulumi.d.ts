@@ -110,11 +110,19 @@ declare module 'lulumi' {
 
   export namespace renderer {
     // src/renderer/js
-    export interface SuggestionObject {
+    export interface SuggestionItem {
       title?: string;
       value: string;
       location: string;
       icon: string;
+    }
+    export interface SuggestionMatch {
+      indices: number[];
+      key: string;
+    }
+    export interface SuggestionObject {
+      item: SuggestionItem;
+      matches?: SuggestionMatch[];
     }
     export interface AboutLocationObject {
       title: string;
