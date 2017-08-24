@@ -709,7 +709,7 @@
         }
       }
       const pageObject: store.PageObject = this.getPageObject(this.currentTabIndex);
-      if (pageObject) {
+      if ((process.env.NODE_ENV !== 'testing') && pageObject) {
         this.extensionService.updateTabs();
         this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, pageObject.pid));
       }
