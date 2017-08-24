@@ -86,7 +86,7 @@ export const guest = {
       },
       tabConfigPage: {
         title: 'Tab',
-        location: 'Opening Location',
+        url: 'Opening Url',
         favicon: 'Default Favicon',
       },
       LanguagePage: {
@@ -190,7 +190,7 @@ export default {
       },
     },
   },
-  page: {
+  tab: {
     loading: 'Loading',
     findInPage: {
       placeholder: 'Search in Page',

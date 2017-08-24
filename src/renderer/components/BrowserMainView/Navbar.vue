@@ -3,13 +3,13 @@
     .control-group
       a(@click="$parent.onClickHome", class="enabled")
         iview-icon(type="ios-home", size="16")
-      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="page.canGoBack ? 'enabled' : 'disabled'")
+      a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="tab.canGoBack ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-left-c", size="16")
-      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="page.canGoForward ? 'enabled' : 'disabled'")
+      a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="tab.canGoForward ? 'enabled' : 'disabled'")
         iview-icon(type="arrow-right-c", size="16")
-      a(v-if="page.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
+      a(v-if="tab.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
         iview-icon(type="close", size="16")
-      a(v-else @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="page.canRefresh ? 'enabled' : 'disabled'")
+      a(v-else @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
         iview-icon(type="android-refresh", size="16")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
@@ -129,7 +129,7 @@
             renderElementsOfValue.push(item.value);
           }
           return h('li', ctx.data, [
-            h('div', { attrs: { class: 'location' } }, [
+            h('div', { attrs: { class: 'url' } }, [
               h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
               h('span', renderElementsOfValue),
               h('span', { attrs: { class: 'name' } }, [
@@ -140,7 +140,7 @@
         ]);
         }
         return h('li', ctx.data, [
-          h('div', { attrs: { class: 'location' } }, [
+          h('div', { attrs: { class: 'url' } }, [
             h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
             h('span', item.value),
             h('span', { attrs: { class: 'name' } }, [
@@ -151,7 +151,7 @@
         ]);
       }
       return h('li', ctx.data, [
-        h('div', { attrs: { class: 'location' } }, [
+        h('div', { attrs: { class: 'url' } }, [
           h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
           h('span', item.value),
         ]),
@@ -204,32 +204,32 @@
     
     windowId: number;
 
-    get dummyPageObject(): store.PageObject {
-      return this.$store.getters.tabConfig.dummyPageObject;
+    get dummyTabObject(): store.TabObject {
+      return this.$store.getters.tabConfig.dummyTabObject;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get pages(): Array<store.PageObject> {
-      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    get tabs(): Array<store.TabObject> {
+      return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
-    get page(): store.PageObject {
-      if (this.pages.length === 0) {
-        return this.dummyPageObject;
+    get tab(): store.TabObject {
+      if (this.tabs.length === 0) {
+        return this.dummyTabObject;
       }
-      return this.pages[this.currentTabIndex];
+      return this.tabs[this.currentTabIndex];
     }
     get pageActionMapping(): object {
-      if (this.pages.length === 0) {
+      if (this.tabs.length === 0) {
         return {};
       }
-      return this.pages[this.currentTabIndex].pageActionMapping;
+      return this.tabs[this.currentTabIndex].pageActionMapping;
     }
-    get location(): string {
-      if (this.pages.length === 0) {
+    get url(): string {
+      if (this.tabs.length === 0) {
         return '';
       }
-      return this.pages[this.currentTabIndex].location;
+      return this.tabs[this.currentTabIndex].url;
     }
     get currentSearchEngine(): store.SearchEngineObject {
       return this.$store.getters.currentSearchEngine;
@@ -241,7 +241,7 @@
         suggestionItems.push({
           title: history.title,
           value: part,
-          location: part,
+          url: part,
           icon: 'document',
         });
       });
@@ -260,21 +260,21 @@
       return fuse;
     }
 
-    @Watch('location')
-    onLocation(newLocation: string): void {
+    @Watch('url')
+    onUrl(newUrl: string): void {
       if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
-        this.showLocation(newLocation);
-        const currentLocation = url.parse(newLocation, true);
+        this.showUrl(newUrl);
+        const currentUrl = url.parse(newUrl, true);
         const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
-        const newElement = document.getElementById('securityLocation');
+        const newElement = document.getElementById('securityOrigin');
         if (newElement !== null) {
-          if (currentLocation.href !== undefined && (currentLocation.protocol === 'https:' || currentLocation.protocol === 'wss:')) {
+          if (currentUrl.href !== undefined && (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:')) {
             this.secure = true;
-            const newLocation
-              = `<div class="security-location"><span style="color: #3c943c;">${currentLocation.protocol}</span>${currentLocation.href.substr(currentLocation.protocol.length)}</div>`;
+            const newUrl
+              = `<div class="security-origin"><span style="color: #3c943c;">${currentUrl.protocol}</span>${currentUrl.href.substr(currentUrl.protocol.length)}</div>`;
             originalInput.style.display = 'none';
 
-            newElement.innerHTML = newLocation;
+            newElement.innerHTML = newUrl;
             newElement.style.display = 'block';
 
             newElement.removeEventListener('click', this.clickHandler, false);
@@ -310,15 +310,15 @@
       const seen: Set<string> = new Set();
 
       suggestions.forEach((suggestion) => {
-        if (!seen.has(`${suggestion.item.icon}:${suggestion.item.location}`)) {
-          seen.add(`${suggestion.item.icon}:${suggestion.item.location}`);
+        if (!seen.has(`${suggestion.item.icon}:${suggestion.item.url}`)) {
+          seen.add(`${suggestion.item.icon}:${suggestion.item.url}`);
           newSuggestions.push(suggestion);
         }
       });
       return newSuggestions;
     }
-    showLocation(location: string): void {
-      if (location === undefined || location.startsWith('lulumi-extension')) {
+    showUrl(url: string): void {
+      if (url === undefined || url.startsWith('lulumi-extension')) {
         this.value = '';
         return;
       }
@@ -326,10 +326,10 @@
         this.value = '';
         return;
       }
-      let newLocation = decodeURIComponent(location);
-      newLocation = urlUtil.getLocationIfError(newLocation);
-      newLocation = urlUtil.getLocationIfPDF(newLocation);
-      this.value = urlUtil.getLocationIfAbout(newLocation).url;
+      let newUrl = decodeURIComponent(url);
+      newUrl = urlUtil.getUrlIfError(newUrl);
+      newUrl = urlUtil.getUrlIfPDF(newUrl);
+      this.value = urlUtil.getUrlIfAbout(newUrl).url;
     }
     onGoBackMouseDown(): void {
       this.handler = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
@@ -354,10 +354,10 @@
       const item: renderer.SuggestionItem = event.item;
       this.focused = false;
       if (item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
-        (this.$parent as BrowserMainView).onEnterLocation(
-          `${this.currentSearchEngine.search}${encodeURIComponent(item.location)}`);
+        (this.$parent as BrowserMainView).onEnterUrl(
+          `${this.currentSearchEngine.search}${encodeURIComponent(item.url)}`);
       } else {
-        (this.$parent as BrowserMainView).onEnterLocation(item.location);
+        (this.$parent as BrowserMainView).onEnterUrl(item.url);
       }
     }
     querySearch(queryString: string, cb: Function): void {
@@ -370,7 +370,7 @@
         item: {
           title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
           value: this.value,
-          location: this.value,
+          url: this.value,
           icon: 'search',
         },
       });
@@ -378,7 +378,7 @@
         suggestions.unshift({
           item: {
             value: this.value,
-            location: this.value,
+            url: this.value,
             icon: 'document',
           },
         });
@@ -395,7 +395,7 @@
               item: {
                 title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
                 value: entry[0],
-                location: entry[0],
+                url: entry[0],
                 icon: 'search',
               },
             });
@@ -587,7 +587,7 @@
             }
             if (extension.webContentsId) {
               (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-                .send('lulumi-page-action-clicked', { id: this.page.pid });
+                .send('lulumi-page-action-clicked', { id: this.tab.id });
             }
           }
         } else if (isBrowserAction) {
@@ -602,7 +602,7 @@
           }
           if (extension.webContentsId) {
             (this as any).$electron.remote.webContents.fromId(extension.webContentsId)
-              .send('lulumi-browser-action-clicked', { id: this.page.pid });
+              .send('lulumi-browser-action-clicked', { id: this.tab.id });
           }
         }
       }
@@ -629,7 +629,7 @@
       if (process.env.NODE_ENV !== 'testing') {
         const originalInput = document.getElementsByClassName('el-input__inner')[0];
         let newElement = document.createElement('div');
-        newElement.id = 'securityLocation';
+        newElement.id = 'securityOrigin';
         (newElement as any).classList = 'el-input__inner';
         newElement.innerHTML = '';
         newElement.style.display = 'none';

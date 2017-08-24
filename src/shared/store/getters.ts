@@ -6,10 +6,10 @@ interface BrowserState extends store.State {
 
 export const getters = {
   pid(state: BrowserState): number {
-    return state.browser.pid;
+    return state.browser.tabId;
   },
-  pages(state: BrowserState): store.PageObject[] {
-    return state.browser.pages;
+  tabs(state: BrowserState): store.TabObject[] {
+    return state.browser.tabs;
   },
   tabsOrder(state: BrowserState) {
     return state.browser.tabsOrder;

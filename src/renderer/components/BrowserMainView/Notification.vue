@@ -14,7 +14,7 @@
 
   import urlUtil from '../../js/lib/url-util';
 
-  import Page from './Page.vue';
+  import Tab from './Tab.vue';
 
   @Component({
     components: {
@@ -59,7 +59,7 @@
         });
       }
       (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc(100vh - 73px)';
-      (this.$parent as Page).showNotification = false;
+      (this.$parent as Tab).showNotification = false;
 
       if (this.handler) {
         clearTimeout(this.handler);
@@ -83,7 +83,7 @@
         });
       }
       (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc(100vh - 73px)';
-      (this.$parent as Page).showNotification = false;
+      (this.$parent as Tab).showNotification = false;
 
       if (this.handler) {
         clearTimeout(this.handler);
@@ -100,7 +100,7 @@
         this.type = 'update';
         this.template = this.$t('notification.update.updateAvailable', { releaseName: data.releaseName });
         (this.$parent.$refs.webview as Electron.WebviewTag).style.height = 'calc((100vh - 73px) - 35px)';
-        (this.$parent as Page).showNotification = true;
+        (this.$parent as Tab).showNotification = true;
       });
       ipc.on('request-permission', (event, data) => {
         if ((this.$parent.$refs.webview as Electron.WebviewTag).getWebContents().id === data.webContentsId) {
@@ -124,39 +124,39 @@
                   this.type = 'permission';
                   this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
                   webview.style.height = 'calc((100vh - 73px) - 35px)';
-                  (this.$parent as Page).showNotification = true;
+                  (this.$parent as Tab).showNotification = true;
                   this.handler = setTimeout(() => {
                     ipc.send(`response-permission-${this.id}`, {
                       accept: false,
                     });
                     webview.style.height = 'calc(100vh - 73px)';
-                    (this.$parent as Page).showNotification = false;
+                    (this.$parent as Tab).showNotification = false;
                   }, 5000);
                 }
               } else {
                 this.type = 'permission';
                 this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
                 webview.style.height = 'calc((100vh - 73px) - 35px)';
-                (this.$parent as Page).showNotification = true;
+                (this.$parent as Tab).showNotification = true;
                 this.handler = setTimeout(() => {
                   ipc.send(`response-permission-${this.id}`, {
                     accept: false,
                   });
                   webview.style.height = 'calc(100vh - 73px)';
-                  (this.$parent as Page).showNotification = false;
+                  (this.$parent as Tab).showNotification = false;
                 }, 5000);
               }
             } else {
               this.type = 'permission';
               this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
               webview.style.height = 'calc((100vh - 73px) - 35px)';
-              (this.$parent as Page).showNotification = true;
+              (this.$parent as Tab).showNotification = true;
               this.handler = setTimeout(() => {
                 ipc.send(`response-permission-${this.id}`, {
                   accept: false,
                 });
                 webview.style.height = 'calc(100vh - 73px)';
-                (this.$parent as Page).showNotification = false;
+                (this.$parent as Tab).showNotification = false;
               }, 10000);
             }
           }

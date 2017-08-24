@@ -244,11 +244,11 @@ const urlUtil = {
   },
 
   /**
-   * Gets PDF location from a potential PDFJS URL
+   * Gets PDF url from a potential PDFJS URL
    * @param {string} url
    * @return {string}
    */
-  getLocationIfPDF(url: string): string {
+  getUrlIfPDF(url: string): string {
     const PDF_VIEWER_WITH_PDFJS = '/pdfjs/web/viewer.html';
     const PDF_VIEWER_FOR_CHROME = 'chrome://pdf-viewer/index.html?src=';
     if (url) {
@@ -263,11 +263,11 @@ const urlUtil = {
   },
 
   /**
-   * Shows the original location from a error page
+   * Shows the original url from a error page
    * @param {string} url
    * @return {string}
    */
-  getLocationIfError(url: string): string {
+  getUrlIfError(url: string): string {
     const errorPage = '/pages/error/index.html';
     if (url) {
       if (url.includes(errorPage)) {
@@ -279,11 +279,11 @@ const urlUtil = {
   },
 
   /**
-   * Gets about location from a lulumi scheme
+   * Gets about url from a lulumi scheme
    * @param {string} url
    * @return {object}
    */
-  getLocationIfAbout(url: string): renderer.AboutLocationObject {
+  getUrlIfAbout(url: string): renderer.AboutLocationObject {
     if (url.startsWith(config.lulumiPagesCustomProtocol)) {
       const guestUrl = require('url').parse(url);
       const guestHash = guestUrl.hash.substr(2);

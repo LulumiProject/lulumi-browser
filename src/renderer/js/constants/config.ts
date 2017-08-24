@@ -20,10 +20,10 @@ const homepage = 'https://github.com/qazbnm456/lulumi-browser';
 const pdfViewer = 'pdf-viewer';
 
 const tabConfig = {
-  dummyPageObject: {
-    pid: -1,
+  dummyTabObject: {
+    id: -1,
     windowId: -1,
-    location: 'https://github.com/qazbnm456/lulumi-browser',
+    url: 'https://github.com/qazbnm456/lulumi-browser',
     statusText: false,
     favicon: null,
     title: null,

@@ -7,11 +7,11 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
 ```javascript
 {
   pid: number,
-  pages: {
-    pid: number,
+  tabs: {
+    id: number,
     windowId: number,
-    location: string,
-    statusText: boolean,
+    url: string,
+    statusText: string | boolean,
     favicon: string | null,
     title: string | null,
     isLoading: boolean,
@@ -52,7 +52,8 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
     isPaused: boolean,
     canResume: boolean,
     state: string,
-    savePath: string,
+    savePath: string | null,
+    dataState: string,
   }],
   history: [{
     title: string,

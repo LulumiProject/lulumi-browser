@@ -1,19 +1,19 @@
 <template lang="pug">
   #chrome-tabs-shell(@dblclick.self="onDoubleClick")
     .chrome-tabs(v-sortable="")
-      div(v-for="(page, index) in pages", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${page.pid}`")
+      div(v-for="(tab, index) in tabs", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${tab.id}`")
         svg(width="15", height="30", class="left-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
           path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
           div#tab-icons(class="chrome-tab-favicon")
-            i.el-icon-loading(v-if="page.isLoading", style="font-size: 16px; padding-right: 2px;")
-            img(:src="page.favicon", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
-            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-off", v-if="page.hasMedia && page.isAudioMuted", class="volume volume-off")
-            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !page.isAudioMuted)", name="volume-up", v-else-if="page.hasMedia && !page.isAudioMuted", class="volume volume-up")
-          el-tooltip(:content="page.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
+            i.el-icon-loading(v-if="tab.isLoading", style="font-size: 16px; padding-right: 2px;")
+            img(:src="tab.favicon", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", v-if="tab.hasMedia && tab.isAudioMuted", class="volume volume-off")
+            awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", v-else-if="tab.hasMedia && !tab.isAudioMuted", class="volume volume-up")
+          el-tooltip(:content="tab.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
             span(class="chrome-tab-title")
-              | {{ page.title || $t('tabs.loading') }}
+              | {{ tab.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
@@ -85,8 +85,8 @@
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get pages(): Array<store.PageObject> {
-      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    get tabs(): Array<store.TabObject> {
+      return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
 
     loadDefaultFavicon(event: Electron.Event) {
@@ -152,7 +152,7 @@
       ipc.on('new-tab', (event, payload) => {
         if ((this.$parent as BrowserMainView).onNewTab) {
           if (payload) {
-            (this.$parent as BrowserMainView).onNewTab(this.windowId, payload.location, payload.follow);
+            (this.$parent as BrowserMainView).onNewTab(this.windowId, payload.url, payload.follow);
           } else {
             (this.$parent as BrowserMainView).onNewTab(this.windowId, 'about:newtab', false);
           }

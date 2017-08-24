@@ -170,7 +170,7 @@ const getTemplate = () => {
         {
           label: i18n.t('help.reportIssue'),
           click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
-            location: 'https://github.com/qazbnm456/lulumi-browser/issues',
+            url: 'https://github.com/qazbnm456/lulumi-browser/issues',
             follow: true,
           }),
         },
@@ -194,7 +194,7 @@ const getTemplate = () => {
         {
           label: i18n.t('app.about', { appName }),
           click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
-            location: 'about:lulumi',
+            url: 'about:lulumi',
             follow: true,
           }),
         },

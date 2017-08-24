@@ -63,10 +63,10 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           if (el.selectionStart === queryString.length) {
             if ((this as any).lastQueryString !== queryString) {
               const startPos = queryString.length;
-              const endPos = (this as any).suggestions[0].item.location.length;
+              const endPos = (this as any).suggestions[0].item.url.length;
               (this as any).$nextTick().then(() => {
                 (this as any).$refs.input.$refs.input.value
-                  = (this as any).suggestions[0].item.location;
+                  = (this as any).suggestions[0].item.url;
                 (this as any).setInputSelection(el, startPos, endPos);
                 (this as any).lastQueryString = queryString;
               });
@@ -102,12 +102,12 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         && (this as any).highlightedIndex < (this as any).suggestions.length) {
         (this as any).select((this as any).suggestions[(this as any).highlightedIndex]);
       } else {
-        (this.$parent.$parent as any).onEnterLocation(event.target.value);
+        (this.$parent.$parent as any).onEnterUrl(event.target.value);
         (this as any).select({
           item: {
             title: '',
             value: event.target.value,
-            location: event.target.value,
+            url: event.target.value,
           },
         });
       }
@@ -138,7 +138,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       (this as any).highlightedIndex = newIndex;
       if (newIndex >= 0) {
         (this.$refs.input as any).$refs.input.value
-          = (this as any).suggestions[(this as any).highlightedIndex].item.location;
+          = (this as any).suggestions[(this as any).highlightedIndex].item.url;
       }
     },
   },

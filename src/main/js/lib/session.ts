@@ -316,7 +316,7 @@ export default {
         const param = qs.stringify({ file: itemURL });
         const pdfViewerURL = `file://${path}/web/viewer.html`;
         mainWindow.webContents.send('open-pdf', {
-          location: `${pdfViewerURL}?${param}`,
+          url: `${pdfViewerURL}?${param}`,
           webContentsId: webContents.id,
         });
       } else {

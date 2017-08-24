@@ -138,9 +138,9 @@ const windowStateSave = (): void => {
   });
 };
 
-const tabsMapping = (pages: store.PageObject[], tabsOrder: number[]): number[] => {
+const tabsMapping = (tabs: store.TabObject[], tabsOrder: number[]): number[] => {
   const newOrder: number[] = [];
-  for (let index = 0; index < pages.length; index += 1) {
+  for (let index = 0; index < tabs.length; index += 1) {
     if (tabsOrder) {
       newOrder[index] = tabsOrder.indexOf(index) === -1
         ? index
@@ -152,41 +152,41 @@ const tabsMapping = (pages: store.PageObject[], tabsOrder: number[]): number[] =
   return newOrder;
 };
 
-function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.PageObject[] {
-  let newPid: number = newStart;
-  let newPages: store.PageObject[] = [];
+function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.TabObject[] {
+  let newTabId: number = newStart;
+  let newTabs: store.TabObject[] = [];
   let windowId: number = bumpWindowIdsBy === 0
     ? (1 + bumpWindowIdsBy)
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
   Object.keys(windows).forEach((key) => {
-    const tmpPages: store.PageObject[] = [];
+    const tmpTabs: store.TabObject[] = [];
     const id = parseInt(key, 10);
-    const oldPages: store.PageObject[]
-      = store.getters.pages.filter(page => page.windowId === id);
-    const tabsOrder: number[] = tabsMapping(oldPages, store.getters.tabsOrder[id]);
-    if (tabsOrder.length < oldPages.length) {
-      for (let index = 0; index < oldPages.length; index += 1) {
-        tmpPages.push((Object.assign({}, oldPages[index]) as any));
+    const oldTabs: store.TabObject[]
+      = store.getters.tabs.filter(tab => tab.windowId === id);
+    const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
+    if (tabsOrder.length < oldTabs.length) {
+      for (let index = 0; index < oldTabs.length; index += 1) {
+        tmpTabs.push((Object.assign({}, oldTabs[index]) as any));
       }
     } else {
-      oldPages.forEach((page, index) => {
-        tmpPages.push((Object.assign({}, oldPages[tabsOrder[index]]) as any));
+      oldTabs.forEach((tab, index) => {
+        tmpTabs.push((Object.assign({}, oldTabs[tabsOrder[index]]) as any));
       });
     }
-    tmpPages.forEach((page) => {
-      page.pid = (newPid += 1);
-      page.windowId = windowId;
-      if (page.location.startsWith('about:')) {
-        page.location = urlResource.aboutUrls(page.location);
+    tmpTabs.forEach((tab) => {
+      tab.id = (newTabId += 1);
+      tab.windowId = windowId;
+      if (tab.url.startsWith('about:')) {
+        tab.url = urlResource.aboutUrls(tab.url);
       }
-      if (page.location.startsWith('lulumi-extension:')) {
-        page.location = urlResource.aboutUrls('about:newtab');
+      if (tab.url.startsWith('lulumi-extension:')) {
+        tab.url = urlResource.aboutUrls('about:newtab');
       }
     });
-    newPages = newPages.concat(tmpPages);
+    newTabs = newTabs.concat(tmpTabs);
     windowId += 1;
   });
-  return newPages;
+  return newTabs;
 }
 
 function tabIndexesOrdering(bumpWindowIdsBy: number): number[] {
@@ -196,9 +196,9 @@ function tabIndexesOrdering(bumpWindowIdsBy: number): number[] {
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
-    const pages: store.PageObject[]
-      = store.getters.pages.filter(page => page.windowId === id);
-    const tabsOrder: number[] = tabsMapping(pages, store.getters.tabsOrder[id]);
+    const tabs: store.TabObject[]
+      = store.getters.tabs.filter(tab => tab.windowId === id);
+    const tabsOrder: number[] = tabsMapping(tabs, store.getters.tabsOrder[id]);
     const currentTabIndex: number = store.getters.currentTabIndexes[id];
     newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
       ? currentTabIndex
@@ -225,10 +225,10 @@ function windowsOrdering(bumpWindowIdsBy: number): store.LulumiBrowserWindowProp
   return newWindows;
 }
 
-function collect(getters, newStart: number, newPages: store.PageObject[], newCurrentTabIndexes: number[], newWindows: store.LulumiBrowserWindowProperty[], downloads) {
+function collect(getters, newStart: number, newTabs: store.TabObject[], newCurrentTabIndexes: number[], newWindows: store.LulumiBrowserWindowProperty[], downloads) {
   return {
-    pid: newStart + newPages.length,
-    pages: newPages,
+    pid: newStart + newTabs.length,
+    tabs: newTabs,
     currentTabIndexes: newCurrentTabIndexes,
     currentSearchEngine: getters.currentSearchEngine,
     homepage: getters.homepage,
@@ -243,7 +243,7 @@ function collect(getters, newStart: number, newPages: store.PageObject[], newCur
 
 function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promise<any> {
   const newStart = Math.ceil(Math.random() * 10000);
-  const newPages = tabsOrdering(newStart, bumpWindowIdsBy);
+  const newTabs = tabsOrdering(newStart, bumpWindowIdsBy);
   const newCurrentTabIndexes = tabIndexesOrdering(bumpWindowIdsBy);
   const newWindows = windowsOrdering(bumpWindowIdsBy);
   const downloads = store.getters.downloads;
@@ -251,20 +251,20 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
 
   if (soft) {
     return Promise.resolve(JSON.stringify(
-      collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, downloads)));
+      collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
   }
   if (pendingDownloads.length !== 0) {
     ipcMain.once('okay-to-quit', (event, okay) => {
       if (okay) {
         return Promise.resolve(JSON.stringify(
-          collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
+          collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
       }
       return Promise.resolve('');
     });
     BrowserWindow.getFocusedWindow().webContents.send('about-to-quit');
   }
   return Promise.resolve(JSON.stringify(
-    collect(store.getters, newStart, newPages, newCurrentTabIndexes, newWindows, downloads)));
+    collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
 }
 
 function bumpWindowIds(bumpWindowIdsBy: number) {

@@ -34,6 +34,8 @@
 
   import BrowserMainView from '../BrowserMainView.vue';
 
+  import { store } from 'lulumi';
+
   @Component({
     components: {
       'el-button-group': ButtonGroup,
@@ -61,7 +63,7 @@
     prettyReceivedSize(size: number): string {
       return prettySize.process(size);
     }
-    percentage(file): number {
+    percentage(file: store.DownloadItem): number {
       return (file.getReceivedBytes / file.totalBytes) * 100 || 0;
     }
     showItemInFolder(savePath: string): void {

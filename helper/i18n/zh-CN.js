@@ -86,7 +86,7 @@ export const guest = {
       },
       tabConfigPage: {
         title: '分页',
-        location: '默认开启',
+        url: '默认开启',
         favicon: '默认图示',
       },
       LanguagePage: {
@@ -190,7 +190,7 @@ export default {
       },
     },
   },
-  page: {
+  tab: {
     loading: '载入中',
     findInPage: {
       placeholder: '在页面中找寻',

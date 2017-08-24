@@ -4,12 +4,12 @@
       #notification(v-show="showNotification && isActive")
         notification
     webview(plugins,
-            :element-loading-text="$t('page.loading')",
+            :element-loading-text="$t('tab.loading')",
             ref="webview",
             :class="isActive ? 'active' : 'hidden'",
             :partition="nonReactivePartitionId")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
-      input(ref="findinpageInput", :placeholder="$t('page.findInPage.placeholder')")
+      input(ref="findinpageInput", :placeholder="$t('tab.findInPage.placeholder')")
       span(ref="findinpageCount")
       div
         i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
@@ -26,21 +26,21 @@
 
   import Notification from './Notification.vue';
 
-  import { page, store } from 'lulumi';
+  import { tab, store } from 'lulumi';
 
   @Component({
     props: [
       'isActive',
       'windowId',
       'tabIndex',
-      'pageId',
+      'tabId',
       'partitionId',
     ],
     components: {
       Notification,
     },
   })
-  export default class Page extends Vue {
+  export default class Tab extends Vue {
     hidden: boolean = true;
     requestId: number | null | void = null;
     showNotification: boolean = false;
@@ -49,36 +49,36 @@
     isActive: boolean;
     windowId: number;
     tabIndex: number;
-    pageId: number;
+    tabId: number;
     partitionId: number;
 
-    findinpage: page.FindInPageObject;
+    findinpage: tab.FindInPageObject;
 
-    get dummyPageObject(): store.PageObject {
-      return this.$store.getters.tabConfig.dummyPageObject;
+    get dummyTabObject(): store.TabObject {
+      return this.$store.getters.tabConfig.dummyTabObject;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get pages(): Array<store.PageObject> {
-      return this.$store.getters.pages.filter(page => page.windowId === this.windowId);
+    get tabs(): Array<store.TabObject> {
+      return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
-    get page(): store.PageObject {
-      if (this.pages.length === 0) {
-        return this.dummyPageObject;
+    get tab(): store.TabObject {
+      if (this.tabs.length === 0) {
+        return this.dummyTabObject;
       }
-      return this.pages[this.tabIndex];
+      return this.tabs[this.tabIndex];
     }
 
-    navigateTo(location) {
+    navigateTo(url) {
       if (this.$refs.webview) {
-        (this.$refs.webview as Electron.WebviewTag).setAttribute('src', urlUtil.getUrlFromInput(location));
+        (this.$refs.webview as Electron.WebviewTag).setAttribute('src', urlUtil.getUrlFromInput(url));
       }
     }
     webviewHandler(self, fnName) {
       return (event) => {
         if (self.$parent[fnName]) {
-          self.$parent[fnName](event, this.tabIndex, this.pageId);
+          self.$parent[fnName](event, this.tabIndex, this.tabId);
         }
       };
     }
@@ -219,7 +219,7 @@
               match = 2;
             }
             this.findinpage.counter.textContent
-              = `${this.$t('page.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('page.findInPage.match', match)}`;
+              = `${this.$t('tab.findInPage.status', { activeMatch: event.result.activeMatchOrdinal, matches: event.result.matches })} ${this.$tc('tab.findInPage.match', match)}`;
           }
         }
       });
@@ -229,7 +229,7 @@
         webview.style.height
           = `calc(100vh - ${nav.clientHeight}px)`;
         (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
-        this.navigateTo(this.page.location);
+        this.navigateTo(this.tab.url);
       }
     }
   };

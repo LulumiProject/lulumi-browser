@@ -51,11 +51,11 @@ declare module 'lulumi' {
 
   export namespace store {
     // store
-    export interface PageObject {
-      pid: number;
+    export interface TabObject {
+      id: number;
       windowId: number;
-      location: string;
-      statusText: boolean;
+      url: string;
+      statusText: string | boolean;
       favicon: string | null;
       title: string | null;
       isLoading: boolean;
@@ -69,7 +69,7 @@ declare module 'lulumi' {
       pageActionMapping: object;
     }
     export interface TabConfig {
-      dummyPageObject: PageObject;
+      dummyTabObject: TabObject;
       defaultFavicon: string;
       lulumiFavicon: string;
     }
@@ -78,19 +78,39 @@ declare module 'lulumi' {
       search: string;
       autocomplete: string;
     }
+    export interface TabHistory {
+      title: string | null;
+      url: string;
+      favicon: string | null;
+      label: string;
+      time: string;
+    }
+    export interface DownloadItem {
+      getReceivedBytes: number;
+      totalBytes: number;
+      startTime: number;
+      webContentsId: number;
+      name: string;
+      url: string;
+      isPaused: boolean;
+      canResume: boolean;
+      state: string;
+      savePath: string | null;
+      dataState: string;
+    }
     export interface LastOpenedTabObject {
-      title: string;
-      location: string;
+      title: string | null;
+      url: string;
       favicon: string | null;
     }
     export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
       windowId: number;
-      focused: boolean;
-      state: string;
+      focused?: boolean;
+      windowState: string;
     }
     export interface State {
-      pid: number;
-      pages: PageObject[];
+      tabId: number;
+      tabs: TabObject[];
       tabsOrder: number[][];
       currentTabIndexes: number[];
       searchEngine: SearchEngineObject[];
@@ -99,10 +119,10 @@ declare module 'lulumi' {
       pdfViewer: string;
       tabConfig: TabConfig;
       lang: string;
-      downloads: object[];
-      history: object[];
+      downloads: DownloadItem[];
+      history: TabHistory[];
       permissions: object;
-      mappings: number[];
+      mappings: number[][];
       lastOpenedTabs: LastOpenedTabObject[];
       windows: LulumiBrowserWindowProperty[];
     }
@@ -113,7 +133,7 @@ declare module 'lulumi' {
     export interface SuggestionItem {
       title?: string;
       value: string;
-      location: string;
+      url: string;
       icon: string;
     }
     export interface SuggestionMatch {
@@ -141,8 +161,8 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace page {
-    // Page.vue
+  export namespace tab {
+    // Tab.vue
     export interface FindInPageObject {
       container?: HTMLElement;
       input: HTMLElement;

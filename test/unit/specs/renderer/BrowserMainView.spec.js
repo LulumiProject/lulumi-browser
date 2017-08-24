@@ -100,7 +100,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         && this.highlightedIndex < this.suggestions.length) {
         this.select(this.suggestions[this.highlightedIndex]);
       } else {
-        this.$parent.$parent.onEnterLocation(event.target.value);
+        this.$parent.$parent.onEnterUrl(event.target.value);
         this.select({
           title: '',
           value: event.target.value,
@@ -180,21 +180,21 @@ describe('BrowserMainView.vue', () => {
 
     describe('methods.getWebView()', () => {
       it('has the corresponding webview element', async () => {
-        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.dummyPageObject.location);
+        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.dummyTabObject.url);
       });
     });
 
-    describe('methods.getPage()', () => {
-      it('can call navigateTo method from certain page instance to let the webview navigate to somewhere', () => {
-        vm.getPage().navigateTo('https://www.youtube.com/');
+    describe('methods.getTab()', () => {
+      it('can call navigateTo method from certain tab instance to let the webview navigate to somewhere', () => {
+        vm.getTab().navigateTo('https://www.youtube.com/');
         expect(vm.getWebView().getAttribute('src')).to.equal('https://www.youtube.com/');
       });
     });
 
-    describe('methods.getPageObject()', () => {
-      it('can call navigateTo method from certain page instance to let the webview navigate to somewhere', () => {
-        vm.getPage().navigateTo('https://github.com/qazbnm456/lulumi-browser');
-        expect(vm.getPageObject().location).to.equal('https://github.com/qazbnm456/lulumi-browser');
+    describe('methods.getTabObject()', () => {
+      it('can call navigateTo method from certain tab instance to let the webview navigate to somewhere', () => {
+        vm.getTab().navigateTo('https://github.com/qazbnm456/lulumi-browser');
+        expect(vm.getTabObject().url).to.equal('https://github.com/qazbnm456/lulumi-browser');
       });
     });
 
@@ -219,9 +219,9 @@ describe('BrowserMainView.vue', () => {
       });
     });
 
-    describe('methods.onEnterLocation()', () => {
-      it('navigates to specified location', async () => {
-        vm.onEnterLocation('https://www.youtube.com/');
+    describe('methods.onEnterUrl()', () => {
+      it('navigates to specified url', async () => {
+        vm.onEnterUrl('https://www.youtube.com/');
         expect(vm.getWebView().getAttribute('src')).to.equal('https://www.youtube.com/');
       });
     });
@@ -231,7 +231,7 @@ describe('BrowserMainView.vue', () => {
     it('shows the title of webview.getTitle()', async () => {
       vm.$store.dispatch('pageTitleSet', {
         windowId: -1,
-        pageId: vm.getPageObject().pid,
+        tabId: vm.getTabObject().id,
         tabIndex: 0,
         title: name,
       });
@@ -242,7 +242,7 @@ describe('BrowserMainView.vue', () => {
     it('shows the volume icon when there exists at least one media in the page, and it\'s playing', async () => {
       vm.$store.dispatch('mediaStartedPlaying', {
         windowId: -1,
-        pageId: vm.getPageObject().pid,
+        tabId: vm.getTabObject().id,
         tabIndex: 0,
         isAudioMuted: false,
       });
@@ -253,7 +253,7 @@ describe('BrowserMainView.vue', () => {
     it('shows the volume icon when there exists at least one media in the page, and it\'s not playing', async () => {
       vm.$store.dispatch('mediaStartedPlaying', {
         windowId: -1,
-        pageId: vm.getPageObject().pid,
+        tabId: vm.getTabObject().id,
         tabIndex: 0,
         isAudioMuted: true,
       });
@@ -283,8 +283,8 @@ describe('BrowserMainView.vue', () => {
 
   describe('Navbar.vue (integrated)', () => {
     it('shows the corresponding url to the webview', () => {
-      const page = vm.getPageObject(0);
-      expect(vm.$el.querySelector('webview.active').src).to.equal(page.location);
+      const tabObject = vm.getTabObject(0);
+      expect(vm.$el.querySelector('webview.active').src).to.equal(tabObject.url);
     });
 
     it('has four controls in .control-group', () => {
@@ -295,10 +295,10 @@ describe('BrowserMainView.vue', () => {
     });
   });
 
-  describe('Page.vue (integrated)', () => {
-    it('reveals itself when it\'s the current page', () => {
-      const pageVm = vm.getPage(0);
-      expect(pageVm.isActive).to.equal((vm.currentTabIndex === 0));
+  describe('Tab.vue (integrated)', () => {
+    it('reveals itself when it\'s the current tab', () => {
+      const tab = vm.getTab(0);
+      expect(tab.isActive).to.equal((vm.currentTabIndex === 0));
     });
   });
 });

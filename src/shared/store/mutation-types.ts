@@ -1,4 +1,4 @@
-export const INCREMENT_PID = 'INCREMENT_PID';
+export const INCREMENT_TAB_ID = 'INCREMENT_TAB_ID';
 
 export const CREATE_TAB = 'CREATE_TAB';
 export const CLOSE_TAB = 'CLOSE_TAB';

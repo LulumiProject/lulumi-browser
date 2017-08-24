@@ -3,15 +3,15 @@
     h1 {{ $t('about.preferencesPage.tabConfigPage.title') }}
     div
       el-input(
-        placeholder="Input default opening location you want",
+        placeholder="Input default opening url you want",
         @change="setTabConfig",
-        v-model.trim="defaultLocation",
+        v-model.trim="defaultUrl",
         :autofocus="true",
         ref="input")
-        template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.location') }}
+        template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.url') }}
     div(style="margin-top: 15px;")
       el-input(
-        placeholder="Input default favicon location you want",
+        placeholder="Input default favicon url you want",
         @change="setTabConfig",
         v-model.trim="defaultFavicon",
         :autofocus="true",
@@ -24,23 +24,25 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { store } from 'lulumi';
+
   declare const ipcRenderer: Electron.IpcRenderer;
 
   @Component
   export default class TabConfig extends Vue {
-    defaultLocation: string = '';
+    defaultUrl: string = '';
     defaultFavicon: string = '';
 
     setTabConfig(): void {
       ipcRenderer.send('set-tab-config', {
-        defaultLocation: this.defaultLocation,
+        defaultUrl: this.defaultUrl,
         defaultFavicon: this.defaultFavicon,
       });
     }
 
     mounted() {
-      ipcRenderer.on('guest-here-your-data', (event, tabConfig) => {
-        this.defaultLocation = tabConfig.dummyPageObject.location;
+      ipcRenderer.on('guest-here-your-data', (event: Electron.Event, tabConfig: store.TabConfig) => {
+        this.defaultUrl = tabConfig.dummyTabObject.url;
         this.defaultFavicon = tabConfig.defaultFavicon;
       });
       ipcRenderer.send('guest-want-data', 'tabConfig');
