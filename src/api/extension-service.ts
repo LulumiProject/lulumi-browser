@@ -752,10 +752,6 @@ export default class ExtensionService {
     (this.instance.$refs.navbar as any).extensions = manifest;
   }
 
-  updateTabs(): void {
-    require('lulumi').tabs.query({});
-  }
-
   getTab(windowId: number, tabId: number, remove: boolean = false): Tab {
     if (remove) {
       return new Tab(windowId, tabId, -1, false);

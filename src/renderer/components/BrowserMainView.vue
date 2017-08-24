@@ -710,7 +710,6 @@
       }
       const TabObject: store.TabObject = this.getTabObject(this.currentTabIndex);
       if ((process.env.NODE_ENV !== 'testing') && TabObject) {
-        this.extensionService.updateTabs();
         this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, TabObject.id));
       }
     }
