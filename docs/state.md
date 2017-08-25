@@ -6,7 +6,7 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
 
 ```javascript
 {
-  pid: number,
+  tabId: number,
   tabs: {
     id: number,
     windowId: number,
@@ -30,7 +30,7 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
   },
   currentTabIndexes: number[],
   currentSearchEngine: {
-    name: string, // 'Google', 'Bing'
+    name: string, // 'Google'
     search: string, // 'https://www.google.com/search?q='
     autocomplete: string, // 'https://suggestqueries.google.com/complete/search?client=youtube&q='
   },
