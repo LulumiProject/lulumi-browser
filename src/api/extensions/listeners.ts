@@ -368,6 +368,7 @@ ipcMain.on('lulumi-runtime-emit-on-message-external', (event, message) => {
 });
 
 ipcMain.on('lulumi-tabs-get', (event, tabId) => {
+  // event.sender.send('lulumi-tabs-get-result', store.getters.tabs.find(tab => (tab.id === tabId)));
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];

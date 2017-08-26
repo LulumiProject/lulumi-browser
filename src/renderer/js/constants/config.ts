@@ -1,6 +1,8 @@
 import { nativeImage } from 'electron';
 import path from 'path';
 
+import { store } from 'lulumi';
+
 declare const __static;
 
 const searchEngine = [
@@ -19,14 +21,20 @@ const searchEngine = [
 const homepage = 'https://github.com/qazbnm456/lulumi-browser';
 const pdfViewer = 'pdf-viewer';
 
-const tabConfig = {
+const tabConfig: store.TabConfig = {
   dummyTabObject: {
     id: -1,
+    index: -1,
     windowId: -1,
+    highlighted: false,
+    active: false,
+    pinned: false,
     url: 'https://github.com/qazbnm456/lulumi-browser',
-    statusText: false,
-    favicon: null,
     title: null,
+    favIconUrl: null,
+    status: null,
+    incognito: false,
+    statusText: false,
     isLoading: false,
     isSearching: false,
     canGoBack: false,

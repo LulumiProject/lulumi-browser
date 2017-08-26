@@ -1,5 +1,4 @@
 import { ipcRenderer } from 'electron';
-import Tab from './extensions/tab';
 import url from 'url';
 import Vue from 'vue';
 
@@ -750,12 +749,5 @@ export default class ExtensionService {
     });
 
     (this.instance.$refs.navbar as any).extensions = manifest;
-  }
-
-  getTab(windowId: number, tabId: number, remove: boolean = false): Tab {
-    if (remove) {
-      return new Tab(windowId, tabId, -1, false);
-    }
-    return require('lulumi').tabs.get(tabId);
   }
 }

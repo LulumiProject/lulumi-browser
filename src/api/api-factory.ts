@@ -1,76 +1,33 @@
 import Event from './extensions/event';
 import { api, store } from 'lulumi';
-import Tab from './extensions/tab';
 
 /* tslint:disable:max-line-length */
 
-const tabArray: Tab[] = [];
-
-function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId?: number, tabIndex?: number): Tab {
-  let tabHolder: Tab = new Tab(0, -1, -1, false);
-  if (tabId !== undefined) {
-    // if tabId === -1, we then just return a Tab instance with id = -1
-    if (tabId === -1) {
-      return tabHolder;
-    } else if (tabId === 0) {
-      // if tabId === 0 and tabIndex remains undefined,
-      // we then just create a Tab instance storing the information of current tab
-      if (tabIndex === undefined) {
-        tabHolder = new Tab(vueInstance.windowId, vueInstance.$store.getters.id, vueInstance.currentTabIndex, active);
-        const tabObject: store.TabObject = vueInstance.getTabObject(tabHolder.index);
-        tabHolder.update(tabObject.url, tabObject.title, tabObject.favicon);
-        tabArray[tabHolder.id] = tabHolder;
-      } else {
-        // however, if tabIndex has a value, then we find or create one
-        const tabObject: store.TabObject = vueInstance.getTabObject(tabIndex);
-        if (tabObject === undefined) {
-          return tabHolder;
-        }
-        tabHolder = tabArray[tabObject.id];
-        if (tabHolder === undefined) {
-          tabHolder = new Tab(vueInstance.windowId, tabObject.id, tabIndex, active);
-          tabHolder.update(tabObject.url, tabObject.title, tabObject.favicon);
-          tabArray[tabObject.id] = tabHolder;
-        } else {
-          tabArray[tabObject.id].update(tabObject.url, tabObject.title, tabObject.favicon);
-          tabHolder = tabArray[tabObject.id];
-        }
-      }
-      if ((tabHolder.index !== -1) && active) {
-        tabArray.map(tab => tab.activate(false));
-        tabArray[tabHolder.id].activate(true);
-        tabHolder = tabArray[tabHolder.id];
-        vueInstance.onTabClick(tabHolder.index);
-      }
-      return tabArray[tabHolder.id];
-    } else {
-      // if we have tabId, then we just find or create one
-      if (tabArray[tabId] === undefined) {
-        const index = vueInstance.tabs.findIndex(tab => (tab.id === tabId));
-        if (index === -1) {
-          return tabHolder;
-        }
-        tabHolder = new Tab(vueInstance.windowId, tabId, index, active);
-        const tabObject: store.TabObject = vueInstance.getTabObject(tabHolder.index);
-        tabHolder.update(tabObject.url, tabObject.title, tabObject.favicon);
-        tabArray[tabId] = tabHolder;
-      }
-      if (active) {
-        tabArray.map(tab => tab.activate(false));
-        tabArray[tabId].activate(true);
-        vueInstance.onTabClick(tabArray[tabId].index);
-      }
-      return tabArray[tabId];
+function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number, tabIndex?: number): store.TabObject {
+  const dummyTabObject: store.TabObject = vueInstance.$store.getters.tabConfig.dummyTabObject;
+  // if tabId === -1, we then just return a Tab instance with id = -1
+  if (tabId === -1) {
+    return dummyTabObject;
+  } else if (tabId === 0) {
+    // if tabId === 0, then we just find the Tab having located at that tabIndex
+    const tabObject: store.TabObject = vueInstance.getTabObject(tabIndex);
+    if (tabObject === undefined) {
+      return dummyTabObject;
     }
+    if (active) {
+      vueInstance.onTabClick(tabIndex);
+    }
+    return tabObject;
   } else {
-    tabArray.length = 0;
-    vueInstance.$store.getters.tabs.forEach((tab, index) => {
-      findAndUpdateOrCreate(vueInstance, (index === vueInstance.currentTabIndex), 0, index);
-      if (tabArray[tab.id]) {
-        tabArray[tab.id].update(tab.url, tab.title, tab.favicon);
-      }
-    });
-    return tabHolder;
+    // if we have tabId, then we just find one
+    const tabObject: store.TabObject = vueInstance.tabs.find(tab => (tab.id === tabId));
+    if (tabObject === undefined) {
+      return dummyTabObject;
+    }
+    if (active) {
+      vueInstance.onTabClick(tabObject.index);
+    }
+    return tabObject;
   }
 }
 
@@ -154,11 +111,11 @@ export default (vueInstance: any) => {
   };
 
   const tabs = {
-    get: (tabId: number): Tab => {
+    get: (tabId: number): store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       return tab;
     },
-    getCurrent: (guestInstanceId: number): Tab => {
+    getCurrent: (guestInstanceId: number): store.TabObject => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       if (webContents) {
         const tabIndex = vueInstance.mappings[webContents.id];
@@ -180,17 +137,16 @@ export default (vueInstance: any) => {
       }
       webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
-    query: (queryInfo: chrome.tabs.QueryInfo): Tab[] => {
-      findAndUpdateOrCreate(vueInstance, false);
+    query: (queryInfo: chrome.tabs.QueryInfo): store.TabObject[] => {
       if (Object.keys(queryInfo).length === 0) {
-        return tabArray;
+        return vueInstance.tabs;
       } else {
-        const tabs: Tab[] = [];
+        const tabs: store.TabObject[] = [];
         if (queryInfo.currentWindow) {
           delete queryInfo.currentWindow;
           queryInfo.windowId = vueInstance.windowId;
         }
-        tabArray.forEach((tab) => {
+        vueInstance.tabs.forEach((tab) => {
           if (Object.keys(queryInfo).every(k => (queryInfo[k] === tab[k]))) {
             tabs.push(tab);
           }
@@ -198,7 +154,7 @@ export default (vueInstance: any) => {
         return tabs;
       }
     },
-    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties): Tab => {
+    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties): store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (updateProperties.url) {

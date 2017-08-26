@@ -276,6 +276,7 @@ function bumpWindowIds(bumpWindowIdsBy: number) {
 }
 
 export default {
+  getStore: () => store,
   register,
   dispatch,
   windowStateSave,

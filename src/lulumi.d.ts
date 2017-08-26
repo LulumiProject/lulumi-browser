@@ -52,12 +52,22 @@ declare module 'lulumi' {
   export namespace store {
     // store
     export interface TabObject {
-      id: number;
-      windowId: number;
-      url: string;
+      id: number; // 頁籤的標識符。(某些狀況可能會沒有id)
+      index: number; // 頁籤在所在窗口中的索引，從 0 開始。
+      windowId: number; // 頁籤所在窗口的標識符。
+      openerTabId?: number; // 使用哪個已存在的頁籤打開指定的網址。
+      highlighted: boolean; // 頁籤是否為高亮狀態。
+      active: boolean; // 頁籤是否是窗口中的活動頁籤。 （因為視窗不一定是focus的狀態。）
+      pinned: boolean; // 頁籤是否固定。(指定為tue的頁籤，不能移動，也沒有關閉鈕)
+      url: string; // 頁籤中顯示的 URL。需要 "tabs" 權限
+      title: string | null; // 頁籤的標題，如果頁籤正在加載它也可能是空字符串。需要 "tabs" 權限
+      favIconUrl: string | null; // 頁籤的收藏夾圖標 URL，如果頁籤正在加載它也可能是空字符串。需要 "tabs" 權限
+      status: string | null; // "loading"（正在加載）或 "complete"（完成）。
+      incognito: boolean; // 頁籤是否在隱身窗口中。
+      width?: number; // 頁籤寬度，以像素為單位。
+      height?: number; // 頁籤高度，以像素為單位。
+      sessionId?: number; // session標識符。(如果使用session匯入tab可能導致沒有tab的id而只有session的id)
       statusText: string | boolean;
-      favicon: string | null;
-      title: string | null;
       isLoading: boolean;
       isSearching: boolean;
       canGoBack: boolean;
@@ -81,7 +91,7 @@ declare module 'lulumi' {
     export interface TabHistory {
       title: string | null;
       url: string;
-      favicon: string | null;
+      favIconUrl: string | null;
       label: string;
       time: string;
     }
@@ -101,7 +111,7 @@ declare module 'lulumi' {
     export interface LastOpenedTabObject {
       title: string | null;
       url: string;
-      favicon: string | null;
+      favIconUrl: string | null;
     }
     export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
       windowId: number;

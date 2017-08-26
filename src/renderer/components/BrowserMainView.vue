@@ -128,7 +128,7 @@
         if (!out[h.url]) {
           out[h.url] = {
             title: h.title,
-            icon: h.favicon,
+            icon: h.favIconUrl,
           };
         }
       });
@@ -708,9 +708,8 @@
           });
         }
       }
-      const TabObject: store.TabObject = this.getTabObject(this.currentTabIndex);
-      if ((process.env.NODE_ENV !== 'testing') && TabObject) {
-        this.onCreatedEvent.emit(this.extensionService.getTab(this.windowId, TabObject.id));
+      if ((process.env.NODE_ENV !== 'testing')) {
+        this.onCreatedEvent.emit(this.getTabObject(this.currentTabIndex));
       }
     }
     onTabDuplicate(tabIndex: number): void {
@@ -733,11 +732,9 @@
       }
     }
     onTabClose(tabIndex: number): void {
-      const tabId: number = this.getTabObject(tabIndex).id;
-      this.onRemovedEvent.emit(this.extensionService.getTab(this.windowId, tabId, true).id, {
-        windowId: this.windowId,
-        isWindowClosing: false,
-      });
+      const TabObject: store.TabObject = this.getTabObject(tabIndex);
+      const tabId: number = TabObject.id;
+      this.onRemovedEvent.emit(TabObject);
       this.$store.dispatch('closeTab', {
         windowId: this.windowId,
         tabId,

@@ -28,11 +28,17 @@ const state: store.State = {
 function createTabObject(state: store.State, wid: number, openUrl: string | null = null): store.TabObject {
   return {
     id: 0,
+    index: 0,
     windowId: wid,
+    highlighted: false,
+    active: false,
+    pinned: false,
     url: openUrl || state.tabConfig.dummyTabObject.url,
-    statusText: false,
-    favicon: null,
     title: null,
+    favIconUrl: null,
+    status: null,
+    incognito: false,
+    statusText: false,
     isLoading: false,
     isSearching: false,
     canGoBack: false,
@@ -68,12 +74,17 @@ const mutations = {
       state.tabs.push(createTabObject(state, windowId));
     }
     const last = state.tabs.filter(tab => tab.windowId === windowId).length - 1;
-    state.tabs[state.tabs.length - 1].id = state.tabId;
+    Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
+    Vue.set(state.tabs[state.tabs.length - 1], 'index', last);
     if (url) {
       if (follow) {
+        Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
+        Vue.set(state.tabs[state.tabs.length - 1], 'active', true);
         Vue.set(state.currentTabIndexes, windowId, last);
       }
     } else {
+      Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
+      Vue.set(state.tabs[state.tabs.length - 1], 'active', true);
       Vue.set(state.currentTabIndexes, windowId, last);
     }
   },
@@ -90,7 +101,7 @@ const mutations = {
         state.lastOpenedTabs.unshift({
           title: state.tabs[tabsIndex].title,
           url: state.tabs[tabsIndex].url,
-          favicon: state.tabs[tabsIndex].favicon,
+          favIconUrl: state.tabs[tabsIndex].favIconUrl,
         });
       }
 
@@ -98,7 +109,10 @@ const mutations = {
         Vue.delete(state.tabs, tabsIndex);
         state.tabId += 1;
         state.tabs.push(createTabObject(state, windowId));
-        state.tabs[state.tabs.length - 1].id = state.tabId;
+        Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
+        Vue.set(state.tabs[state.tabs.length - 1], 'index', 0);
+        Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
+        Vue.set(state.tabs[state.tabs.length - 1], 'active', true);
         Vue.set(state.currentTabIndexes, windowId, 0);
       } else {
         // find the nearest adjacent tab to make active
@@ -123,8 +137,18 @@ const mutations = {
             if (tabs[mapping.indexOf(i)]) {
               if (mapping.indexOf(i) > tabIndex) {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i) - 1);
+                const index: number
+                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i) - 1].id));
+                Vue.set(state.tabs[index], 'index', i - 1);
+                Vue.set(state.tabs[index], 'highlighted', true);
+                Vue.set(state.tabs[index], 'active', true);
               } else {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i));
+                const index: number
+                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i)].id));
+                Vue.set(state.tabs[index], 'index', i);
+                Vue.set(state.tabs[index], 'highlighted', true);
+                Vue.set(state.tabs[index], 'active', true);
               }
               return;
             }
@@ -133,8 +157,18 @@ const mutations = {
             if (tabs[mapping.indexOf(i)]) {
               if (mapping.indexOf(i) > tabIndex) {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i) - 1);
+                const index: number
+                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i) - 1].id));
+                Vue.set(state.tabs[index], 'index', i - 1);
+                Vue.set(state.tabs[index], 'highlighted', true);
+                Vue.set(state.tabs[index], 'active', true);
               } else {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i));
+                const index: number
+                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i)].id));
+                Vue.set(state.tabs[index], 'index', i);
+                Vue.set(state.tabs[index], 'highlighted', true);
+                Vue.set(state.tabs[index], 'active', true);
               }
               return;
             }
@@ -142,6 +176,11 @@ const mutations = {
         } else if (currentTabIndex > tabIndex) {
           Vue.delete(state.tabs, tabsIndex);
           Vue.set(state.currentTabIndexes, windowId, currentTabIndex - 1);
+          const index: number
+            = state.tabs.findIndex(tab => (tab.id === tabs[currentTabIndex - 1].id));
+          Vue.set(state.tabs[index], 'index', currentTabIndex - 1);
+          Vue.set(state.tabs[index], 'highlighted', true);
+          Vue.set(state.tabs[index], 'active', true);
         } else {
           Vue.delete(state.tabs, tabsIndex);
         }
@@ -161,7 +200,9 @@ const mutations = {
     const tabIndex: number = payload.tabIndex;
 
     Vue.set(state.currentTabIndexes, windowId, tabIndex);
-    state.currentTabIndexes[windowId] = tabIndex;
+    // const index: number = state.tabs.findIndex(tab => (tab.id === tabId));
+    // Vue.set(state.tabs[index], 'highlighted', true);
+    // Vue.set(state.tabs[index], 'active', true);
   },
   // tab handlers
   [types.DID_START_LOADING](state: store.State, payload) {
@@ -175,6 +216,7 @@ const mutations = {
     if (state.tabs[tabsIndex]) {
       state.tabs[tabsIndex].url = url;
       state.tabs[tabsIndex].isLoading = true;
+      state.tabs[tabsIndex].status = 'loading';
       state.tabs[tabsIndex].error = false;
     }
   },
@@ -237,7 +279,7 @@ const mutations = {
           state.tabs[tabsIndex].canGoForward = payload.canGoForward;
           state.tabs[tabsIndex].isLoading = false;
         }
-        state.tabs[tabsIndex].favicon = config.tabConfig.lulumiFavicon;
+        state.tabs[tabsIndex].favIconUrl = config.tabConfig.lulumiFavicon;
       } else {
         if (state.tabs[tabsIndex].title === '') {
           state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
@@ -251,7 +293,7 @@ const mutations = {
               state.history.unshift({
                 title: state.tabs[tabsIndex].title,
                 url: state.tabs[tabsIndex].url,
-                favicon: config.tabConfig.defaultFavicon,
+                favIconUrl: config.tabConfig.defaultFavicon,
                 label: date.split(' ')[0],
                 time: date.split(' ')[1],
               });
@@ -261,7 +303,7 @@ const mutations = {
             state.history.unshift({
               title: state.tabs[tabsIndex].title,
               url: state.tabs[tabsIndex].url,
-              favicon: config.tabConfig.defaultFavicon,
+              favIconUrl: config.tabConfig.defaultFavicon,
               label: date.split(' ')[0],
               time: date.split(' ')[1],
             });
@@ -269,6 +311,7 @@ const mutations = {
         }
       }
       state.tabs[tabsIndex].isLoading = false;
+      state.tabs[tabsIndex].status = 'complete';
     }
   },
   [types.PAGE_FAVICON_UPDATED](state: store.State, payload) {
@@ -280,7 +323,7 @@ const mutations = {
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex]) {
-      state.tabs[tabsIndex].favicon = url;
+      state.tabs[tabsIndex].favIconUrl = url;
     }
   },
   [types.DID_STOP_LOADING](state: store.State, payload) {
@@ -294,14 +337,14 @@ const mutations = {
 
     if (state.tabs[tabsIndex] && url !== null) {
       if (!url.match(regexp)) {
-        if (!state.tabs[tabsIndex].favicon) {
-          state.tabs[tabsIndex].favicon = config.tabConfig.defaultFavicon;
+        if (!state.tabs[tabsIndex].favIconUrl) {
+          state.tabs[tabsIndex].favIconUrl = config.tabConfig.defaultFavicon;
         }
         // update favicon of the certain history
         if (state.tabs[tabsIndex].title !== 'error') {
           for (let i = 0; i < ((state.history.length < 10) ? state.history.length : 10); i += 1) {
             if (state.history[i].url === url) {
-              state.history[i].favicon = state.tabs[tabsIndex].favicon;
+              state.history[i].favIconUrl = state.tabs[tabsIndex].favIconUrl;
             }
           }
         }
