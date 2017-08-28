@@ -75,7 +75,6 @@ const mutations = {
     }
     const last = state.tabs.filter(tab => tab.windowId === windowId).length - 1;
     Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
-    Vue.set(state.tabs[state.tabs.length - 1], 'index', last);
     if (url) {
       if (follow) {
         Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
@@ -110,7 +109,6 @@ const mutations = {
         state.tabId += 1;
         state.tabs.push(createTabObject(state, windowId));
         Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
-        Vue.set(state.tabs[state.tabs.length - 1], 'index', 0);
         Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
         Vue.set(state.tabs[state.tabs.length - 1], 'active', true);
         Vue.set(state.currentTabIndexes, windowId, 0);
@@ -138,15 +136,13 @@ const mutations = {
               if (mapping.indexOf(i) > tabIndex) {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i) - 1);
                 const index: number
-                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i) - 1].id));
-                Vue.set(state.tabs[index], 'index', i - 1);
+                  = state.tabs.findIndex(tab => (tab.id === state.tabs[mapping.indexOf(i) - 1].id));
                 Vue.set(state.tabs[index], 'highlighted', true);
                 Vue.set(state.tabs[index], 'active', true);
               } else {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i));
                 const index: number
-                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i)].id));
-                Vue.set(state.tabs[index], 'index', i);
+                  = state.tabs.findIndex(tab => (tab.id === state.tabs[mapping.indexOf(i)].id));
                 Vue.set(state.tabs[index], 'highlighted', true);
                 Vue.set(state.tabs[index], 'active', true);
               }
@@ -158,15 +154,13 @@ const mutations = {
               if (mapping.indexOf(i) > tabIndex) {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i) - 1);
                 const index: number
-                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i) - 1].id));
-                Vue.set(state.tabs[index], 'index', i - 1);
+                  = state.tabs.findIndex(tab => (tab.id === state.tabs[mapping.indexOf(i) - 1].id));
                 Vue.set(state.tabs[index], 'highlighted', true);
                 Vue.set(state.tabs[index], 'active', true);
               } else {
                 Vue.set(state.currentTabIndexes, windowId, mapping.indexOf(i));
                 const index: number
-                  = state.tabs.findIndex(tab => (tab.id === tabs[mapping.indexOf(i)].id));
-                Vue.set(state.tabs[index], 'index', i);
+                  = state.tabs.findIndex(tab => (tab.id === state.tabs[mapping.indexOf(i)].id));
                 Vue.set(state.tabs[index], 'highlighted', true);
                 Vue.set(state.tabs[index], 'active', true);
               }
@@ -177,8 +171,7 @@ const mutations = {
           Vue.delete(state.tabs, tabsIndex);
           Vue.set(state.currentTabIndexes, windowId, currentTabIndex - 1);
           const index: number
-            = state.tabs.findIndex(tab => (tab.id === tabs[currentTabIndex - 1].id));
-          Vue.set(state.tabs[index], 'index', currentTabIndex - 1);
+            = state.tabs.findIndex(tab => (tab.id === state.tabs[currentTabIndex - 1].id));
           Vue.set(state.tabs[index], 'highlighted', true);
           Vue.set(state.tabs[index], 'active', true);
         } else {
