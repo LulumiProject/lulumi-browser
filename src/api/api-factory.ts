@@ -31,6 +31,10 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
   }
 }
 
+function getBuiltInTabIndex(vueInstance: any, tabIndexThatWeSee: number): number {
+  return vueInstance.tabs.findIndex(tab => tab.index === tabIndexThatWeSee);
+}
+
 // vueInstance is an instance of BrowserMainView
 export default (vueInstance: any) => {
   const env = {
@@ -158,7 +162,7 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (updateProperties.url) {
-          vueInstance.getTab(tab.index).$refs.webview.loadURL(updateProperties.url);
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.loadURL(updateProperties.url);
         }
         if (updateProperties.active) {
           findAndUpdateOrCreate(vueInstance, true, tabId);
@@ -171,9 +175,9 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (reloadProperties.bypassCache) {
-          vueInstance.getTab(tab.index).$refs.webview.reloadIgnoringCache();
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.reloadIgnoringCache();
         } else {
-          vueInstance.getTab(tab.index).$refs.webview.reload();
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.reload();
         }
       }
     },
@@ -196,14 +200,14 @@ export default (vueInstance: any) => {
       targetTabIds.forEach((tabId) => {
         const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
         if (tab.windowId === vueInstance.windowId) {
-          vueInstance.onTabClose(tab.index);
+          vueInstance.onTabClose(getBuiltInTabIndex(vueInstance, tab.index));
         }
       });
     },
     detectLanguage: (tabId: number, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
-        vueInstance.getTab(tab.index).$refs.webview.executeJavaScript(`
+        vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
           ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
         `);
       }
@@ -212,7 +216,7 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (details.code) {
-          vueInstance.getTab(tab.index).$refs.webview.executeJavaScript(details.code, false);
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(details.code, false);
         }
       }
     },
@@ -220,14 +224,14 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (details.code) {
-          vueInstance.getTab(tab.index).$refs.webview.insertCSS(details.code);
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.insertCSS(details.code);
         }
       }
     },
     sendMessage: (tabId: number, message: any): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
-        vueInstance.getTab(tab.index).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
+        vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
       }
     },
     onActivated: vueInstance.onActivatedEvent,
@@ -274,9 +278,9 @@ export default (vueInstance: any) => {
     getFrame: (details: chrome.webNavigation.GetFrameDetails, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
-        const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
+        const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
         if (details.processId === processId) {
-          vueInstance.getTab(tab.index).$refs.webview.executeJavaScript(`
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
             String.prototype.hashCode = function() {
               var hash = 0, i, chr;
               if (this.length === 0) return hash;
@@ -325,8 +329,8 @@ export default (vueInstance: any) => {
     getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
-        const processId = vueInstance.getWebView(tab.index).getWebContents().getOSProcessId();
-        vueInstance.getTab(tab.index).$refs.webview.executeJavaScript(`
+        const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
+        vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
           String.prototype.hashCode = function() {
             var hash = 0, i, chr;
             if (this.length === 0) return hash;

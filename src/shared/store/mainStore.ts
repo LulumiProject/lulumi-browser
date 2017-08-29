@@ -164,15 +164,9 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.TabObjec
     const oldTabs: store.TabObject[]
       = store.getters.tabs.filter(tab => tab.windowId === id);
     const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
-    if (tabsOrder.length < oldTabs.length) {
-      for (let index = 0; index < oldTabs.length; index += 1) {
-        tmpTabs.push((Object.assign({}, oldTabs[index]) as any));
-      }
-    } else {
-      oldTabs.forEach((tab, index) => {
-        tmpTabs.push((Object.assign({}, oldTabs[tabsOrder[index]]) as any));
-      });
-    }
+    oldTabs.forEach((tab, index) => {
+      tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
+    });
     tmpTabs.forEach((tab) => {
       tab.id = (newTabId += 1);
       tab.windowId = windowId;

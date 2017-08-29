@@ -707,10 +707,13 @@ ipcMain.on('lulumi-web-navigation-get-frame-result', (event, details, webContent
   });
 });
 ipcMain.on('lulumi-web-navigation-get-all-frames', (event, details) => {
-  const window = BrowserWindow.getFocusedWindow();
-  window.webContents.send('lulumi-web-navigation-get-all-frames', {
-    details,
-    webContentsId: event.sender.id,
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-web-navigation-get-all-frames', {
+      details,
+      webContentsId: event.sender.id,
+    });
   });
 });
 ipcMain.on('lulumi-web-navigation-get-all-frames-result', (event, details, webContentsId) => {

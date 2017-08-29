@@ -17,6 +17,8 @@ const webRequestMapping = {
   onErrorOccurred: {},
 };
 
+ipcMain.setMaxListeners(0);
+
 const register = (eventName: any, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
   if ((eventName === 'onBeforeRequest') || (eventName === 'onBeforeSendHeaders')) {
     sess.webRequest[eventName](filter, (details, callback) => {
@@ -31,7 +33,6 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       }
       details.tabId = (sess as any).id;
 
-      ipcMain.setMaxListeners(0);
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
         if (response) {
           callback(response);
@@ -52,7 +53,6 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       details.type = details.resourceType;
       details.tabId = (sess as any).id;
 
-      ipcMain.setMaxListeners(0);
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
         if (response) {
           callback(response);

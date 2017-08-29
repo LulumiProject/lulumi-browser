@@ -108,16 +108,16 @@
       }
     }
 
-    getWebView(i?: number): Electron.WebviewTag {
-      const index: number = (i === undefined) ? this.currentTabIndex : i;
+    getWebView(tabIndex?: number): Electron.WebviewTag {
+      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
       return this.$refs[`tab-${index}`][0].$refs.webview;
     }
-    getTab(i?: number): Tab {
-      const index: number = (i === undefined) ? this.currentTabIndex : i;
+    getTab(tabIndex?: number): Tab {
+      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
       return this.$refs[`tab-${index}`][0];
     }
-    getTabObject(i?: number): store.TabObject {
-      const index: number = (i === undefined) ? this.currentTabIndex : i;
+    getTabObject(tabIndex?: number): store.TabObject {
+      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
       return this.tabs[index];
     }
     historyMappings() {
@@ -1294,8 +1294,8 @@
         this.getTab(this.currentTabIndex).findInPage();
       });
 
-      ipc.on('tab-click', (event, tabIndex) => {
-        this.onTabClick(tabIndex);
+      ipc.on('tab-click', (event, tabIndexThatWeSee) => {
+        (document.querySelectorAll('.chrome-tab-draggable')[tabIndexThatWeSee] as HTMLElement).click();
       });
 
       ipc.on('open-pdf', (event, data) => {
