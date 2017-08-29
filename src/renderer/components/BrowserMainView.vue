@@ -708,9 +708,15 @@
           });
         }
       }
-      if ((process.env.NODE_ENV !== 'testing')) {
-        this.onCreatedEvent.emit(this.getTabObject(this.currentTabIndex));
-      }
+      setTimeout(() => {
+        this.$store.dispatch('setTabsOrder', {
+          windowId: this.windowId,
+          tabsOrder: (this.$refs.tabs as Tabs).sortable.toArray(),
+        });
+        if ((process.env.NODE_ENV !== 'testing')) {
+          this.onCreatedEvent.emit(this.getTabObject(this.currentTabIndex));
+        }
+      }, 300);
     }
     onTabDuplicate(tabIndex: number): void {
       this.onNewTab(this.windowId, this.getTab[tabIndex].url, true);

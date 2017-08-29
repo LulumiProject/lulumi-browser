@@ -436,7 +436,10 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
         if (counting === count) {
           ipcRenderer.removeAllListeners('lulumi-tabs-query-result');
           if (callback) {
-            callback(collect(results).flatten(1).sortBy('windowId').all());
+            // https://github.com/ecrmnn/collect.js#reduce
+            callback(
+              collect(Object.values(collect(results).flatten(1).groupBy('windowId').all())).reduce(
+                (a, b) => collect(a).sortBy('index').all().concat(collect(b).sortBy('index').all()), []));
           }
         }
       });

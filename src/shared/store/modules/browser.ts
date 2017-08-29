@@ -437,6 +437,13 @@ const mutations = {
     const tabsOrder: string[] = payload.tabsOrder;
     if (tabsOrder.length !== 0) {
       Vue.set(state.tabsOrder, windowId, tabsOrder.map(element => parseInt(element, 10)));
+      // assigning new indexes to tabs
+      const tabs = state.tabs.filter(tab => tab.windowId === windowId);
+      for (let index = 0; index < tabs.length; index += 1) {
+        const tabsIndex: number
+          = state.tabs.findIndex(tab => (tabs[tabsOrder[index]].id === tab.id));
+        Vue.set(state.tabs[tabsIndex], 'index', index);
+      }
     }
   },
   [types.SET_PAGE_ACTION](state: store.State, payload) {
