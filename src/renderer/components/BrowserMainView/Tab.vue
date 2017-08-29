@@ -86,7 +86,7 @@
       if (this.hidden) {
         this.findinpage.start();
         this.findinpage.counter.textContent = `
-          ${this.$t('page.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('page.findInPage.match', 1)}
+          ${this.$t('tab.findInPage.status', { activeMatch: 0, matches: 0 })} ${this.$tc('tab.findInPage.match', 1)}
         `;
       } else {
         this.findinpage.input.focus();

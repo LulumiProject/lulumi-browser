@@ -196,7 +196,7 @@ export default {
       placeholder: '在页面中找寻',
       of: '/',
       match: '符合',
-      status: '%{activeMatch} @:page.findInPage.of %{matches}',
+      status: '%{activeMatch} @:tab.findInPage.of %{matches}',
     },
   },
   tabs: {

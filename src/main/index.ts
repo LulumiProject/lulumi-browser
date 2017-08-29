@@ -2,11 +2,13 @@ import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
 import { app, BrowserWindow, ipcMain, protocol, shell, systemPreferences } from 'electron';
-import menu from './js/lib/menu';
-import session from './js/lib/session';
+
 import autoUpdater from './js/lib/auto-updater';
 import config from './js/constants/config';
+import localshortcut from 'electron-localshortcut';
+import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
+import session from './js/lib/session';
 
 import { api, scheme } from 'lulumi';
 
@@ -103,6 +105,16 @@ function createWindow(options: Electron.BrowserWindowConstructorOptions | undefi
   }
 
   mainWindow.loadURL(winURL);
+  for (let index = 1; index < 9; index += 1) {
+    localshortcut.register(mainWindow, `CmdOrCtrl+${index}`, () => {
+      mainWindow.webContents.send('tab-click', index - 1);
+    });
+  }
+  // special case: go to the last tab
+  localshortcut.register(mainWindow, `CmdOrCtrl+9`, () => {
+    mainWindow.webContents.send('tab-click', -1);
+  });
+
   menu.init();
 
   if (process.env.NODE_ENV !== 'development') {
@@ -130,6 +142,7 @@ function createWindow(options: Electron.BrowserWindowConstructorOptions | undefi
   });
 
   mainWindow.on('closed', () => {
+    localshortcut.unregisterAll(mainWindow);
     if (setLanguage) {
       createWindow();
       setLanguage = false;

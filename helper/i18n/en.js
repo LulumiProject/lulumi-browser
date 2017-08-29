@@ -196,7 +196,7 @@ export default {
       placeholder: 'Search in Page',
       of: 'of',
       match: 'match | matches',
-      status: '%{activeMatch} @:page.findInPage.of %{matches}',
+      status: '%{activeMatch} @:tab.findInPage.of %{matches}',
     },
   },
   tabs: {

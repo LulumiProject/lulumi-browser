@@ -71,7 +71,7 @@ const getTemplate = () => {
         {
           label: i18n.t('edit.find'),
           accelerator: 'CmdOrCtrl+F',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('startFindInPage'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('start-find-in-page'),
         },
         {
           label: i18n.t('edit.speech.title'),

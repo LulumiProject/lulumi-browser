@@ -722,34 +722,44 @@
       this.onNewTab(this.windowId, this.getTab[tabIndex].url, true);
     }
     onTabClick(tabIndex: number): void {
+      if (tabIndex === -1) {
+        tabIndex = this.tabs.length - 1;
+      }
       const TabObject: store.TabObject = this.getTabObject(tabIndex);
-      const tabId: number = TabObject.id;
-      const tabTitle: string | null = TabObject.title;
-      this.$store.dispatch('clickTab', {
-        windowId: this.windowId,
-        tabId,
-        tabIndex,
-      });
-      if (tabTitle) {
-        (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+      if (TabObject) {
+        const tabId: number = TabObject.id;
+        const tabTitle: string | null = TabObject.title;
+        this.$store.dispatch('clickTab', {
           windowId: this.windowId,
-          title: tabTitle,
+          tabId,
+          tabIndex,
         });
+        if (tabTitle) {
+          (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+            windowId: this.windowId,
+            title: tabTitle,
+          });
+        }
       }
     }
     onTabClose(tabIndex: number): void {
+      if (tabIndex === -1) {
+        tabIndex = this.tabs.length - 1;
+      }
       const TabObject: store.TabObject = this.getTabObject(tabIndex);
-      const tabId: number = TabObject.id;
-      this.onRemovedEvent.emit(TabObject);
-      this.$store.dispatch('closeTab', {
-        windowId: this.windowId,
-        tabId,
-        tabIndex,
-      });
-      setTimeout(() => this.$store.dispatch('setTabsOrder', {
-        windowId: this.windowId,
-        tabsOrder: (this.$refs.tabs as Tabs).sortable.toArray(),
-      }), 300);
+      if (TabObject) {
+        const tabId: number = TabObject.id;
+        this.onRemovedEvent.emit(TabObject);
+        this.$store.dispatch('closeTab', {
+          windowId: this.windowId,
+          tabId,
+          tabIndex,
+        });
+        setTimeout(() => this.$store.dispatch('setTabsOrder', {
+          windowId: this.windowId,
+          tabsOrder: (this.$refs.tabs as Tabs).sortable.toArray(),
+        }), 300);
+      }
     }
     // navHandlers
     onClickHome(): void {
@@ -1280,8 +1290,12 @@
 
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
-      ipc.on('startFindInPage', () => {
+      ipc.on('start-find-in-page', () => {
         this.getTab(this.currentTabIndex).findInPage();
+      });
+
+      ipc.on('tab-click', (event, tabIndex) => {
+        this.onTabClick(tabIndex);
       });
 
       ipc.on('open-pdf', (event, data) => {
