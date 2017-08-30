@@ -62,5 +62,15 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
     label: string,
     time: string,
   }],
+  windows: [{
+    id: number,
+    width: number,
+    height: number,
+    left: number,
+    top: number,
+    focused: boolean,
+    state: string,
+    type: string,
+  }],
 }
 ```
