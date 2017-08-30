@@ -41,10 +41,68 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
+function handleWindowProperty(store: Vuex.Store<any>, window: Electron.BrowserWindow, action: string) {
+  const bounds: Electron.Rectangle = window.getBounds();
+  let windowState: string = 'normal';
+  if (window.isFullScreen()) {
+    windowState = 'fullscreen';
+  } else if (window.isMaximized()) {
+    windowState = 'maximized';
+  } else if (window.isMinimized()) {
+    windowState = 'minimized';
+  }
+  if (action === 'create') {
+    store.dispatch('createWindow', {
+      windowId: window.id,
+      width: bounds.width,
+      height: bounds.height,
+      left: bounds.x,
+      top: bounds.y,
+      windowState,
+      type: (window.webContents as any).getType(),
+    });
+  } else if (action === 'update') {
+    store.dispatch('updateWindowProperty', {
+      windowId: window.id,
+      width: bounds.width,
+      height: bounds.height,
+      left: bounds.x,
+      top: bounds.y,
+      focused: window.isFocused(),
+      windowState,
+    });
+  }
+}
+
 const register = (storagePath: string, swipeGesture: boolean): void => {
   ipcMain.on('vuex-connect', (event: Electron.Event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     window.setMaxListeners(0);
+
+    window.on('blur', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('focus', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('maximize', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('unmaximize', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('minimize', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('restore', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('resize', () => {
+      handleWindowProperty(store, window, 'update');
+    });
+    window.on('move', () => {
+      handleWindowProperty(store, window, 'update');
+    });
 
     window.on('scroll-touch-begin', () => {
       window.webContents.send('scroll-touch-begin', swipeGesture);
@@ -70,9 +128,17 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         ipcMain.once(('window-close' as any), () => {
           store.dispatch('closeWindow', window.id);
           delete windows[window.id];
-          window.webContents.removeAllListeners('scroll-touch-begin');
+          window.webContents.removeAllListeners('blur');
+          window.webContents.removeAllListeners('focus');
+          window.webContents.removeAllListeners('maximize');
+          window.webContents.removeAllListeners('unmaximize');
+          window.webContents.removeAllListeners('minimize');
+          window.webContents.removeAllListeners('restore');
+          window.webContents.removeAllListeners('resize');
+          window.webContents.removeAllListeners('move');
           window.webContents.removeAllListeners('scroll-touch-end');
           window.webContents.removeAllListeners('scroll-touch-edge');
+          window.webContents.removeAllListeners('window-id');
           close = true;
           window.close();
         });
@@ -81,25 +147,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       }
     });
 
-    // window state
-    const bounds: Electron.Rectangle = window.getBounds();
-    let windowState: string = 'normal';
-    if (window.isFullScreen()) {
-      windowState = 'fullscreen';
-    } else if (window.isMaximized()) {
-      windowState = 'maximized';
-    } else if (window.isMinimized()) {
-      windowState = 'minimized';
-    }
-    store.dispatch('createWindow', {
-      windowId: window.id,
-      width: bounds.width,
-      height: bounds.height,
-      left: bounds.x,
-      top: bounds.y,
-      windowState,
-      type: (window.webContents as any).getType(),
-    });
+    handleWindowProperty(store, window, 'create');
 
     windows[window.id] = window;
     event.returnValue = store.state;
@@ -117,24 +165,7 @@ const dispatch = (state) => {
 
 const windowStateSave = (): void => {
   Object.values(windows).forEach((window) => {
-    const bounds: Electron.Rectangle = window.getBounds();
-    let windowState: string = 'normal';
-    if (window.isFullScreen()) {
-      windowState = 'fullscreen';
-    } else if (window.isMaximized()) {
-      windowState = 'maximized';
-    } else if (window.isMinimized()) {
-      windowState = 'minimized';
-    }
-    store.dispatch('updateWindowProperty', {
-      windowId: window.id,
-      width: bounds.width,
-      height: bounds.height,
-      left: bounds.x,
-      top: bounds.y,
-      focused: window.isFocused(),
-      windowState,
-    });
+    handleWindowProperty(store, window, 'update');
   });
 };
 
