@@ -488,6 +488,25 @@ export default class ExtensionService {
       }
     });
 
+    ipc.on('lulumi-windows-get', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-windows-get-result', require('lulumi').windows.get(data.windowId, data.getInfo));
+      }
+    });
+    ipc.on('lulumi-windows-get-current', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-windows-get-current-result', require('lulumi').windows.getCurrent(data.getInfo, data.guestInstanceId));
+      }
+    });
+    ipc.on('lulumi-windows-get-all', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send('lulumi-windows-get-all-result', require('lulumi').windows.getAll(data.getInfo));
+      }
+    });
+
     ipc.on('lulumi-storage-add-listener-on-changed', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);

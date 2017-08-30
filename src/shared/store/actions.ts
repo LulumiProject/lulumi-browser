@@ -228,13 +228,13 @@ export const actions = {
     commit(types.SET_APP_STATE, { newState });
   },
 
-  createWindow({ commit }, { windowId, width, height, x, y, windowState, type }) {
+  createWindow({ commit }, { windowId, width, height, left, top, windowState, type }) {
     commit(types.CREATE_WINDOW, {
       windowId,
       width,
       height,
-      x,
-      y,
+      left,
+      top,
       windowState,
       type,
     });
@@ -242,13 +242,13 @@ export const actions = {
   closeWindow({ commit }, windowId) {
     commit(types.CLOSE_WINDOW, { windowId });
   },
-  updateWindowProperty({ commit }, { windowId, width, height, x, y, focused, windowState }) {
+  updateWindowProperty({ commit }, { windowId, width, height, left, top, focused, windowState }) {
     commit(types.UPDATE_WINDOW_PROPERTY, {
       windowId,
       width,
       height,
-      x,
-      y,
+      left,
+      top,
       focused,
       windowState,
     });

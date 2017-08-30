@@ -114,9 +114,12 @@ declare module 'lulumi' {
       favIconUrl: string | null;
     }
     export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
-      windowId: number;
+      id: number;
       focused?: boolean;
-      windowState: string;
+      left: number;
+      top: number;
+      state: string;
+      tabs?: TabObject[];
     }
     export interface State {
       tabId: number;

@@ -76,6 +76,9 @@
     get dummyTabObject(): store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
     }
+    get window(): store.LulumiBrowserWindowProperty {
+      return this.$store.getters.windows.find(window => window.id === this.windowId);
+    }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }

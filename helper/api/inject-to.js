@@ -445,7 +445,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       });
       ipcRenderer.send('lulumi-tabs-query', queryInfo);
     },
-    update: (tabId, updateProperties = {}, callback) => {
+    update: (tabId, updateProperties, callback) => {
       const count = ipcRenderer.sendSync('get-window-count');
       let counting = 0;
       const results = [];
@@ -461,7 +461,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       });
       ipcRenderer.send('lulumi-tabs-update', tabId, updateProperties);
     },
-    reload: (tabId, reloadProperties = {}, callback) => {
+    reload: (tabId, reloadProperties, callback) => {
       const count = ipcRenderer.sendSync('get-window-count');
       let counting = 0;
       const results = [];
@@ -477,7 +477,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       });
       ipcRenderer.send('lulumi-tabs-reload', tabId, reloadProperties);
     },
-    create: (createProperties = {}, callback) => {
+    create: (createProperties, callback) => {
       const count = ipcRenderer.sendSync('get-window-count');
       let counting = 0;
       const results = [];
@@ -565,6 +565,59 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
     onUpdated: new IpcEvent('tabs', 'on-updated'),
     onCreated: new IpcEvent('tabs', 'on-created'),
     onRemoved: new IpcEvent('tabs', 'on-removed'),
+  };
+
+  lulumi.windows = {
+    get: (windowId, getInfo, callback) => {
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-windows-get-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-windows-get-result');
+          if (callback) {
+            callback(collect(results).filter(result => result).first());
+          }
+        }
+      });
+      ipcRenderer.send('lulumi-windows-get', windowId, getInfo);
+    },
+    getCurrent: (getInfo, callback) => {
+      if (guestInstanceId !== -1) {
+        const count = ipcRenderer.sendSync('get-window-count');
+        let counting = 0;
+        const results = [];
+        ipcRenderer.on('lulumi-windows-get-current-result', (event, result) => {
+          counting += 1;
+          results.push(result);
+          if (counting === count) {
+            ipcRenderer.removeAllListeners('lulumi-windows-get-current-result');
+            if (callback) {
+              callback(collect(results).filter(result => result).first());
+            }
+          }
+        });
+        ipcRenderer.send('lulumi-windows-get-current', getInfo, guestInstanceId);
+      }
+    },
+    getAll: (getInfo, callback) => {
+      const count = ipcRenderer.sendSync('get-window-count');
+      let counting = 0;
+      const results = [];
+      ipcRenderer.on('lulumi-windows-get-all-result', (event, result) => {
+        counting += 1;
+        results.push(result);
+        if (counting === count) {
+          ipcRenderer.removeAllListeners('lulumi-windows-get-all-result');
+          if (callback) {
+            callback(collect(results).sortBy('id').all());
+          }
+        }
+      });
+      ipcRenderer.send('lulumi-windows-get-all', getInfo);
+    },
   };
 
   lulumi.storage = {

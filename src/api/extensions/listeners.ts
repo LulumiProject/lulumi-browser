@@ -624,6 +624,39 @@ ipcMain.on('lulumi-tabs-emit-on-removed', (event, args) => {
   });
 });
 
+ipcMain.on('lulumi-windows-get', (event, windowId, getInfo) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-windows-get', {
+      windowId,
+      getInfo,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+ipcMain.on('lulumi-windows-get-current', (event, getInfo, guestInstanceId) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-windows-get-current', {
+      getInfo,
+      guestInstanceId,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+ipcMain.on('lulumi-windows-get-all', (event, getInfo) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-windows-get-all', {
+      getInfo,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
 ipcMain.on('lulumi-storage-add-listener-on-changed', (event, digest) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);

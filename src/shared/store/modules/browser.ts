@@ -5,6 +5,8 @@ import config from '../../../renderer/js/constants/config';
 import { store } from 'lulumi';
 import timeUtil from '../../../renderer/js/lib/time-util';
 
+/* tslint:disable:object-shorthand-properties-first */
+
 const state: store.State = {
   tabId: 0,
   tabs: [],
@@ -549,22 +551,36 @@ const mutations = {
     const windowId: number = payload.windowId;
     const width: number = payload.width;
     const height: number = payload.height;
-    const x: number = payload.x;
-    const y: number = payload.y;
+    const left: number = payload.left;
+    const top: number = payload.top;
     const windowState: string = payload.windowState;
     const type: string = payload.type;
-    state.windows.push({
-      windowId,
-      width,
-      height,
-      x,
-      y,
-      windowState,
-      type,
-    });
+
+    const windowsIndex: number = state.windows.findIndex(window => window.id === windowId);
+    if (windowsIndex === -1) {
+      state.windows.push({
+        id: windowId,
+        width,
+        height,
+        left,
+        top,
+        state: windowState,
+        type,
+      });
+    } else {
+      Vue.set(state.windows, windowsIndex, {
+        id: windowId,
+        width,
+        height,
+        left,
+        top,
+        state: windowState,
+        type,
+      });
+    }
   },
   [types.CLOSE_WINDOW](state: store.State, { windowId }) {
-    const index: number = state.windows.findIndex(window => (window.windowId === windowId));
+    const index: number = state.windows.findIndex(window => (window.id === windowId));
     if (index !== -1) {
       Vue.delete(state.windows, index);
     }
@@ -573,18 +589,18 @@ const mutations = {
     const windowId: number = payload.windowId;
     const width: number = payload.width;
     const height: number = payload.height;
-    const x: number = payload.x;
-    const y: number = payload.y;
+    const left: number = payload.left;
+    const top: number = payload.top;
     const focused: boolean = payload.focused;
     const windowState: string = payload.windowState;
-    const index: number = state.windows.findIndex(window => (window.windowId === windowId));
+    const index: number = state.windows.findIndex(window => (window.id === windowId));
     if (index !== -1) {
       Vue.set(state.windows[index], 'width', width);
       Vue.set(state.windows[index], 'height', height);
-      Vue.set(state.windows[index], 'x', x);
-      Vue.set(state.windows[index], 'y', y);
+      Vue.set(state.windows[index], 'left', left);
+      Vue.set(state.windows[index], 'top', top);
       Vue.set(state.windows[index], 'focused', focused);
-      Vue.set(state.windows[index], 'windowState', windowState);
+      Vue.set(state.windows[index], 'state', windowState);
     }
   },
 };

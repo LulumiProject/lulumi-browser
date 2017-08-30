@@ -158,7 +158,7 @@ export default (vueInstance: any) => {
         return tabs;
       }
     },
-    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties): store.TabObject => {
+    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (updateProperties.url) {
@@ -171,7 +171,7 @@ export default (vueInstance: any) => {
       }
       return findAndUpdateOrCreate(vueInstance, false, -1);
     },
-    reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties): void => {
+    reload: (tabId: number, reloadProperties: chrome.tabs.ReloadProperties = {}): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (reloadProperties.bypassCache) {
@@ -181,7 +181,7 @@ export default (vueInstance: any) => {
         }
       }
     },
-    create: (createProperties: chrome.tabs.CreateProperties, webContentsId: number): void => {
+    create: (createProperties: chrome.tabs.CreateProperties = {}, webContentsId: number): void => {
       const webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       if (createProperties.windowId === undefined) {
         createProperties.windowId = vueInstance.$electron.remote.BrowserWindow.getFocusedWindow().id;
@@ -238,6 +238,40 @@ export default (vueInstance: any) => {
     onUpdated: vueInstance.onUpdatedEvent,
     onCreated: vueInstance.onCreatedEvent,
     onRemoved: vueInstance.onRemovedEvent,
+  };
+
+  const windows = {
+    get: (windowId: number, getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty | undefined => {
+      if (windowId === vueInstance.windowId) {
+        const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+        if (getInfo.populate) {
+          window.tabs = vueInstance.tabs;
+        }
+        return window;
+      }
+      return;
+    },
+    getCurrent: (getInfo: chrome.windows.GetInfo = {}, guestInstanceId: number): store.LulumiBrowserWindowProperty | undefined => {
+      const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
+      if (webContents) {
+        if (vueInstance.mappings[webContents.id] === undefined) {
+          return;
+        }
+        const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+        if (getInfo.populate) {
+          window.tabs = vueInstance.tabs;
+        }
+        return window;
+      }
+      return;
+    },
+    getAll: (getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty => {
+      const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+      if (getInfo.populate) {
+        window.tabs = vueInstance.tabs;
+      }
+      return window;
+    },
   };
 
   const storage = {
@@ -378,6 +412,7 @@ export default (vueInstance: any) => {
     pageAction,
     runtime,
     tabs,
+    windows,
     storage,
     contextMenus,
     webNavigation,

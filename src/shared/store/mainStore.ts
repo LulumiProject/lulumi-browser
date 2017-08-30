@@ -95,8 +95,8 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       windowId: window.id,
       width: bounds.width,
       height: bounds.height,
-      x: bounds.x,
-      y: bounds.y,
+      left: bounds.x,
+      top: bounds.y,
       windowState,
       type: (window.webContents as any).getType(),
     });
@@ -130,8 +130,8 @@ const windowStateSave = (): void => {
       windowId: window.id,
       width: bounds.width,
       height: bounds.height,
-      x: bounds.x,
-      y: bounds.y,
+      left: bounds.x,
+      top: bounds.y,
       focused: window.isFocused(),
       windowState,
     });
@@ -210,9 +210,9 @@ function windowsOrdering(bumpWindowIdsBy: number): store.LulumiBrowserWindowProp
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
-    const index: number = store.getters.windows.findIndex(window => window.windowId === id);
+    const index: number = oldWindows.findIndex(window => window.id === id);
     const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, oldWindows[index]);
-    tmp.windowId = windowId;
+    tmp.id = windowId;
     newWindows.push(tmp);
     windowId += 1;
   });
