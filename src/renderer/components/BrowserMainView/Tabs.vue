@@ -41,8 +41,6 @@
 
   import { Button, Tooltip } from 'element-ui';
 
-  import BrowserMainView from '../BrowserMainView.vue';
-
   import { store } from 'lulumi';
 
   declare const __static: string;
