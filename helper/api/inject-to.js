@@ -578,7 +578,12 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
         if (counting === count) {
           ipcRenderer.removeAllListeners('lulumi-windows-get-result');
           if (callback) {
-            callback(collect(results).filter(result => result).first());
+            const window = collect(results).filter(result => result).first();
+            const windowTabs = window.tabs;
+            if (windowTabs) {
+              window.tabs = collect(windowTabs).sortBy('index').all();
+            }
+            callback(window);
           }
         }
       });
@@ -595,7 +600,12 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
           if (counting === count) {
             ipcRenderer.removeAllListeners('lulumi-windows-get-current-result');
             if (callback) {
-              callback(collect(results).filter(result => result).first());
+              const window = collect(results).filter(result => result).first();
+              const windowTabs = window.tabs;
+              if (windowTabs) {
+                window.tabs = collect(windowTabs).sortBy('index').all();
+              }
+              callback(window);
             }
           }
         });
@@ -612,6 +622,12 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
         if (counting === count) {
           ipcRenderer.removeAllListeners('lulumi-windows-get-all-result');
           if (callback) {
+            results.forEach((window, index) => {
+              const windowTabs = window.tabs;
+              if (windowTabs) {
+                results[index].tabs = collect(windowTabs).sortBy('index').all();
+              }
+            });
             callback(collect(results).sortBy('id').all());
           }
         }

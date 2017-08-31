@@ -243,7 +243,7 @@ export default (vueInstance: any) => {
   const windows = {
     get: (windowId: number, getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty | undefined => {
       if (windowId === vueInstance.windowId) {
-        const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+        const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
         if (getInfo.populate) {
           window.tabs = vueInstance.tabs;
         }
@@ -257,7 +257,7 @@ export default (vueInstance: any) => {
         if (vueInstance.mappings[webContents.id] === undefined) {
           return;
         }
-        const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+        const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
         if (getInfo.populate) {
           window.tabs = vueInstance.tabs;
         }
@@ -266,7 +266,7 @@ export default (vueInstance: any) => {
       return;
     },
     getAll: (getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty => {
-      const window: store.LulumiBrowserWindowProperty = vueInstance.window;
+      const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
       if (getInfo.populate) {
         window.tabs = vueInstance.tabs;
       }
