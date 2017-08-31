@@ -1293,106 +1293,103 @@
 
       const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
 
-      ipc.on('start-find-in-page', () => {
-        this.getTab(this.currentTabIndex).findInPage();
+      ipc.on('go-back', () => {
+        this.onClickBack();
       });
-
+      ipc.on('go-forward', () => {
+        this.onClickForward();
+      });
+      ipc.on('reload', () => {
+        this.onClickRefresh();
+      });
+      ipc.on('force-reload', () => {
+        this.onClickForceRefresh();
+      });
+      ipc.on('view-source', () => {
+        this.onClickViewSource();
+      });
+      ipc.on('toggle-dev-tools', () => {
+        this.onClickToggleDevTools();
+      });
+      ipc.on('new-tab', (event, payload) => {
+        if (payload) {
+          this.onNewTab(this.windowId, payload.url, payload.follow);
+        } else {
+          this.onNewTab(this.windowId, 'about:newtab', false);
+        }
+      });
+      ipc.on('tab-close', () => {
+        this.onTabClose(this.currentTabIndex);
+      });
       ipc.on('tab-click', (event, tabIndexThatWeSee) => {
         (document.querySelectorAll('.chrome-tab-draggable')[tabIndexThatWeSee] as HTMLElement).click();
       });
-
+      ipc.on('start-find-in-page', () => {
+        this.getTab(this.currentTabIndex).findInPage();
+      });
       ipc.on('open-pdf', (event, data) => {
-        if (this.onOpenPDF) {
-          this.onOpenPDF(event, data);
-        }
+        this.onOpenPDF(event, data);
       });
-
+      ipc.on('scroll-touch-begin', (event, swipeGesture) => {
+        this.onScrollTouchBegin(event, swipeGesture);
+      });
+      ipc.on('scroll-touch-end', () => {
+        this.onScrollTouchEnd();
+      });
+      ipc.on('scroll-touch-edge', () => {
+        this.onScrollTouchEdge();
+      });
       ipc.on('will-download-any-file', (event, data) => {
-        if (this.onWillDownloadAnyFile) {
-          this.onWillDownloadAnyFile(event, data);
-        }
+        this.onWillDownloadAnyFile(event, data);
       });
-
       ipc.on('update-downloads-progress', (event, data) => {
-        if (this.onUpdateDownloadsProgress) {
-          this.onUpdateDownloadsProgress(event, data);
-        }
+        this.onUpdateDownloadsProgress(event, data);
       });
       ipc.on('complete-downloads-progress', (event, data) => {
-        if (this.onCompleteDownloadsProgress) {
-          this.onCompleteDownloadsProgress(event, data);
-        }
+        this.onCompleteDownloadsProgress(event, data);
       });
 
       ipc.on('get-search-engine-provider', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetSearchEngineProvider) {
-          this.onGetSearchEngineProvider(event, webContentsId);
-        }
+        this.onGetSearchEngineProvider(event, webContentsId);
       });
       ipc.on('set-search-engine-provider', (event, val) => {
-        if (this.onSetSearchEngineProvider) {
-          this.onSetSearchEngineProvider(event, val);
-        }
+        this.onSetSearchEngineProvider(event, val);
       });
       ipc.on('get-homepage', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetHomepage) {
-          this.onGetHomepage(event, webContentsId);
-        }
+        this.onGetHomepage(event, webContentsId);
       });
       ipc.on('set-homepage', (event, val) => {
-        if (this.onSetHomepage) {
-          this.onSetHomepage(event, val);
-        }
+        this.onSetHomepage(event, val);
       });
       ipc.on('get-pdf-viewer', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetPDFViewer) {
-          this.onGetPDFViewer(event, webContentsId);
-        }
+        this.onGetPDFViewer(event, webContentsId);
       });
       ipc.on('set-pdf-viewer', (event, val) => {
-        if (this.onSetPDFViewer) {
-          this.onSetPDFViewer(event, val);
-        }
+        this.onSetPDFViewer(event, val);
       });
       ipc.on('get-tab-config', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetTabConfig) {
-          this.onGetTabConfig(event, webContentsId);
-        }
+        this.onGetTabConfig(event, webContentsId);
       });
       ipc.on('set-tab-config', (event, val) => {
-        if (this.onSetTabConfig) {
-          this.onSetTabConfig(event, val);
-        }
+        this.onSetTabConfig(event, val);
       });
       ipc.on('get-lang', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetLang) {
-          this.onGetLang(event, webContentsId);
-        }
+        this.onGetLang(event, webContentsId);
       });
       ipc.on('set-lang', (event, val) => {
-        if (this.onSetLang) {
-          this.onSetLang(event, val);
-        }
+        this.onSetLang(event, val);
       });
       ipc.on('get-downloads', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetDownloads) {
-          this.onGetDownloads(event, webContentsId);
-        }
+        this.onGetDownloads(event, webContentsId);
       });
       ipc.on('set-downloads', (event, val) => {
-        if (this.onSetDownloads) {
-          this.onSetDownloads(event, val);
-        }
+        this.onSetDownloads(event, val);
       });
       ipc.on('get-history', (event: Electron.Event, webContentsId: number) => {
-        if (this.onGetHistory) {
-          this.onGetHistory(event, webContentsId);
-        }
+        this.onGetHistory(event, webContentsId);
       });
       ipc.on('set-history', (event, val) => {
-        if (this.onSetHistory) {
-          this.onSetHistory(event, val);
-        }
+        this.onSetHistory(event, val);
       });
 
       ipc.on('about-to-quit', () => {
@@ -1415,22 +1412,6 @@
               ipc.send('okay-to-quit', false);
             }
           });
-        }
-      });
-
-      ipc.on('scroll-touch-begin', (event, swipeGesture) => {
-        if (this.onScrollTouchBegin) {
-          this.onScrollTouchBegin(event, swipeGesture);
-        }
-      });
-      ipc.on('scroll-touch-end', () => {
-        if (this.onScrollTouchEnd) {
-          this.onScrollTouchEnd();
-        }
-      });
-      ipc.on('scroll-touch-edge', () => {
-        if (this.onScrollTouchEdge) {
-          this.onScrollTouchEdge();
         }
       });
 

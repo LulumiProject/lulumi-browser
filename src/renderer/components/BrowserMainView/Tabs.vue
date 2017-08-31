@@ -126,44 +126,6 @@
         (target.getElementsByClassName('right-edge')[0] as HTMLElement).style.background = '';
       }
     }
-
-    mounted() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
-      ipc.on('reload', () => {
-        if ((this.$parent as BrowserMainView).onClickRefresh) {
-          (this.$parent as BrowserMainView).onClickRefresh();
-        }
-      });
-      ipc.on('forceReload', () => {
-        if ((this.$parent as BrowserMainView).onClickForceRefresh) {
-          (this.$parent as BrowserMainView).onClickForceRefresh();
-        }
-      });
-      ipc.on('viewSource', () => {
-        if ((this.$parent as BrowserMainView).onClickViewSource) {
-          (this.$parent as BrowserMainView).onClickViewSource();
-        }
-      });
-      ipc.on('toggleDevTools', () => {
-        if ((this.$parent as BrowserMainView).onClickToggleDevTools) {
-          (this.$parent as BrowserMainView).onClickToggleDevTools();
-        }
-      });
-      ipc.on('new-tab', (event, payload) => {
-        if ((this.$parent as BrowserMainView).onNewTab) {
-          if (payload) {
-            (this.$parent as BrowserMainView).onNewTab(this.windowId, payload.url, payload.follow);
-          } else {
-            (this.$parent as BrowserMainView).onNewTab(this.windowId, 'about:newtab', false);
-          }
-        }
-      });
-      ipc.on('tab-close', () => {
-        if ((this.$parent as BrowserMainView).onTabClose) {
-          (this.$parent as BrowserMainView).onTabClose(this.currentTabIndex);
-        }
-      });
-    }
   };
 </script>
 

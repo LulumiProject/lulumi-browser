@@ -99,7 +99,7 @@ const getTemplate = () => {
         {
           label: i18n.t('view.forceReload'),
           accelerator: 'Shift+CmdOrCtrl+R',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('forceReload'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('force-reload'),
         },
         {
           type: 'separator',
@@ -126,12 +126,12 @@ const getTemplate = () => {
         {
           label: i18n.t('view.viewSource'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('viewSource'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('view-source'),
         },
         {
           label: i18n.t('view.toggleDevTools'),
           accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('toggleDevTools'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('toggle-dev-tools'),
         },
       ],
     },

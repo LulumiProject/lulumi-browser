@@ -16,6 +16,7 @@ Vue.use(Vuex);
 /* tslint:disable:no-console */
 /* tslint:disable:object-shorthand-properties-first */
 
+const isWindows: boolean = process.platform === 'win32';
 const windows: Electron.BrowserWindow[] = [];
 
 let close: boolean = false;
@@ -104,14 +105,22 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       handleWindowProperty(store, window, 'update');
     });
 
+    if (isWindows) {
+      window.on('app-command', (event, command) => {
+        if (command === 'browser-backward') {
+          window.webContents.send('go-back');
+        } else if (command === 'browser-forward') {
+          window.webContents.send('go-forward');
+        }
+      });
+    }
+
     window.on('scroll-touch-begin', () => {
       window.webContents.send('scroll-touch-begin', swipeGesture);
     });
-
     window.on('scroll-touch-end', () => {
       window.webContents.send('scroll-touch-end');
     });
-
     window.on('scroll-touch-edge', () => {
       window.webContents.send('scroll-touch-edge');
     });
@@ -136,6 +145,9 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
           window.webContents.removeAllListeners('restore');
           window.webContents.removeAllListeners('resize');
           window.webContents.removeAllListeners('move');
+          if (isWindows) {
+            window.webContents.removeAllListeners('app-command');
+          }
           window.webContents.removeAllListeners('scroll-touch-end');
           window.webContents.removeAllListeners('scroll-touch-edge');
           window.webContents.removeAllListeners('window-id');
