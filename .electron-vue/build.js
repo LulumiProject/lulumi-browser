@@ -117,17 +117,17 @@ function pack (config) {
 }
 
 function bundleApp () {
-  packager(buildConfig, (err, appPaths) => {
-    if (err) {
-      console.log(`\n${errorLog}${chalk.yellow('`electron-packager`')} says...\n`)
-      console.log(err + '\n')
-    } else {
+  packager(buildConfig)
+    .then((appPaths) => {
       console.log(`\n${doneLog}\n`)
       console.log(appPaths)
 
       console.log('\n\x1b[34mDONE\n\x1b[0m')
-    }
-  })
+    })
+    .catch((err) => {
+      console.log(`\n${errorLog}${chalk.yellow('`electron-packager`')} says...\n`)
+      console.log(err + '\n')
+    });
 }
 
 function greeting () {

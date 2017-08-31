@@ -22,6 +22,7 @@ const config = {
     ignore: /(^\/(src|test|build|extensions|userData|tslint|\.\w+|README|yarn))|\.gitkeep/,
     out: path.join(__dirname, '../builds'),
     overwrite: true,
+    packageManager: false,
     platform: process.env.BUILD_TARGET || 'all',
   },
 };
