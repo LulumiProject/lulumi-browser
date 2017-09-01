@@ -16,8 +16,10 @@ ipcMain.on('add-lulumi-extension', (event) => {
       let name: string = '';
       let result: string = 'OK';
       try {
-        // an array of diretory paths chosen by the user will be returned, but we only want one path
-        name = (BrowserWindow as any).addLulumiExtension(dir);
+        if (dir) {
+          // an array of directory paths chosen by the user will be returned, but we only want one path
+          name = (BrowserWindow as any).addLulumiExtension(dir);
+        }
       } catch (readError) {
         result = readError.message;
       }
