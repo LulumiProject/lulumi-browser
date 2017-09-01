@@ -1,4 +1,3 @@
-import { api } from 'lulumi';
 import { app, BrowserWindow, ipcMain, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
@@ -9,6 +8,8 @@ import url from 'url';
 
 import config from '../main/js/constants/config';
 import './extensions/listeners';
+
+import { api } from 'lulumi';
 
 /* tslint:disable:no-console */
 /* tslint:disable:max-line-length */

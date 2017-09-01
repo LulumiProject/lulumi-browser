@@ -44,9 +44,6 @@ declare module 'lulumi' {
       manifestNameMap: ManifestNameMap;
       guestData: LulumiObject;
     }
-    export interface CustomBrowserWindow extends Electron.BrowserWindow {
-      addLulumiExtension(srcDirectory: string): void;
-    }
   }
 
   export namespace store {

@@ -12,11 +12,12 @@ ipcMain.on('open-dev-tools', (event, webContentsId) => {
 ipcMain.on('add-lulumi-extension', (event) => {
   dialog.showOpenDialog({ properties: ['openDirectory'] }, (dirs) => {
     if (dirs) {
-      let name = '';
+      const dir: string = dirs[0];
+      let name: string = '';
       let result: string = 'OK';
       try {
         // an array of diretory paths chosen by the user will be returned, but we only want one path
-        name = (BrowserWindow as any).addLulumiExtension(dirs[0]);
+        name = (BrowserWindow as any).addLulumiExtension(dir);
       } catch (readError) {
         result = readError.message;
       }
