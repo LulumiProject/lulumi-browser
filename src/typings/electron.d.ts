@@ -1,4 +1,4 @@
-// Type definitions for Electron 1.7.6
+// Type definitions for Electron 1.8.0
 // Project: http://electron.atom.io/
 // Definitions by: The Electron Team <https://github.com/electron/electron>
 // Definitions: https://github.com/electron/electron-typescript-definitions
@@ -565,6 +565,7 @@ declare namespace Electron {
      * the Windows Registry and LSCopyDefaultHandlerForURLScheme internally.
      */
     isDefaultProtocolClient(protocol: string, path?: string, args?: string[]): boolean;
+    isInApplicationsFolder(): boolean;
     isReady(): boolean;
     isUnityRunning(): boolean;
     /**
@@ -588,6 +589,16 @@ declare namespace Electron {
      * instance starts:
      */
     makeSingleInstance(callback: (argv: string[], workingDirectory: string) => void): boolean;
+    /**
+     * No confirmation dialog will be presented by default, if you wish to allow the
+     * user to confirm the operation you may do so using the dialog API. NOTE: This
+     * method throws errors if anything other than the user causes the move to fail.
+     * For instance if the user cancels the authorization dialog this method returns
+     * false.  If we fail to perform the copy then this method will throw an error.
+     * The message in the error should be informative and tell you exactly what went
+     * wrong
+     */
+    moveToApplicationsFolder(): boolean;
     /**
      * Try to close all windows. The before-quit event will be emitted first. If all
      * windows are successfully closed, the will-quit event will be emitted and by
@@ -841,7 +852,11 @@ declare namespace Electron {
      * cancel the close. Usually you would want to use the beforeunload handler to
      * decide whether the window should be closed, which will also be called when the
      * window is reloaded. In Electron, returning any value other than undefined would
-     * cancel the close. For example:
+     * cancel the close. For example: Note: There is a subtle difference between the
+     * behaviors of window.onbeforeunload = handler and
+     * window.addEventListener('beforeunload', handler). It is recommended to always
+     * set the event.returnValue explicitly, instead of just returning a value, as the
+     * former works more consistently within Electron.
      */
     on(event: 'close', listener: (event: Event) => void): this;
     once(event: 'close', listener: (event: Event) => void): this;
@@ -1326,7 +1341,7 @@ declare namespace Electron {
      * window will be passed to the window below this window, but if this window has
      * focus, it will still receive keyboard events.
      */
-    setIgnoreMouseEvents(ignore: boolean): void;
+    setIgnoreMouseEvents(ignore: boolean, options?: IgnoreMouseEventsOptions): void;
     /**
      * Enters or leaves the kiosk mode.
      */
@@ -2634,7 +2649,7 @@ declare namespace Electron {
     /**
      * Removes all listeners, or those of the specified channel.
      */
-    removeAllListeners(channel?: string): this;
+    removeAllListeners(channel: string): this;
     /**
      * Removes the specified listener from the listener array for the specified
      * channel.
@@ -3390,7 +3405,7 @@ declare namespace Electron {
      * options, you have to ensure the Session with the partition has never been used
      * before. There is no way to change the options of an existing Session object.
      */
-    static fromPartition(partition: string, options: FromPartitionOptions): Session;
+    static fromPartition(partition: string, options?: FromPartitionOptions): Session;
     /**
      * A Session object, the default session object of the app.
      */
@@ -5111,7 +5126,7 @@ declare namespace Electron {
      * webContents.print({silent: false, printBackground: false, deviceName: ''}). Use
      * page-break-before: always; CSS style to force to print to a new page.
      */
-    print(options?: PrintOptions): void;
+    print(options?: PrintOptions, callback?: Function): void;
     /**
      * Prints window's web page as PDF with Chromium's preview printing custom
      * settings. The callback will be called with callback(error, data) on completion.
@@ -5623,7 +5638,7 @@ declare namespace Electron {
      * context in the page. HTML APIs like requestFullScreen, which require user
      * action, can take advantage of this option for automation.
      */
-    executeJavaScript(code: string, userGesture: boolean, callback?: (result: any) => void): void;
+    executeJavaScript(code: string, userGesture?: boolean, callback?: (result: any) => void): void;
     /**
      * Starts a request to find all matches for the text in the web page and returns an
      * Integer representing the request id used for the request. The result of the
@@ -6650,6 +6665,15 @@ declare namespace Electron {
     name: string;
   }
 
+  interface IgnoreMouseEventsOptions {
+    /**
+     * If true, forwards mouse move messages to Chromium, enabling mouse related events
+     * such as mouseleave. Only used when ignore is true. If ignore is false,
+     * forwarding is always disabled regardless of this value.
+     */
+    forward?: boolean;
+  }
+
   interface ImportCertificateOptions {
     /**
      * Path for the pkcs12 file.
@@ -6982,6 +7006,10 @@ declare namespace Electron {
      * The placeholder to write in the inline reply input field.
      */
     replyPlaceholder?: string;
+    /**
+     * The name of the sound file to play when the notification is shown.
+     */
+    sound?: string;
     /**
      * Actions to add to the notification. Please read the available actions and
      * limitations in the NotificationAction documentation

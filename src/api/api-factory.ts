@@ -216,7 +216,7 @@ export default (vueInstance: any) => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (details.code) {
-          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(details.code, false);
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(details.code);
         }
       }
     },

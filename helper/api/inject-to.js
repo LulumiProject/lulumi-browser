@@ -910,7 +910,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
     },
     detectLanguage: (text, callback) => {
       if (callback) {
-        callback([]); // TODO: wait for electron 1.8.x
+        callback([]);
       }
     },
   };
