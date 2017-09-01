@@ -1,7 +1,5 @@
 // Place your settings in this file to overwrite the default settings
 {
     "editor.detectIndentation": false,
-    "editor.tabSize": 2,
-    "typescript.tsdk": "./node_modules/typescript/lib",
-    "typescript.check.tscVersion": false
+    "editor.tabSize": 2
 }

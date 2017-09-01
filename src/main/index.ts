@@ -84,9 +84,9 @@ function appStateSave(soft: boolean = true): void {
 }
 
 // tslint:disable-next-line:max-line-length
-function createWindow(options: Electron.BrowserWindowConstructorOptions | undefined = undefined): Electron.BrowserWindow {
+function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
-  if (options) {
+  if (options && Object.keys(options).length !== 0) {
     mainWindow = new BrowserWindow(options);
   } else {
     /**
@@ -155,6 +155,13 @@ function createWindow(options: Electron.BrowserWindowConstructorOptions | undefi
   if (process.env.NODE_ENV !== 'testing' || process.env.TEST_ENV !== 'e2e') {
     // save app-state every 5 mins
     appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
+  }
+  if (callback) {
+    callback();
+  } else {
+    ipcMain.once('any-new-tab-suggestion', (event: Electron.Event) => {
+      event.returnValue = { url: 'about:newtab', follow: true };
+    });
   }
   return mainWindow;
 }
@@ -488,6 +495,25 @@ ipcMain.on('set-history', (event: Electron.Event, val) => {
       webContentsId,
     });
   });
+});
+
+// listen to new-lulumi-window event
+ipcMain.on('new-lulumi-window', (event, data) => {
+  if (data.url) {
+    createWindow({
+      width: 800,
+      height: 500,
+      titleBarStyle: 'hiddenInset',
+      fullscreenWindowTitle: true,
+      autoHideMenuBar: autoHideMenuBarSetting,
+      frame: !isWindows,
+      // tslint:disable-next-line:align
+    }, () => {
+      ipcMain.once('any-new-tab-suggestion', (event: Electron.Event) => {
+        event.returnValue = { url: data.url, follow: data.follow };
+      });
+    });
+  }
 });
 
 // load the lang file

@@ -5,13 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Main Process",
       "type": "node",
       "request": "launch",
-      "name": "Run AVA test",
-      "program": "${workspaceRoot}/node_modules/ava/profile.js",
-      "args": [
-        "${file}"
-      ]
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "program": "${workspaceRoot}/dist/main.js",
+      "protocol": "inspector"
     }
   ]
 }

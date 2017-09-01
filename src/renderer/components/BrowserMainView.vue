@@ -386,17 +386,27 @@
       this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
     }
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
-      this.onNewTab(this.windowId, event.url, true);
-      if (event.disposition === 'new-window' || event.disposition === 'foreground-tab') {
-        this.onCreatedNavigationTarget.emit({
-          sourceTabId: this.getTabObject(tabIndex).id,
-          sourceProcessId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
-          sourceFrameId: 0,
-          timeStamp: Date.now(),
+      const disposition: string = event.disposition;
+      if (disposition === 'new-window') {
+        (this as any).$electron.ipcRenderer.send('new-lulumi-window', {
           url: event.url,
-          tabId: this.$store.getters.pid,
+          follow: true,
         });
+      } else if (disposition === 'foreground-tab') {
+        this.onNewTab(this.windowId, event.url, false);
+      } else if (disposition === 'background-tab') {
+        this.onNewTab(this.windowId, event.url, true);
       }
+      /*
+      this.onCreatedNavigationTarget.emit({
+        sourceTabId: this.getTabObject(tabIndex).id,
+        sourceProcessId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+        sourceFrameId: 0,
+        timeStamp: Date.now(),
+        url: event.url,
+        tabId: this.$store.getters.pid,
+      });
+      */
     }
     onWheel(event: WheelEvent): void {
       const leftSwipeArrow = document.getElementById('left-swipe-arrow');
@@ -1280,7 +1290,8 @@
         this.windowId = 0;
       }
       if (this.tabs.length === 0) {
-        this.onNewTab(this.windowId, 'about:newtab', false);
+        const suggestion = ipc.sendSync('any-new-tab-suggestion');
+        this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
       }
       this.extensionService = new ExtensionService(this);
     }
