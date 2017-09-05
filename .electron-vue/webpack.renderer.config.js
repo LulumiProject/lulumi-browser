@@ -7,7 +7,7 @@ const { dependencies } = require('../package.json')
 const settings = require('./config.js')
 const webpack = require('webpack')
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const MinifyPlugin = require('babel-minify-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -360,7 +360,7 @@ if (process.env.TEST_ENV === 'e2e') {
     aboutConfig.devtool = ''
 
     rendererConfig.plugins.push(
-      new BabiliWebpackPlugin({
+      new MinifyPlugin({
         removeConsole: true,
         removeDebugger: true
       }),
@@ -372,7 +372,7 @@ if (process.env.TEST_ENV === 'e2e') {
       })
     )
     aboutConfig.plugins.push(
-      new BabiliWebpackPlugin({
+      new MinifyPlugin({
         removeConsole: true,
         removeDebugger: true
       }),

@@ -6,7 +6,7 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const MinifyPlugin = require('babel-minify-webpack-plugin')
 
 let whiteListedModules = ['vue']
 
@@ -109,7 +109,7 @@ if (process.env.TEST_ENV === 'e2e') {
    */
   if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-      new BabiliWebpackPlugin({
+      new MinifyPlugin({
         removeConsole: true,
         removeDebugger: true
       }),

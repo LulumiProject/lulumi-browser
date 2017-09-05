@@ -3,9 +3,7 @@
 > Lulumi-browser is a light weight browser coded with Vue.js 2 and Electron.
 
 <p align="center">
-  <a href="http://i.imgur.com/Fypop6G.png" target="_blank">
-    <img src="http://i.imgur.com/Fypop6G.png" width="700px">
-  </a>
+  <img alt="Lulumi-browser" src="https://i.imgur.com/7jB91KV.jpg" width="700px">
 </p>
 
 ## Warning
@@ -40,7 +38,7 @@ $ yarn run lint:fix
 $ yarn run test
 ```
 
-## API (experimental)
+## API support (experimental)
 
 - https://github.com/qazbnm456/lulumi-browser/issues/19
 
