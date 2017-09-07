@@ -1289,8 +1289,10 @@
       } else {
         this.windowId = 0;
       }
+
+      // we have to call sendSync anyway, in order to cancel the corresponding event listener
+      const suggestion = ipc.sendSync('any-new-tab-suggestion');
       if (this.tabs.length === 0) {
-        const suggestion = ipc.sendSync('any-new-tab-suggestion');
         this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
       }
       this.extensionService = new ExtensionService(this);
