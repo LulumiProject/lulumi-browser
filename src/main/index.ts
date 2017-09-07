@@ -124,6 +124,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.contextIsolation = true;
+    webPreferences.nativeWindowOpen = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
     session.registerScheme(params.partition, config.lulumiPagesCustomProtocol, config.delayedInit);
     session.onWillDownload(params.partition, mainWindow!, config.lulumiPDFJSPath);

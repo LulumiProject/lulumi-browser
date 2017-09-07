@@ -393,9 +393,9 @@
           follow: true,
         });
       } else if (disposition === 'foreground-tab') {
-        this.onNewTab(this.windowId, event.url, false);
-      } else if (disposition === 'background-tab') {
         this.onNewTab(this.windowId, event.url, true);
+      } else if (disposition === 'background-tab') {
+        this.onNewTab(this.windowId, event.url, false);
       }
       /*
       this.onCreatedNavigationTarget.emit({
