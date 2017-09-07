@@ -45,7 +45,12 @@ export default (vueInstance: any) => {
   const browserAction = {
     setIcon: (extensionId: string, startPage: string, details: chrome.browserAction.TabIconDetails): void => {
       if (details.path) {
-        vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${details.path}`);
+        // TODO: https://developer.chrome.com/extensions/browserAction#method-setIcon
+        let path: string | object = details.path;
+        if (typeof path === 'object') {
+          path = Object.values(path)[0];
+        }
+        vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${path}`);
       }
     },
     setBadgeText: (extensionId: string, details: chrome.browserAction.BadgeTextDetails): void => {

@@ -1,5 +1,6 @@
 const { ipcRenderer, remote } = require('electron');
 const { LocalStorage } = require('node-localstorage');
+const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
@@ -17,6 +18,7 @@ process.once('loaded', () => {
   global.chrome = global.lulumi;
 
   global.ipcRenderer = ipcRenderer;
+  global.ResizeSensor = ResizeSensor;
 
   ipcRenderer.on('lulumi-runtime-before-connect', (event, extensionId, connectInfo, responseScriptType, webContentsId) => {
     global.lulumi.runtime.beforeConnect(

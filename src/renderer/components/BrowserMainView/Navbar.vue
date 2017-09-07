@@ -47,7 +47,7 @@
                           :title="showTitle(extension)",
                           @click.prevent="sendIPC($event, extension)",
                           @contextmenu.prevent="onContextmenu(extension)")
-          webview(:ref="`webview-${extension.extensionId}`",
+          webview.extension(:ref="`webview-${extension.extensionId}`",
                   webpreferences="nativeWindowOpen=yes")
     .common-group
       a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
@@ -408,7 +408,7 @@
       return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
     }
     setBrowserActionIcon(extensionId: string, path: string): void {
-      this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+      this.$refs[`popover-${extensionId}`][0].referenceElm.querySelector('img').setAttribute('src', path);
     }
     setBrowserActionBadgeText(extensionId: string, details): void {
       if (this.badgeTextArray[extensionId] === undefined) {
@@ -465,7 +465,7 @@
       return '';
     }
     setPageActionIcon(extensionId: string, path: string): void {
-      this.$refs[`popover-${extensionId}`][0].referenceElm.setAttribute('src', path);
+      this.$refs[`popover-${extensionId}`][0].referenceElm.querySelector('img').setAttribute('src', path);
     }
     loadIcon(extension: any): string | undefined {
       try {
@@ -559,19 +559,23 @@
         webview.addEventListener('ipc-message', (event: Electron.IpcMessageEvent) => {
           if (event.channel === 'resize') {
             const size = event.args[0];
-            webview.style.height = `calc(${size.height + 30}px)`;
-            webview.style.width = `calc(${size.width + 20}px)`;
+            webview.style.height = `${size.height}px`;
+            webview.style.width = `${size.width}px`;
             webview.style.overflow = 'hidden';
           }
         });
         webview.addEventListener('dom-ready', () => {
           webview.executeJavaScript(`
-            var height = document.body.clientHeight;
-            var width = document.body.clientWidth;
-            ipcRenderer.sendToHost('resize', {
-              height,
-              width,
-            });
+            function triggerResize() {
+              const height = document.body.clientHeight;
+              const width = document.body.clientWidth;
+              ipcRenderer.sendToHost('resize', {
+                height,
+                width,
+              });
+            }
+            triggerResize();
+            new ResizeSensor(document.body, triggerResize);
           `);
         });
         if (isPageAction) {
