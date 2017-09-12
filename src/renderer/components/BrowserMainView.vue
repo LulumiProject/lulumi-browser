@@ -1335,7 +1335,11 @@
         this.onTabClose(this.currentTabIndex);
       });
       ipc.on('tab-click', (event, tabIndexThatWeSee) => {
-        (document.querySelectorAll('.chrome-tab-draggable')[tabIndexThatWeSee] as HTMLElement).click();
+        const el: HTMLElement
+          = (document.querySelectorAll('.chrome-tab-draggable')[tabIndexThatWeSee] as HTMLElement);
+        if (el) {
+          el.click();
+        }
       });
       ipc.on('start-find-in-page', () => {
         this.getTab(this.currentTabIndex).findInPage();
