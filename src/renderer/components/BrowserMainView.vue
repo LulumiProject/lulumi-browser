@@ -1286,15 +1286,20 @@
 
       if (process.env.NODE_ENV !== 'testing') {
         this.windowId = ipc.sendSync('window-id');
+
+        // we have to call sendSync anyway, in order to cancel the corresponding event listener
+        const suggestion = ipc.sendSync('any-new-tab-suggestion');
+        if (this.tabs.length === 0) {
+          this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
+        }
       } else {
         this.windowId = 0;
+
+        if (this.tabs.length === 0) {
+          this.onNewTab(this.windowId, 'https://github.com/qazbnm456/lulumi-browser', true);
+        }
       }
 
-      // we have to call sendSync anyway, in order to cancel the corresponding event listener
-      const suggestion = ipc.sendSync('any-new-tab-suggestion');
-      if (this.tabs.length === 0) {
-        this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
-      }
       this.extensionService = new ExtensionService(this);
     }
     mounted() {
