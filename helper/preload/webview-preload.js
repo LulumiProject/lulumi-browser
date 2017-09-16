@@ -3,7 +3,6 @@
 const { ipcRenderer, remote } = require('electron');
 const { runInThisContext } = require('vm');
 const { LocalStorage } = require('node-localstorage');
-const stripCssComments = require('strip-css-comments');
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
@@ -25,40 +24,38 @@ const matchesPattern = (pattern) => {
   return url.match(regexp);
 };
 
-// Run the code with lulumi API integrated.
+// Run the code with chrome and lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
   require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'content', context, LocalStorage);
-  global.lulumi = context.lulumi;
-  const wrapper = `\n
+  const wrapper = `(function (lulumi) {
     var chrome = lulumi;
     ${code}
-    \n`;
-  runInThisContext(wrapper, {
-    filename: url,
-    lineOffset: 1,
-    displayErrors: true,
-  });
-  // TODO: `this` show be global.window due to L#67, but it's not. Wired!
-  // return compiledWrapper.call(window, context.lulumi);
-};
-
-// Run the code with lulumi API integrated.
-const runStylesheet = (extensionId, url, code) => {
-  const wrapper = `(function () {\n
-    function init() {
-      var styleElement = document.createElement('style');
-      styleElement.setAttribute('type', 'text/css');
-      styleElement.textContent = \`${stripCssComments(code, { preserve: false })}\`;
-      document.querySelector('head').append(styleElement);
-    }
-    document.addEventListener('DOMContentLoaded', init);\n})`;
+  });`;
   const compiledWrapper = runInThisContext(wrapper, {
     filename: url,
     lineOffset: 1,
     displayErrors: true,
   });
-  return compiledWrapper.call(this);
+  return compiledWrapper.call(this, context.lulumi);
+};
+
+const runStylesheet = (url, code) => {
+  const wrapper = `(function (code) {
+    function init() {
+      var styleElement = document.createElement('style');
+      styleElement.setAttribute('type', 'text/css');
+      styleElement.textContent = code;
+      document.querySelector('head').append(styleElement);
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  })`;
+  const compiledWrapper = runInThisContext(wrapper, {
+    filename: url,
+    lineOffset: 1,
+    displayErrors: true,
+  });
+  return compiledWrapper.call(this, code);
 };
 
 // run injected scripts
@@ -84,9 +81,9 @@ const injectContentScript = (extensionId, script) => {
     });
   }
 
-  if (script.css !== undefined) {
+  if (script.css) {
     script.css.forEach((css) => {
-      const fire = runStylesheet.bind(window, extensionId, css.url, css.code);
+      const fire = runStylesheet.bind(window, css.url, css.code);
       if (script.runAt === 'document_start') {
         process.once('document-start', fire);
       } else if (script.runAt === 'document_end') {
