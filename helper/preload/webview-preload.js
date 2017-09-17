@@ -28,7 +28,7 @@ const matchesPattern = (pattern) => {
 const runContentScript = (extensionId, url, code) => {
   const context = {};
   require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'content', context, LocalStorage);
-  const wrapper = `(function (lulumi) {
+  const wrapper = `((lulumi) => {
     var chrome = lulumi;
     ${code}
   });`;
@@ -41,12 +41,11 @@ const runContentScript = (extensionId, url, code) => {
 };
 
 const runStylesheet = (url, code) => {
-  const wrapper = `(function (code) {
+  const wrapper = `((code) => {
     function init() {
-      var styleElement = document.createElement('style');
-      styleElement.setAttribute('type', 'text/css');
+      const styleElement = document.createElement('style');
       styleElement.textContent = code;
-      document.querySelector('head').append(styleElement);
+      document.head.append(styleElement);
     }
     document.addEventListener('DOMContentLoaded', init);
   })`;
@@ -68,14 +67,14 @@ const injectContentScript = (extensionId, script) => {
   // process will listen on multiple document_* events
   // if we have multiple extensions
   process.setMaxListeners(0);
-  if (script.js !== undefined) {
+  if (script.js) {
     script.js.forEach((js) => {
       const fire = runContentScript.bind(window, extensionId, js.url, js.code);
       if (script.runAt === 'document_start') {
         process.once('document-start', fire);
       } else if (script.runAt === 'document_end') {
         process.once('document-end', fire);
-      } else if (script.runAt === 'document_idle') {
+      } else {
         document.addEventListener('DOMContentLoaded', fire);
       }
     });
@@ -88,7 +87,7 @@ const injectContentScript = (extensionId, script) => {
         process.once('document-start', fire);
       } else if (script.runAt === 'document_end') {
         process.once('document-end', fire);
-      } else if (script.runAt === 'document_idle') {
+      } else {
         document.addEventListener('DOMContentLoaded', fire);
       }
     });
