@@ -126,7 +126,8 @@ export default (vueInstance: any) => {
     },
     getCurrent: (guestInstanceId: number): store.TabObject => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
-      if (webContents) {
+      // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
+      if (!((webContents as any).type && (webContents as any).type === 'exception')) {
         const tabIndex = vueInstance.mappings[webContents.id];
         if (tabIndex === undefined) {
           return findAndUpdateOrCreate(vueInstance, false, -1);
@@ -258,7 +259,8 @@ export default (vueInstance: any) => {
     },
     getCurrent: (getInfo: chrome.windows.GetInfo = {}, guestInstanceId: number): store.LulumiBrowserWindowProperty | undefined => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
-      if (webContents) {
+      // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
+      if (!((webContents as any).type && (webContents as any).type === 'exception')) {
         if (vueInstance.mappings[webContents.id] === undefined) {
           return;
         }

@@ -556,7 +556,7 @@ ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => 
     const id = parseInt(key, 10);
     const window = windows[id];
     if (status) {
-      if (globalObjet.online === false && status === true) {
+      if (!globalObjet.online && status === true) {
         globalObjet.online = true;
         window.webContents.send('reload');
       }

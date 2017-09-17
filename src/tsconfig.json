@@ -21,9 +21,19 @@
       "es7",
       "es2017.object"
     ],
-    "baseUrl": ".",
-		"typeRoots": [
-			"typings"
-		]
-  }
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
+    "types": [
+      "chrome",
+      "node",
+      "mocha",
+      "webpack",
+      "webpack-env",
+      "webpack-hot-middleware"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ]
 }

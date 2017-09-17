@@ -36,7 +36,10 @@ let rendererConfig = {
         enforce: 'pre',
         exclude: /node_modules/,
         use: {
-          loader: 'tslint-loader'
+          loader: 'tslint-loader',
+          options: {
+            typeCheck: true
+          }
         }
       },
       {
@@ -185,7 +188,10 @@ let aboutConfig = {
         enforce: 'pre',
         exclude: /node_modules/,
         use: {
-          loader: 'tslint-loader'
+          loader: 'tslint-loader',
+          options: {
+            typeCheck: true
+          }
         }
       },
       {
