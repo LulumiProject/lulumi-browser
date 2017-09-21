@@ -1,60 +1,60 @@
 export const appMenu = {
   app: {
-    about: 'About %{appName}',
+    about: '关于 %{appName}',
     services: {
-      title: 'Services',
+      title: '服务',
     },
-    hide: 'Hide %{appName}',
-    hideOthers: 'Hide Others',
-    unhide: 'Show All',
-    quit: 'Quit %{appName}',
+    hide: '隐藏 %{appName}',
+    hideOthers: '隐藏其他',
+    unhide: '全部显示',
+    quit: '退出 %{appName}',
   },
   file: {
-    title: 'File',
-    newTab: 'New Tab',
-    newWindow: 'New Window',
-    closeTab: 'Close Tab',
+    title: '文件',
+    newTab: '新标签页',
+    newWindow: '新建窗口',
+    closeTab: '关闭标签页',
   },
   edit: {
-    title: 'Edit',
-    undo: 'Undo',
-    redo: 'Redo',
-    cut: 'Cut',
-    copy: 'Copy',
-    paste: 'Paste',
-    pasteAndMatchStyle: 'Paste and Match Style',
-    delete: 'Delete',
-    selectAll: 'Select All',
-    find: 'Find',
+    title: '编辑',
+    undo: '撤销',
+    redo: '恢复',
+    cut: '剪切',
+    copy: '复制',
+    paste: '粘贴',
+    pasteAndMatchStyle: '粘贴并匹配格式',
+    delete: '删除',
+    selectAll: '选择全部',
+    find: '查找',
     speech: {
-      title: 'Speech',
-      startSpeaking: 'Start Speaking',
-      stopSpeaking: 'Stop Speaking',
+      title: '拼写',
+      startSpeaking: '开始拼写',
+      stopSpeaking: '停止拼写',
     },
   },
   view: {
-    title: 'View',
-    reload: 'Reload',
-    forceReload: 'Force Reload',
-    toggleFullscreen: 'Toggle Fullscreen',
-    resetZoom: 'Actual Size',
-    zoomIn: 'Zoom In',
-    zoomOut: 'Zoom Out',
-    viewSource: 'View Source',
-    toggleDevTools: 'Toggle Developer Tools',
+    title: '视图',
+    reload: '重新加载',
+    forceReload: '完全重载',
+    toggleFullscreen: '进入全屏幕',
+    resetZoom: '实际大小',
+    zoomIn: '放大',
+    zoomOut: '缩小',
+    viewSource: '显示网页源代码',
+    toggleDevTools: '开发者工具',
   },
   window: {
-    title: 'Window',
-    minimize: 'Minimize',
-    close: 'Close Window',
-    front: 'Bring All to Front',
-    processManager: 'Process Manager',
+    title: '窗口',
+    minimize: '最小化',
+    close: '关闭窗口',
+    front: '全部置于顶层',
+    processManager: '任务管理器',
   },
   help: {
-    title: 'Help',
-    reportIssue: 'Report Issue',
-    forceReload: 'Force Reload',
-    toggleDevTools: 'Toggle Developer Tools',
+    title: '帮助',
+    reportIssue: '报告问题',
+    forceReload: '重新启动',
+    toggleDevTools: '切换开发者工具',
   },
 };
 
@@ -73,7 +73,7 @@ export const guest = {
     preferencesPage: {
       searchEngineProviderPage: {
         title: '搜索引擎提供者',
-        current: '这刻',
+        current: '当前使用',
         searchEngine: '搜索引擎',
         name: '提供者',
       },
@@ -87,16 +87,16 @@ export const guest = {
       tabConfigPage: {
         title: '分页',
         url: '默认开启',
-        favicon: '默认图示',
+        favicon: '图标',
       },
       LanguagePage: {
         title: '语言',
       },
     },
     historyPage: {
-      title: '历史纪录',
+      title: '历史记录',
       clear: '清空',
-      sync: '纪录',
+      sync: '记录',
       syncStatus: {
         syncing: '同步中',
         notSyncing: '非同步',
@@ -105,12 +105,12 @@ export const guest = {
       noData: '无纪录',
     },
     extensionsPage: {
-      title: '扩充组件',
+      title: '扩展程序',
       add: '添加',
       path: '位置：',
     },
     newtabPage: {
-      title: 'Newtab',
+      title: '新标签页',
     },
   },
 };
@@ -148,8 +148,8 @@ export default {
     },
   },
   navbar: {
-    placeholder: '键入 URL 搜寻',
-    search: '搜寻',
+    placeholder: '输入地址搜索',
+    search: '搜索',
     indicator: {
       secure: '安全',
       insecure: '一般',
@@ -165,13 +165,13 @@ export default {
     },
     common: {
       options: {
-        preferences: '设定',
+        preferences: '设置',
         downloads: '下载',
         history: {
-          title: '纪录',
-          history: '纪录',
+          title: '历史记录',
+          history: '所有历史记录',
         },
-        extensions: '扩充功能',
+        extensions: '扩展程序',
         help: '帮助',
         lulumi: '关于 Lulumi',
       },
@@ -179,7 +179,7 @@ export default {
   },
   notification: {
     update: {
-      updateAvailable: '新版本，%{releaseName}，已经下载完毕。重启后进行安装？',
+      updateAvailable: '新版本，%{releaseName}，已经下载完毕。重启执行安装？',
     },
     permission: {
       request: {
@@ -193,7 +193,7 @@ export default {
   tab: {
     loading: '载入中',
     findInPage: {
-      placeholder: '在页面中找寻',
+      placeholder: '查找',
       of: '/',
       match: '符合',
       status: '%{activeMatch} @:tab.findInPage.of %{matches}',
