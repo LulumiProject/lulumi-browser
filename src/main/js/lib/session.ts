@@ -252,7 +252,7 @@ const registerWebRequest = (sess: Electron.Session, delayedInit: number): void =
 };
 
 const registerScheme = (partition: string, scheme: string, delayedInit: number): void => {
-  const sess = session.fromPartition(partition);
+  const sess = session.fromPartition(partition, {cache: false});
   (sess as any).id = parseInt(partition, 10);
   registerWebRequest(sess, delayedInit);
   if (process.env.NODE_ENV === 'development') {
@@ -304,7 +304,7 @@ export default {
   registerWebRequestListeners,
   registerScheme,
   onWillDownload(partition: string, mainWindow: Electron.BrowserWindow, path: string): void {
-    const sess = session.fromPartition(partition);
+    const sess = session.fromPartition(partition, {cache: false});
     sess.on('will-download', (event, item, webContents) => {
       const itemURL = item.getURL();
       if (item.getMimeType() === 'application/pdf'
@@ -374,7 +374,7 @@ export default {
     });
   },
   setPermissionRequestHandler(partition: string, mainWindow: Electron.BrowserWindow): void {
-    const sess = session.fromPartition(partition);
+    const sess = session.fromPartition(partition, {cache: false});
     sess.setPermissionRequestHandler((webContents, permission, callback) => {
       mainWindow.webContents.send('request-permission', {
         permission,
