@@ -75,7 +75,7 @@ const unregister = (eventName: string, sess: Electron.Session): void => {
 };
 
 const registerWebRequestListeners = (): void => {
-  const sess = session.fromPartition('persist:lulumi-browser');
+  const sess = session.defaultSession as Electron.Session;
   ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event: Electron.Event, extensionName: string, eventLispCaseName: string, digest: string, filter): void => {
     register('onBeforeRequest', sess, eventLispCaseName, event.sender.id, digest, filter);
   });
@@ -127,7 +127,7 @@ const registerWebRequestListeners = (): void => {
 };
 
 const registerScheme = (scheme: string): void => {
-  const sess = session.fromPartition('persist:lulumi-browser');
+  const sess = session.defaultSession as Electron.Session;
   if (process.env.NODE_ENV === 'development') {
     sess.protocol.registerBufferProtocol('lulumi', (request, callback) => {
       const url: string = request.url.substr(scheme.length);
@@ -177,7 +177,7 @@ export default {
   registerWebRequestListeners,
   registerScheme,
   onWillDownload(mainWindow: Electron.BrowserWindow, path: string): void {
-    const sess = session.fromPartition('persist:lulumi-browser');
+    const sess = session.defaultSession as Electron.Session;
     sess.on('will-download', (event, item, webContents) => {
       const itemURL = item.getURL();
       if (item.getMimeType() === 'application/pdf'
@@ -247,7 +247,7 @@ export default {
     });
   },
   setPermissionRequestHandler(mainWindow: Electron.BrowserWindow): void {
-    const sess = session.fromPartition('persist:lulumi-browser');
+    const sess = session.defaultSession as Electron.Session;
     sess.setPermissionRequestHandler((webContents, permission, callback) => {
       mainWindow.webContents.send('request-permission', {
         permission,
