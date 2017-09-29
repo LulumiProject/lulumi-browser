@@ -6,8 +6,7 @@
     webview(plugins,
             :element-loading-text="$t('tab.loading')",
             ref="webview",
-            :class="isActive ? 'active' : 'hidden'",
-            :partition="nonReactivePartitionId")
+            :class="isActive ? 'active' : 'hidden'")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", :placeholder="$t('tab.findInPage.placeholder')")
       span(ref="findinpageCount")
@@ -34,7 +33,6 @@
       'windowId',
       'tabIndex',
       'tabId',
-      'partitionId',
     ],
     components: {
       Notification,
@@ -50,7 +48,6 @@
     windowId: number;
     tabIndex: number;
     tabId: number;
-    partitionId: number;
 
     findinpage: tab.FindInPageObject;
 
@@ -101,11 +98,9 @@
       }
     }
 
-    beforeMount() {
-      (this as any).nonReactivePartitionId = (this as any).partitionId;
-    }
     mounted() {
       const webview = this.$refs.webview as Electron.WebviewTag;
+
       const webviewEvents = {
         'did-start-loading': 'onDidStartLoading',
         'load-commit': 'onLoadCommit',

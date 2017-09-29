@@ -23,6 +23,7 @@ const pdfViewer = 'pdf-viewer';
 
 const tabConfig: store.TabConfig = {
   dummyTabObject: {
+    webContentsId: -1,
     id: -1,
     index: -1,
     windowId: -1,

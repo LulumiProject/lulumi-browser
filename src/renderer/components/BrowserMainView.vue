@@ -10,8 +10,7 @@
         :tabIndex="index",
         :tabId="tab.id",
         :ref="`tab-${index}`",
-        :key="`tab-${tab.id}`",
-        :partitionId="`${tab.id}`")
+        :key="`tab-${tab.id}`")
     #footer
       transition(name="extend")
         .browser-tab-status(v-show="tab.statusText") {{ decodeURIComponent(tab.statusText) }}
@@ -99,9 +98,6 @@
     }
     get pdfViewer(): string {
       return this.$store.getters.pdfViewer;
-    }
-    get mappings(): number[] {
-      return this.$store.getters.mappings[this.windowId];
     }
 
     @Watch('ready')
@@ -206,16 +202,11 @@
     onDidStartLoading(event: Electron.Event, tabIndex: number, tabId: number): void {
       const webview = this.getWebView(tabIndex);
       this.$store.dispatch('didStartLoading', {
+        webContentsId: webview.getWebContents().id,
         windowId: this.windowId,
         tabId,
         tabIndex,
         url: webview.getURL(),
-      });
-      this.$store.dispatch('updateMappings', {
-        windowId: this.windowId,
-        tabId,
-        tabIndex,
-        webContentsId: webview.getWebContents().id,
       });
       this.onCommitted.emit({
         frameId: 0,

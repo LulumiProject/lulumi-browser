@@ -33,8 +33,9 @@ export const actions = {
     });
   },
 
-  didStartLoading({ commit }, { windowId, tabId, tabIndex, url }) {
+  didStartLoading({ commit }, { webContentsId, windowId, tabId, tabIndex, url }) {
     commit(types.DID_START_LOADING, {
+      webContentsId,
       windowId,
       tabId,
       tabIndex,
@@ -212,15 +213,6 @@ export const actions = {
       hostname,
       permission,
       accept,
-    });
-  },
-
-  updateMappings({ commit }, { windowId, tabId, tabIndex, webContentsId }) {
-    commit(types.UPDATE_MAPPINGS, {
-      windowId,
-      tabId,
-      tabIndex,
-      webContentsId,
     });
   },
 

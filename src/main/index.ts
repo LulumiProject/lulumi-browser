@@ -117,6 +117,11 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   menu.init();
 
+  // Session related operations
+  session.registerScheme(config.lulumiPagesCustomProtocol);
+  session.onWillDownload(mainWindow!, config.lulumiPDFJSPath);
+  session.setPermissionRequestHandler(mainWindow);
+
   if (process.env.NODE_ENV !== 'development') {
     autoUpdater.init();
     autoUpdater.listen(mainWindow);
@@ -126,9 +131,6 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     // webPreferences.contextIsolation = true;
     webPreferences.nativeWindowOpen = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
-    session.registerScheme(params.partition, config.lulumiPagesCustomProtocol, config.delayedInit);
-    session.onWillDownload(params.partition, mainWindow!, config.lulumiPDFJSPath);
-    session.setPermissionRequestHandler(params.partition, mainWindow!);
 
     const regexp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {

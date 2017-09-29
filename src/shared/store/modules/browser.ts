@@ -21,7 +21,6 @@ const state: store.State = {
   downloads: [],
   history: [],
   permissions: {},
-  mappings: [],
   lastOpenedTabs: [],
   windows: [],
 };
@@ -29,6 +28,7 @@ const state: store.State = {
 // tslint:disable-next-line:max-line-length
 function createTabObject(state: store.State, wid: number, openUrl: string | null = null): store.TabObject {
   return {
+    webContentsId: -1,
     id: 0,
     index: 0,
     windowId: wid,
@@ -202,6 +202,7 @@ const mutations = {
   // tab handlers
   [types.DID_START_LOADING](state: store.State, payload) {
     // const windowId: number = payload.windowId;
+    const webContentsId: number = payload.webContentsId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
     const url: string = payload.url;
@@ -209,6 +210,7 @@ const mutations = {
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex]) {
+      state.tabs[tabsIndex].webContentsId = webContentsId;
       state.tabs[tabsIndex].url = url;
       state.tabs[tabsIndex].isLoading = true;
       state.tabs[tabsIndex].status = 'loading';
@@ -516,20 +518,6 @@ const mutations = {
     }
 
     Vue.set(state.permissions[hostname], permission, accept);
-  },
-  // webContentsId => tabsIndex mappings
-  [types.UPDATE_MAPPINGS](state: store.State, payload) {
-    const windowId: number = payload.windowId;
-    // const tabId: number = payload.tabId;
-    const tabIndex: number = payload.tabIndex;
-    const webContentsId: number = payload.webContentsId;
-
-    // const tabsIndex = state.tabs.findIndex(tab => tab.pid === tabId);
-
-    if (state.mappings[windowId] === undefined) {
-      Vue.set(state.mappings, windowId, []);
-    }
-    Vue.set(state.mappings[windowId], webContentsId, tabIndex);
   },
   // app state
   [types.SET_APP_STATE](state: store.State, { newState }) {

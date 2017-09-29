@@ -64,7 +64,7 @@ export default (vueInstance: any) => {
       }
     },
     onClicked: (webContentsId: number): Event => {
-      let id = vueInstance.mappings[webContentsId];
+      let id = tabs.query({ webContentsId })[0].index;
       if (id === undefined) {
         id = 0;
       }
@@ -79,7 +79,7 @@ export default (vueInstance: any) => {
       }
     },
     onClicked: (webContentsId: number): Event => {
-      let id = vueInstance.mappings[webContentsId];
+      let id = tabs.query({ webContentsId })[0].index;
       if (id === undefined) {
         id = 0;
       }
@@ -90,7 +90,7 @@ export default (vueInstance: any) => {
   const runtime = {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
-      const tabIndex: number = vueInstance.mappings[webContentsId];
+      const tabIndex: number = tabs.query({ webContentsId })[0].index;
       if (tabIndex === undefined) {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
@@ -103,14 +103,14 @@ export default (vueInstance: any) => {
       }
     },
     onMessage: (webContentsId: number): Event | undefined => {
-      const tabIndex = vueInstance.mappings[webContentsId];
+      const tabIndex = tabs.query({ webContentsId })[0].index;
       if (tabIndex === undefined) {
         return undefined;
       }
       return vueInstance.getTab(tabIndex).onMessageEvent;
     },
     onMessageExternal: (webContentsId: number): Event | undefined => {
-      const tabIndex = vueInstance.mappings[webContentsId];
+      const tabIndex = tabs.query({ webContentsId })[0].index;
       if (tabIndex === undefined) {
         return undefined;
       }
@@ -128,7 +128,7 @@ export default (vueInstance: any) => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
       if (!((webContents as any).type && (webContents as any).type === 'exception')) {
-        const tabIndex = vueInstance.mappings[webContents.id];
+        const tabIndex = tabs.query({ webContentsId: webContents.id })[0].index;
         if (tabIndex === undefined) {
           return findAndUpdateOrCreate(vueInstance, false, -1);
         }
@@ -147,8 +147,8 @@ export default (vueInstance: any) => {
       }
       webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
-    query: (queryInfo: chrome.tabs.QueryInfo): store.TabObject[] => {
-      if (Object.keys(queryInfo).length === 0) {
+    query: (queryInfo: api.customTabsQueryInfo): store.TabObject[] => {
+      if (Object.keys(queryInfo).length === 0 || queryInfo.url === '<all_urls>') {
         return vueInstance.tabs;
       } else {
         const tabs: store.TabObject[] = [];
@@ -261,7 +261,7 @@ export default (vueInstance: any) => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
       if (!((webContents as any).type && (webContents as any).type === 'exception')) {
-        if (vueInstance.mappings[webContents.id] === undefined) {
+        if (tabs.query({ webContentsId: webContents.id })[0].index === undefined) {
           return;
         }
         const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);

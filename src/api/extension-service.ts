@@ -715,7 +715,9 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const details = data.details;
+        const tab = require('lulumi').tabs.query({ webContentsId: details.webContentsId })[0];
 
+        details.tabId = (tab === undefined) ? -1 : tab.id;
         webContents.send(
           `lulumi-web-request-${data.eventLispCaseName}-intercepted-${data.digest}`,
           details);

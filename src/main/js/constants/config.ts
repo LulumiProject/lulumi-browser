@@ -8,7 +8,6 @@ const lulumiHelperPath = path.resolve(lulumiRootPath, './helper');
 export default {
   lulumiRootPath,
   lulumiHelperPath,
-  delayedInit: 3000,
   devUserData: `${lulumiRootPath}/userData`,
   testUserData: `${lulumiRootPath}/test/userData`,
   lulumiPagesCustomProtocol: 'lulumi://',
@@ -16,5 +15,5 @@ export default {
   lulumiPreloadPath: `${lulumiHelperPath}/preload`,
   lulumiPagesPath: `${lulumiHelperPath}/pages`,
   lulumiPDFJSPath: `${lulumiHelperPath}/pdfjs`,
-  lulumiRev: '594372a957a89b2ede88b0bfa9e4458ecccb8773',
+  lulumiRev: '2f172f3ea259e6e371a05fa705f0dfed9e7860f5',
 };

@@ -47,9 +47,6 @@ export const getters = {
   permissions(state: BrowserState) {
     return state.browser.permissions;
   },
-  mappings(state: BrowserState) {
-    return state.browser.mappings;
-  },
   windows(state: BrowserState) {
     return state.browser.windows;
   },
