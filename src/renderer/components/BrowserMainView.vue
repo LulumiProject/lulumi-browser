@@ -1279,7 +1279,7 @@
         this.windowId = ipc.sendSync('window-id');
 
         // we have to call sendSync anyway, in order to cancel the corresponding event listener
-        const suggestion = ipc.sendSync('any-new-tab-suggestion');
+        const suggestion = ipc.sendSync(`any-new-tab-suggestion-for-window-${this.windowId}`);
         if (this.tabs.length === 0) {
           this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
         }
@@ -1331,10 +1331,12 @@
         this.onTabClose(this.currentTabIndex);
       });
       ipc.on('tab-click', (event, tabIndexThatWeSee) => {
-        const el: HTMLElement
-          = (document.querySelectorAll('.chrome-tab-draggable')[tabIndexThatWeSee] as HTMLElement);
+        const els: NodeListOf<Element> = document.querySelectorAll('.chrome-tab-draggable');
+        const el: Element = (tabIndexThatWeSee === -1)
+          ? els[els.length - 1]
+          : els[tabIndexThatWeSee];
         if (el) {
-          el.click();
+          (el as HTMLElement).click();
         }
       });
       ipc.on('start-find-in-page', () => {

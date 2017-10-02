@@ -130,6 +130,8 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       event.returnValue = window.id;
     });
 
+    (window as any).callback(`any-new-tab-suggestion-for-window-${window.id}`);
+
     window.on('close', (event: Electron.Event) => {
       if (close) {
         close = false;

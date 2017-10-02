@@ -160,11 +160,13 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
   }
   if (callback) {
-    callback();
+    (mainWindow as any).callback = callback;
   } else {
-    ipcMain.once('any-new-tab-suggestion', (event: Electron.Event) => {
-      event.returnValue = { url: 'about:newtab', follow: true };
-    });
+    (mainWindow as any).callback = (eventName) => {
+      ipcMain.once(eventName, (event: Electron.Event) => {
+        event.returnValue = { url: 'about:newtab', follow: true };
+      });
+    };
   }
   return mainWindow;
 }
@@ -511,8 +513,8 @@ ipcMain.on('new-lulumi-window', (event, data) => {
       autoHideMenuBar: autoHideMenuBarSetting,
       frame: !isWindows,
       // tslint:disable-next-line:align
-    }, () => {
-      ipcMain.once('any-new-tab-suggestion', (event: Electron.Event) => {
+    }, (eventName) => {
+      ipcMain.once(eventName, (event: Electron.Event) => {
         event.returnValue = { url: data.url, follow: data.follow };
       });
     });
