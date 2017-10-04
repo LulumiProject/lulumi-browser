@@ -119,7 +119,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   // Session related operations
   session.registerScheme(config.lulumiPagesCustomProtocol);
-  session.onWillDownload(mainWindow!, config.lulumiPDFJSPath);
+  session.onWillDownload(mainWindow, config.lulumiPDFJSPath);
   session.setPermissionRequestHandler(mainWindow);
 
   if (process.env.NODE_ENV !== 'development') {

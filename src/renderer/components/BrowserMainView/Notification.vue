@@ -1,7 +1,8 @@
 <template lang="pug">
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
-    el-col(:span="18") {{ `${template}` }}
-    el-col(:span="6")
+    el-col(:span="14") {{ `${template}` }}
+    el-col(:span="10")
+      el-checkbox(v-model="permanent", style="padding-right: 10px;") Remember this decision
       el-button(:plain="true", type="success", size="small", @click="onAllow") {{ $t('notification.permission.request.allow') }}
       el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
 </template>
@@ -10,7 +11,7 @@
   import { Component, Vue } from 'vue-property-decorator';
   import VueI18n from 'vue-i18n';
 
-  import { Button, ButtonGroup, Col, Row } from 'element-ui';
+  import { Button, ButtonGroup, Checkbox, Col, Row } from 'element-ui';
 
   import urlUtil from '../../js/lib/url-util';
 
@@ -20,11 +21,13 @@
     components: {
       'el-button': Button,
       'el-button-group': ButtonGroup,
+      'el-checkbox': Checkbox,
       'el-col': Col,
       'el-row': Row,
     },
   })
   export default class Notification extends Vue {
+    permanent: boolean = false;
     type: string = '';
     template: VueI18n.LocaleMessage = '';
     permission: string = ''; 
@@ -48,11 +51,13 @@
         ipc.send(`response-permission-${this.id}`, {
           accept: true,
         });
-        this.$store.dispatch('setPermissions', {
-          hostname: this.hostname,
-          permission: this.permission,
-          accept: true,
-        });
+        if (this.permanent) {
+          this.$store.dispatch('setPermissions', {
+            hostname: this.hostname,
+            permission: this.permission,
+            accept: true,
+          });
+        }
       } else {
         ipc.send('quit-and-install', {
           accept: true,
@@ -72,11 +77,13 @@
         ipc.send(`response-permission-${this.id}`, {
           accept: false,
         });
-        this.$store.dispatch('setPermissions', {
-          hostname: this.hostname,
-          permission: this.permission,
-          accept: false,
-        });
+        if (this.permanent) {
+          this.$store.dispatch('setPermissions', {
+            hostname: this.hostname,
+            permission: this.permission,
+            accept: false,
+          });
+        }
       } else {
         ipc.send('quit-and-install', {
           accept: false,
@@ -110,29 +117,24 @@
           this.hostname = urlUtil.getHostname(webContents.getURL());
           this.permission = data.permission;
           if (this.hostname !== null) {
-            if (this.permission !== 'setLanguage') {
-              if (this.permissions[`${this.hostname}`]) {
-                if (this.permissions[`${this.hostname}`][`${this.permission}`] === true) {
-                  ipc.send(`response-permission-${this.id}`, {
-                    accept: true,
-                  });
-                } else if (this.permissions[`${this.hostname}`][`${this.permission}`] === false) {
-                  ipc.send(`response-permission-${this.id}`, {
-                    accept: false,
-                  });
-                } else {
-                  this.type = 'permission';
-                  this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
-                  webview.style.height = 'calc((100vh - 73px) - 35px)';
-                  (this.$parent as Tab).showNotification = true;
-                  this.handler = setTimeout(() => {
-                    ipc.send(`response-permission-${this.id}`, {
-                      accept: false,
-                    });
-                    webview.style.height = 'calc(100vh - 73px)';
-                    (this.$parent as Tab).showNotification = false;
-                  }, 5000);
-                }
+            if (this.permission === 'setLanguage') {
+              this.type = 'permission';
+              this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
+              webview.style.height = 'calc((100vh - 73px) - 35px)';
+              (this.$parent as Tab).showNotification = true;
+              this.handler = setTimeout(() => {
+                ipc.send(`response-permission-${this.id}`, {
+                  accept: false,
+                });
+                webview.style.height = 'calc(100vh - 73px)';
+                (this.$parent as Tab).showNotification = false;
+              }, 10000);
+            } else {
+              if (this.permissions[`${this.hostname}`]
+                && this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
+                ipc.send(`response-permission-${this.id}`, {
+                  accept: this.permissions[`${this.hostname}`][`${this.permission}`],
+                });
               } else {
                 this.type = 'permission';
                 this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
@@ -146,18 +148,6 @@
                   (this.$parent as Tab).showNotification = false;
                 }, 5000);
               }
-            } else {
-              this.type = 'permission';
-              this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
-              webview.style.height = 'calc((100vh - 73px) - 35px)';
-              (this.$parent as Tab).showNotification = true;
-              this.handler = setTimeout(() => {
-                ipc.send(`response-permission-${this.id}`, {
-                  accept: false,
-                });
-                webview.style.height = 'calc(100vh - 73px)';
-                (this.$parent as Tab).showNotification = false;
-              }, 10000);
             }
           }
         }
