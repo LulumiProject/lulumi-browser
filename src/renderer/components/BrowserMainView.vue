@@ -379,7 +379,8 @@
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       const disposition: string = event.disposition;
       if (disposition === 'new-window') {
-        (this as any).$electron.ipcRenderer.send('new-lulumi-window', {
+        event.preventDefault();
+        (event as any).newGuest = (this as any).$electron.ipcRenderer.sendSync('new-lulumi-window', {
           url: event.url,
           follow: true,
         });
@@ -387,6 +388,9 @@
         this.onNewTab(this.windowId, event.url, true);
       } else if (disposition === 'background-tab') {
         this.onNewTab(this.windowId, event.url, false);
+      } else {
+        // tslint:disable-next-line
+        console.log(`NOTIMPLEMENTED: ${disposition}`);
       }
       /*
       this.onCreatedNavigationTarget.emit({

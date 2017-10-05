@@ -505,7 +505,7 @@ ipcMain.on('set-history', (event: Electron.Event, val) => {
 // listen to new-lulumi-window event
 ipcMain.on('new-lulumi-window', (event, data) => {
   if (data.url) {
-    createWindow({
+    event.returnValue = createWindow({
       width: 800,
       height: 500,
       titleBarStyle: 'hiddenInset',
