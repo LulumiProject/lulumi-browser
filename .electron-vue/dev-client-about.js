@@ -1,6 +1,6 @@
 const hotClient = require('webpack-hot-middleware/client?name=about&noInfo=true&reload=true')
 
-hotClient.subscribe(event => {
+hotClient.subscribe((event) => {
   /**
    * Reload browser when HTMLWebpackPlugin emits a new index.html
    */

@@ -35,7 +35,7 @@
   import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
 
-  import { browserMainView, store } from 'lulumi';
+  import { browserMainView, main, store } from 'lulumi';
 
   @Component({
     name: 'browser-main',
@@ -1282,11 +1282,14 @@
       if (process.env.NODE_ENV !== 'testing') {
         this.windowId = ipc.sendSync('window-id');
 
-        // we have to call sendSync anyway, in order to cancel the corresponding event listener
-        const suggestion = ipc.sendSync(`any-new-tab-suggestion-for-window-${this.windowId}`);
-        if (this.tabs.length === 0) {
-          this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
-        }
+        ipc.once(`new-tab-suggestion-for-window-${this.windowId}`,
+          (event: Electron.Event, suggestion: main.BrowserWindowSuggestionItem) => {
+          if (this.tabs.length === 0) {
+            this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
+          }
+        });
+        // we have to call ipc.send anyway in order to cancel/trigger the corresponding event listener
+        ipc.send(`any-new-tab-suggestion-for-window-${this.windowId}`);
       } else {
         this.windowId = 0;
 

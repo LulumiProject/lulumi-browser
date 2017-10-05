@@ -1,11 +1,12 @@
 const hotClient = require('webpack-hot-middleware/client?name=renderer&noInfo=true&reload=true')
+const { remote } = require('electron')
 
-hotClient.subscribe(event => {
+hotClient.subscribe((event) => {
   /**
    * Reload browser when HTMLWebpackPlugin emits a new index.html
    */
   if (event.action === 'reload') {
-    window.location.reload()
+    remote.BrowserWindow.getAllWindows().forEach(window => window.webContents.reloadIgnoringCache())
   }
 
   /**

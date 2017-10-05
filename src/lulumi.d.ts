@@ -141,6 +141,14 @@ declare module 'lulumi' {
     }
   }
 
+  export namespace main {
+    // src/main/index.js
+    export interface BrowserWindowSuggestionItem {
+      url: string;
+      follow: boolean;
+    }
+  }
+
   export namespace renderer {
     // src/renderer/js
     export interface SuggestionItem {

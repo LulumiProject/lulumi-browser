@@ -164,7 +164,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   } else {
     (mainWindow as any).callback = (eventName) => {
       ipcMain.once(eventName, (event: Electron.Event) => {
-        event.returnValue = { url: 'about:newtab', follow: true };
+        event.sender.send(eventName.substr(4), { url: 'about:newtab', follow: true });
       });
     };
   }
@@ -515,7 +515,7 @@ ipcMain.on('new-lulumi-window', (event, data) => {
       // tslint:disable-next-line:align
     }, (eventName) => {
       ipcMain.once(eventName, (event: Electron.Event) => {
-        event.returnValue = { url: data.url, follow: data.follow };
+        event.sender.send(eventName.substr(4), { url: data.url, follow: data.follow });
       });
     });
   }
