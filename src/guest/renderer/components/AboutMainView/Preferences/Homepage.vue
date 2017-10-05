@@ -13,9 +13,15 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Input } from 'element-ui';
+
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-input': Input,
+    },
+  })
   export default class Homepage extends Vue {
     homepage: string = '';
 

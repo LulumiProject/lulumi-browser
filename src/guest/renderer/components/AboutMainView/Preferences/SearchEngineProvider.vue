@@ -10,6 +10,8 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Table, TableColumn } from 'element-ui';
+
   interface TableData {
     current: string;
     name: string;
@@ -19,7 +21,12 @@
 
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-table': Table,
+      'el-table-column': TableColumn,
+    },
+  })
   export default class SearchEngineProvider extends Vue {
     tableData: Array<TableData> = [];
 

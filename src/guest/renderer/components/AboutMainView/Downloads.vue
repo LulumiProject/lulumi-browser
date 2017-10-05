@@ -24,6 +24,8 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Button, ButtonGroup, Col, Row } from 'element-ui';
+
   interface File {
     webContentsId: number;
     name: string;
@@ -39,7 +41,14 @@
 
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-button': Button,
+      'el-button-group': ButtonGroup,
+      'el-col': Col,
+      'el-row': Row,
+    },
+  })
   export default class Downloads extends Vue {
     files: Array<File> = [];
     handler: any = null;

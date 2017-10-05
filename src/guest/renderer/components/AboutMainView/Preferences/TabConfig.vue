@@ -24,11 +24,17 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Input } from 'element-ui';
+
   import { store } from 'lulumi';
 
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-input': Input,
+    },
+  })
   export default class TabConfig extends Vue {
     defaultUrl: string = '';
     defaultFavicon: string = '';

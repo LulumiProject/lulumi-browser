@@ -25,6 +25,8 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Button, Col, Row } from 'element-ui';
+
   interface RenderProcessPreference {
     name: string;
     extensionId: string;
@@ -45,7 +47,13 @@
   declare const ipcRenderer: Electron.IpcRenderer;
   declare const window: Window;
 
-  @Component
+  @Component({
+    components: {
+      'el-button': Button,
+      'el-col': Col,
+      'el-row': Row,
+    },
+  })
   export default class Extensions extends Vue {
     get extensions() {
       return this.$store.getters.extensions;

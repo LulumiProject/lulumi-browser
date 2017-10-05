@@ -11,9 +11,16 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Option, Select } from 'element-ui';
+
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-option': Option,
+      'el-select': Select,
+    },
+  })
   export default class PDFViewer extends Vue {
     options: Array<object> = [
       {

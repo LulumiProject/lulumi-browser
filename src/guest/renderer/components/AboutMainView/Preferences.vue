@@ -11,7 +11,16 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  @Component
+  import { Col, Menu, MenuItem, Row } from 'element-ui';
+
+  @Component({
+    components: {
+      'el-col': Col,
+      'el-menu': Menu,
+      'el-menu-item': MenuItem,
+      'el-row': Row,
+    },
+  })
   export default class Preferences extends Vue {
     path: string = '/preferences';
 

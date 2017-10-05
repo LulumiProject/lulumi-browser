@@ -13,9 +13,16 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import { Table, TableColumn } from 'element-ui';
+
   declare const ipcRenderer: Electron.IpcRenderer;
 
-  @Component
+  @Component({
+    components: {
+      'el-table': Table,
+      'el-table-column': TableColumn,
+    },
+  })
   export default class Lulumi extends Vue {
     get datas() {
       return this.$store.getters.about;
