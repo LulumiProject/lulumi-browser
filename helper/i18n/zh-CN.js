@@ -185,6 +185,7 @@ export default {
       request: {
         normal: '%{hostname} 要求 %{permission} 权限.',
         setLanguage: '%{hostname} 想要变更语言成 %{lang}（需重启）',
+        permanent: 'Remember this decision',
         allow: '允许',
         deny: '拒绝',
       },

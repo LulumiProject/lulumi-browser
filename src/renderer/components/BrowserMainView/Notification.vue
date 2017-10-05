@@ -2,7 +2,7 @@
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
     el-col(:span="14") {{ `${template}` }}
     el-col(:span="10")
-      el-checkbox(v-model="permanent", style="padding-right: 10px;") Remember this decision
+      el-checkbox(v-model="permanent", style="padding-right: 10px;") {{ $t('notification.permission.request.permanent') }}
       el-button(:plain="true", type="success", size="small", @click="onAllow") {{ $t('notification.permission.request.allow') }}
       el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
 </template>
