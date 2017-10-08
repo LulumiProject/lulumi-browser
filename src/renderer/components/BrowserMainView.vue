@@ -206,7 +206,7 @@
         windowId: this.windowId,
         tabId,
         tabIndex,
-        url: webview.getURL(),
+        url: webview.getAttribute('src'),
       });
       this.onCommitted.emit({
         frameId: 0,
@@ -214,7 +214,7 @@
         processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
         tabId: this.getTabObject(tabIndex).id,
         timeStamp: Date.now(),
-        url: webview.getURL(),
+        url: webview.getAttribute('src'),
       });
     }
     onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, tabId: number): void {

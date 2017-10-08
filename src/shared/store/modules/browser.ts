@@ -262,7 +262,7 @@ const mutations = {
 
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
-    if (state.tabs[tabsIndex] && url !== '') {
+    if (state.tabs[tabsIndex] && url) {
       state.tabs[tabsIndex].url = url;
       if (url.match(regexp)) {
         if (url.match(regexp)![1] === undefined) {
