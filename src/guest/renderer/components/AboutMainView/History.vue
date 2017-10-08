@@ -19,7 +19,7 @@
   import { Component, Watch, Vue } from 'vue-property-decorator';
   import VueI18n from 'vue-i18n';
 
-  import { Button, Col, Input, Row, Tree } from 'element-ui';
+  import { Button, Col, Input, Row, Switch, Tree } from 'element-ui';
 
   import '../../css/el-tree';
 
@@ -42,6 +42,7 @@
       'el-col': Col,
       'el-input': Input,
       'el-row': Row,
+      'el-switch': Switch,
       'el-tree': Tree,
     },
   })
