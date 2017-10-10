@@ -47,8 +47,7 @@
                           :title="showTitle(extension)",
                           @click.prevent="sendIPC($event, extension)",
                           @contextmenu.prevent="onContextmenu(extension)")
-          webview.extension(:ref="`webview-${extension.extensionId}`",
-                  webpreferences="nativeWindowOpen=yes")
+          webview.extension(:ref="`webview-${extension.extensionId}`")
     .common-group
       a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
         iview-icon(type="android-more-vertical", size="22")
