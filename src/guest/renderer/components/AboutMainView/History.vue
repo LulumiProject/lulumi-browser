@@ -51,7 +51,7 @@
     data: Array<HistoryItem> = [];
     handler: any = null;
     filterText: string = '';
-    sync: boolean = true;
+    sync: boolean = false;
   
     @Watch('filterText')
     onFilterText(val: string): void {
@@ -145,7 +145,8 @@
         this.history = ret;
         this.data = this.transformArr(this.history);
       });
-      this.fetch();
+      // fetch once when the component is mounted
+      ipcRenderer.send('guest-want-data', 'history');
     }
     beforeDestroy() {
       this.clear();
