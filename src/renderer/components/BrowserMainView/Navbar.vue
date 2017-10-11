@@ -18,7 +18,6 @@
         @keyup.shift.down.native="selectPortion",
         @input="onChange",
         @select="onSelect",
-        icon="search",
         :trigger-on-focus="false",
         :placeholder="$t('navbar.placeholder')",
         :fetch-suggestions="querySearch",
@@ -30,8 +29,8 @@
           div.secure(v-if="secure")
             awesome-icon(name="lock")
             span {{ $t('navbar.indicator.secure') }}
-          div(v-else)
-            awesome-icon(name="info-circle")
+          div.insecure(v-else)
+            awesome-icon(name="unlock")
             span {{ $t('navbar.indicator.insecure') }}
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
@@ -67,7 +66,7 @@
   import 'vue-awesome/icons/refresh';
   import 'vue-awesome/icons/times';
   import 'vue-awesome/icons/lock';
-  import 'vue-awesome/icons/info-circle';
+  import 'vue-awesome/icons/unlock';
 
   import Fuse from 'fuse.js';
   import Sortable from 'sortablejs';
@@ -264,16 +263,16 @@
 
     @Watch('url')
     onUrl(newUrl: string): void {
-      this.updateSecure(this.url);
+      this.showUrl(this.url, this.tab.id);
       if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
-        this.showUrl(newUrl);
         const currentUrl = url.parse(newUrl, true);
         const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
-        const newElement = document.getElementById('securityOrigin');
+        const newElement = document.getElementById('security-indicator');
         if (newElement !== null) {
           if (currentUrl.href !== undefined && (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:')) {
+            const hint = this.secure ? 'secure' : 'insecure';
             const newUrl
-              = `<div class="security-origin"><span style="color: #3c943c;">${currentUrl.protocol}</span>${currentUrl.href.substr(currentUrl.protocol.length)}</div>`;
+              = `<div class="security-hint"><span class="${hint}-origin">${currentUrl.protocol}</span>${currentUrl.href.substr(currentUrl.protocol.length)}</div>`;
             originalInput.style.display = 'none';
 
             newElement.innerHTML = newUrl;
@@ -296,6 +295,10 @@
     }
 
     updateSecure(url: string): void {
+      if (urlUtil.getScheme(url) === 'lulumi://') {
+        this.secure = true;
+        return;
+      }
       const hostname = urlUtil.getHostname(url);
       if (hostname) {
         const certificateObject = this.certificates[hostname];
@@ -338,19 +341,22 @@
       });
       return newSuggestions;
     }
-    showUrl(url: string): void {
-      if (url === undefined || url.startsWith('lulumi-extension')) {
-        this.value = '';
-        return;
+    showUrl(url: string, tabId: number): void {
+      if (tabId === this.tab.id) {
+        this.updateSecure(url);
+        if (url === undefined || url.startsWith('lulumi-extension')) {
+          this.value = '';
+          return;
+        }
+        if (this.focused) {
+          this.value = '';
+          return;
+        }
+        let newUrl = decodeURIComponent(url);
+        newUrl = urlUtil.getUrlIfError(newUrl);
+        newUrl = urlUtil.getUrlIfPDF(newUrl);
+        this.value = urlUtil.getUrlIfAbout(newUrl).url;
       }
-      if (this.focused) {
-        this.value = '';
-        return;
-      }
-      let newUrl = decodeURIComponent(url);
-      newUrl = urlUtil.getUrlIfError(newUrl);
-      newUrl = urlUtil.getUrlIfPDF(newUrl);
-      this.value = urlUtil.getUrlIfAbout(newUrl).url;
     }
     onGoBackMouseDown(): void {
       this.handler = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
@@ -659,7 +665,7 @@
         // .el-input__inner event(s)
         const originalInput = document.getElementsByClassName('el-input__inner')[0];
         let newElement = document.createElement('div');
-        newElement.id = 'securityOrigin';
+        newElement.id = 'security-indicator';
         (newElement as any).classList = 'el-input__inner';
         newElement.innerHTML = '';
         newElement.style.display = 'none';

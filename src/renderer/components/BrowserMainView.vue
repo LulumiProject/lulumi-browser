@@ -220,8 +220,7 @@
     onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, tabId: number): void {
       if (event.isMainFrame) {
         const navbar = this.$refs.navbar;
-        (navbar as any).showUrl(event.url);
-        (navbar as any).updateSecure(event.url);
+        (navbar as any).showUrl(event.url, tabId);
         this.$store.dispatch('loadCommit', {
           windowId: this.windowId,
           tabId,

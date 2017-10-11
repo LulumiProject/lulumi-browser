@@ -152,7 +152,7 @@ export default {
     search: 'Search',
     indicator: {
       secure: 'Secure',
-      insecure: 'Normal',
+      insecure: 'Not Secure',
     },
     navigator: {
       history: 'Show history',

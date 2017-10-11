@@ -152,7 +152,7 @@ export default {
     search: '搜尋',
     indicator: {
       secure: '安全',
-      insecure: '一般',
+      insecure: '不安全',
     },
     navigator: {
       history: '顯示完整紀錄',

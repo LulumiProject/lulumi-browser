@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
+    width: auto;
     margin: 4px 0 3px;
     padding: 0 18px;
     background: #fff;
@@ -38,6 +38,10 @@
           &.secure {
             color: #3c943c;
           }
+
+          &.insecure {
+            color: #da0000;
+          }
         }
       }
     }
@@ -55,7 +59,7 @@
     border-left: none;
     font-family: 'Source Code Pro', Courier, monospace;
 
-    .security-origin {
+    .security-hint {
       float: left;
       font-size: 14px;
       padding: 3px 0;
@@ -64,6 +68,15 @@
       white-space: nowrap;
       // TODO: adjust the width correctly when text overflow happened
       max-width: 75vw;
+
+      .secure-origin {
+        color: #3c943c;
+      }
+      .insecure-origin {
+        text-decoration-line: line-through;
+        text-decoration-color: #da0000;
+        color: #da0000;
+      }
     }
   }
 

@@ -96,7 +96,7 @@ export const guest = {
     historyPage: {
       title: '历史记录',
       clear: '清空',
-      sync: '',
+      sync: '记录',
       syncStatus: {
         syncing: '已打开同步',
         notSyncing: '同步已关闭',
@@ -152,7 +152,7 @@ export default {
     search: '搜索',
     indicator: {
       secure: '安全',
-      insecure: '一般',
+      insecure: '不安全',
     },
     navigator: {
       history: '显示历史',
