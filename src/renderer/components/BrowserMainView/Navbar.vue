@@ -264,6 +264,7 @@
 
     @Watch('url')
     onUrl(newUrl: string): void {
+      this.updateSecure(this.url);
       if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
         this.showUrl(newUrl);
         const currentUrl = url.parse(newUrl, true);
