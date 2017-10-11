@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { BrowserWindow, ipcMain, session } from 'electron';
 
+import mainStore from '../../../shared/store/mainStore';
+
 /* tslint:disable:max-line-length */
 /* tslint:disable:no-console */
 /* tslint:disable:object-shorthand-properties-first */
@@ -173,93 +175,110 @@ const registerScheme = (scheme: string): void => {
   }
 };
 
+const registerCertificateVerifyProc = () => {
+  const sess = session.defaultSession as Electron.Session;
+  const store = mainStore.getStore();
+  (sess.setCertificateVerifyProc as any)((hostname, certificate, callback) => {
+    store.dispatch('updateCertificate', {
+      hostname,
+      certificate,
+    });
+    callback(-3);
+  });
+};
+
+const onWillDownload = (mainWindow: Electron.BrowserWindow, path: string): void => {
+  const sess = session.defaultSession as Electron.Session;
+  sess.on('will-download', (event, item, webContents) => {
+    const itemURL = item.getURL();
+    if (item.getMimeType() === 'application/pdf'
+      && itemURL.indexOf('blob:') !== 0
+      && itemURL.indexOf('#pdfjs.action=download') === -1
+      && itemURL.indexOf('skip=true') === -1) {
+      event.preventDefault();
+      const qs = require('querystring');
+      const param = qs.stringify({ file: itemURL });
+      const pdfViewerURL = `file://${path}/web/viewer.html`;
+      mainWindow.webContents.send('open-pdf', {
+        url: `${pdfViewerURL}?${param}`,
+        webContentsId: webContents.id,
+      });
+    } else {
+      const totalBytes = item.getTotalBytes();
+      const startTime = item.getStartTime();
+      mainWindow.webContents.send('will-download-any-file', {
+        totalBytes,
+        startTime,
+        webContentsId: webContents.id,
+        name: item.getFilename(),
+        url: item.getURL(),
+        isPaused: item.isPaused(),
+        canResume: item.canResume(),
+        dataState: 'init',
+      });
+
+      ipcMain.on('pause-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+        if (startTime === remoteStartTime) {
+          item.pause();
+        }
+      });
+      ipcMain.on('resume-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+        if (startTime === remoteStartTime) {
+          item.resume();
+        }
+      });
+      ipcMain.on('cancel-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+        if (startTime === remoteStartTime) {
+          item.cancel();
+        }
+      });
+
+      item.on('updated', (event: Electron.Event, state: string) => {
+        mainWindow.webContents.send('update-downloads-progress', {
+          startTime: item.getStartTime(),
+          getReceivedBytes: item.getReceivedBytes(),
+          savePath: item.getSavePath(),
+          isPaused: item.isPaused(),
+          canResume: item.canResume(),
+          dataState: state,
+        });
+      });
+
+      item.on('done', (event: Electron.Event, state: string) => {
+        ipcMain.removeAllListeners('pause-downloads-progress');
+        ipcMain.removeAllListeners('resume-downloads-progress');
+        ipcMain.removeAllListeners('cancel-downloads-progress');
+        mainWindow.webContents.send('complete-downloads-progress', {
+          name: item.getFilename(),
+          startTime: item.getStartTime(),
+          dataState: state,
+        });
+      });
+    }
+  });
+};
+
+const setPermissionRequestHandler = (mainWindow: Electron.BrowserWindow): void => {
+  const sess = session.defaultSession as Electron.Session;
+  sess.setPermissionRequestHandler((webContents, permission, callback) => {
+    mainWindow.webContents.send('request-permission', {
+      permission,
+      webContentsId: webContents.id,
+    });
+    ipcMain.once(`response-permission-${webContents.id}`, (event: Electron.Event, data) => {
+      if (data.accept) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    });
+  });
+};
+
 export default {
   registerWebRequestListeners,
   registerScheme,
-  onWillDownload(mainWindow: Electron.BrowserWindow, path: string): void {
-    const sess = session.defaultSession as Electron.Session;
-    sess.on('will-download', (event, item, webContents) => {
-      const itemURL = item.getURL();
-      if (item.getMimeType() === 'application/pdf'
-        && itemURL.indexOf('blob:') !== 0
-        && itemURL.indexOf('#pdfjs.action=download') === -1
-        && itemURL.indexOf('skip=true') === -1) {
-        event.preventDefault();
-        const qs = require('querystring');
-        const param = qs.stringify({ file: itemURL });
-        const pdfViewerURL = `file://${path}/web/viewer.html`;
-        mainWindow.webContents.send('open-pdf', {
-          url: `${pdfViewerURL}?${param}`,
-          webContentsId: webContents.id,
-        });
-      } else {
-        const totalBytes = item.getTotalBytes();
-        const startTime = item.getStartTime();
-        mainWindow.webContents.send('will-download-any-file', {
-          totalBytes,
-          startTime,
-          webContentsId: webContents.id,
-          name: item.getFilename(),
-          url: item.getURL(),
-          isPaused: item.isPaused(),
-          canResume: item.canResume(),
-          dataState: 'init',
-        });
-
-        ipcMain.on('pause-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
-          if (startTime === remoteStartTime) {
-            item.pause();
-          }
-        });
-        ipcMain.on('resume-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
-          if (startTime === remoteStartTime) {
-            item.resume();
-          }
-        });
-        ipcMain.on('cancel-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
-          if (startTime === remoteStartTime) {
-            item.cancel();
-          }
-        });
-
-        item.on('updated', (event: Electron.Event, state: string) => {
-          mainWindow.webContents.send('update-downloads-progress', {
-            startTime: item.getStartTime(),
-            getReceivedBytes: item.getReceivedBytes(),
-            savePath: item.getSavePath(),
-            isPaused: item.isPaused(),
-            canResume: item.canResume(),
-            dataState: state,
-          });
-        });
-
-        item.on('done', (event: Electron.Event, state: string) => {
-          ipcMain.removeAllListeners('pause-downloads-progress');
-          ipcMain.removeAllListeners('resume-downloads-progress');
-          ipcMain.removeAllListeners('cancel-downloads-progress');
-          mainWindow.webContents.send('complete-downloads-progress', {
-            name: item.getFilename(),
-            startTime: item.getStartTime(),
-            dataState: state,
-          });
-        });
-      }
-    });
-  },
-  setPermissionRequestHandler(mainWindow: Electron.BrowserWindow): void {
-    const sess = session.defaultSession as Electron.Session;
-    sess.setPermissionRequestHandler((webContents, permission, callback) => {
-      mainWindow.webContents.send('request-permission', {
-        permission,
-        webContentsId: webContents.id,
-      });
-      ipcMain.once(`response-permission-${webContents.id}`, (event: Electron.Event, data) => {
-        if (data.accept) {
-          callback(true);
-        } else {
-          callback(false);
-        }
-      });
-    });
-  },
+  registerCertificateVerifyProc,
+  onWillDownload,
+  setPermissionRequestHandler,
 };

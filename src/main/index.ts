@@ -1,14 +1,13 @@
 import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, protocol, shell, systemPreferences } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, protocol, shell, systemPreferences } from 'electron';
 
 import autoUpdater from './js/lib/auto-updater';
 import config from './js/constants/config';
 import localshortcut from 'electron-localshortcut';
 import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
-import session from './js/lib/session';
 
 import { api, scheme } from 'lulumi';
 
@@ -55,6 +54,9 @@ const swipeGesture: boolean = isDarwin
 const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
+
+// ./js/lib/session.ts
+const session = require('./js/lib/session').default;
 
 // ../shared/store/mainStore.ts
 const mainStore = require('../shared/store/mainStore').default;
@@ -119,6 +121,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   // Session related operations
   session.registerScheme(config.lulumiPagesCustomProtocol);
+  session.registerCertificateVerifyProc();
   session.onWillDownload(mainWindow, config.lulumiPDFJSPath);
   session.setPermissionRequestHandler(mainWindow);
 
@@ -274,6 +277,16 @@ app.on('before-quit', (event) => {
 ipcMain.on('get-window-count', (event: Electron.Event) => {
   event.returnValue = BrowserWindow.getAllWindows().length;
 });
+
+// return the number of BrowserWindow
+ipcMain.on('show-certificate',
+  (event: Electron.Event, certificate: Electron.Certificate, message: string) => {
+    dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
+      certificate,
+      message,
+      // tslint:disable-next-line:align
+    }, () => {});
+  });
 
 // set the title for the focused BrowserWindow
 ipcMain.on('set-browser-window-title', (event, data) => {

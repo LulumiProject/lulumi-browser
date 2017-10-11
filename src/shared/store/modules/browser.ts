@@ -22,6 +22,7 @@ const state: store.State = {
   history: [],
   permissions: {},
   lastOpenedTabs: [],
+  certificates: {},
   windows: [],
 };
 
@@ -412,6 +413,12 @@ const mutations = {
     if (state.tabs[tabsIndex]) {
       state.tabs[tabsIndex].isAudioMuted = muted;
     }
+  },
+  [types.UPDATE_CERTIFICATE](state: store.State, payload) {
+    const hostname: string = payload.hostname;
+    const certificate: Electron.Certificate = payload.certificate;
+
+    Vue.set(state.certificates, hostname, certificate);
   },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: store.State, { val }) {

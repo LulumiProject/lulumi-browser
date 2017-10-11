@@ -9,7 +9,7 @@
         iview-icon(type="arrow-right-c", size="16")
       a(v-if="tab.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
         iview-icon(type="close", size="16")
-      a(v-else @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
+      a(v-else, @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
         iview-icon(type="android-refresh", size="16")
     .input-group(@contextmenu="$parent.onNavContextMenu")
       good-custom-autocomplete#url-input(
@@ -224,6 +224,9 @@
       }
       return this.tabs[this.currentTabIndex].pageActionMapping;
     }
+    get certificates(): store.Certificates {
+      return this.$store.getters.certificates;
+    }
     get url(): string {
       if (this.tabs.length === 0) {
         return '';
@@ -294,6 +297,16 @@
       (this.$refs.input as any).suggestions.length = 0;
     }
 
+    showCertificate(): void {
+      const hostname = urlUtil.getHostname(this.url);
+      if (hostname) {
+        const certificate = this.certificates[hostname];
+        if (certificate) {
+          (this as any).$electron.ipcRenderer
+            .send('show-certificate', certificate, `The certificate of ${hostname}.`);
+        }
+      }
+    }
     selectPortion(event): void {
       const code: string = event.code;
       const el = event.target;
@@ -630,6 +643,11 @@
 
     mounted() {
       if (process.env.NODE_ENV !== 'testing') {
+        // .el-input-group__prepend event(s)
+        const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
+        prepend.addEventListener('click', this.showCertificate);
+
+        // .el-input__inner event(s)
         const originalInput = document.getElementsByClassName('el-input__inner')[0];
         let newElement = document.createElement('div');
         newElement.id = 'securityOrigin';
@@ -640,14 +658,14 @@
 
         originalInput.addEventListener('click', () => {
           this.focused = true;
-        })
+        });
         originalInput.addEventListener('blur', () => {
           setTimeout(() => {
             this.focused = false;
             (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
               .style.display = 'none';
           }, 50);
-        })
+        });
         this.clickHandler = () => {
           newElement.style.display = 'none';
           (originalInput as HTMLInputElement).style.display = 'block';

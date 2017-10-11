@@ -133,6 +133,12 @@ export const actions = {
       muted,
     });
   },
+  updateCertificate({ commit }, { hostname, certificate }) {
+    commit(types.UPDATE_CERTIFICATE, {
+      hostname,
+      certificate,
+    });
+  },
 
   setCurrentSearchEngineProvider({ commit }, val) {
     commit(types.SET_CURRENT_SEARCH_ENGINE_PROVIDER, { val });

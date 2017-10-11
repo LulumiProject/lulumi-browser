@@ -114,6 +114,9 @@ declare module 'lulumi' {
       url: string;
       favIconUrl: string | null;
     }
+    export interface Certificates {
+      [index: string]: Electron.Certificate | undefined;
+    }
     export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
       id: number;
       focused?: boolean;
@@ -137,6 +140,7 @@ declare module 'lulumi' {
       history: TabHistory[];
       permissions: object;
       lastOpenedTabs: LastOpenedTabObject[];
+      certificates: Certificates;
       windows: LulumiBrowserWindowProperty[];
     }
   }

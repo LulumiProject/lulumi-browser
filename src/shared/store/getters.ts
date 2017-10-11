@@ -47,6 +47,9 @@ export const getters = {
   permissions(state: BrowserState) {
     return state.browser.permissions;
   },
+  certificates(state: BrowserState) {
+    return state.browser.certificates;
+  },
   windows(state: BrowserState) {
     return state.browser.windows;
   },
