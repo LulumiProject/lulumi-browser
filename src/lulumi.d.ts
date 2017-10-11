@@ -114,8 +114,12 @@ declare module 'lulumi' {
       url: string;
       favIconUrl: string | null;
     }
+    export interface CertificateObject {
+      certificate: Electron.Certificate;
+      verificationResult: string;
+    }
     export interface Certificates {
-      [index: string]: Electron.Certificate | undefined;
+      [index: string]: CertificateObject | undefined;
     }
     export interface LulumiBrowserWindowProperty extends Electron.BrowserWindowConstructorOptions {
       id: number;

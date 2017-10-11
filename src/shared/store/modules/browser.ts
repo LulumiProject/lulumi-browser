@@ -417,8 +417,14 @@ const mutations = {
   [types.UPDATE_CERTIFICATE](state: store.State, payload) {
     const hostname: string = payload.hostname;
     const certificate: Electron.Certificate = payload.certificate;
+    const verificationResult: string = payload.verificationResult;
 
-    Vue.set(state.certificates, hostname, certificate);
+    if (state.certificates[hostname] === undefined) {
+      Vue.set(state.certificates, hostname, {});
+    }
+
+    Vue.set(state.certificates[hostname]!, 'certificate', certificate);
+    Vue.set(state.certificates[hostname]!, 'verificationResult', verificationResult);
   },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: store.State, { val }) {

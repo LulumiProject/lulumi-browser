@@ -221,6 +221,7 @@
       if (event.isMainFrame) {
         const navbar = this.$refs.navbar;
         (navbar as any).showUrl(event.url);
+        (navbar as any).updateSecure(event.url);
         this.$store.dispatch('loadCommit', {
           windowId: this.windowId,
           tabId,

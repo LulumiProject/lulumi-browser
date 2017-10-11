@@ -271,7 +271,6 @@
         const newElement = document.getElementById('securityOrigin');
         if (newElement !== null) {
           if (currentUrl.href !== undefined && (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:')) {
-            this.secure = true;
             const newUrl
               = `<div class="security-origin"><span style="color: #3c943c;">${currentUrl.protocol}</span>${currentUrl.href.substr(currentUrl.protocol.length)}</div>`;
             originalInput.style.display = 'none';
@@ -284,8 +283,6 @@
             newElement.addEventListener('click', this.clickHandler);
             originalInput.addEventListener('blur', this.blurHandler);
           } else {
-            this.secure = false;
-
             newElement.style.display = 'none';
             originalInput.style.display = 'block';
 
@@ -297,13 +294,24 @@
       (this.$refs.input as any).suggestions.length = 0;
     }
 
+    updateSecure(url: string): void {
+      const hostname = urlUtil.getHostname(url);
+      if (hostname) {
+        const certificateObject = this.certificates[hostname];
+        if (certificateObject) {
+          this.secure = (certificateObject.verificationResult === 'net::OK');
+          return;
+        }
+      }
+      this.secure = false;
+    }
     showCertificate(): void {
       const hostname = urlUtil.getHostname(this.url);
       if (hostname) {
-        const certificate = this.certificates[hostname];
-        if (certificate) {
-          (this as any).$electron.ipcRenderer
-            .send('show-certificate', certificate, `The certificate of ${hostname}.`);
+        const certificateObject = this.certificates[hostname];
+        if (certificateObject) {
+          (this as any).$electron.ipcRenderer.send('show-certificate',
+            certificateObject.certificate, `${hostname}\n${certificateObject.verificationResult}`);
         }
       }
     }
