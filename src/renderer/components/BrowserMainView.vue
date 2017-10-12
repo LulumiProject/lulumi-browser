@@ -208,6 +208,12 @@
         tabIndex,
         url: webview.getAttribute('src'),
       });
+      if ((process.env.NODE_ENV !== 'testing')) {
+        this.onUpdatedEvent.emit(tabId, {
+          url: webview.getAttribute('src'),
+        },
+        this.getTabObject(tabIndex));
+      }
       this.onCommitted.emit({
         frameId: 0,
         parentFrameId: -1,
@@ -240,6 +246,12 @@
         tabIndex,
         title: webview.getTitle(),
       });
+      if ((process.env.NODE_ENV !== 'testing')) {
+        this.onUpdatedEvent.emit(tabId, {
+          title: webview.getTitle(),
+        },
+        this.getTabObject(tabIndex));
+      }
     }
     onDomReady(event: Electron.Event, tabIndex: number, tabId: number): void {
       const webview = this.getWebView(tabIndex);
@@ -295,6 +307,12 @@
         tabIndex,
         url: event.favicons[0],
       });
+      if ((process.env.NODE_ENV !== 'testing')) {
+        this.onUpdatedEvent.emit(tabId, {
+          favIconUrl: event.favicons[0],
+        },
+        this.getTabObject(tabIndex));
+      }
     }
     onDidStopLoading(event: Electron.Event, tabIndex: number, tabId: number): void {
       const webview = this.getWebView(tabIndex);
@@ -359,13 +377,20 @@
       });
     }
     onToggleAudio(event: Electron.Event, tabIndex: number, muted: boolean): void {
+      const tabObject = this.getTabObject(tabIndex);
       this.getWebView(tabIndex).setAudioMuted(muted);
       this.$store.dispatch('toggleAudio', {
         windowId: this.windowId,
-        tabId: this.getTabObject(tabIndex).id,
+        tabId: tabObject.id,
         tabIndex,
         muted,
       });
+      if ((process.env.NODE_ENV !== 'testing')) {
+        this.onUpdatedEvent.emit(tabObject.id, {
+          mutedInfo: { muted },
+        },
+        tabObject);
+      }
     }
     onEnterHtmlFullScreen(): void {
       (this.$el.querySelector('#nav') as any).style.display = 'none';
