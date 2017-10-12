@@ -285,7 +285,7 @@ ipcMain.on('show-certificate',
       certificate,
       message,
       // tslint:disable-next-line:align
-    }, () => {});
+    }, () => { });
   });
 
 // set the title for the focused BrowserWindow
