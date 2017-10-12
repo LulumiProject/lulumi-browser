@@ -301,7 +301,14 @@
       }
       const hostname = urlUtil.getHostname(url);
       if (hostname) {
-        const certificateObject = this.certificates[hostname];
+        const key
+          = Object.keys(this.certificates).find((el) => {
+            const rule = new RegExp(`${el}$`);
+            return rule.test(hostname);
+          });
+        const certificateObject = (key === undefined)
+          ? undefined
+          : this.certificates[key];
         if (certificateObject) {
           this.secure = (certificateObject.verificationResult === 'net::OK');
           return;
