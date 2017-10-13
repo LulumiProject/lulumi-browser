@@ -135,9 +135,9 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     // webPreferences.nativeWindowOpen = true;
     webPreferences.blinkfeatures = 'OverlayScrollbars';
 
-    const regexp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
+    const backgroundRegExp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {
-      if (params.src.match(regexp)) {
+      if (params.src.match(backgroundRegExp)) {
         webPreferences.preload = path.join(config.lulumiPreloadPath, 'extension-preload.js');
       } else {
         webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');

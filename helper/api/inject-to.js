@@ -223,11 +223,9 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
     onClicked: (scriptType === 'event') ? new Event() : new IpcEvent('page-action', 'on-clicked'),
   };
 
-  if ((scriptType === 'event')) {
-    lulumi.commands = {
-      onCommand: new Event(),
-    };
-  }
+  lulumi.commands = {
+    onCommand: (scriptType === 'event') ? new Event() : new IpcEvent('commands', 'on-command'),
+  };
 
   lulumi.alarms = {
     get: (name, callback) => {

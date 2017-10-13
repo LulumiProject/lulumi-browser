@@ -60,6 +60,7 @@
     extensionService: ExtensionService;
     ready: boolean = false;
     contextMenus: object = {};
+    onCommandEvent: Event = new Event();
     onUpdatedEvent: Event = new Event();
     onCreatedEvent: Event = new Event();
     onRemovedEvent: Event = new Event();

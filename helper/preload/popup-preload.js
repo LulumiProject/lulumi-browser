@@ -13,7 +13,8 @@ if (guestInstanceIndex !== -1) {
 process.once('loaded', () => {
   const extensionId = global.location.hostname;
   const context = {};
-  require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'popup', context, LocalStorage);
+  global.scriptType = 'popup';
+  require('../api/inject-to').injectTo(guestInstanceId, extensionId, global.scriptType, context, LocalStorage);
   global.lulumi = context.lulumi;
   global.chrome = global.lulumi;
 

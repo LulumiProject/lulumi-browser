@@ -645,9 +645,9 @@
         }
       }
     }
-    removeLulumiExtension(name: string): void {
+    removeLulumiExtension(extensionId: string): void {
       const ipc = (this as any).$electron.ipcRenderer;
-      ipc.send('remove-lulumi-extension', name);
+      ipc.send('remove-lulumi-extension', extensionId);
     }
     onContextmenu(extension: any): void {
       const { Menu, MenuItem } = (this as any).$electron.remote;
@@ -656,7 +656,7 @@
       menu.append(new MenuItem({
         label: 'Remove extension',
         click: () => {
-          this.removeLulumiExtension(extension.name);
+          this.removeLulumiExtension(extension.extensionId);
         },
       }));
 
@@ -721,7 +721,6 @@
         if (data.result === 'OK') {
           (this.$parent as BrowserMainView).extensionService.update();
           this.$forceUpdate();
-          ipc.send('lulumi-extension-removed', data.name);
         } else {
           alert(data.result);
         }

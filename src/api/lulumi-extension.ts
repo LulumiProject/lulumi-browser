@@ -104,32 +104,30 @@ const startBackgroundPages = (manifest: api.ManifestObject) => {
 
   let html: Buffer = Buffer.from('');
   let name: string;
-  if (manifest.background) {
-    if (manifest.background.page) {
-      name = manifest.background.page;
-      html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page));
-    } else {
-      name = '_generated_background_page.html';
-      if (manifest.background.scripts) {
-        const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
-        html = Buffer.from(`<html><body>${scripts}</body></html>`, 'utf8');
-      }
+  if (manifest.background.page) {
+    name = manifest.background.page;
+    html = fs.readFileSync(path.join(manifest.srcDirectory, manifest.background.page));
+  } else {
+    name = '_generated_background_page.html';
+    if (manifest.background.scripts) {
+      const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
+      html = Buffer.from(`<html><body>${scripts}</body></html>`, 'utf8');
     }
-
-    const contents = (webContents as any).create({
-      partition: 'persist:__lulumi_extension',
-      isBackgroundPage: true,
-      commandLineSwitches: ['--background-page'],
-      preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
-    });
-    backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
-    contents.loadURL(url.format({
-      protocol: 'lulumi-extension',
-      slashes: true,
-      hostname: manifest.extensionId,
-      pathname: name,
-    }));
   }
+
+  const contents = (webContents as any).create({
+    partition: 'persist:__lulumi_extension',
+    isBackgroundPage: true,
+    commandLineSwitches: ['--background-page'],
+    preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
+  });
+  backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
+  contents.loadURL(url.format({
+    protocol: 'lulumi-extension',
+    slashes: true,
+    hostname: manifest.extensionId,
+    pathname: name,
+  }));
 };
 
 const removeBackgroundPages = (manifest) => {
@@ -162,11 +160,16 @@ const loadCommands = (window: Electron.BrowserWindow, manifest) => {
             } else {
               const extension = backgroundPages[manifest.extensionId];
               if (extension) {
-                webContents.fromId(extension.webContentsId)
-                  .send('lulumi-commands-triggered', command);
+                const wc = webContents.fromId(extension.webContentsId);
+                if (wc) {
+                  wc.send('lulumi-commands-triggered', command);
+                }
               }
             }
           }
+        });
+        ipcMain.once(`lulumi-extension-${manifest.extensionId}-local-shortcut-unregister`, () => {
+          localshortcut.unregister(window, suggested_key.default);
         });
       }
     });
@@ -334,15 +337,16 @@ app.once('ready', () => {
     }
   };
 
-  (BrowserWindow as any).removeLulumiExtension = (name: string): string => {
-    const manifest = manifestNameMap[name];
+  (BrowserWindow as any).removeLulumiExtension = (extensionId: string): string => {
+    const manifest = manifestMap[extensionId];
     if (manifest) {
       removeBackgroundPages(manifest);
       removeRenderProcessPreferences(manifest);
       delete manifestMap[manifest.extensionId];
-      delete manifestNameMap[name];
+      delete manifestNameMap[manifest.name];
+      return manifest.name;
     }
-    return name;
+    return '';
   };
 
   (BrowserWindow as any).getLulumiExtensions = () => {

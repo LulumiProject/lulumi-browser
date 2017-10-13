@@ -133,12 +133,12 @@ export default class ExtensionService {
         vue.$nextTick(() => vue.$refs.navbar.$forceUpdate());
       }
     });
-    ipc.on('lulumi-page-action-add-listener-on-message', (event, data) => {
+    ipc.on('lulumi-page-action-add-listener-on-clicked', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
           webContents.send(
-            `lulumi-page-action-add-listener-on-message-result-${data.digest}`,
+            `lulumi-page-action-add-listener-on-clicked-result-${data.digest}`,
             args);
         };
         const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
@@ -147,12 +147,12 @@ export default class ExtensionService {
         }
       }
     });
-    ipc.on('lulumi-page-action-remove-listener-on-message', (event, data) => {
+    ipc.on('lulumi-page-action-remove-listener-on-clicked', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
           webContents.send(
-            `lulumi-page-action-add-listener-on-message-result-${data.digest}`,
+            `lulumi-page-action-add-listener-on-clicked-result-${data.digest}`,
             args);
         };
         const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
@@ -161,11 +161,48 @@ export default class ExtensionService {
         }
       }
     });
-    ipc.on('lulumi-page-action-emit-on-message', (event, data) => {
+    ipc.on('lulumi-page-action-emit-on-clicked', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
         if (onClickedEvent) {
-          onClickedEvent.emit(data.message, data.sender);
+          onClickedEvent.emit(data.args, data.sender);
+        }
+      }
+    });
+
+    ipc.on('lulumi-commands-add-listener-on-command', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(
+            `lulumi-commands-add-listener-on-command-result-${data.digest}`,
+            args);
+        };
+        const onCommandEvent = require('lulumi').commands.onCommand(data.webContentsId);
+        if (onCommandEvent) {
+          onCommandEvent.addListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-commands-remove-listener-on-command', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        const wrapper = function (...args) {
+          webContents.send(
+            `lulumi-commands-add-listener-on-command-result-${data.digest}`,
+            args);
+        };
+        const onCommandEvent = require('lulumi').commands.onCommand(data.webContentsId);
+        if (onCommandEvent) {
+          onCommandEvent.removeListener(wrapper);
+        }
+      }
+    });
+    ipc.on('lulumi-commands-emit-on-command', (event, data) => {
+      if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
+        const onCommandEvent = require('lulumi').commands.onCommand(data.webContentsId);
+        if (onCommandEvent) {
+          onCommandEvent.emit(data.args);
         }
       }
     });

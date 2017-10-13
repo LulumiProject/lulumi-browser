@@ -100,7 +100,7 @@
           (this as any).$message.error(data.result);
         }
       });
-      ipcRenderer.send('remove-lulumi-extension', window.renderProcessPreferences[id].name);
+      ipcRenderer.send('remove-lulumi-extension', window.renderProcessPreferences[id].extensionId);
     }
   };
 </script>

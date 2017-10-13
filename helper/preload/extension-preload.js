@@ -12,7 +12,8 @@ if (guestInstanceIndex !== -1) {
 process.once('loaded', () => {
   const extensionId = global.location.hostname;
   const context = {};
-  require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'event', context, LocalStorage);
+  global.scriptType = 'event';
+  require('../api/inject-to').injectTo(guestInstanceId, extensionId, global.scriptType, context, LocalStorage);
   global.lulumi = context.lulumi;
   global.chrome = global.lulumi;
 
@@ -22,7 +23,12 @@ process.once('loaded', () => {
     // remove all the registered things related to this extension
     Object.values(global.lulumi.webRequest).forEach(v => v.removeAllListeners());
     global.lulumi.contextMenus.removeAll(() => {
+      // removeBackgroundPages of src/api/lulumi-extension.ts
+      ipcRenderer.send(`lulumi-extension-${extensionId}-local-shortcut-unregister`);
+      // removeBackgroundPages of src/api/lulumi-extension.ts
       ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
+      // removeBackgroundPages of src/api/extensions/listeners.ts
+      ipcRenderer.send(`remove-lulumi-extension-${extensionId}`);
     });
   });
   ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {

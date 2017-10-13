@@ -87,6 +87,10 @@ export default (vueInstance: any) => {
     },
   };
 
+  const commands = {
+    onCommand: vueInstance.onCommandEvent,
+  };
+
   const runtime = {
     sendMessage: (extensionId: string, message: any, external: boolean, webContentsId: number): void => {
       let webContents: Electron.WebContents | null = null;
@@ -417,6 +421,7 @@ export default (vueInstance: any) => {
     env,
     browserAction,
     pageAction,
+    commands,
     runtime,
     tabs,
     windows,

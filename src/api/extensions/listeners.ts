@@ -39,26 +39,30 @@ ipcMain.on('add-lulumi-extension', (event) => {
     }
   });
 });
-ipcMain.on('remove-lulumi-extension', (event, name) => {
+ipcMain.on('remove-lulumi-extension', (event, extensionId) => {
   let result: string = 'OK';
   try {
-    (BrowserWindow as any).removeLulumiExtension(name);
+    const ret: string = (BrowserWindow as any).removeLulumiExtension(extensionId);
+    ipcMain.once(`remove-lulumi-extension-${extensionId}`, () => {
+      Object.keys(windows).forEach((key) => {
+        const id = parseInt(key, 10);
+        const window = windows[id];
+        window.webContents.send('remove-lulumi-extension-result', {
+          extensionId,
+          result,
+        });
+      });
+      event.sender.send('remove-lulumi-extension-result', {
+        extensionId,
+        result,
+      });
+    });
+    if (ret === '') {
+      result = `ENOENT: Extension ${extensionId} not found!`;
+    }
   } catch (removeError) {
     result = removeError.message;
   }
-
-  Object.keys(windows).forEach((key) => {
-    const id = parseInt(key, 10);
-    const window = windows[id];
-    window.webContents.send('remove-lulumi-extension-result', {
-      name,
-      result,
-    });
-  });
-  event.sender.send('remove-lulumi-extension-result', {
-    name,
-    result,
-  });
 });
 
 ipcMain.on('lulumi-env-app-name', (event) => {
@@ -182,33 +186,63 @@ ipcMain.on('lulumi-page-action-hide', (event, tabId, extensionId, enabled) => {
     });
   });
 });
-ipcMain.on('lulumi-page-action-add-listener-on-message', (event, digest) => {
+ipcMain.on('lulumi-page-action-add-listener-on-clicked', (event, digest) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('lulumi-page-action-add-listener-on-message', {
+    window.webContents.send('lulumi-page-action-add-listener-on-clicked', {
       digest,
       webContentsId: event.sender.id,
     });
   });
 });
-ipcMain.on('lulumi-page-action-remove-listener-on-message', (event, digest) => {
+ipcMain.on('lulumi-page-action-remove-listener-on-clicked', (event, digest) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('lulumi-page-action-remove-listener-on-message', {
+    window.webContents.send('lulumi-page-action-remove-listener-on-clicked', {
       digest,
       webContentsId: event.sender.id,
     });
   });
 });
-ipcMain.on('lulumi-page-action-emit-on-message', (event, message) => {
+ipcMain.on('lulumi-page-action-emit-on-clicked', (event, args) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('lulumi-page-action-emit-on-message', {
-      message,
-      sender: event.sender,
+    window.webContents.send('lulumi-page-action-emit-on-clicked', {
+      args,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+
+ipcMain.on('lulumi-commands-add-listener-on-command', (event, digest) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-commands-add-listener-on-command', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+ipcMain.on('lulumi-commands-remove-listener-on-command', (event, digest) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-commands-remove-listener-on-command', {
+      digest,
+      webContentsId: event.sender.id,
+    });
+  });
+});
+ipcMain.on('lulumi-commands-emit-on-command', (event, args) => {
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('lulumi-commands-emit-on-command', {
+      args,
       webContentsId: event.sender.id,
     });
   });

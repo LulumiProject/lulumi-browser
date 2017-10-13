@@ -27,7 +27,8 @@ const matchesPattern = (pattern) => {
 // Run the code with chrome and lulumi API integrated.
 const runContentScript = (extensionId, url, code) => {
   const context = {};
-  require('../api/inject-to').injectTo(guestInstanceId, extensionId, 'content', context, LocalStorage);
+  global.scriptType = 'content-script';
+  require('../api/inject-to').injectTo(guestInstanceId, extensionId, global.scriptType, context, LocalStorage);
   const wrapper = `((lulumi) => {
     var chrome = lulumi;
     ${code}
