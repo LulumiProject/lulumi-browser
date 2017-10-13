@@ -66,6 +66,12 @@ const mutations = {
     const url: string = payload.url;
     const isURL: boolean = payload.isURL;
     const follow: boolean = payload.follow;
+
+    state.tabs.forEach((tab, index) => {
+      Vue.set(state.tabs[index], 'highlighted', false);
+      Vue.set(state.tabs[index], 'active', false);
+    });
+
     let newUrl: string | null = null;
     if (isURL) {
       newUrl = url;
@@ -99,6 +105,12 @@ const mutations = {
     const tabs = state.tabs.filter(tab => tab.windowId === windowId);
 
     if (tabs.length > tabIndex) {
+
+      state.tabs.forEach((tab, index) => {
+        Vue.set(state.tabs[index], 'highlighted', false);
+        Vue.set(state.tabs[index], 'active', false);
+      });
+
       if (state.tabs[tabsIndex].title !== 'error') {
         state.lastOpenedTabs.unshift({
           title: state.tabs[tabsIndex].title,
@@ -192,13 +204,18 @@ const mutations = {
   },
   [types.CLICK_TAB](state: store.State, payload) {
     const windowId: number = payload.windowId;
-    // const tabId: number = payload.tabId;
+    const tabId: number = payload.tabId;
     const tabIndex: number = payload.tabIndex;
 
+    state.tabs.forEach((tab, index) => {
+      Vue.set(state.tabs[index], 'highlighted', false);
+      Vue.set(state.tabs[index], 'active', false);
+    });
+
     Vue.set(state.currentTabIndexes, windowId, tabIndex);
-    // const index: number = state.tabs.findIndex(tab => (tab.id === tabId));
-    // Vue.set(state.tabs[index], 'highlighted', true);
-    // Vue.set(state.tabs[index], 'active', true);
+    const index: number = state.tabs.findIndex(tab => (tab.id === tabId));
+    Vue.set(state.tabs[index], 'highlighted', true);
+    Vue.set(state.tabs[index], 'active', true);
   },
   // tab handlers
   [types.DID_START_LOADING](state: store.State, payload) {
