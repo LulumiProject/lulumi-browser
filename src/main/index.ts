@@ -275,7 +275,7 @@ app.on('before-quit', (event) => {
 
 // return the number of BrowserWindow
 ipcMain.on('get-window-count', (event: Electron.Event) => {
-  event.returnValue = BrowserWindow.getAllWindows().length;
+  event.returnValue = Object.keys(windows).length;
 });
 
 // return the number of BrowserWindow
