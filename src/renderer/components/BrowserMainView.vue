@@ -394,13 +394,18 @@
       }
     }
     onEnterHtmlFullScreen(): void {
-      (this.$el.querySelector('#nav') as any).style.display = 'none';
-      this.getWebView().style.height = '100vh';
+      const nav = this.$el.querySelector('#nav');
+      if (nav) {
+        (nav as HTMLElement).style.display = 'none';
+        this.getWebView().style.height = '100vh';
+      }
     }
     onLeaveHtmlFullScreen(): void {
-      const nav: any = this.$el.querySelector('#nav');
-      nav.style.display = 'block';
-      this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+      const nav = this.$el.querySelector('#nav');
+      if (nav) {
+        (nav as HTMLElement).style.display = 'block';
+        this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+      }
     }
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       const disposition: string = event.disposition;

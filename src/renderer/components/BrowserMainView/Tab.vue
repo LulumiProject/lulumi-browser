@@ -19,6 +19,8 @@
 <script lang="ts">
   import { Component, Vue, Watch } from 'vue-property-decorator';
 
+  import ResizeSensor from 'css-element-queries/src/ResizeSensor';
+
   import urlUtil from '../../js/lib/url-util';
 
   import Event from '../../../api/extensions/event';
@@ -220,10 +222,20 @@
       });
 
       const nav = this.$parent.$el.querySelector('#nav');
-      if (nav !== null) {
+      if (nav) {
+        // fired once
         webview.style.height
           = `calc(100vh - ${nav.clientHeight}px)`;
-        (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
+
+        /*
+         * register the resize event on nav element to dynamically adjust
+         * the height of webview element
+         */
+        new ResizeSensor(nav, () => {
+          webview.style.height
+            = `calc(100vh - ${nav.clientHeight}px)`;
+          (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
+        });
         this.navigateTo(this.tab.url);
       }
     }
@@ -254,7 +266,7 @@
 
     &[hidden] {
       flex: 0 1;
-      width: 0px;
+      width: 100vw;
       height: 0px !important;
     }
 
@@ -270,7 +282,7 @@
     /* hack to work around display: none issues with webviews */
     &.hidden {
       flex: 0 1;
-      width: 0px;
+      width: 100vw;
       height: 0px !important;
     }
   }
