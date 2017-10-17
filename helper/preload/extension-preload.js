@@ -25,10 +25,10 @@ process.once('loaded', () => {
     global.lulumi.contextMenus.removeAll(() => {
       // removeBackgroundPages of src/api/lulumi-extension.ts
       ipcRenderer.send(`lulumi-extension-${extensionId}-local-shortcut-unregister`);
-      // removeBackgroundPages of src/api/lulumi-extension.ts
-      ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
       // removeBackgroundPages of src/api/extensions/listeners.ts
       ipcRenderer.send(`remove-lulumi-extension-${extensionId}`);
+      // removeBackgroundPages of src/api/lulumi-extension.ts
+      ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
     });
   });
   ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {

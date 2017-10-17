@@ -223,10 +223,6 @@
 
       const nav = this.$parent.$el.querySelector('#nav');
       if (nav) {
-        // fired once
-        webview.style.height
-          = `calc(100vh - ${nav.clientHeight}px)`;
-
         /*
          * register the resize event on nav element to dynamically adjust
          * the height of webview element
@@ -236,6 +232,11 @@
             = `calc(100vh - ${nav.clientHeight}px)`;
           (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
         });
+
+        // fired once
+        webview.style.height
+          = `calc(100vh - ${nav.clientHeight}px)`;
+
         this.navigateTo(this.tab.url);
       }
     }

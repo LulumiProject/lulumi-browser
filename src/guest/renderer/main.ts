@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import axios from 'axios';
+import { Message } from 'element-ui';
 import 'element-ui/lib/theme-default/index.css';
 
 import App from './App.vue';
@@ -8,6 +9,7 @@ import store from './store';
 import i18n from './i18n';
 
 (Vue as any).prototype.$http = axios;
+(Vue as any).prototype.$message = Message;
 (Vue as any).http = (Vue as any).prototype.$http;
 
 if (process.env.NODE_ENV === 'production') {
