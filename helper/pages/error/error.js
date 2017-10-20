@@ -52,7 +52,7 @@ const errorCodes = {
     message: 'The connection timed out',
   },
   '-104': {
-    message: 'Lulumi-browser couldn\'t connect to the website.',
+    message: 'Lulumi-browser couldn\'t connect to the website',
   },
   '-105': websiteNotFound,
   '-106': offlineError,
@@ -63,12 +63,18 @@ const errorCodes = {
   '-113': sslError,
   '-116': sslError,
   '-117': sslError,
-  '-200': sslError,
+  '-200': {
+    name: 'This website is not available.',
+    message: "Lulumi-browser couldn't connect securely to this website. (NET::ERR_CERT_COMMON_NAME_INVALID)",
+  },
   '-201': {
     name: 'This website is not available',
     message: "Lulumi-browser couldn't connect securely to this website. Please make sure your computer's clock is set correctly.",
   },
-  '-202': sslError,
+  '-202': {
+    name: 'This website is not available.',
+    message: "Lulumi-browser couldn't connect securely to this website. (NET::ERR_CERT_AUTHORITY_INVALID)",
+  },
   '-203': sslError,
   '-204': sslError,
   '-205': sslError,

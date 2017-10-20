@@ -133,11 +133,12 @@ export const actions = {
       muted,
     });
   },
-  updateCertificate({ commit }, { hostname, certificate, verificationResult }) {
+  updateCertificate({ commit }, { hostname, certificate, verificationResult, errorCode }) {
     commit(types.UPDATE_CERTIFICATE, {
       hostname,
       certificate,
       verificationResult,
+      errorCode,
     });
   },
 

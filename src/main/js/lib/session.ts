@@ -178,20 +178,18 @@ const registerScheme = (scheme: string): void => {
 const registerCertificateVerifyProc = () => {
   const sess = session.defaultSession as Electron.Session;
   const store = mainStore.getStore();
-  (sess.setCertificateVerifyProc as any)((request, callback) => {
+  sess.setCertificateVerifyProc((request, callback) => {
     store.dispatch('updateCertificate', {
       hostname: request.hostname,
       certificate: request.certificate,
       verificationResult: request.verificationResult,
+      errorCode: request.errorCode,
     });
-    /*
     if (request.verificationResult !== 'net::OK') {
-      callback(-2);
+      callback(-3);
     } else {
       callback(0);
     }
-    */
-    callback(0);
   });
 };
 

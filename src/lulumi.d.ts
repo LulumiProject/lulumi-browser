@@ -117,6 +117,7 @@ declare module 'lulumi' {
     export interface CertificateObject {
       certificate: Electron.Certificate;
       verificationResult: string;
+      errorCode: number;
     }
     export interface Certificates {
       [index: string]: CertificateObject | undefined;

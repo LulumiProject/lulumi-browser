@@ -100,6 +100,9 @@
     get pdfViewer(): string {
       return this.$store.getters.pdfViewer;
     }
+    get certificates(): store.Certificates {
+      return this.$store.getters.certificates;
+    }
 
     @Watch('ready')
     onReady(ready: boolean): void {
@@ -336,10 +339,21 @@
       const appPath = process.env.NODE_ENV === 'development'
         ? process.cwd()
         : (this as any).$electron.remote.app.getAppPath();
+      let errorCode = event.errorCode;
       let errorPage = `file://${appPath}/helper/pages/error/index.html`;
-      errorPage += `?ec=${encodeURIComponent((event as any).errorCode)}`;
-      errorPage += `&url=${encodeURIComponent((event as any).target.getURL())}`;
-      if ((event as any).errorCode !== -3 && (event as any).validatedURL === (event as any).target.getURL()) {
+
+      if (errorCode === -501) {
+        const hostname = urlUtil.getHostname(event.validatedURL);
+        if (hostname) {
+          const certificateObject = this.certificates[hostname];
+          if (certificateObject) {
+            errorCode = certificateObject.errorCode;
+          }
+        }
+      }
+      errorPage += `?ec=${encodeURIComponent(errorCode.toString())}`;
+      errorPage += `&url=${encodeURIComponent((event.target as any).getURL())}`;
+      if (errorCode !== -3 && event.validatedURL === (event.target as any).getURL()) {
         this.getTab(tabIndex).navigateTo(
           `${errorPage}`);
       }

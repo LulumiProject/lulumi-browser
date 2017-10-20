@@ -268,7 +268,11 @@ describe('BrowserMainView.vue', () => {
     });
 
     it('clicks last created tab', async () => {
-      vm.$store.dispatch('clickTab', 1);
+      vm.$store.dispatch('clickTab', {
+        windowId: -1,
+        tabId: vm.getTabObject(1).id,
+        tabIndex: 1,
+      });
       await vm.$nextTick();
       expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('1');
     });
