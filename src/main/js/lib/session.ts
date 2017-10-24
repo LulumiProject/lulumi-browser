@@ -23,6 +23,14 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
         details.type = details.resourceType;
       }
 
+      if (details.requestHeaders) {
+        const requestHeaders: object[] = [];
+        Object.keys(details.requestHeaders).forEach((k) => {
+          requestHeaders.push({ name: k, value: details.requestHeaders[k][0] });
+        });
+        details.requestHeaders = requestHeaders;
+      }
+
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
         if (response) {
           callback(response);
@@ -42,6 +50,14 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
     sess.webRequest[eventName](filter, (details, callback) => {
       details.type = details.resourceType;
 
+      if (details.responseHeaders) {
+        const responseHeaders: object[] = [];
+        Object.keys(details.responseHeaders).forEach((k) => {
+          responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
+        });
+        details.responseHeaders = responseHeaders;
+      }
+
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
         if (response) {
           callback(response);
@@ -60,6 +76,21 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
   } else {
     sess.webRequest[eventName](filter, (details) => {
       details.type = details.resourceType;
+
+      if (details.requestHeaders) {
+        const requestHeaders: object[] = [];
+        Object.keys(details.requestHeaders).forEach((k) => {
+          requestHeaders.push({ name: k, value: details.requestHeaders[k][0] });
+        });
+        details.requestHeaders = requestHeaders;
+      }
+      if (details.responseHeaders) {
+        const responseHeaders: object[] = [];
+        Object.keys(details.responseHeaders).forEach((k) => {
+          responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
+        });
+        details.responseHeaders = responseHeaders;
+      }
 
       const window = BrowserWindow.getAllWindows()[0];
       window.webContents.send('lulumi-web-request-intercepted', {

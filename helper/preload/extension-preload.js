@@ -1,5 +1,7 @@
-const { ipcRenderer, remote } = require('electron');
+const { ipcRenderer, remote, webFrame } = require('electron');
 const { LocalStorage } = require('node-localstorage');
+
+webFrame.registerURLSchemeAsPrivileged('lulumi-extension');
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
