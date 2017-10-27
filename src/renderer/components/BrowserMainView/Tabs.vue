@@ -130,7 +130,8 @@
 <style lang="less" scoped>
   #chrome-tabs-shell {
     height: 38px;
-    padding-right: 18px;
+    padding-right: 26px;
+    padding-left: 10px;
     border-bottom: 1px solid #999;
   }
 
@@ -347,6 +348,6 @@
 
   // make room for the traffic lights
   .darwin:not(.fullscreen) .chrome-tabs {
-    padding-left: 80px;
+    padding-left: 70px;
   }
 </style>
