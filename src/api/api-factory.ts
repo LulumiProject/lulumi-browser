@@ -151,7 +151,7 @@ export default (vueInstance: any) => {
       }
       webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
-    query: (queryInfo: api.customTabsQueryInfo): store.TabObject[] => {
+    query: (queryInfo: api.CustomTabsQueryInfo): store.TabObject[] => {
       if (Object.keys(queryInfo).length === 0 || queryInfo.url === '<all_urls>') {
         return vueInstance.tabs;
       } else {

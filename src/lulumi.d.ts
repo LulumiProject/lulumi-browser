@@ -35,7 +35,7 @@ declare module 'lulumi' {
     export interface ManifestNameMap {
       [index: string]: ManifestObject | undefined;
     }
-    export interface customTabsQueryInfo extends chrome.tabs.QueryInfo {
+    export interface CustomTabsQueryInfo extends chrome.tabs.QueryInfo {
       webContentsId: number;
     }
     export interface GlobalObject extends NodeJS.Global {
