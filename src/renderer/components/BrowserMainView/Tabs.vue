@@ -31,7 +31,7 @@
         use(:xlink:href="loadButton('minimize-window')")
       svg(@click="onCustomButtonClick")
         use(:xlink:href="window.state === 'maximized' ? loadButton('restore-window') : loadButton('maximize-window')")
-      svg(@click="onCustomButtonClick")
+      svg.close(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('close-window')")
 </template>
 
@@ -162,6 +162,7 @@
     height: 38px;
     padding-left: 10px;
     border-bottom: 1px solid #999;
+    -webkit-app-region: drag;
   }
 
   .chrome-tabs {
@@ -380,20 +381,25 @@
     display: flex;
     width: 120px;
     height: 30px;
+    padding-right: 10px;
     justify-content: space-between;
 
     svg {
       width: 30px;
       height: 10px;
-      padding: 10px 15px;
-      opacity: 0.5;
+      padding: 5px 15px;
+      opacity: 1;
 
       &:hover {
-        opacity: 1;
+        background: #bbb;
+      }
+      &.close:hover {
+        color: white;
+        background: #f52424;
       }
 
       &:active {
-        opacity: 0.3;
+        opacity: 0.8;
       }
     }
   }
