@@ -381,7 +381,7 @@
   .custom-buttons {
     display: flex;
     width: 120px;
-    height: 30px;
+    height: 20px;
     padding-right: 10px;
     justify-content: space-between;
     -webkit-app-region: no-drag;
