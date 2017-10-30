@@ -40,7 +40,7 @@ $ yarn run test
 
 ## API support (experimental)
 
-- https://github.com/qazbnm456/lulumi-browser/issues/19
+- https://github.com/LulumiProject/lulumi-browser/issues/19
 
 ## Code of Conduct
 

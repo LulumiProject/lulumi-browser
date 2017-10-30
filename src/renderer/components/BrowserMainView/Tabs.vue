@@ -26,6 +26,13 @@
           i.el-icon-plus
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+    .custom-buttons(v-if="arch !== 'darwin'")
+      svg(@click="onCustomButtonClick")
+        use(:xlink:href="loadButton('minimize-window')")
+      svg(@click="onCustomButtonClick")
+        use(:xlink:href="window.state === 'maximized' ? loadButton('restore-window') : loadButton('maximize-window')")
+      svg(@click="onCustomButtonClick")
+        use(:xlink:href="loadButton('close-window')")
 </template>
 
 <script lang="ts">
@@ -67,6 +74,7 @@
       },
     },
     props: [
+      'arch',
       'windowId',
     ],
     components: {
@@ -78,8 +86,12 @@
   export default class Tabs extends Vue {
     sortable: any;
 
+    arch: string;
     windowId: number;
 
+    get window(): store.LulumiBrowserWindowProperty {
+      return this.$store.getters.windows.find(window => window.id === this.windowId);
+    }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
@@ -87,10 +99,27 @@
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
 
+    loadButton(id: string): string {
+      return process.env.NODE_ENV !== 'production'
+        ? `${path.join('static', 'icons', 'icons.svg')}#${id}`
+        : `${path.join(__static, 'icons', 'icons.svg')}#${id}`;
+    }
     loadDefaultFavicon(event: Electron.Event) {
-      (event.target as HTMLImageElement).src = (this as any).$electron.remote.nativeImage
-        .createFromPath(path.join(__static, 'icons', 'document.png'))
-        .toDataURL('image/png');
+      (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
+    }
+    onCustomButtonClick(event) {
+      const mainWindow = (this as any).$electron.remote.getCurrentWindow();
+      const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
+      const state: string = pattern.split('#').reverse()[0].split('-')[0];
+      if (state === 'minimize') {
+        mainWindow.minimize();
+      } else if (state === 'restore') {
+        mainWindow.unmaximize();
+      } else if (state === 'maximize') {
+        mainWindow.maximize();
+      } else if (state === 'close') {
+        mainWindow.close();
+      }
     }
     onDoubleClick(event: Electron.Event) {
       if (event.target) {
@@ -129,13 +158,14 @@
 
 <style lang="less" scoped>
   #chrome-tabs-shell {
+    display: flex;
     height: 38px;
-    padding-right: 26px;
     padding-left: 10px;
     border-bottom: 1px solid #999;
   }
 
   .chrome-tabs {
+    flex: 1;
     display: flex;
 
     * {
@@ -343,6 +373,28 @@
   
     &.ghost {
       opacity: .5;
+    }
+  }
+
+  .custom-buttons {
+    display: flex;
+    width: 120px;
+    height: 30px;
+    justify-content: space-between;
+
+    svg {
+      width: 30px;
+      height: 10px;
+      padding: 10px 15px;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:active {
+        opacity: 0.3;
+      }
     }
   }
 

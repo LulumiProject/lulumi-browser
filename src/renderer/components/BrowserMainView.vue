@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     #nav
-      tabs(ref="tabs", :windowId="windowId")
+      tabs(ref="tabs", :arch="arch", :windowId="windowId")
       navbar(ref="navbar", :windowId="windowId")
     swipeArrow
     tab(v-for="(tab, index) in tabs",
@@ -48,6 +48,8 @@
     },
   })
   export default class BrowserMainView extends Vue {
+    arch: string = process.platform;
+
     windowId: number = 0;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
@@ -1279,7 +1281,7 @@
           }));
         }
       }
-      const macOS = /^darwin/.test(process.platform);
+      const macOS = /^darwin/.test(this.arch);
       if (macOS) {
         if (params.selectionText) {
           menu.append(new MenuItem({
@@ -1299,7 +1301,7 @@
       if (sourceUrl !== null) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.viewSource'),
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
+          accelerator: this.arch === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
           click: () => this.onNewTab(this.windowId, sourceUrl, true),
         }));
       }
@@ -1339,14 +1341,14 @@
         this.windowId = 0;
 
         if (this.tabs.length === 0) {
-          this.onNewTab(this.windowId, 'https://github.com/qazbnm456/lulumi-browser', true);
+          this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser', true);
         }
       }
 
       this.extensionService = new ExtensionService(this);
     }
     mounted() {
-      if (process.platform === 'darwin') {
+      if (this.arch === 'darwin') {
         document.body.classList.add('darwin');
       }
       // removed unneeded tabs

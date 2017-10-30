@@ -6,7 +6,7 @@ const controlGroup = '.control-group';
 test('enables back button', async (t) => {
   const app = t.context.app;
   await app.client
-    .waitForUrl('https://github.com/qazbnm456/lulumi-browser')
+    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
     .waitForExist(controlGroup)
@@ -23,7 +23,7 @@ test('enables back button', async (t) => {
 test('enables forward button', async (t) => {
   const app = t.context.app;
   await app.client
-    .waitForUrl('https://github.com/qazbnm456/lulumi-browser')
+    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
     .waitForExist(controlGroup)
@@ -43,7 +43,7 @@ test('enables refresh', async (t) => {
   const app = t.context.app;
 
   expect(await app.client
-    .waitForUrl('https://github.com/qazbnm456/lulumi-browser')
+    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
     .waitForExist(controlGroup)

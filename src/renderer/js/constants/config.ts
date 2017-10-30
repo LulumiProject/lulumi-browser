@@ -18,7 +18,7 @@ const searchEngine = [
   },
 ];
 
-const homepage = 'https://github.com/qazbnm456/lulumi-browser';
+const homepage = 'https://github.com/LulumiProject/lulumi-browser';
 const pdfViewer = 'pdf-viewer';
 
 const tabConfig: store.TabConfig = {
@@ -30,7 +30,7 @@ const tabConfig: store.TabConfig = {
     highlighted: false,
     active: false,
     pinned: false,
-    url: 'https://github.com/qazbnm456/lulumi-browser',
+    url: 'https://github.com/LulumiProject/lulumi-browser',
     title: null,
     favIconUrl: null,
     status: null,

@@ -38,6 +38,7 @@
 
     &.darwin #chrome-tabs-shell {
       -webkit-app-region: drag;
+      padding-right: 26px;
     }
   }
 </style>
