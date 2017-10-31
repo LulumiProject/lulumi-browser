@@ -415,6 +415,7 @@
         (nav as HTMLElement).style.display = 'none';
         this.getWebView().style.height = '100vh';
       }
+      (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(true);
     }
     onLeaveHtmlFullScreen(): void {
       const nav = this.$el.querySelector('#nav');
@@ -422,6 +423,7 @@
         (nav as HTMLElement).style.display = 'block';
         this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
       }
+      (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
     }
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       const disposition: string = event.disposition;
@@ -1392,6 +1394,9 @@
         if (el) {
           (el as HTMLElement).click();
         }
+      });
+      ipc.on('escape-click', () => {
+        this.onLeaveHtmlFullScreen();
       });
       ipc.on('start-find-in-page', () => {
         this.getTab(this.currentTabIndex).findInPage();

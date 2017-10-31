@@ -1,7 +1,15 @@
 import { readFileSync, writeFile } from 'fs';
 import os from 'os';
 import path from 'path';
-import { app, BrowserWindow, dialog, ipcMain, protocol, shell, systemPreferences } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  protocol,
+  shell,
+  systemPreferences,
+} from 'electron';
 
 import autoUpdater from './js/lib/auto-updater';
 import config from './js/constants/config';
@@ -112,6 +120,12 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       mainWindow.webContents.send('tab-click', index - 1);
     });
   }
+  // register 'Escape' shortcut
+  localshortcut.register(mainWindow, 'Escape', () => {
+    if (mainWindow.isFullScreen()) {
+      mainWindow.webContents.send('escape-click');
+    }
+  });
   // special case: go to the last tab
   localshortcut.register(mainWindow, `CmdOrCtrl+9`, () => {
     mainWindow.webContents.send('tab-click', -1);
