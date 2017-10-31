@@ -147,14 +147,13 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     }
   });
 
+  mainWindow.on('close', () => (mainWindow.removeAllListeners('will-attach-webview')));
+
   mainWindow.on('closed', () => {
-    localshortcut.unregisterAll(mainWindow);
     if (setLanguage) {
       createWindow();
       setLanguage = false;
     }
-    mainWindow.removeAllListeners('will-attach-webview');
-    mainWindow.removeAllListeners('closed');
     (mainWindow as any) = null;
   });
 
