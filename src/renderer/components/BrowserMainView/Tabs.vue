@@ -30,7 +30,7 @@
       svg(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('minimize-window')")
       svg(@click="onCustomButtonClick")
-        use(:xlink:href="window.state === 'maximized' ? loadButton('restore-window') : loadButton('maximize-window')")
+        use(:xlink:href="window && window.state === 'maximized' ? loadButton('restore-window') : loadButton('maximize-window')")
       svg.close(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('close-window')")
 </template>
@@ -109,17 +109,19 @@
     }
     onCustomButtonClick(event) {
       const mainWindow = (this as any).$electron.remote.getCurrentWindow();
-      const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
-      const state: string = pattern.split('#').reverse()[0].split('-')[0];
-      if (state === 'minimize') {
-        mainWindow.minimize();
-      } else if (state === 'restore') {
-        mainWindow.unmaximize();
-      } else if (state === 'maximize') {
-        mainWindow.maximize();
-      } else if (state === 'close') {
-        mainWindow.close();
-      }
+      this.$nextTick(() => {
+        const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
+        const state: string = pattern.split('#').reverse()[0].split('-')[0];
+        if (state === 'minimize') {
+          mainWindow.minimize();
+        } else if (state === 'restore') {
+          mainWindow.unmaximize();
+        } else if (state === 'maximize') {
+          mainWindow.maximize();
+        } else if (state === 'close') {
+          mainWindow.close();
+        }
+      });
     }
     onDoubleClick(event: Electron.Event) {
       if (event.target) {
