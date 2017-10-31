@@ -48,7 +48,8 @@ let rendererConfig = {
         use: {
           loader: 'ts-loader',
           options: {
-            appendTsSuffixTo: [/\.vue$/]
+            appendTsSuffixTo: [/\.vue$/],
+            onlyCompileBundledFiles: true
           }
         }
       },
@@ -200,7 +201,8 @@ let aboutConfig = {
         use: {
           loader: 'ts-loader',
           options: {
-            appendTsSuffixTo: [/\.vue$/]
+            appendTsSuffixTo: [/\.vue$/],
+            onlyCompileBundledFiles: true
           }
         }
       },

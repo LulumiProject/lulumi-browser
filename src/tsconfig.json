@@ -21,9 +21,6 @@
       "es7",
       "es2017.object"
     ],
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
     "types": [
       "chrome",
       "node",
@@ -34,6 +31,7 @@
     ]
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../node_modules/electron/electron.d.ts"
   ]
 }

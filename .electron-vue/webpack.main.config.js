@@ -36,7 +36,8 @@ let mainConfig = {
         use: {
           loader: 'ts-loader',
           options: {
-            appendTsSuffixTo: [/\.vue$/]
+            appendTsSuffixTo: [/\.vue$/],
+            onlyCompileBundledFiles: true
           }
         }
       },
