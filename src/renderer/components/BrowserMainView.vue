@@ -1466,6 +1466,9 @@
         this.onSetHistory(event, val);
       });
 
+      ipc.on('remove-non-bg-lulumi-extension', (event: Electron.Event, extensionId: string) => {
+        ipc.send(`remove-lulumi-extension-${extensionId}`);
+      });
       ipc.on('about-to-quit', () => {
         const downloads = this.$store.getters.downloads;
         const pendingDownloads = downloads.filter(download => download.state === 'progressing');

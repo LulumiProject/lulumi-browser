@@ -142,6 +142,9 @@ const removeBackgroundPages = (manifest) => {
     });
     // notify the extension that itself is going to be removed
     toBeRemovedwebContents.send(`lulumi-extension-${manifest.extensionId}-going-removed`);
+  } else {
+    // because the extension doesn't have any background page, we should just send an IPC message
+    BrowserWindow.getFocusedWindow().webContents.send('remove-non-bg-lulumi-extension', manifest.extensionId);
   }
 };
 
