@@ -1099,9 +1099,6 @@
 
       const registerExtensionContextMenus = (menu) => {
         const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
-        if (contextMenus.length !== 0) {
-          menu.append(new MenuItem({ type: 'separator' }));
-        }
         Object.keys(contextMenus).forEach((webContentsIdInString) => {
           contextMenus[webContentsIdInString].forEach((menuItems) => {
             menuItems.forEach((menuItem) => {
@@ -1137,6 +1134,9 @@
               .forEach(menuItem => menu.append(menuItem));
           });
         });
+        if (contextMenus.length !== 0) {
+          menu.append(new MenuItem({ type: 'separator' }));
+        }
       };
 
       if (params.isEditable) {
@@ -1324,8 +1324,6 @@
 
       // lulumi.contextMenus
       registerExtensionContextMenus(menu);
-
-      menu.append(new MenuItem({ type: 'separator' }));
 
       const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
       if (sourceUrl !== null) {
