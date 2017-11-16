@@ -27,5 +27,8 @@
       ]
     }
   },
-  "plugins": ["transform-runtime"]
+  "plugins": [
+    "closure-elimination",
+    "transform-runtime"
+  ]
 }
