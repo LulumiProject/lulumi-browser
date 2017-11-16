@@ -1095,6 +1095,7 @@
       const webview = this.getWebView();
       const tab = this.getTabObject();
       const params: Electron.ContextMenuParams = (event as any).params;
+      const editFlags = params.editFlags;
 
       const registerExtensionContextMenus = (menu) => {
         const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
@@ -1138,97 +1139,85 @@
         });
       };
 
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.back'),
-        click: () => {
-          this.onClickBack();
-        },
-        enabled: tab.canGoBack,
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.forward'),
-        click: () => {
-          this.onClickForward();
-        },
-        enabled: tab.canGoForward,
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.reload'),
-        accelerator: 'CmdOrCtrl+R',
-        click: () => {
-          this.onClickRefresh();
-        },
-        enabled: tab.canRefresh,
-      }));
+      if (params.isEditable) {
+        if (editFlags.canUndo) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.undo'),
+            accelerator: 'CmdOrCtrl+Z',
+            role: 'undo',
+          }));
+        }
 
-      if (params.editFlags.canUndo) {
+        if (editFlags.canRedo) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.redo'),
+            accelerator: 'CmdOrCtrl+Shift+Z',
+            role: 'redo',
+          }));
+        }
+
+        menu.append(new MenuItem({ type: 'separator' }));
+
+        if (editFlags.canCut) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.cut'),
+            accelerator: 'CmdOrCtrl+X',
+            role: 'cut',
+          }));
+        }
+
+        if (editFlags.canCopy) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.copy'),
+            accelerator: 'CmdOrCtrl+C',
+            role: 'copy',
+          }));
+        }
+
+        if (editFlags.canPaste) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.paste'),
+            accelerator: 'CmdOrCtrl+V',
+            role: 'paste',
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.pasteAndMatchStyle'),
+            accelerator: 'CmdOrCtrl+Shift+V',
+            role: 'pasteandmatchstyle',
+          }));
+        }
+
         menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.undo'),
-          accelerator: 'CmdOrCtrl+Z',
-          role: 'undo',
+          label: this.$t('webview.contextMenu.selectAll'),
+          accelerator: 'CmdOrCtrl+A',
+          role: 'selectall',
         }));
-      }
-
-      if (params.editFlags.canRedo) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.redo'),
-          accelerator: 'CmdOrCtrl+Shift+Z',
-          role: 'redo',
-        }));
-      }
-
-      menu.append(new MenuItem({ type: 'separator' }));
-
-      if (params.editFlags.canCut) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.cut'),
-          accelerator: 'CmdOrCtrl+X',
-          role: 'cut',
-        }));
-      }
-
-      if (params.editFlags.canCopy) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.copy'),
-          accelerator: 'CmdOrCtrl+C',
-          role: 'copy',
-        }));
-      }
-
-      if (params.editFlags.canPaste) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.paste'),
-          accelerator: 'CmdOrCtrl+V',
-          role: 'paste',
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.pasteAndMatchStyle'),
-          accelerator: 'CmdOrCtrl+Shift+V',
-          role: 'pasteandmatchstyle',
-        }));
-      }
-
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.selectAll'),
-        accelerator: 'CmdOrCtrl+A',
-        role: 'selectall',
-      }));
-      menu.append(new MenuItem({ type: 'separator' }));
-
-      if (params.linkURL) {
+      } else if (params.linkURL) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.openLinkInNewTab'),
           click: () => this.onNewTab(this.windowId, params.linkURL, false),
         }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.openLinkInNewWindow'),
+          click: () => {
+            const webContent = webview.getWebContents();
+            webContent.executeJavaScript(`window.open('${params.linkURL}')`);
+          }
+        }));
+
+        menu.append(new MenuItem({ type: 'separator' }));
+
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.copyLinkAddress'),
           click: () => {
             clipboard.writeText(params.linkURL);
           },
         }));
-      }
-
-      if (params.hasImageContents) {
+      } else if (params.hasImageContents) {
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.openImageInNewTab'),
+          click: () => this.onNewTab(this.windowId, params.srcURL, false),
+        }));
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.saveImageAs'),
           click: () => {
@@ -1260,20 +1249,44 @@
           },
         }));
         menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.copyImage'),
+          click: () => {
+            const electron = (this as any).$electron;
+            urlUtil.getFilenameFromUrl(params.srcURL).then(
+              async (filename) => {
+                  if (filename) {
+                    const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
+                    clipboard.writeImage(electron.nativeImage.createFromDataURL(dataURL));
+                  }
+              },
+            );
+          },
+        }));
+        menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.copyImageUrl'),
           click: () => {
             clipboard.writeText(params.srcURL);
           },
         }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.openImageInNewTab'),
-          click: () => this.onNewTab(this.windowId, params.srcURL, false),
-        }));
-      }
+      } else if (params.selectionText) {
+        const macOS = /^darwin/.test(this.arch);
+        if (macOS) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.lookUp', { selectionText: params.selectionText }),
+            click: () => {
+              webview.showDefinitionForSelection();
+            },
+          }));
 
-      menu.append(new MenuItem({ type: 'separator' }));
-      if (params.selectionText) {
-        if (params.editFlags.canCopy) {
+          menu.append(new MenuItem({ type: 'separator' }));
+        }
+
+        if (editFlags.canCopy) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.copy'),
+            accelerator: 'CmdOrCtrl+C',
+            role: 'copy',
+          }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.searchFor', {
               selectionText: params.selectionText,
@@ -1282,23 +1295,38 @@
             click: () => this.onNewTab(this.windowId, params.selectionText, false),
           }));
         }
+      } else {
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.back'),
+          click: () => {
+            this.onClickBack();
+          },
+          enabled: tab.canGoBack,
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.forward'),
+          click: () => {
+            this.onClickForward();
+          },
+          enabled: tab.canGoForward,
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.reload'),
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            this.onClickRefresh();
+          },
+          enabled: tab.canRefresh,
+        }));
       }
-      const macOS = /^darwin/.test(this.arch);
-      if (macOS) {
-        if (params.selectionText) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.lookUp', { selectionText: params.selectionText }),
-            click: () => {
-              webview.showDefinitionForSelection();
-            },
-          }));
-        }
-      }
+
+      menu.append(new MenuItem({ type: 'separator' }));
 
       // lulumi.contextMenus
       registerExtensionContextMenus(menu);
 
       menu.append(new MenuItem({ type: 'separator' }));
+
       const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
       if (sourceUrl !== null) {
         menu.append(new MenuItem({
@@ -1311,6 +1339,23 @@
         label: this.$t('webview.contextMenu.inspectElement'),
         click: () => {
           webview.inspectElement(params.x, params.y);
+        },
+      }));
+      menu.append(new MenuItem({
+        label: this.$t('webview.contextMenu.openToConsole'),
+        click: () => {
+          const webContent = webview.getWebContents();
+          if (webContent.isDevToolsOpened()) {
+            webContent.closeDevTools();
+          } else {
+            webContent.once('devtools-opened', () => {
+              const dtwc = webContent.devToolsWebContents;
+              if (dtwc) {
+                dtwc.executeJavaScript('DevToolsAPI.showPanel("console")');
+              }
+            });
+            webContent.openDevTools();
+          }
         },
       }));
 
