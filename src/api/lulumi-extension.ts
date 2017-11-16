@@ -86,7 +86,9 @@ const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
         }),
       });
       return manifest;
-    } else if (manifest && manifest.name) {
+    }
+
+    if (manifest && manifest.name) {
       console.warn(`Attempted to load extension "${manifest.name}" that has already been loaded.`);
       return null;
     }
@@ -335,9 +337,9 @@ app.once('ready', () => {
     if (manifest !== null) {
       loadExtension(manifest);
       return manifest.name;
-    } else {
-      return '';
     }
+
+    return '';
   };
 
   (BrowserWindow as any).removeLulumiExtension = (extensionId: string): string => {

@@ -254,9 +254,12 @@ const urlUtil = {
     if (url) {
       if (url.includes(PDF_VIEWER_WITH_PDFJS)) {
         return url.replace(/^file:.+\/pdfjs\/web\/viewer.html\?file=(\w+:\/\/.+)/, '$1');
-      } else if (url.includes(PDF_VIEWER_FOR_CHROME)) {
+      }
+
+      if (url.includes(PDF_VIEWER_FOR_CHROME)) {
         return url.replace(/^chrome:\/\/pdf-viewer\/index\.html\?src=/, '');
       }
+
       return url;
     }
     return '';

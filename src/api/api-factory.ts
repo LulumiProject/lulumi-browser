@@ -8,7 +8,9 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
   // if tabId === -1, we then just return a Tab instance with id = -1
   if (tabId === -1) {
     return dummyTabObject;
-  } else if (tabId === 0) {
+  }
+
+  if (tabId === 0) {
     // if tabId === 0, then we just find the Tab having located at that tabIndex
     const tabObject: store.TabObject = vueInstance.getTabObject(tabIndex);
     if (tabObject === undefined) {
@@ -18,17 +20,17 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
       vueInstance.onTabClick(tabIndex);
     }
     return tabObject;
-  } else {
-    // if we have tabId, then we just find one
-    const tabObject: store.TabObject = vueInstance.tabs.find(tab => (tab.id === tabId));
-    if (tabObject === undefined) {
-      return dummyTabObject;
-    }
-    if (active) {
-      vueInstance.onTabClick(tabObject.index);
-    }
-    return tabObject;
   }
+
+  // if we have tabId, then we just find one
+  const tabObject: store.TabObject = vueInstance.tabs.find(tab => (tab.id === tabId));
+  if (tabObject === undefined) {
+    return dummyTabObject;
+  }
+  if (active) {
+    vueInstance.onTabClick(tabObject.index);
+  }
+  return tabObject;
 }
 
 function getBuiltInTabIndex(vueInstance: any, tabIndexThatWeSee: number): number {
@@ -154,19 +156,19 @@ export default (vueInstance: any) => {
     query: (queryInfo: api.CustomTabsQueryInfo): store.TabObject[] => {
       if (Object.keys(queryInfo).length === 0 || queryInfo.url === '<all_urls>') {
         return vueInstance.tabs;
-      } else {
-        const tabs: store.TabObject[] = [];
-        if (queryInfo.currentWindow) {
-          delete queryInfo.currentWindow;
-          queryInfo.windowId = vueInstance.windowId;
-        }
-        vueInstance.tabs.forEach((tab) => {
-          if (Object.keys(queryInfo).every(k => (queryInfo[k] === tab[k]))) {
-            tabs.push(tab);
-          }
-        });
-        return tabs;
       }
+
+      const tabs: store.TabObject[] = [];
+      if (queryInfo.currentWindow) {
+        delete queryInfo.currentWindow;
+        queryInfo.windowId = vueInstance.windowId;
+      }
+      vueInstance.tabs.forEach((tab) => {
+        if (Object.keys(queryInfo).every(k => (queryInfo[k] === tab[k]))) {
+          tabs.push(tab);
+        }
+      });
+      return tabs;
     },
     update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
