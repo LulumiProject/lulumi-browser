@@ -4,10 +4,14 @@ const { remote } = require('electron')
 hotClient.subscribe((event) => {
   /**
    * Reload browser when HTMLWebpackPlugin emits a new index.html
+   *
+   * Currently disabled until jantimon/html-webpack-plugin#680 is resolved.
+   * https://github.com/SimulatedGREG/electron-vue/issues/437
+   * https://github.com/jantimon/html-webpack-plugin/issues/680
    */
-  if (event.action === 'reload') {
-    remote.BrowserWindow.getAllWindows().forEach(window => window.webContents.reloadIgnoringCache())
-  }
+  // if (event.action === 'reload') {
+  //   remote.BrowserWindow.getAllWindows().forEach(window => window.webContents.reloadIgnoringCache())
+  // }
 
   /**
    * Notify `mainWindow` when `main` process is compiling,
