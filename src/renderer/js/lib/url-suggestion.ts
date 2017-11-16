@@ -8,7 +8,7 @@ export default (provider: string, autocomplete: string): Promise<Object[]> => {
       .then(response => response.json())
       .then(data => data[1]);
   }
-  
+
   if (provider === 'Bing') {
     return fetchJsonp(`${autocomplete}&JsonType=callback`, {
       timeout: TIMEOUT,
