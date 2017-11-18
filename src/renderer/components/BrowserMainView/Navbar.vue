@@ -295,13 +295,15 @@
     }
     @Watch('focused')
     onFocused(isFocus: boolean): void {
-      if (isFocus) {
-        (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
-          .style.display = 'block';
-      } else {
-        (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
-          .style.display = 'none';
-      }
+      setTimeout(() => {
+        if (isFocus) {
+          (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+            .style.display = 'block';
+        } else {
+          (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+            .style.display = 'none';
+        }
+      }, 150);
     }
 
     updateSecure(url: string): void {
