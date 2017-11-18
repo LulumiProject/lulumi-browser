@@ -293,6 +293,16 @@
       }
       (this.$refs.input as any).suggestions.length = 0;
     }
+    @Watch('focused')
+    onFocused(isFocus: boolean): void {
+      if (isFocus) {
+        (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+          .style.display = 'block';
+      } else {
+        (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+          .style.display = 'none';
+      }
+    }
 
     updateSecure(url: string): void {
       if (urlUtil.getScheme(url) === 'lulumi://') {
@@ -682,11 +692,7 @@
           this.focused = true;
         });
         originalInput.addEventListener('blur', () => {
-          setTimeout(() => {
-            this.focused = false;
-            (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
-              .style.display = 'none';
-          }, 50);
+          this.focused = false;
         });
         this.clickHandler = () => {
           newElement.style.display = 'none';
@@ -783,7 +789,7 @@
 
     .control-group {
       display: flex;
-      flex: 1;
+      width: 120px;
       align-items: center;
       justify-content: center;
     }

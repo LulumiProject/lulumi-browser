@@ -1030,12 +1030,32 @@
     }
     // onCommonMenu
     onCommonMenu(): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const navbar = document.getElementById('browser-navbar');
       const common = document.getElementById('browser-navbar__common');
+      let sub: Electron.MenuItem[] = [
+        new MenuItem({
+          label: this.$t('navbar.common.options.lulumi'),
+          click: () => this.onNewTab(this.windowId, 'about:lulumi', false),
+        }),
+      ];
 
       if (navbar !== null && common !== null) {
+        if (this.arch === 'win32') {
+          menu.append(new MenuItem({
+            label: this.$t('file.newTab'),
+            click: () => this.onNewTab(this.windowId, 'about:newtab', false),
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('file.newWindow'),
+            click: () => (this as any).$electron.remote.BrowserWindow.createWindow(),
+          }));
+          menu.append(new MenuItem({ type: 'separator' }));
+        }
+
         const lastOpenedTabs: store.LastOpenedTabObject[] = [];
         this.lastOpenedTabs().forEach((tab) => {
           lastOpenedTabs.push(new MenuItem({
@@ -1069,17 +1089,28 @@
           label: this.$t('navbar.common.options.preferences'),
           click: () => this.onNewTab(this.windowId, 'about:preferences', false),
         }));
+        if (this.arch === 'win32') {
+          sub.concat([
+            new MenuItem({
+              label: this.$t('help.reportIssue'),
+              click: () => this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser/issues', true),
+            }),
+            new MenuItem({
+              label: this.$t('help.forceReload'),
+              click: () => currentWindow.webContents.reloadIgnoringCache(),
+            }),
+            new MenuItem({
+              label: this.$t('help.toggleDevTools'),
+              click: () => currentWindow.webContents.toggleDevTools(),
+            }),
+          ]);
+        }
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.help'),
-          submenu: [
-            new MenuItem({
-              label: this.$t('navbar.common.options.lulumi'),
-              click: () => this.onNewTab(this.windowId, 'about:lulumi', false),
-            }),
-          ],
+          submenu: sub,
         }));
 
-        menu.popup((this as any).$electron.remote.getCurrentWindow(), {
+        menu.popup(currentWindow, {
           async: true,
           x: Math.floor(common.getBoundingClientRect().right),
           y: Math.floor(navbar.getBoundingClientRect().bottom),
@@ -1334,12 +1365,6 @@
         }));
       }
       menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.inspectElement'),
-        click: () => {
-          webview.inspectElement(params.x, params.y);
-        },
-      }));
-      menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.openToConsole'),
         click: () => {
           const webContent = webview.getWebContents();
@@ -1354,6 +1379,12 @@
             });
             webContent.openDevTools();
           }
+        },
+      }));
+      menu.append(new MenuItem({
+        label: this.$t('webview.contextMenu.inspectElement'),
+        click: () => {
+          webview.inspectElement(params.x, params.y);
         },
       }));
 

@@ -116,6 +116,15 @@ export const guest = {
 };
 
 export default {
+  file: {
+    newTab: '新增分頁',
+    newWindow: '新增視窗',
+  },
+  help: {
+    reportIssue: '回報問題',
+    forceReload: '強制重新載入',
+    toggleDevTools: '開發人員工具',
+  },
   webview: {
     contextMenu: {
       back: '上一頁',

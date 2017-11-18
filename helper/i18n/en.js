@@ -116,6 +116,15 @@ export const guest = {
 };
 
 export default {
+  file: {
+    newTab: 'New Tab',
+    newWindow: 'New Window',
+  },
+  help: {
+    reportIssue: 'Report Issue',
+    forceReload: 'Force Reload',
+    toggleDevTools: 'Toggle Developer Tools',
+  },
   webview: {
     contextMenu: {
       back: 'Back',
