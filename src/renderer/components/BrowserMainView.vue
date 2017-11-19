@@ -1089,7 +1089,7 @@
           click: () => this.onNewTab(this.windowId, 'about:preferences', false),
         }));
         if (is.windows) {
-          sub.concat([
+          sub = sub.concat([
             new MenuItem({
               label: this.$t('help.reportIssue'),
               click: () => this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser/issues', true),
@@ -1164,7 +1164,7 @@
               .forEach(menuItem => menu.append(menuItem));
           });
         });
-        if (contextMenus.length !== 0) {
+        if (Object.keys(contextMenus).length !== 0) {
           menu.append(new MenuItem({ type: 'separator' }));
         }
       };

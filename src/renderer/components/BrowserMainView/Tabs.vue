@@ -100,7 +100,9 @@
     }
 
     loadButton(id: string): string {
-      return fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
+      return process.env.NODE_ENV !== 'production'
+        ? `${path.join('static', 'icons', 'icons.svg')}#${id}`
+        : fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
     }
     loadDefaultFavicon(event: Electron.Event) {
       (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
