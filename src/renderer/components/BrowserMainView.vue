@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     #nav
-      tabs(ref="tabs", :arch="arch", :windowId="windowId")
+      tabs(ref="tabs", :windowId="windowId")
       navbar(ref="navbar", :windowId="windowId")
     swipeArrow
     tab(v-for="(tab, index) in tabs",
@@ -28,6 +28,7 @@
   import Tab from './BrowserMainView/Tab.vue';
   import Download from './BrowserMainView/Download.vue';
 
+  import { is } from 'electron-util';
   import urlUtil from '../js/lib/url-util';
   import imageUtil from '../js/lib/image-util';
   import urlResource from '../js/lib/url-resource';
@@ -48,8 +49,6 @@
     },
   })
   export default class BrowserMainView extends Vue {
-    arch: string = process.platform;
-
     windowId: number = 0;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
@@ -1044,7 +1043,7 @@
       ];
 
       if (navbar !== null && common !== null) {
-        if (this.arch === 'win32') {
+        if (is.windows) {
           menu.append(new MenuItem({
             label: this.$t('file.newTab'),
             click: () => this.onNewTab(this.windowId, 'about:newtab', false),
@@ -1089,7 +1088,7 @@
           label: this.$t('navbar.common.options.preferences'),
           click: () => this.onNewTab(this.windowId, 'about:preferences', false),
         }));
-        if (this.arch === 'win32') {
+        if (is.windows) {
           sub.concat([
             new MenuItem({
               label: this.$t('help.reportIssue'),
@@ -1300,8 +1299,7 @@
           },
         }));
       } else if (params.selectionText) {
-        const macOS = /^darwin/.test(this.arch);
-        if (macOS) {
+        if (is.macos) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.lookUp', { selectionText: params.selectionText }),
             click: () => {
@@ -1360,7 +1358,7 @@
       if (sourceUrl !== null) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.viewSource'),
-          accelerator: this.arch === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
+          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+Shift+U',
           click: () => this.onNewTab(this.windowId, sourceUrl, true),
         }));
       }
@@ -1424,7 +1422,7 @@
       this.extensionService = new ExtensionService(this);
     }
     mounted() {
-      if (this.arch === 'darwin') {
+      if (is.macos) {
         document.body.classList.add('darwin');
       }
       // removed unneeded tabs

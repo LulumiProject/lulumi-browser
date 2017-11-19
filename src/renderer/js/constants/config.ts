@@ -1,4 +1,5 @@
 import { nativeImage } from 'electron';
+import { fixPathForAsarUnpack } from 'electron-util';
 import path from 'path';
 
 import { store } from 'lulumi';
@@ -47,10 +48,10 @@ const tabConfig: store.TabConfig = {
     pageActionMapping: {},
   },
   defaultFavicon: nativeImage
-    .createFromPath(path.join(__static, 'icons', 'document.png'))
+    .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'document.png')))
     .toDataURL(),
   lulumiFavicon: nativeImage
-    .createFromPath(path.join(__static, 'icons', 'icon.png'))
+    .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'icon.png')))
     .toDataURL(),
 };
 

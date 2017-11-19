@@ -26,7 +26,7 @@
           i.el-icon-plus
         svg(width="15", height="30", class="right-edge")
           path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-    .custom-buttons(v-if="arch !== 'darwin'")
+    .custom-buttons(v-if="enableCustomButtons")
       svg(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('minimize-window')")
       svg(@click="onCustomButtonClick")
@@ -44,6 +44,7 @@
   import 'vue-awesome/icons/volume-up';
   import 'vue-awesome/icons/volume-off';
 
+  import { fixPathForAsarUnpack, is } from 'electron-util';
   import Sortable from 'sortablejs';
 
   import { Button, Tooltip } from 'element-ui';
@@ -74,7 +75,6 @@
       },
     },
     props: [
-      'arch',
       'windowId',
     ],
     components: {
@@ -86,8 +86,8 @@
   export default class Tabs extends Vue {
     sortable: any;
 
-    arch: string;
     windowId: number;
+    enableCustomButtons: boolean = !is.macos;
 
     get window(): store.LulumiBrowserWindowProperty {
       return this.$store.getters.windows.find(window => window.id === this.windowId);
@@ -100,9 +100,7 @@
     }
 
     loadButton(id: string): string {
-      return process.env.NODE_ENV !== 'production'
-        ? `${path.join('static', 'icons', 'icons.svg')}#${id}`
-        : `${path.join(__static, 'icons', 'icons.svg')}#${id}`;
+      return fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
     }
     loadDefaultFavicon(event: Electron.Event) {
       (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
