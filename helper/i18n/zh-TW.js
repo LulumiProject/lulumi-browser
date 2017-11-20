@@ -42,6 +42,7 @@ export const appMenu = {
     zoomOut: '縮小',
     viewSource: '檢視網頁原始碼',
     toggleDevTools: '開發人員工具',
+    javascriptPanel: 'JavaScript 控制台',
   },
   window: {
     title: '視窗',
@@ -120,6 +121,9 @@ export default {
     newTab: '新增分頁',
     newWindow: '新增視窗',
   },
+  window: {
+    processManager: '工作管理員',
+  },
   help: {
     reportIssue: '回報問題',
     forceReload: '強制重新載入',
@@ -148,7 +152,7 @@ export default {
       lookUp: '查詢「%{selectionText}」',
       viewSource: '檢視網頁原始碼',
       inspectElement: '檢查',
-      openToConsole: '檢視網頁控制台',
+      javascriptPanel: 'JavaScript 控制台',
     },
   },
   downloads: {

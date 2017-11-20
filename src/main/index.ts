@@ -10,6 +10,7 @@ import {
   shell,
   systemPreferences,
 } from 'electron';
+import { is } from 'electron-util';
 
 import autoUpdater from './js/lib/auto-updater';
 import config from './js/constants/config';
@@ -18,6 +19,8 @@ import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
 
 import { api, scheme } from 'lulumi';
+
+const { openProcessManager } = require('electron-process-manager');
 
 const globalObjet = global as api.GlobalObject;
 
@@ -51,8 +54,8 @@ if (process.env.NODE_ENV === 'development') {
 let appStateSaveHandler: any = null;
 let setLanguage: boolean = false;
 
-const isDarwin: boolean = process.platform === 'darwin';
-const isWindows: boolean = process.platform === 'win32';
+const isDarwin: boolean = is.macos;
+const isWindows: boolean = is.windows;
 
 const autoHideMenuBarSetting: boolean = isDarwin;
 const swipeGesture: boolean = isDarwin
@@ -244,7 +247,7 @@ app.on('ready', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (!isDarwin) {
     app.quit();
   }
 });
@@ -284,6 +287,11 @@ app.on('before-quit', (event) => {
     appStateSaveHandler = null;
   }
   appStateSave(false);
+});
+
+// open ProcessManager
+ipcMain.on('open-process-manager', () => {
+  openProcessManager();
 });
 
 // return the number of BrowserWindow

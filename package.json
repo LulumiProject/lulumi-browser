@@ -79,7 +79,7 @@
     "electron-devtools-installer": "^2.2.1",
     "electron-packager": "^9.1.0",
     "electron-rebuild": "^1.6.0",
-    "electron-util": "^0.2.1",
+    "electron-util": "git://github.com/sindresorhus/electron-util.git#9b3a39bed301c4f6e11c0928546ee28cf309e1ee",
     "element-ui": "1.4.8",
     "eslint": "^4.11.0",
     "eslint-config-airbnb-base": "^12.1.0",

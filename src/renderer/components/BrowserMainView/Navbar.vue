@@ -585,6 +585,8 @@
       return '';
     }
     sendIPC(event: Electron.Event, extension: any): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const isPageAction = extension.page_action;
       const isBrowserAction = extension.browser_action;
       if (isPageAction || isBrowserAction) {
@@ -600,7 +602,7 @@
             },
           }));
 
-          menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+          menu.popup(currentWindow, { async: true });
         });
         webview.addEventListener('ipc-message', (event: Electron.IpcMessageEvent) => {
           if (event.channel === 'resize') {
@@ -662,6 +664,8 @@
       ipc.send('remove-lulumi-extension', extensionId);
     }
     onContextmenu(extension: any): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
 
@@ -672,7 +676,7 @@
         },
       }));
 
-      menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+      menu.popup(currentWindow, { async: true });
     }
 
     mounted() {

@@ -3315,9 +3315,9 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.16:
   version "1.3.16"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.16.tgz#d0e026735754770901ae301a21664cba45d92f7d"
 
-electron-util@^0.2.1:
+"electron-util@git://github.com/sindresorhus/electron-util.git#9b3a39bed301c4f6e11c0928546ee28cf309e1ee":
   version "0.2.1"
-  resolved "https://registry.yarnpkg.com/electron-util/-/electron-util-0.2.1.tgz#2f084303668cdd9a8b3a402e48717f976daab21c"
+  resolved "git://github.com/sindresorhus/electron-util.git#9b3a39bed301c4f6e11c0928546ee28cf309e1ee"
   dependencies:
     electron-is-dev "^0.3.0"
 

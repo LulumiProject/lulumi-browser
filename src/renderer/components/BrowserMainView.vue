@@ -867,6 +867,21 @@
         webview.loadURL(this.tab.url);
       }
     }
+    onClickJavaScriptPanel(): void {
+      const webview = this.getWebView();
+      const webContent = webview.getWebContents();
+      if (webContent.isDevToolsOpened()) {
+        webContent.closeDevTools();
+      } else {
+        webContent.once('devtools-opened', () => {
+          const dtwc = webContent.devToolsWebContents;
+          if (dtwc) {
+            dtwc.executeJavaScript('DevToolsAPI.showPanel("console")');
+          }
+        });
+        webContent.openDevTools();
+      }
+    }
     onEnterUrl(url: string): void {
       let newUrl: string;
       if (url.startsWith('about:')) {
@@ -880,6 +895,8 @@
     }
     // onTabContextMenu
     onTabContextMenu(event: Electron.Event, tabIndex: number): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
 
@@ -903,10 +920,12 @@
         },
       }));
 
-      menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+      menu.popup(currentWindow, { async: true });
     }
     // onClickBackContextMenu
     onClickBackContextMenu(): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const webview = this.getWebView();
@@ -941,7 +960,7 @@
             click: () => this.onNewTab(this.windowId, 'about:history', false),
           }));
 
-          menu.popup((this as any).$electron.remote.getCurrentWindow(), {
+          menu.popup(currentWindow, {
             async: true,
             x: Math.floor(goBack.getBoundingClientRect().left),
             y: Math.floor(navbar.getBoundingClientRect().bottom),
@@ -951,6 +970,8 @@
     }
     // onClickForwardContextMenu
     onClickForwardContextMenu(): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const webview = this.getWebView();
@@ -985,7 +1006,7 @@
             click: () => this.onNewTab(this.windowId, 'about:history', false),
           }));
 
-          menu.popup((this as any).$electron.remote.getCurrentWindow(), {
+          menu.popup(currentWindow, {
             async: true,
             x: Math.floor(goForward.getBoundingClientRect().left),
             y: Math.floor(navbar.getBoundingClientRect().bottom),
@@ -995,6 +1016,8 @@
     }
     // onNavContextMenu
     onNavContextMenu(event: Electron.Event): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const el = event.target as HTMLInputElement;
@@ -1025,7 +1048,7 @@
         },
       }));
 
-      menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+      menu.popup(currentWindow, { async: true });
     }
     // onCommonMenu
     onCommonMenu(): void {
@@ -1046,10 +1069,12 @@
         if (is.windows) {
           menu.append(new MenuItem({
             label: this.$t('file.newTab'),
+            accelerator: 'CmdOrCtrl+T',
             click: () => this.onNewTab(this.windowId, 'about:newtab', false),
           }));
           menu.append(new MenuItem({
             label: this.$t('file.newWindow'),
+            accelerator: 'CmdOrCtrl+N',
             click: () => (this as any).$electron.remote.BrowserWindow.createWindow(),
           }));
           menu.append(new MenuItem({ type: 'separator' }));
@@ -1059,7 +1084,7 @@
         this.lastOpenedTabs().forEach((tab) => {
           lastOpenedTabs.push(new MenuItem({
             label: tab.title,
-            click: () => this.onNewTab(this.windowId, tab.url, false),
+            click: () => this.onNewTab(this.windowId, tab.url, true),
           }));
         });
 
@@ -1102,6 +1127,11 @@
               label: this.$t('help.toggleDevTools'),
               click: () => currentWindow.webContents.toggleDevTools(),
             }),
+            new MenuItem({ type: 'separator' }),
+            new MenuItem({
+              label: this.$t('window.processManager'),
+              click: () => (this as any).$electron.ipcRenderer.send('open-process-manager'),
+            }),
           ]);
         }
         menu.append(new MenuItem({
@@ -1118,6 +1148,8 @@
     }
     // onWebviewContextMenu
     onWebviewContextMenu(event: Electron.Event): void {
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
       const menu = new Menu();
       const clipboard = (this as any).$electron.clipboard;
@@ -1258,7 +1290,7 @@
               (filename) => {
                 const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
                 electron.remote.dialog.showSaveDialog(
-                  electron.remote.getCurrentWindow(), {
+                  currentWindow, {
                     defaultPath,
                     filters: [
                       {
@@ -1358,35 +1390,24 @@
       if (sourceUrl !== null) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.viewSource'),
-          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+Shift+U',
-          click: () => this.onNewTab(this.windowId, sourceUrl, true),
+          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
+          click: this.onClickViewSource,
         }));
       }
       menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.openToConsole'),
-        click: () => {
-          const webContent = webview.getWebContents();
-          if (webContent.isDevToolsOpened()) {
-            webContent.closeDevTools();
-          } else {
-            webContent.once('devtools-opened', () => {
-              const dtwc = webContent.devToolsWebContents;
-              if (dtwc) {
-                dtwc.executeJavaScript('DevToolsAPI.showPanel("console")');
-              }
-            });
-            webContent.openDevTools();
-          }
-        },
+        label: this.$t('webview.contextMenu.javascriptPanel'),
+        accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
+        click: this.onClickJavaScriptPanel,
       }));
       menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.inspectElement'),
+        accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
         click: () => {
           webview.inspectElement(params.x, params.y);
         },
       }));
 
-      menu.popup((this as any).$electron.remote.getCurrentWindow(), { async: true });
+      menu.popup(currentWindow, { async: true });
     }
 
     beforeMount() {
@@ -1447,6 +1468,9 @@
       });
       ipc.on('toggle-dev-tools', () => {
         this.onClickToggleDevTools();
+      });
+      ipc.on('javascript-panel', () => {
+        this.onClickJavaScriptPanel();
       });
       ipc.on('new-tab', (event, payload) => {
         if (payload) {

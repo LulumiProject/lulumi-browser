@@ -108,28 +108,30 @@
       (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
     }
     onCustomButtonClick(event) {
-      const mainWindow = (this as any).$electron.remote.getCurrentWindow();
+      const currentWindow: Electron.BrowserWindow
+        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       this.$nextTick(() => {
         const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
         const state: string = pattern.split('#').reverse()[0].split('-')[0];
         if (state === 'minimize') {
-          mainWindow.minimize();
+          currentWindow.minimize();
         } else if (state === 'restore') {
-          mainWindow.unmaximize();
+          currentWindow.unmaximize();
         } else if (state === 'maximize') {
-          mainWindow.maximize();
+          currentWindow.maximize();
         } else if (state === 'close') {
-          mainWindow.close();
+          currentWindow.close();
         }
       });
     }
     onDoubleClick(event: Electron.Event) {
       if (event.target) {
-        const mainWindow = (this as any).$electron.remote.getCurrentWindow();
-        if (mainWindow.isMaximized()) {
-          mainWindow.unmaximize();
+        const currentWindow: Electron.BrowserWindow
+          = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
+        if (currentWindow.isMaximized()) {
+          currentWindow.unmaximize();
         } else {
-          mainWindow.maximize();
+          currentWindow.maximize();
         }
       }
     }

@@ -1,32 +1,10 @@
 import { Menu, BrowserWindow } from 'electron';
+import { is } from 'electron-util';
 import i18n from '../../i18n';
 const { openProcessManager } = require('electron-process-manager');
 
 const getTemplate = () => {
   const template = [
-    {
-      label: i18n.t('file.title'),
-      submenu: [
-        {
-          label: i18n.t('file.newTab'),
-          accelerator: 'CmdOrCtrl+T',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
-        },
-        {
-          label: i18n.t('file.newWindow'),
-          accelerator: 'CmdOrCtrl+N',
-          click: () => (BrowserWindow as any).createWindow(),
-        },
-        process.platform === 'darwin' ? {
-          type: 'separator',
-        } : {},
-        {
-          label: i18n.t('file.closeTab'),
-          accelerator: 'CmdOrCtrl+W',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
-        },
-      ],
-    },
     {
       label: i18n.t('edit.title'),
       submenu: [
@@ -53,7 +31,7 @@ const getTemplate = () => {
           label: i18n.t('edit.paste'),
           role: 'paste',
         },
-        process.platform === 'darwin' ? {
+        is.macos ? {
           label: i18n.t('edit.pasteAndMatchStyle'),
           role: 'pasteandmatchstyle',
         } : {},
@@ -125,13 +103,18 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.viewSource'),
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+U' : 'Ctrl+Shift+U',
+          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('view-source'),
         },
         {
           label: i18n.t('view.toggleDevTools'),
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('toggle-dev-tools'),
+        },
+        {
+          label: i18n.t('view.javascriptPanel'),
+          accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('javascript-panel'),
         },
       ],
     },
@@ -147,14 +130,14 @@ const getTemplate = () => {
           label: i18n.t('window.close'),
           role: 'close',
         },
-        process.platform === 'darwin' ? {
+        is.macos ? {
           type: 'separator',
         } : {},
-        process.platform === 'darwin' ? {
+        is.macos ? {
           label: i18n.t('window.front'),
           role: 'front',
         } : {},
-        process.platform === 'darwin' ? {
+        is.macos ? {
           type: 'separator',
         } : {},
         {
@@ -163,31 +146,33 @@ const getTemplate = () => {
         },
       ],
     },
-    {
-      label: i18n.t('help.title'),
-      role: 'help',
-      submenu: [
-        {
-          label: i18n.t('help.reportIssue'),
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
-            url: 'https://github.com/LulumiProject/lulumi-browser/issues',
-            follow: true,
-          }),
-        },
-        {
-          label: i18n.t('help.forceReload'),
-          click: () => BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
-        },
-        {
-          label: i18n.t('help.toggleDevTools'),
-          click: () => BrowserWindow.getFocusedWindow().webContents.toggleDevTools(),
-        },
-      ],
-    },
   ];
 
-  if (process.platform === 'darwin') {
+  if (is.macos) {
     const appName = require('electron').app.getName();
+    template.unshift({
+      label: i18n.t('file.title'),
+      submenu: [
+        {
+          label: i18n.t('file.newTab'),
+          accelerator: 'CmdOrCtrl+T',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
+        },
+        {
+          label: i18n.t('file.newWindow'),
+          accelerator: 'CmdOrCtrl+N',
+          click: () => (BrowserWindow as any).createWindow(),
+        },
+        is.macos ? {
+          type: 'separator',
+        } : {},
+        {
+          label: i18n.t('file.closeTab'),
+          accelerator: 'CmdOrCtrl+W',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
+        },
+      ],
+    });
     template.unshift({
       label: appName,
       submenu: [
@@ -227,6 +212,27 @@ const getTemplate = () => {
         {
           label: i18n.t('app.quit', { appName }),
           role: 'quit',
+        },
+      ],
+    });
+    template.push({
+      label: i18n.t('help.title'),
+      role: 'help',
+      submenu: [
+        {
+          label: i18n.t('help.reportIssue'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
+            url: 'https://github.com/LulumiProject/lulumi-browser/issues',
+            follow: true,
+          }),
+        },
+        {
+          label: i18n.t('help.forceReload'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
+        },
+        {
+          label: i18n.t('help.toggleDevTools'),
+          click: () => BrowserWindow.getFocusedWindow().webContents.toggleDevTools(),
         },
       ],
     });

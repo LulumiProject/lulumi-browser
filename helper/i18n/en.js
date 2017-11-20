@@ -42,6 +42,7 @@ export const appMenu = {
     zoomOut: 'Zoom Out',
     viewSource: 'View Source',
     toggleDevTools: 'Toggle Developer Tools',
+    javascriptPanel: 'JavaScript Panel',
   },
   window: {
     title: 'Window',
@@ -120,6 +121,9 @@ export default {
     newTab: 'New Tab',
     newWindow: 'New Window',
   },
+  window: {
+    processManager: 'Process Manager',
+  },
   help: {
     reportIssue: 'Report Issue',
     forceReload: 'Force Reload',
@@ -148,7 +152,7 @@ export default {
       lookUp: 'Look up "%{selectionText}"',
       viewSource: 'View Source',
       inspectElement: 'Inspect Element',
-      openToConsole: 'Open To Console',
+      javascriptPanel: 'JavaScript Panel',
     },
   },
   downloads: {
