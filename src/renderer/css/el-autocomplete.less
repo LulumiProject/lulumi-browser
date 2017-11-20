@@ -48,26 +48,25 @@
   }
 
   .el-input__inner {
+    position: relative;
     flex: 1;
     margin: 4px 0 3px;
     font-size: 14px;
     color: #808080;
     outline: 0;
     height: auto;
+    overflow: hidden;
     background: #fff;
     border: 1px solid #bbb;
     border-left: none;
     font-family: 'Source Code Pro', Courier, monospace;
 
     .security-hint {
+      position: absolute;
       float: left;
       font-size: 14px;
       padding: 3px 0;
-      position: absolute;
-      overflow: hidden;
       white-space: nowrap;
-      // TODO: adjust the width correctly when text overflow happened
-      max-width: 75vw;
 
       .secure-origin {
         color: #3c943c;
