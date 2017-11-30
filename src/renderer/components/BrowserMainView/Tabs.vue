@@ -38,7 +38,7 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  import path from 'path';
+  import * as path from 'path';
 
   import AwesomeIcon from 'vue-awesome/components/Icon.vue';
   import 'vue-awesome/icons/volume-up';

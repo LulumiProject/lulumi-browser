@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 
 const lulumiRootPath = process.env.NODE_ENV === 'development'
   ? path.resolve(__dirname, '../../../../')

@@ -1,5 +1,5 @@
 <template lang="pug">
-  #browser-navbar
+  #browser-navbar(@contextmenu.prevent="onNavbarContextMenu")
     .control-group
       a(@click="$parent.onClickHome", class="enabled")
         iview-icon(type="ios-home", size="16")
@@ -11,20 +11,18 @@
         iview-icon(type="close", size="16")
       a(v-else, @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
         iview-icon(type="android-refresh", size="16")
-    .input-group(@contextmenu="$parent.onNavContextMenu")
-      good-custom-autocomplete#url-input(
-        ref="input",
-        @keyup.shift.up.native="selectPortion",
-        @keyup.shift.down.native="selectPortion",
-        @input="onChange",
-        @select="onSelect",
-        :trigger-on-focus="false",
-        :placeholder="$t('navbar.placeholder')",
-        :fetch-suggestions="querySearch",
-        v-focus="focused",
-        :value="value",
-        popper-class="my-autocomplete",
-        custom-item="url-suggestion")
+    .input-group
+      good-custom-autocomplete#url-input(ref="input",
+                                         @keyup.shift.up.native="selectPortion",
+                                         @keyup.shift.down.native="selectPortion",
+                                         @input="onChange",
+                                         @select="onSelect",
+                                         :trigger-on-focus="false",
+                                         :placeholder="$t('navbar.placeholder')",
+                                         :fetch-suggestions="querySearch",
+                                         v-focus="focused",
+                                         :value="value",
+                                         popper-class="my-autocomplete")
         el-button(slot="prepend")
           div.secure(v-if="secure")
             awesome-icon(name="lock")
@@ -32,13 +30,21 @@
           div.insecure(v-else)
             awesome-icon(name="unlock")
             span {{ $t('navbar.indicator.insecure') }}
+        template(slot-scope="props")
+          component(:is="'suggestion-item'", :item="props.item")
     .extensions-group(v-sortable="")
       div.block(v-for="extension in extensions",
-          :key="extension.extensionId")
-        el-popover(:ref="`popover-${extension.extensionId}`", placement="bottom", trigger="click", :disabled="showPopupOrNot(extension)")
+                :key="extension.extensionId")
+        el-popover(:ref="`popover-${extension.extensionId}`",
+                   placement="bottom",
+                   trigger="click",
+                   :disabled="showPopupOrNot(extension)",
+                   :popper-options={
+                     gpuAcceleration: true,
+                  })
           el-badge.badge(:ref="`badge-${extension.extensionId}`",
                          :value="showBrowserActionBadgeText(extension.extensionId)",
-                         :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)"
+                         :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)",
                          slot="reference")
             img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                           :src="loadIcon(extension)",
@@ -55,8 +61,8 @@
 <script lang="ts">
   import { Component, Watch, Vue } from 'vue-property-decorator';
 
-  import path from 'path';
-  import url from 'url';
+  import * as path from 'path';
+  import * as url from 'url';
   import { focus } from 'vue-focus';
 
   import AwesomeIcon from 'vue-awesome/components/Icon.vue';
@@ -68,7 +74,7 @@
   import 'vue-awesome/icons/lock';
   import 'vue-awesome/icons/unlock';
 
-  import Fuse from 'fuse.js';
+  import * as Fuse from 'fuse.js';
   import Sortable from 'sortablejs';
 
   import { Badge, Button, Popover } from 'element-ui';
@@ -87,7 +93,7 @@
 
   import { navbar, renderer, store } from 'lulumi';
 
-  Vue.component('url-suggestion', {
+  Vue.component('suggestion-item', {
     functional: true,
     render(h, ctx) {
       const suggestion: renderer.SuggestionObject = ctx.props.item;
@@ -106,7 +112,7 @@
               const target: string = tmpStr.substring(indexPair[0], indexPair[1] + 1);
               
               renderElements.push(prefix);
-              renderElements.push(h('span', { style: 'color: #499fff' }, target));
+              renderElements.push(h('span', { style: { color: '#499fff' } }, target));
               prefixIndex = indexPair[1] + 1;
               if (index === match.indices.length - 1) {
                 renderElements.push(tmpStr.substring(prefixIndex, tmpStr.length));
@@ -126,33 +132,27 @@
           } else if (renderElementsOfValue.length === 0) {
             renderElementsOfValue.push(item.value);
           }
-          return h('li', ctx.data, [
-            h('div', { attrs: { class: 'url' } }, [
-              h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-              h('span', renderElementsOfValue),
-              h('span', { attrs: { class: 'name' } }, [
-                ' - ',
-                ...renderElementsOfTitle,
-              ]),
-            ]),
-        ]);
-        }
-        return h('li', ctx.data, [
-          h('div', { attrs: { class: 'url' } }, [
+          return h('div', { attrs: { class: 'url' } }, [
             h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-            h('span', item.value),
+            h('span', renderElementsOfValue),
             h('span', { attrs: { class: 'name' } }, [
               ' - ',
-              item.title,
+              ...renderElementsOfTitle,
             ]),
+          ]);
+        }
+        return h('div', { attrs: { class: 'url' } }, [
+          h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
+          h('span', item.value),
+          h('span', { attrs: { class: 'name' } }, [
+            ' - ',
+            item.title,
           ]),
         ]);
       }
-      return h('li', ctx.data, [
-        h('div', { attrs: { class: 'url' } }, [
-          h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
-          h('span', item.value),
-        ]),
+      return h('div', { attrs: { class: 'url' } }, [
+        h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
+        h('span', item.value),
       ]);
     },
     props: {

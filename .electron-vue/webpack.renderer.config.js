@@ -65,12 +65,21 @@ let rendererConfig = {
         }
       },
       {
-        test: /\.(less|css)$/,
+        test: /\.less$/,
         use: ExtractTextPlugin.extract({
           use: [{
             loader: "css-loader"
-          }, {
+          },{
             loader: "less-loader"
+          }],
+          fallback: "style-loader"
+        })
+      },
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          use: [{
+            loader: "css-loader"
           }],
           fallback: "style-loader"
         })
@@ -218,12 +227,21 @@ let aboutConfig = {
         }
       },
       {
-        test: /\.(less|css)$/,
+        test: /\.less$/,
         use: ExtractTextPlugin.extract({
           use: [{
             loader: "css-loader"
-          }, {
+          },{
             loader: "less-loader"
+          }],
+          fallback: "style-loader"
+        })
+      },
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          use: [{
+            loader: "css-loader"
           }],
           fallback: "style-loader"
         })

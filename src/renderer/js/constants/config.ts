@@ -1,6 +1,6 @@
 import { nativeImage } from 'electron';
 import { fixPathForAsarUnpack } from 'electron-util';
-import path from 'path';
+import * as path from 'path';
 
 import { store } from 'lulumi';
 

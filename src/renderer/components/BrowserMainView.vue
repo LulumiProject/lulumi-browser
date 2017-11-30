@@ -20,7 +20,7 @@
 <script lang="ts">
   import { Component, Watch, Vue } from 'vue-property-decorator';
 
-  import urlPackage from 'url';
+  import * as urlPackage from 'url';
 
   import Tabs from './BrowserMainView/Tabs.vue';
   import Navbar from './BrowserMainView/Navbar.vue';

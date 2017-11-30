@@ -1,11 +1,11 @@
-import Vuex from 'vuex';
+import { ModuleTree } from 'vuex';
 
 interface RequireContext extends __WebpackModuleApi.RequireContext {
   default: object;
 }
 
 const files = require.context('.', false, /\.ts$/);
-const modules: Vuex.ModuleTree<any> = {};
+const modules: ModuleTree<any> = {};
 
 files.keys().forEach((key) => {
   if (key === './index.ts') return;

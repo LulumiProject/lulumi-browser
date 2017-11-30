@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 import { BrowserWindow, ipcMain } from 'electron';
 
 import { actions } from './actions';
@@ -42,7 +42,7 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
-function handleWindowProperty(store: Vuex.Store<any>, window: Electron.BrowserWindow, action: string) {
+function handleWindowProperty(store: Store<any>, window: Electron.BrowserWindow, action: string) {
   const bounds: Electron.Rectangle = window.getBounds();
   let windowState: string = 'normal';
   if (window.isFullScreen()) {

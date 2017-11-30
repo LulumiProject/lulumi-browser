@@ -532,12 +532,6 @@ async@1.x, async@^1.4.0, async@^1.5.2:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
 
-async@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/async/-/async-2.4.1.tgz#62a56b279c98a11d0987096a01cc3eeb8eb7bbd7"
-  dependencies:
-    lodash "^4.14.0"
-
 async@^2.0.0, async@^2.1.2, async@^2.4.1:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/async/-/async-2.5.0.tgz#843190fd6b7357a0b9e1c956edddd5ec8462b54d"
@@ -2461,13 +2455,6 @@ compressible@~2.0.10:
   dependencies:
     mime-db ">= 1.27.0 < 2"
 
-compression-webpack-plugin@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/compression-webpack-plugin/-/compression-webpack-plugin-1.0.1.tgz#7f0a2af9f642b4f87b5989516a3b9e9b41bb4b3f"
-  dependencies:
-    async "2.4.1"
-    webpack-sources "^1.0.1"
-
 compression@^1.5.2:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/compression/-/compression-1.7.0.tgz#030c9f198f1643a057d776a738e922da4373012d"
@@ -3375,9 +3362,9 @@ element-resize-detector@^1.1.12:
   dependencies:
     batch-processor "^1.0.0"
 
-element-ui@1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-1.4.8.tgz#2bd32fb022ab2482e08e1559daaa7774a86517bc"
+element-ui@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.0.7.tgz#29e6a156ff43b19a9eefcbf6c69999bd79662c8a"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -5231,12 +5218,11 @@ istanbul@^0.4.0:
     which "^1.1.1"
     wordwrap "^1.0.0"
 
-iview@2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/iview/-/iview-2.5.1.tgz#c647121173024675c6d3746eafc526be0dce1aad"
+iview@^2.7.3:
+  version "2.7.3"
+  resolved "https://registry.yarnpkg.com/iview/-/iview-2.7.3.tgz#b1e5857ffb876468205f6b0aea3475bb6d1ab0aa"
   dependencies:
     async-validator "^1.8.1"
-    compression-webpack-plugin "^1.0.1"
     core-js "^2.5.0"
     deepmerge "^1.5.2"
     element-resize-detector "^1.1.12"
@@ -7604,7 +7590,7 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-reflect-metadata@^0.1.9:
+reflect-metadata@^0.1.10:
   version "0.1.10"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.10.tgz#b4f83704416acad89988c9b15635d47e03b9344a"
 
@@ -9112,9 +9098,9 @@ vue-awesome@^2.3.4:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue-awesome/-/vue-awesome-2.3.4.tgz#a8b06a21dd95a5787e108561be89e216fd9a78e6"
 
-vue-class-component@5.0.2, vue-class-component@^5.0.0:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-5.0.2.tgz#3dcdc005c58c4e88d8ec2d46e01c74f4d90135c8"
+vue-class-component@^6.0.0, vue-class-component@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.1.0.tgz#41a51a7991f2c0d51ff73f08436de0c2bfd934d6"
 
 vue-electron@^1.0.6:
   version "1.0.6"
@@ -9144,9 +9130,9 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@7.3.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.3.1.tgz#62930f0f229d4ba467209140f15b664539c1794b"
+vue-i18n@^7.3.2:
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.3.2.tgz#1205bb8811323fd5c44e57e4fd619beaf2f7a9a1"
 
 vue-loader@^13.5.0:
   version "13.5.0"
@@ -9166,16 +9152,16 @@ vue-loader@^13.5.0:
     vue-style-loader "^3.0.0"
     vue-template-es2015-compiler "^1.6.0"
 
-vue-property-decorator@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-5.3.0.tgz#f0fa1d0efd3c569ff2009fe9546cd2fb33ed7f43"
+vue-property-decorator@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-6.0.0.tgz#bb651b293542e31db0d24f36f4b0250ef08d8515"
   dependencies:
-    reflect-metadata "^0.1.9"
-    vue-class-component "^5.0.0"
+    reflect-metadata "^0.1.10"
+    vue-class-component "^6.0.0"
 
-vue-router@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-2.7.0.tgz#16d424493aa51c3c8cce8b7c7210ea4c3a89aff1"
+vue-router@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
 vue-style-loader@^3.0.0:
   version "3.0.1"
@@ -9191,9 +9177,9 @@ vue-style-loader@^3.0.3:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-template-compiler@2.4.4:
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.4.4.tgz#2cde3b704124985c27d50b5387c9691ba515fb57"
+vue-template-compiler@^2.5.9:
+  version "2.5.9"
+  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.5.9.tgz#7fabc73c8d3d12d32340cd86c5fc33e00e86d686"
   dependencies:
     de-indent "^1.0.2"
     he "^1.1.0"
@@ -9202,13 +9188,13 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@2.4.4:
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.4.4.tgz#ea9550b96a71465fd2b8b17b61673b3561861789"
+vue@^2.5.9:
+  version "2.5.9"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.9.tgz#b2380cd040915dca69881dafd121d760952e65f7"
 
-vuex@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/vuex/-/vuex-2.4.1.tgz#7890b650ba8565b70937b4e7670577082dfe8bc1"
+vuex@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.0.1.tgz#e761352ebe0af537d4bb755a9b9dc4be3df7efd2"
 
 walkdir@^0.0.11:
   version "0.0.11"

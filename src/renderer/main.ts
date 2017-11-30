@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Electron from 'vue-electron';
-import axios from 'axios';
-import { Autocomplete, Scrollbar } from 'element-ui';
-import 'element-ui/lib/theme-default/index';
+import { Autocomplete } from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 import 'iview/dist/styles/iview.css';
 
 import App from './App.vue';
@@ -11,8 +10,6 @@ import store from '../shared/store/rendererStore';
 import i18n from './i18n';
 
 Vue.use(Electron);
-(Vue as any).prototype.$http = axios;
-(Vue as any).http = (Vue as any).prototype.$http;
 
 if (process.env.NODE_ENV === 'production') {
   Vue.config.productionTip = false;
@@ -29,10 +26,10 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   },
   computed: {
     suggestionVisible() {
-      const suggestions = (this as any).suggestions;
+      const suggestions = this.suggestions;
       const isValidData = Array.isArray(suggestions) && suggestions.length > 0;
       // Don't show suggestions if we have no input there
-      return (isValidData || (this as any).loading) && (this as any).isFocus && (this as any).value;
+      return (isValidData || this.loading) && this.activated && this.value;
     },
   },
   methods: {
@@ -53,25 +50,25 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
     getData(queryString) {
       const el = (this.$refs.input as any).$el.querySelector('.el-input__inner');
-      (this as any).loading = true;
-      (this as any).fetchSuggestions(queryString, (suggestions) => {
-        (this as any).loading = false;
+      this.loading = true;
+      this.fetchSuggestions(queryString, (suggestions) => {
+        this.loading = false;
         if (Array.isArray(suggestions)) {
-          (this as any).suggestions = suggestions;
-          (this as any).highlightedIndex = 0;
+          this.suggestions = suggestions;
+          this.highlightedIndex = 0;
 
           if (el.selectionStart === queryString.length) {
-            if ((this as any).lastQueryString !== queryString) {
+            if (this.lastQueryString !== queryString) {
               const startPos = queryString.length;
-              const endPos = (this as any).suggestions[0].item.url.length;
-              (this as any).$nextTick().then(() => {
-                (this as any).$refs.input.$refs.input.value
-                  = (this as any).suggestions[0].item.url;
-                (this as any).setInputSelection(el, startPos, endPos);
-                (this as any).lastQueryString = queryString;
+              const endPos = this.suggestions[0].item.url.length;
+              this.$nextTick().then(() => {
+                this.$refs.input.$refs.input.value
+                  = this.suggestions[0].item.url;
+                this.setInputSelection(el, startPos, endPos);
+                this.lastQueryString = queryString;
               });
             } else {
-              (this as any).lastQueryString = (this as any).lastQueryString.slice(0, -1);
+              this.lastQueryString = this.lastQueryString.slice(0, -1);
             }
           }
         } else {
@@ -82,28 +79,29 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
     handleChange(value) {
       this.$emit('input', value);
-      if ((this as any).isOnComposition || (!(this as any).triggerOnFocus && !value)) {
-        (this as any).lastQueryString = '';
-        (this as any).suggestions.length = 0;
+      if (this.isOnComposition || (!this.triggerOnFocus && !value)) {
+        this.lastQueryString = '';
+        this.suggestions.length = 0;
         return;
       }
-      (this as any).getData(value);
+      this.debouncedGetData(value);
     },
     handleFocus(event) {
+      this.activated = true;
       event.target.select();
-      (this as any).isFocus = true;
-      if ((this as any).triggerOnFocus) {
-        (this as any).getData((this as any).value);
+      if (this.triggerOnFocus) {
+        this.debouncedGetData(this.value);
       }
     },
     handleKeyEnter(event) {
-      if ((this as any).suggestionVisible
-        && (this as any).highlightedIndex >= 0
-        && (this as any).highlightedIndex < (this as any).suggestions.length) {
-        (this as any).select((this as any).suggestions[(this as any).highlightedIndex]);
+      if (this.suggestionVisible
+        && this.highlightedIndex >= 0
+        && this.highlightedIndex < this.suggestions.length) {
+        event.preventDefault();
+        this.select(this.suggestions[this.highlightedIndex]);
       } else {
         (this.$parent.$parent as any).onEnterUrl(event.target.value);
-        (this as any).select({
+        this.$emit('select', {
           item: {
             title: '',
             value: event.target.value,
@@ -114,37 +112,37 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
     highlight(index) {
       let newIndex = index;
-      if (!(this as any).suggestionVisible || (this as any).loading) {
+      if (!this.suggestionVisible || this.loading) {
         return;
       }
       if (index < 0) {
         newIndex = 0;
       }
-      if (index >= (this as any).suggestions.length) {
-        newIndex = (this as any).suggestions.length - 1;
+      if (index >= this.suggestions.length) {
+        newIndex = this.suggestions.length - 1;
       }
       const suggestion
         = (this.$refs.suggestions as any).$el.querySelector('.el-autocomplete-suggestion__wrap');
       const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
+
       const highlightItem = suggestionList[newIndex];
       const scrollTop = suggestion.scrollTop;
       const offsetTop = highlightItem.offsetTop;
+
       if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
         suggestion.scrollTop += highlightItem.scrollHeight;
       }
       if (offsetTop < scrollTop) {
         suggestion.scrollTop -= highlightItem.scrollHeight;
       }
-      (this as any).highlightedIndex = newIndex;
-      if (newIndex >= 0) {
-        (this.$refs.input as any).$refs.input.value
-          = (this as any).suggestions[(this as any).highlightedIndex].item.url;
-      }
+      this.highlightedIndex = newIndex;
+      this.$el.querySelector('.el-input__inner')
+        .setAttribute('aria-activedescendant', `${this.id}-item-${this.highlightedIndex}`);
+      this.$emit('input', this.suggestions[this.highlightedIndex].item.url);
     },
   },
 });
 Vue.component('good-custom-autocomplete', goodCustomAutocomplete);
-Vue.component('el-scrollbar', Scrollbar);
 
 new Vue({
   i18n,

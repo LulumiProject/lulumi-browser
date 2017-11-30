@@ -1,10 +1,10 @@
 import { app, BrowserWindow, ipcMain, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import localshortcut from 'electron-localshortcut';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import generate from 'nanoid/generate';
-import url from 'url';
+import * as url from 'url';
 
 import config from '../main/js/constants/config';
 import './extensions/listeners';

@@ -23,7 +23,7 @@
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-  import VueI18n from 'vue-i18n';
+  import * as VueI18n from 'vue-i18n';
 
   import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
 

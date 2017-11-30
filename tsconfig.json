@@ -30,7 +30,6 @@
     ]
   },
   "include": [
-    "**/*.ts",
-    "../node_modules/electron/electron.d.ts"
+    "./src/**/*.ts"
   ]
 }

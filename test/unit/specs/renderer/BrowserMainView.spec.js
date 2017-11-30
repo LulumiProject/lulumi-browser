@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Electron from 'vue-electron';
-import { Autocomplete, Scrollbar } from 'element-ui';
+import { Autocomplete } from 'element-ui';
 
 import BrowserMainView from 'components/BrowserMainView';
 import config from 'renderer/js/constants/config';
@@ -139,7 +139,6 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   },
 });
 Vue.component('good-custom-autocomplete', goodCustomAutocomplete);
-Vue.component('el-scrollbar', Scrollbar);
 
 let vm;
 describe('BrowserMainView.vue', () => {

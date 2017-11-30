@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import url from 'url';
+import * as url from 'url';
 import Vue from 'vue';
 
 import apiFactory, { initializeExtensionApi } from './api-factory';

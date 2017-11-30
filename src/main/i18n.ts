@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import VueI18n from 'vue-i18n';
+import * as VueI18n from 'vue-i18n';
 import { readFileSync } from 'fs';
 import { app } from 'electron';
-import path from 'path';
+import * as path from 'path';
 
 import enElement from 'element-ui/lib/locale/lang/en';
 import zhElement from 'element-ui/lib/locale/lang/zh-CN';
