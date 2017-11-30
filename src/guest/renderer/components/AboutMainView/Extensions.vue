@@ -4,12 +4,12 @@
       el-col(:span="12")
         h1 {{ $t('about.extensionsPage.title') }}
       el-col(:span="6", :offset="3")
-        el-button(type="info", @click="addLulumiExtension") {{ $t('about.extensionsPage.add') }}
+        el-button(type="success", size="medium", @click="addLulumiExtension") {{ $t('about.extensionsPage.add') }}
     el-row
       el-col(:span="24")
         ul(class="extensions-list")
           li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
-            el-button(:plain="true", type="danger", size="small", icon="circle-cross", @click="removeLulumiExtension(extension)")
+            el-button(:plain="true", type="danger", size="mini", icon="el-icon-close", @click="removeLulumiExtension(extension)")
             a(v-if="extensions[extension].webContentsId !== undefined", class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
               img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
               | {{ loadName(extension) }}
@@ -26,6 +26,8 @@
   import { Component, Vue } from 'vue-property-decorator';
 
   import { Button, Col, Row } from 'element-ui';
+
+  import '../../css/el-button';
 
   interface RenderProcessPreference {
     name: string;

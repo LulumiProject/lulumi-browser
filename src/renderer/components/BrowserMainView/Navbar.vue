@@ -296,10 +296,7 @@
     @Watch('focused')
     onFocused(isFocus: boolean): void {
       setTimeout(() => {
-        if (isFocus) {
-          (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
-            .style.display = 'block';
-        } else {
+        if (!isFocus) {
           (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
             .style.display = 'none';
         }

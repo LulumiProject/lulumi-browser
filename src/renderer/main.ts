@@ -21,6 +21,11 @@ const customAutocomplete = Vue.extend(Autocomplete);
 const goodCustomAutocomplete = customAutocomplete.extend({
   data() {
     return {
+      activated: false,
+      isOnComposition: false,
+      suggestions: [],
+      loading: false,
+      highlightedIndex: -1,
       lastQueryString: '',
     };
   },
@@ -81,14 +86,15 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       this.$emit('input', value);
       if (this.isOnComposition || (!this.triggerOnFocus && !value)) {
         this.lastQueryString = '';
-        this.suggestions.length = 0;
+        this.suggestions = [];
         return;
       }
       this.debouncedGetData(value);
     },
     handleFocus(event) {
-      this.activated = true;
       event.target.select();
+      this.activated = true;
+      this.$emit('focus', event);
       if (this.triggerOnFocus) {
         this.debouncedGetData(this.value);
       }

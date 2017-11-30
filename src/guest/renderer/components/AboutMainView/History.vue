@@ -9,7 +9,7 @@
       el-col(:span="12")
         el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.historyPage.placeholder')", v-model="filterText")
       el-col(:span="2")
-        el-button(:disabled="sync", type="info", @click="setHistory") {{ $t('about.historyPage.clear') }}
+        el-button(:disabled="sync", type="danger", size="medium", @click="setHistory") {{ $t('about.historyPage.clear') }}
     el-row
       el-col(:span="24")
         el-tree(ref="tree", :empty-text="$t('about.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="customRender", :filter-node-method="filterNode")
