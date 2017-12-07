@@ -90,7 +90,12 @@ let rendererConfig = {
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
+        },
         include: [ path.resolve(__dirname, '../src/renderer'), path.resolve(__dirname, '../src/api') ],
         exclude: /node_modules/
       },
@@ -252,7 +257,12 @@ let aboutConfig = {
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
+        },
         include: [ path.resolve(__dirname, '../src/guest/renderer') ],
         exclude: /node_modules/
       },
