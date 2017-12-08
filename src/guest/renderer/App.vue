@@ -18,25 +18,27 @@
   @Component({ name: 'lulumi-browser' })
   export default class App extends Vue {
     mounted() {
-      if (window.about) {
-        this.$store.dispatch('updateAbout', window.about);
-      } else {
-        alert('Error: window.about not found!');
-      }
-      if (window.manifestMap) {
-        const backgroundPages = window.backgroundPages;
-        const manifestMap = window.manifestMap;
-        const extensions = {};
-        Object.keys(manifestMap).forEach((extension) => {
-          if (backgroundPages[extension]) {
-            extensions[extension] = backgroundPages[extension];
-          } else {
-            extensions[extension] = manifestMap[extension];
-          }
-        });
-        this.$store.dispatch('updateExtensions', extensions);
-      } else {
-        alert('Error: window.extensions not found!');
+      if (process.env.NODE_ENV !== 'testing') {
+        if (window.about) {
+          this.$store.dispatch('updateAbout', window.about);
+        } else {
+          alert('Error: window.about not found!');
+        }
+        if (window.manifestMap) {
+          const backgroundPages = window.backgroundPages;
+          const manifestMap = window.manifestMap;
+          const extensions = {};
+          Object.keys(manifestMap).forEach((extension) => {
+            if (backgroundPages[extension]) {
+              extensions[extension] = backgroundPages[extension];
+            } else {
+              extensions[extension] = manifestMap[extension];
+            }
+          });
+          this.$store.dispatch('updateExtensions', extensions);
+        } else {
+          alert('Error: window.extensions not found!');
+        }
       }
     }
   };

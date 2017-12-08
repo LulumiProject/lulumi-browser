@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    #nav
+    #nav(ref="nav")
       tabs(ref="tabs", :windowId="windowId")
       navbar(ref="navbar", :windowId="windowId")
     swipeArrow

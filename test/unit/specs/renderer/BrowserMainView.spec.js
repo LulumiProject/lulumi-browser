@@ -28,7 +28,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   },
   computed: {
     suggestionVisible() {
-      const suggestions = this.suggestions;
+      const { suggestions } = this;
       const isValidData = Array.isArray(suggestions) && suggestions.length > 0;
       // Don't show suggestions if we have no input there
       return (isValidData || this.loading) && this.isFocus && this.value;
@@ -122,13 +122,13 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
       const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
       const highlightItem = suggestionList[newIndex];
-      const scrollTop = suggestion.scrollTop;
-      const offsetTop = highlightItem.offsetTop;
-      if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
-        suggestion.scrollTop += highlightItem.scrollHeight;
+      const { clientHeight, scrollTop } = suggestion;
+      const { offsetTop, scrollHeight } = highlightItem;
+      if ((offsetTop + scrollHeight) > (scrollTop + clientHeight)) {
+        suggestion.scrollTop += scrollHeight;
       }
       if (offsetTop < scrollTop) {
-        suggestion.scrollTop -= highlightItem.scrollHeight;
+        suggestion.scrollTop -= scrollHeight;
       }
       this.highlightedIndex = newIndex;
       if (newIndex >= 0) {

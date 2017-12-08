@@ -221,7 +221,7 @@
         }
       });
 
-      const nav = this.$parent.$el.querySelector('#nav');
+      const nav = (this.$parent.$refs.nav as Element);
       if (nav) {
         /*
          * register the resize event on nav element to dynamically adjust
