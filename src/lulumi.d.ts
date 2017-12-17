@@ -148,6 +148,10 @@ declare module 'lulumi' {
       certificates: Certificates;
       windows: LulumiBrowserWindowProperty[];
     }
+    export interface TabsOrdering {
+      tabObjects: store.TabObject[];
+      currentTabIndexes: number[];
+    }
   }
 
   export namespace main {

@@ -6,6 +6,8 @@ import { actions } from './actions';
 import { getters } from './getters';
 import modules from './modules';
 
+import { writeFile } from 'fs';
+import promisify from '../../main/js/lib/promisify';
 import urlResource from '../../renderer/js/lib/url-resource';
 
 import { store } from 'lulumi';
@@ -156,7 +158,16 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
           close = true;
           window.close();
         });
-        window.webContents.send('window-close');
+
+        // store the property of this window into a temp
+        handleWindowProperty(store, window, 'update');
+        saveWindowState(window.id).then((state) => {
+          if (state) {
+            promisify(writeFile, `${storagePath}-window-${Date.now()}`, state);
+          }
+          window.webContents.send('window-close');
+        });
+
         event.preventDefault();
       }
     });
@@ -197,15 +208,17 @@ const tabsMapping = (tabs: store.TabObject[], tabsOrder: number[]): number[] => 
   return newOrder;
 };
 
-function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.TabObject[] {
+function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: number = -1): store.TabsOrdering {
   let newTabId: number = newStart;
   let newTabs: store.TabObject[] = [];
+  const newCurrentTabIndexes: number[] = [];
   let windowId: number = bumpWindowIdsBy === 0
     ? (1 + bumpWindowIdsBy)
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
-  Object.keys(windows).forEach((key) => {
+  if (oneWindow !== -1) {
     const tmpTabs: store.TabObject[] = [];
-    const id = parseInt(key, 10);
+    const id = oneWindow;
+    const currentTabIndex: number = store.getters.currentTabIndexes[id];
     const oldTabs: store.TabObject[]
       = store.getters.tabs.filter(tab => tab.windowId === id);
     const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
@@ -222,45 +235,71 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number): store.TabObjec
         tab.url = urlResource.aboutUrls('about:newtab');
       }
     });
-    newTabs = newTabs.concat(tmpTabs);
-    windowId += 1;
-  });
-  return newTabs;
-}
-
-function tabIndexesOrdering(bumpWindowIdsBy: number): number[] {
-  const newCurrentTabIndexes: number[] = [];
-  let windowId: number = bumpWindowIdsBy === 0
-    ? (1 + bumpWindowIdsBy)
-    : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
-  Object.keys(windows).forEach((key) => {
-    const id = parseInt(key, 10);
-    const tabs: store.TabObject[]
-      = store.getters.tabs.filter(tab => tab.windowId === id);
-    const tabsOrder: number[] = tabsMapping(tabs, store.getters.tabsOrder[id]);
-    const currentTabIndex: number = store.getters.currentTabIndexes[id];
+    newTabs = tmpTabs;
     newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
       ? currentTabIndex
       : tabsOrder.indexOf(currentTabIndex);
-    windowId += 1;
-  });
-  return newCurrentTabIndexes;
+  } else {
+    Object.keys(windows).forEach((key) => {
+      const tmpTabs: store.TabObject[] = [];
+      const id = parseInt(key, 10);
+      const currentTabIndex: number = store.getters.currentTabIndexes[id];
+      const oldTabs: store.TabObject[]
+        = store.getters.tabs.filter(tab => tab.windowId === id);
+      const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
+      oldTabs.forEach((tab, index) => {
+        tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
+      });
+      tmpTabs.forEach((tab) => {
+        tab.id = (newTabId += 1);
+        tab.windowId = windowId;
+        if (tab.url.startsWith('about:')) {
+          tab.url = urlResource.aboutUrls(tab.url);
+        }
+        if (tab.url.startsWith('lulumi-extension:')) {
+          tab.url = urlResource.aboutUrls('about:newtab');
+        }
+      });
+      newTabs = newTabs.concat(tmpTabs);
+      newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
+        ? currentTabIndex
+        : tabsOrder.indexOf(currentTabIndex);
+      windowId += 1;
+    });
+  }
+  return {
+    tabObjects: newTabs,
+    currentTabIndexes: newCurrentTabIndexes,
+  };
 }
 
-function windowsOrdering(bumpWindowIdsBy: number): store.LulumiBrowserWindowProperty[] {
+function windowsOrdering(bumpWindowIdsBy: number, oneWindow: number = -1): store.LulumiBrowserWindowProperty[] {
   const newWindows: store.LulumiBrowserWindowProperty[] = [];
   let windowId: number = bumpWindowIdsBy === 0
     ? (1 + bumpWindowIdsBy)
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
-  Object.keys(windows).forEach((key) => {
-    const id = parseInt(key, 10);
+  if (oneWindow !== -1) {
+    const id = oneWindow;
     const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
-    const index: number = oldWindows.findIndex(window => window.id === id);
-    const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, oldWindows[index]);
-    tmp.id = windowId;
-    newWindows.push(tmp);
-    windowId += 1;
-  });
+    const value: store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
+    if (value !== undefined) {
+      const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, value);
+      tmp.id = windowId;
+      newWindows.push(tmp);
+    }
+  } else {
+    Object.keys(windows).forEach((key) => {
+      const id = parseInt(key, 10);
+      const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
+      const value: store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
+      if (value !== undefined) {
+        const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, value);
+        tmp.id = windowId;
+        newWindows.push(tmp);
+        windowId += 1;
+      }
+    });
+  }
   return newWindows;
 }
 
@@ -282,8 +321,8 @@ function collect(getters, newStart: number, newTabs: store.TabObject[], newCurre
 
 function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promise<any> {
   const newStart = Math.ceil(Math.random() * 10000);
-  const newTabs = tabsOrdering(newStart, bumpWindowIdsBy);
-  const newCurrentTabIndexes = tabIndexesOrdering(bumpWindowIdsBy);
+  const { tabObjects: newTabs, currentTabIndexes: newCurrentTabIndexes }
+    = tabsOrdering(newStart, bumpWindowIdsBy);
   const newWindows = windowsOrdering(bumpWindowIdsBy);
   const downloads = store.getters.downloads;
   const pendingDownloads = downloads.filter(download => download.state === 'progressing');
@@ -312,6 +351,13 @@ function bumpWindowIds(bumpWindowIdsBy: number) {
       store.dispatch('setAppState', JSON.parse(state));
     }
   });
+}
+
+function saveWindowState(windowId: number): Promise<any> {
+  const { tabObjects: newTabs, currentTabIndexes: newCurrentTabIndexes }
+    = tabsOrdering(0, 0, windowId);
+  const newWindows = windowsOrdering(0, windowId);
+  return Promise.resolve(JSON.stringify({ tabs: newTabs, currentTabIndexes: newCurrentTabIndexes, windows: newWindows }));
 }
 
 export default {
