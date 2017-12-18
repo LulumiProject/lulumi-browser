@@ -1088,6 +1088,16 @@
           }));
         });
 
+        const windowStates: any[] = [];
+        const data:any = (this as any).$electron.ipcRenderer.sendSync('get-window-states');
+        data.forEach((windowState) => {
+          windowStates.push(new MenuItem({
+            label: `${windowState.amount} tabs`,
+            // tslint:disable-next-line
+            click: () => console.log(data),
+          }));
+        });
+
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.history.title'),
           submenu: [
@@ -1097,7 +1107,7 @@
             }),
             new MenuItem({ type: 'separator' }),
             new MenuItem({ label: '最近關閉的分頁', enabled: false }),
-          ].concat(lastOpenedTabs),
+          ].concat(windowStates.concat(lastOpenedTabs)),
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.downloads'),

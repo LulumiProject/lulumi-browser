@@ -1,4 +1,4 @@
-import { readFileSync, writeFile } from 'fs';
+import { readdirSync, readFileSync, writeFile } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
@@ -10,6 +10,7 @@ import {
   shell,
   systemPreferences,
 } from 'electron';
+import collect from 'collect.js';
 import { is } from 'electron-util';
 
 import autoUpdater from './js/lib/auto-updater';
@@ -258,7 +259,7 @@ app.on('activate', () => {
   }
 });
 
-app.on('before-quit', (event) => {
+app.on('before-quit', (event: Electron.Event) => {
   if (shuttingDown) {
     if (setLanguage) {
       event.preventDefault();
@@ -287,6 +288,24 @@ app.on('before-quit', (event) => {
     appStateSaveHandler = null;
   }
   appStateSave(false);
+});
+
+// load windowStates
+ipcMain.on('get-window-states', (event: Electron.Event) => {
+  const windows: any[] = [];
+  const baseDir = path.dirname(storagePath);
+  const collection = collect(readdirSync(baseDir, 'utf8'));
+  const windowStates = collection.filter(v => (v.match(/lulumi-app-state-window-\d+/) !== null));
+  if (windowStates.isNotEmpty()) {
+    const windowStateFiles = windowStates.sort((a, b) => {
+      return ((b.split('-') as any).pop() - (a.split('-') as any).pop());
+    }).all();
+    windowStateFiles.forEach((windowStateFile) => {
+      const data = JSON.parse(readFileSync(path.join(baseDir, windowStateFile), 'utf8'));
+      windows.push(data);
+    });
+  }
+  event.returnValue = windows;
 });
 
 // open ProcessManager
@@ -556,7 +575,7 @@ ipcMain.on('new-lulumi-window', (event, data) => {
 });
 
 // load the lang file
-ipcMain.on('request-lang', (event) => {
+ipcMain.on('request-lang', (event: Electron.Event) => {
   let lang: string = '';
   try {
     lang = readFileSync(langPath, 'utf8');

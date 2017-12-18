@@ -118,10 +118,7 @@ if (process.env.TEST_ENV === 'e2e') {
    */
   if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-      new MinifyPlugin({
-        removeConsole: true,
-        removeDebugger: true
-      }),
+      new MinifyPlugin(),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
       })

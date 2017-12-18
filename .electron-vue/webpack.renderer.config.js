@@ -128,9 +128,17 @@ let rendererConfig = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'imgs/[name].[ext]'
+            name: 'imgs/[name]--[folder].[ext]'
           }
         },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
@@ -138,7 +146,7 @@ let rendererConfig = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'fonts/[name].[ext]'
+            name: 'fonts/[name]--[folder].[ext]'
           }
         },
       }
@@ -295,9 +303,17 @@ let aboutConfig = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'imgs/[name].[ext]'
+            name: 'imgs/[name]--[folder].[ext]'
           }
         },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
@@ -305,7 +321,7 @@ let aboutConfig = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'fonts/[name].[ext]'
+            name: 'fonts/[name]--[folder].[ext]'
           }
         },
       }
@@ -396,10 +412,7 @@ if (process.env.TEST_ENV === 'e2e') {
     aboutConfig.devtool = ''
 
     rendererConfig.plugins.push(
-      new MinifyPlugin({
-        removeConsole: true,
-        removeDebugger: true
-      }),
+      new MinifyPlugin(),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
       }),
@@ -408,10 +421,7 @@ if (process.env.TEST_ENV === 'e2e') {
       })
     )
     aboutConfig.plugins.push(
-      new MinifyPlugin({
-        removeConsole: true,
-        removeDebugger: true
-      }),
+      new MinifyPlugin(),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
       }),

@@ -357,7 +357,12 @@ function saveWindowState(windowId: number): Promise<any> {
   const { tabObjects: newTabs, currentTabIndexes: newCurrentTabIndexes }
     = tabsOrdering(0, 0, windowId);
   const newWindows = windowsOrdering(0, windowId);
-  return Promise.resolve(JSON.stringify({ tabs: newTabs, currentTabIndexes: newCurrentTabIndexes, windows: newWindows }));
+  return Promise.resolve(JSON.stringify({
+    amount: newTabs.length,
+    tabs: newTabs,
+    currentTabIndex: newCurrentTabIndexes[1],
+    window: newWindows[0],
+  }));
 }
 
 export default {
