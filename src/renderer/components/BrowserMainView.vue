@@ -1092,7 +1092,8 @@
         const data:any = (this as any).$electron.ipcRenderer.sendSync('get-window-states');
         data.forEach((windowState) => {
           windowStates.push(new MenuItem({
-            label: `${windowState.amount} tabs`,
+            label: this.$t(
+              'navbar.common.options.history.tabs',{ amount: windowState.amount }),
             // tslint:disable-next-line
             click: () => console.log(data),
           }));
@@ -1106,7 +1107,8 @@
               click: () => this.onNewTab(this.windowId, 'about:history', false),
             }),
             new MenuItem({ type: 'separator' }),
-            new MenuItem({ label: '最近關閉的分頁', enabled: false }),
+            new MenuItem({ label: this.$t(
+              'navbar.common.options.history.recentlyClosed'), enabled: false }),
           ].concat(windowStates.concat(lastOpenedTabs)),
         }));
         menu.append(new MenuItem({

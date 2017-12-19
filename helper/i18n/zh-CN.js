@@ -186,6 +186,8 @@ export default {
         history: {
           title: '历史记录',
           history: '所有历史记录',
+          recentlyClosed: '最近关闭的标签页',
+          tabs: '%{amount} 个标签页',
         },
         extensions: '扩展程序',
         help: '帮助',

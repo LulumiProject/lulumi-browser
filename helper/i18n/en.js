@@ -186,6 +186,8 @@ export default {
         history: {
           title: 'History',
           history: 'History',
+          recentlyClosed: 'Recently closed',
+          tabs: '%{amount} tabs',
         },
         extensions: 'Extensions',
         help: 'Help',

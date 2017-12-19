@@ -186,6 +186,8 @@ export default {
         history: {
           title: '紀錄',
           history: '紀錄',
+          recentlyClosed: '最近關閉的分頁',
+          tabs: '%{amount} 個分頁',
         },
         extensions: '擴充功能',
         help: '說明',
