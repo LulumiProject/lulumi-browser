@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import * as VueI18n from 'vue-i18n';
+import VueI18n from 'vue-i18n';
 import { readFileSync } from 'fs';
 import { app } from 'electron';
 import * as path from 'path';

@@ -17,7 +17,7 @@
 
 <script lang="ts">
   import { Component, Watch, Vue } from 'vue-property-decorator';
-  import * as VueI18n from 'vue-i18n';
+  import VueI18n from 'vue-i18n';
   import { CreateElement, VNode } from 'vue';
 
   import { Button, Col, Input, Row, Switch, Tree } from 'element-ui';
