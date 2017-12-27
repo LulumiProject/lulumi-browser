@@ -266,7 +266,7 @@
       this.showUrl(this.url, this.tab.id);
       if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
         const currentUrl = url.parse(newUrl, true);
-        const originalInput = document.getElementsByClassName('el-input__inner')[0] as HTMLElement;
+        const originalInput = document.querySelector('.el-input__inner') as HTMLInputElement;
         const newElement = document.getElementById('security-indicator');
         if (newElement !== null) {
           if (currentUrl.href !== undefined && (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:')) {
@@ -297,7 +297,7 @@
     onFocused(isFocus: boolean): void {
       setTimeout(() => {
         if (!isFocus) {
-          (document.getElementsByClassName('my-autocomplete')[0] as HTMLElement)
+          (document.querySelector('.my-autocomplete') as HTMLDivElement)
             .style.display = 'none';
         }
       }, 150);
@@ -624,7 +624,7 @@
           `);
         });
         if (isPageAction) {
-          if ((event.target as HTMLElement).classList.contains('enabled')) {
+          if ((event.target as HTMLAnchorElement).classList.contains('enabled')) {
             if (extension.page_action.default_popup) {
               webview.setAttribute('src', `${url.format({
                 protocol: 'lulumi-extension',

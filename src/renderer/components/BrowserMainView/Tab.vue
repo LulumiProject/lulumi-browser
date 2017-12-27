@@ -96,7 +96,7 @@
     @Watch('isActive')
     onIsActive(newState: string): void {
       if (newState && !this.hidden) {
-        this.$nextTick(() => (this.$refs.findinpageInput as HTMLElement).focus());
+        this.$nextTick(() => (this.$refs.findinpageInput as HTMLInputElement).focus());
       }
     }
 
@@ -221,8 +221,8 @@
         }
       });
 
-      const nav = (this.$parent.$refs.nav as HTMLDivElement);
-      const findinpageBar = (this.$refs.findinpageBar as HTMLDivElement);
+      const nav = this.$parent.$refs.nav as HTMLDivElement;
+      const findinpageBar = this.$refs.findinpageBar as HTMLDivElement;
       if (nav && findinpageBar) {
         /*
          * register the resize event on nav element to dynamically adjust

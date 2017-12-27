@@ -409,17 +409,17 @@
       }
     }
     onEnterHtmlFullScreen(): void {
-      const nav = this.$el.querySelector('#nav');
+      const nav = this.$el.querySelector('#nav') as HTMLDivElement;
       if (nav) {
-        (nav as HTMLElement).style.display = 'none';
+        nav.style.display = 'none';
         this.getWebView().style.height = '100vh';
       }
       (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(true);
     }
     onLeaveHtmlFullScreen(): void {
-      const nav = this.$el.querySelector('#nav');
+      const nav = this.$el.querySelector('#nav') as HTMLDivElement;
       if (nav) {
-        (nav as HTMLElement).style.display = 'block';
+        nav.style.display = 'block';
         this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
       }
       (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
@@ -1500,7 +1500,7 @@
           ? els[els.length - 1]
           : els[tabIndexThatWeSee];
         if (el) {
-          (el as HTMLElement).click();
+          (el as HTMLDivElement).click();
         }
       });
       ipc.on('escape-click', () => {

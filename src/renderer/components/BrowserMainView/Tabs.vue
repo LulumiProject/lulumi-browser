@@ -138,25 +138,25 @@
       }
     }
     onMouseMove(event: MouseEvent) {
-      const x = event.pageX - (event.target as HTMLElement).offsetLeft;
-      const y = event.pageY - (event.target as HTMLElement).offsetTop;
+      const x = event.pageX - (event.target as HTMLDivElement).offsetLeft;
+      const y = event.pageY - (event.target as HTMLDivElement).offsetTop;
       const xy = `${x} ${y}`;
 
       const bgWebKit = `-webkit-gradient(radial, ${xy}, 0, ${xy}, 100, from(rgba(255,255,255,0.8)), to(rgba(255,255,255,0.0))), linear-gradient(to bottom, #ddd 90%, #f5f5f5)`;
 
-      const target = (event.target as Element).parentNode!.parentNode as HTMLElement;
+      const target = (event.target as HTMLDivElement).parentNode!.parentNode as HTMLDivElement;
       if (!target.classList.contains('chrome-tab-current')) {
-        (target.getElementsByClassName('left-edge')[0] as HTMLElement).style.background = bgWebKit;
-        (target.getElementsByClassName('chrome-tab-bg')[0] as HTMLElement).style.background = bgWebKit;
-        (target.getElementsByClassName('right-edge')[0] as HTMLElement).style.background = bgWebKit;
+        (target.querySelector('.left-edge') as HTMLElement).style.background = bgWebKit;
+        (target.querySelector('.chrome-tab-bg') as HTMLElement).style.background = bgWebKit;
+        (target.querySelector('.right-edge') as HTMLElement).style.background = bgWebKit;
       }
     }
     onMouseLeave(event: MouseEvent) {
-      const target = (event.target as Element).parentNode!.parentNode as HTMLElement;
+      const target = (event.target as Element).parentNode!.parentNode as HTMLDivElement;
       if (!target.classList.contains('chrome-tab-current')) {
-        (target.getElementsByClassName('left-edge')[0] as HTMLElement).style.background = '';
-        (target.getElementsByClassName('chrome-tab-bg')[0] as HTMLElement).style.background = '';
-        (target.getElementsByClassName('right-edge')[0] as HTMLElement).style.background = '';
+        (target.querySelector('left-edge') as HTMLElement).style.background = '';
+        (target.querySelector('chrome-tab-bg') as HTMLElement).style.background = '';
+        (target.querySelector('right-edge') as HTMLElement).style.background = '';
       }
     }
   };

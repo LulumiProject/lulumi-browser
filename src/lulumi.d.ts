@@ -198,9 +198,9 @@ declare module 'lulumi' {
   export namespace tab {
     // Tab.vue
     export interface FindInPageObject {
-      container?: HTMLElement;
-      input: HTMLElement;
-      counter: HTMLElement;
+      container?: HTMLDivElement;
+      input: HTMLInputElement;
+      counter: HTMLSpanElement;
       previous: HTMLElement;
       next: HTMLElement;
       endButton: HTMLElement;
