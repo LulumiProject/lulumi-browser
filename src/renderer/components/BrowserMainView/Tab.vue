@@ -221,8 +221,9 @@
         }
       });
 
-      const nav = (this.$parent.$refs.nav as Element);
-      if (nav) {
+      const nav = (this.$parent.$refs.nav as HTMLDivElement);
+      const findinpageBar = (this.$refs.findinpageBar as HTMLDivElement);
+      if (nav && findinpageBar) {
         /*
          * register the resize event on nav element to dynamically adjust
          * the height of webview element
@@ -230,13 +231,15 @@
         new ResizeSensor(nav, () => {
           webview.style.height
             = `calc(100vh - ${nav.clientHeight}px)`;
-          (this.$el.querySelector('.findinpage-bar') as HTMLElement).style.top = `${nav.clientHeight}px`;
+          findinpageBar.style.top = `${nav.clientHeight}px`;
         });
 
         // fired once
         webview.style.height
           = `calc(100vh - ${nav.clientHeight}px)`;
+        findinpageBar.style.top = `${nav.clientHeight}px`;
 
+        // navigate
         this.navigateTo(this.tab.url);
       }
     }
