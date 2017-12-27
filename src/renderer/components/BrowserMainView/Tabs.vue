@@ -2,12 +2,12 @@
   #chrome-tabs-shell(@dblclick.self="onDoubleClick")
     .chrome-tabs(v-sortable="")
       div(v-for="(tab, index) in tabs", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${tab.id}`")
-        svg(width="15", height="30", class="left-edge")
-          path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+        svg.left-edge(width="15", height="30")
+          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-border(d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
-          div#tab-icons(class="chrome-tab-favicon")
-            i.el-icon-loading(v-if="tab.isLoading", style="font-size: 16px; padding-right: 2px;")
+          .chrome-tab-favicon
+            iview-icon.spin(v-if="tab.isLoading", type="load-c", size="16")
             img(:src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", v-if="tab.hasMedia && tab.isAudioMuted", class="volume volume-off")
             awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", v-else-if="tab.hasMedia && !tab.isAudioMuted", class="volume volume-up")
@@ -15,17 +15,17 @@
             span(class="chrome-tab-title")
               | {{ tab.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
-        svg(width="15", height="30", class="right-edge")
-          path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path(class="edge-border", d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+        svg.right-edge(width="15", height="30")
+          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-border(d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
       div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab(windowId, 'about:newtab', false)")
-        svg(width="15", height="30", class="left-edge")
-          path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+        svg.left-edge(width="15", height="30")
+          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
         .chrome-tab-bg(style="padding-right: 10px;")
         .chrome-tab-favicon
           i.el-icon-plus
         svg(width="15", height="30", class="right-edge")
-          path(class="edge-bg", d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
     .custom-buttons(v-if="enableCustomButtons")
       svg(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('minimize-window')")
@@ -48,6 +48,7 @@
   import Sortable from 'sortablejs';
 
   import { Button, Tooltip } from 'element-ui';
+  import IViewIcon from 'iview/src/components/icon';
 
   import { store } from 'lulumi';
 
@@ -81,6 +82,7 @@
       'awesome-icon': AwesomeIcon,
       'el-button': Button,
       'el-tooltip': Tooltip,
+      'iview-icon': IViewIcon,
     },
   })
   export default class Tabs extends Vue {
@@ -178,7 +180,7 @@
       -webkit-user-select: none;
       cursor: default;
       font-size: 12px;
-      line-height: 13px;
+      line-height: 16px;
     }
 
     .chrome-tab {
@@ -246,7 +248,18 @@
         img {
           width: 16px;
           height: 16px;
-          padding-right: 2px;
+          margin-right: -2px;
+        }
+
+        .spin {
+          color: #2d8cf0;
+          animation: ani-spin 1s linear infinite;
+        }
+
+        @keyframes ani-spin {
+          from { transform: rotate(0deg); }
+          50%  { transform: rotate(180deg); }
+          to   { transform: rotate(360deg); }
         }
 
         svg.volume {
@@ -257,6 +270,7 @@
           padding: 0 3px;
         }
       }
+
       .spinner {
         position: relative;
         left: 1px;
@@ -270,7 +284,7 @@
 
       .chrome-tab-title {
         color: #222222;
-        padding: 17px 0 0 16px;
+        padding: 15px 0 0 16px;
         height: 28px;
         overflow: hidden;
         white-space: nowrap;
