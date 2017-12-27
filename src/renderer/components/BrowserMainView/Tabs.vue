@@ -154,9 +154,9 @@
     onMouseLeave(event: MouseEvent) {
       const target = (event.target as Element).parentNode!.parentNode as HTMLDivElement;
       if (!target.classList.contains('chrome-tab-current')) {
-        (target.querySelector('left-edge') as HTMLElement).style.background = '';
-        (target.querySelector('chrome-tab-bg') as HTMLElement).style.background = '';
-        (target.querySelector('right-edge') as HTMLElement).style.background = '';
+        (target.querySelector('.left-edge') as HTMLElement).style.background = '';
+        (target.querySelector('.chrome-tab-bg') as HTMLElement).style.background = '';
+        (target.querySelector('.right-edge') as HTMLElement).style.background = '';
       }
     }
   };

@@ -1495,12 +1495,12 @@
         this.onTabClose(this.currentTabIndex);
       });
       ipc.on('tab-click', (event, tabIndexThatWeSee) => {
-        const els: NodeListOf<Element> = document.querySelectorAll('.chrome-tab-draggable');
-        const el: Element = (tabIndexThatWeSee === -1)
+        const els = document.querySelectorAll('.chrome-tab-draggable') as NodeListOf<HTMLDivElement>;
+        const el = (tabIndexThatWeSee === -1)
           ? els[els.length - 1]
           : els[tabIndexThatWeSee];
         if (el) {
-          (el as HTMLDivElement).click();
+          el.click();
         }
       });
       ipc.on('escape-click', () => {
