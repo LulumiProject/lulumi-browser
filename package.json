@@ -50,7 +50,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.56",
+    "@types/chrome": "^0.0.57",
     "@types/mocha": "^2.2.45",
     "@types/webpack": "^3.8.1",
     "@types/webpack-env": "^1.13.3",
@@ -80,7 +80,7 @@
     "electron-packager": "^10.1.0",
     "electron-rebuild": "^1.6.0",
     "electron-util": "git://github.com/sindresorhus/electron-util.git#9b3a39bed301c4f6e11c0928546ee28cf309e1ee",
-    "element-ui": "^2.0.9",
+    "element-ui": "^2.0.10",
     "eslint": "^4.14.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-friendly-formatter": "^3.0.0",
@@ -104,7 +104,7 @@
     "karma-webpack": "^2.0.9",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
-    "mocha": "^4.0.1",
+    "mocha": "^4.1.0",
     "mockery": "^2.1.0",
     "multispinner": "^0.2.1",
     "pug": "^2.0.0-rc.4",
