@@ -205,20 +205,20 @@
     get dummyTabObject(): store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
     }
-    get currentTabIndex(): number {
+    get currentTabIndex(): number | undefined {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
     get tabs(): Array<store.TabObject> {
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
     get tab(): store.TabObject {
-      if (this.tabs.length === 0) {
+      if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return this.dummyTabObject;
       }
       return this.tabs[this.currentTabIndex];
     }
     get pageActionMapping(): object {
-      if (this.tabs.length === 0) {
+      if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return {};
       }
       return this.tabs[this.currentTabIndex].pageActionMapping;
@@ -227,7 +227,7 @@
       return this.$store.getters.certificates;
     }
     get url(): string {
-      if (this.tabs.length === 0) {
+      if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return '';
       }
       return this.tabs[this.currentTabIndex].url;
@@ -471,7 +471,7 @@
     showBrowserActionBadgeText(extensionId: string): string | number {
       const badge = this.badgeTextArray[extensionId];
       if (badge) {
-        if (badge[this.currentTabIndex]) {
+        if (this.currentTabIndex !== undefined && badge[this.currentTabIndex]) {
           return badge[this.currentTabIndex];
         }
         return badge[-1];
@@ -497,7 +497,7 @@
       const badge = this.badgeBackgroundColorArray[extensionId];
       if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
         if (badge) {
-          if (badge[this.currentTabIndex]) {
+          if (this.currentTabIndex !== undefined && badge[this.currentTabIndex]) {
             this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[this.currentTabIndex];
             return badge[this.currentTabIndex];
           }

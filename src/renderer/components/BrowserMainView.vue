@@ -80,14 +80,14 @@
     get window(): store.LulumiBrowserWindowProperty {
       return this.$store.getters.windows.find(window => window.id === this.windowId);
     }
-    get currentTabIndex(): number {
+    get currentTabIndex(): number | undefined {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
     get tabs(): Array<store.TabObject> {
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
     get tab(): store.TabObject {
-      if (this.tabs.length === 0) {
+      if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return this.dummyTabObject;
       }
       return this.tabs[this.currentTabIndex];
@@ -113,15 +113,36 @@
     }
 
     getWebView(tabIndex?: number): Electron.WebviewTag {
-      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
+      let index: number | undefined = tabIndex;
+      if (index === undefined) {
+        if (this.currentTabIndex === undefined) {
+          index = 0;
+        } else {
+          index = this.currentTabIndex;
+        }
+      }
       return this.$refs[`tab-${index}`][0].$refs.webview;
     }
     getTab(tabIndex?: number): Tab {
-      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
+      let index: number | undefined = tabIndex;
+      if (index === undefined) {
+        if (this.currentTabIndex === undefined) {
+          index = 0;
+        } else {
+          index = this.currentTabIndex;
+        }
+      }
       return this.$refs[`tab-${index}`][0];
     }
     getTabObject(tabIndex?: number): store.TabObject {
-      const index: number = (tabIndex === undefined) ? this.currentTabIndex : tabIndex;
+      let index: number | undefined = tabIndex;
+      if (index === undefined) {
+        if (this.currentTabIndex === undefined) {
+          index = 0;
+        } else {
+          index = this.currentTabIndex;
+        }
+      }
       return this.tabs[index];
     }
     historyMappings() {
@@ -1088,14 +1109,14 @@
           }));
         });
 
-        const windowStates: any[] = [];
-        const data:any = (this as any).$electron.ipcRenderer.sendSync('get-window-states');
-        data.forEach((windowState) => {
-          windowStates.push(new MenuItem({
+        const windowHistories: any[] = [];
+        const data: any = (this as any).$electron.ipcRenderer.sendSync('get-window-properties');
+        data.forEach((windowProperty) => {
+          windowHistories.push(new MenuItem({
             label: this.$t(
-              'navbar.common.options.history.tabs',{ amount: windowState.amount }),
-            // tslint:disable-next-line
-            click: () => console.log(data),
+              'navbar.common.options.history.tabs',{ amount: windowProperty.amount }),
+            click: () => (this as any).$electron.ipcRenderer
+              .send('restore-window-property', windowProperty),
           }));
         });
 
@@ -1109,7 +1130,7 @@
             new MenuItem({ type: 'separator' }),
             new MenuItem({ label: this.$t(
               'navbar.common.options.history.recentlyClosed'), enabled: false }),
-          ].concat(windowStates.concat(lastOpenedTabs)),
+          ].concat(windowHistories.concat(lastOpenedTabs)),
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.downloads'),
@@ -1437,8 +1458,8 @@
         this.windowId = ipc.sendSync('window-id');
 
         ipc.once(`new-tab-suggestion-for-window-${this.windowId}`,
-          (event: Electron.Event, suggestion: main.BrowserWindowSuggestionItem) => {
-          if (this.tabs.length === 0) {
+          (event: Electron.Event, suggestion: main.BrowserWindowSuggestionItem | null) => {
+          if (suggestion !== null && this.tabs.length === 0) {
             this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
           }
         });
@@ -1492,7 +1513,9 @@
         }
       });
       ipc.on('tab-close', () => {
-        this.onTabClose(this.currentTabIndex);
+        if (this.currentTabIndex !== undefined) {
+          this.onTabClose(this.currentTabIndex);
+        }
       });
       ipc.on('tab-click', (event, tabIndexThatWeSee) => {
         const els = document.querySelectorAll('.chrome-tab-draggable') as NodeListOf<HTMLDivElement>;

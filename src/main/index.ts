@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFile } from 'fs';
+import { readdirSync, readFileSync, rename, writeFile } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
@@ -100,22 +100,24 @@ function appStateSave(soft: boolean = true): void {
 // tslint:disable-next-line:max-line-length
 function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
+  const defaultOption: Object = {
+    minWidth: 320,
+    minHeight: 500,
+    titleBarStyle: 'hiddenInset',
+    fullscreenWindowTitle: true,
+    autoHideMenuBar: autoHideMenuBarSetting,
+    frame: !isWindows,
+  };
   if (options && Object.keys(options).length !== 0) {
-    mainWindow = new BrowserWindow(options);
+    mainWindow = new BrowserWindow(Object.assign({}, defaultOption, options));
   } else {
     /**
      * Initial window options
      */
-    mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow(Object.assign({}, defaultOption, {
       width: 1080,
       height: 720,
-      minWidth: 320,
-      minHeight: 500,
-      titleBarStyle: 'hiddenInset',
-      fullscreenWindowTitle: true,
-      autoHideMenuBar: autoHideMenuBarSetting,
-      frame: !isWindows,
-    });
+    }));
   }
 
   mainWindow.loadURL(winURL);
@@ -215,14 +217,8 @@ app.on('ready', () => {
         tmpWindow = createWindow({
           width: window.width,
           height: window.height,
-          minWidth: 320,
-          minHeight: 500,
           x: window.left,
           y: window.top,
-          titleBarStyle: 'hiddenInset',
-          fullscreenWindowTitle: true,
-          autoHideMenuBar: autoHideMenuBarSetting,
-          frame: !isWindows,
         });
         if (window.focused) {
           tmpWindow.focus();
@@ -290,22 +286,66 @@ app.on('before-quit', (event: Electron.Event) => {
   appStateSave(false);
 });
 
-// load windowStates
-ipcMain.on('get-window-states', (event: Electron.Event) => {
+// load windowProperties
+ipcMain.on('get-window-properties', (event: Electron.Event) => {
   const windows: any[] = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
-  const windowStates = collection.filter(v => (v.match(/lulumi-app-state-window-\d+/) !== null));
-  if (windowStates.isNotEmpty()) {
-    const windowStateFiles = windowStates.sort((a, b) => {
+  const windowProperties
+    = collection.filter(v => (v.match(/lulumi-app-state-window-\d+/) !== null));
+  if (windowProperties.isNotEmpty()) {
+    const windowPropertyFilenames = windowProperties.sort((a, b) => {
       return ((b.split('-') as any).pop() - (a.split('-') as any).pop());
     }).all();
-    windowStateFiles.forEach((windowStateFile) => {
-      const data = JSON.parse(readFileSync(path.join(baseDir, windowStateFile), 'utf8'));
-      windows.push(data);
+    windowPropertyFilenames.forEach((windowPropertyFilename) => {
+      const windowPropertyFile = path.join(baseDir, windowPropertyFilename);
+      const windowProperty
+        = JSON.parse(readFileSync(windowPropertyFile, 'utf8'));
+      windowProperty.path = windowPropertyFile;
+      windows.push(windowProperty);
     });
   }
   event.returnValue = windows;
+});
+// restore windowProperties
+ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: any) => {
+  let tmpWindow: Electron.BrowserWindow;
+
+  const options: Electron.BrowserWindowConstructorOptions = {};
+  const window = windowProperty.window;
+  const windowState: string = window.state;
+  options.width = window.width;
+  options.height = window.height;
+  options.x = window.left;
+  options.y = window.top;
+
+  tmpWindow = createWindow(options, (eventName) => {
+    ipcMain.once(eventName, (event: Electron.Event) => {
+      event.sender.send(eventName.substr(4), null);
+      windowProperty.tabs.forEach((tab, index) => {
+        tmpWindow.webContents.send(
+          'new-tab', { url: tab.url, follow: index === windowProperty.currentTabIndex });
+      });
+      const windowPropertyFilename = path.basename(windowProperty.path);
+      const windowPropertyTmp = path.resolve(app.getPath('temp'), windowPropertyFilename);
+      rename(windowProperty.path, windowPropertyTmp, (err) => {
+        if (err) {
+          // tslint:disable-next-line:no-console
+          console.error(err);
+        }
+      });
+    });
+  });
+  if (window.focused) {
+    tmpWindow.focus();
+  }
+  if (windowState === 'minimized') {
+    tmpWindow.minimize();
+  } else if (windowState === 'maximized') {
+    tmpWindow.maximize();
+  } else if (windowState === 'fullscreen') {
+    tmpWindow.setFullScreen(true);
+  }
 });
 
 // open ProcessManager
@@ -561,10 +601,6 @@ ipcMain.on('new-lulumi-window', (event, data) => {
     event.returnValue = createWindow({
       width: 800,
       height: 500,
-      titleBarStyle: 'hiddenInset',
-      fullscreenWindowTitle: true,
-      autoHideMenuBar: autoHideMenuBarSetting,
-      frame: !isWindows,
       // tslint:disable-next-line:align
     }, (eventName) => {
       ipcMain.once(eventName, (event: Electron.Event) => {
