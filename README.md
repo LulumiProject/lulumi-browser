@@ -1,9 +1,9 @@
 # Lulumi-browser
 
-> Lulumi-browser is a light weight browser coded with Vue.js 2 and Electron.
+> Lulumi-browser is a lightweight browser coded with Vue.js 2 and Electron.
 
 <p align="center">
-  <img alt="Lulumi-browser" src="https://i.imgur.com/7jB91KV.jpg" width="700px">
+  <img alt="Lulumi-browser" src="https://i.imgur.com/ShSujyF.jpg" width="700px">
 </p>
 
 ## Build Setup
