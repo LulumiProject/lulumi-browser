@@ -4,6 +4,7 @@ import * as types from '../mutation-types';
 import config from '../../../renderer/js/constants/config';
 import { store } from 'lulumi';
 import timeUtil from '../../../renderer/js/lib/time-util';
+import urlUtil from '../../../renderer/js/lib/url-util';
 
 /* tslint:disable:object-shorthand-properties-first */
 
@@ -284,10 +285,7 @@ const mutations = {
       state.tabs[tabsIndex].url = url;
       if (url.match(regexp)) {
         if (url.match(regexp)![1] === undefined) {
-          const guestUrl = require('url').parse(url);
-          const guestHash = guestUrl.hash.substr(2);
-          state.tabs[tabsIndex].title
-            = `${guestUrl.host} : ${guestHash === '' ? 'about' : guestHash}`;
+          state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
         } else {
           state.tabs[tabsIndex].statusText = false;
           state.tabs[tabsIndex].canGoBack = payload.canGoBack;

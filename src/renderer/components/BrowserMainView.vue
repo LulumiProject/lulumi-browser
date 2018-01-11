@@ -160,7 +160,62 @@
       return out;
     }
     lastOpenedTabs(): store.LastOpenedTabObject[] {
-      return this.$store.getters.lastOpenedTabs.slice(0, 8);
+      const tabs: store.LastOpenedTabObject[] = this.$store.getters.lastOpenedTabs.slice(0, 8);
+      const lastOpenedTabs: store.LastOpenedTabObject[] = [];
+      tabs.forEach((tab) => {
+        switch (tab.title) {
+          case 'about:about':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.aboutPage.title'),
+              url: tab.url,
+            });
+            break;
+          case 'about:lulumi':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.lulumiPage.title'),
+              url: tab.url,
+            });
+            break;
+          case 'about:preferences':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.preferencesPage.title'),
+              url: tab.url,
+            });
+            break;
+          case 'about:downloads':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.downloadsPage.title'),
+              url: tab.url,
+            });
+            break;
+          case 'about:history':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.historyPage.title'),
+              url: tab.url,
+            });
+            break;
+          case 'about:extensions':
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: this.$t('lulumi.extensionsPage.title'),
+              url: tab.url,
+            });
+            break;
+          default:
+            lastOpenedTabs.push({
+              favIconUrl: tab.favIconUrl,
+              title: tab.title,
+              url: tab.url,
+            });
+            break;
+        }
+      });
+      return lastOpenedTabs;
     }
     // lulumi.alarms
     getAlarm(name): browserMainView.Alarm | undefined {

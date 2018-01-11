@@ -1,6 +1,6 @@
 <template lang="pug">
   #page-wrapper
-    h1#about-name(ref="h1") {{ $t('about.aboutPage') }}
+    h1#about-name(ref="h1") {{ $t('about.aboutPage.title') }}
     h2#about-desc(ref="h2")
     li(v-for="data in datas.about")
       router-link(:to="`/${data[1]}`", :key="$route.path") {{ data[0] }}

@@ -61,7 +61,9 @@ export const appMenu = {
 
 export const guest = {
   about: {
-    aboutPage: 'About Page',
+    aboutPage: {
+      title: 'About Page',
+    },
     downloadsPage: {
       title: 'Downloads',
       clear: 'Clear',
@@ -224,6 +226,26 @@ export default {
       newTab: 'New Tab',
       duplicateTab: 'Duplicate Tab',
       closeTab: 'Close Tab',
+    },
+  },
+  lulumi: {
+    aboutPage: {
+      title: 'About Page',
+    },
+    downloadsPage: {
+      title: 'Downloads',
+    },
+    lulumiPage: {
+      title: 'About Lulumi',
+    },
+    preferencesPage: {
+      title: 'Preferences',
+    },
+    historyPage: {
+      title: 'History',
+    },
+    extensionsPage: {
+      title: 'Extensions',
     },
   },
 };

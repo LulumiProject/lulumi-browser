@@ -5,6 +5,8 @@ declare module '*.vue' {
 }
 
 declare module 'lulumi' {
+  import VueI18n from 'vue-i18n';
+
   export namespace scheme {
     // lulumi:// scheme
     export interface LulumiObject extends Object {
@@ -110,7 +112,7 @@ declare module 'lulumi' {
       dataState: string;
     }
     export interface LastOpenedTabObject {
-      title: string | null;
+      title: string | VueI18n.LocaleMessageArray | null;
       url: string;
       favIconUrl: string | null;
     }

@@ -61,7 +61,9 @@ export const appMenu = {
 
 export const guest = {
   about: {
-    aboutPage: '关于',
+    aboutPage: {
+      title: '关于',
+    },
     downloadsPage: {
       title: '下载',
       clear: '清空',
@@ -224,6 +226,26 @@ export default {
       newTab: 'New Tab',
       duplicateTab: 'Duplicate Tab',
       closeTab: 'Close Tab',
+    },
+  },
+  lulumi: {
+    aboutPage: {
+      title: '关于',
+    },
+    downloadsPage: {
+      title: '下载',
+    },
+    lulumiPage: {
+      title: '关于 Lulumi',
+    },
+    preferencesPage: {
+      title: '偏好设置',
+    },
+    historyPage: {
+      title: '历史记录',
+    },
+    extensionsPage: {
+      title: '扩展程序',
     },
   },
 };

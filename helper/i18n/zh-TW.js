@@ -61,7 +61,9 @@ export const appMenu = {
 
 export const guest = {
   about: {
-    aboutPage: '關於頁面',
+    aboutPage: {
+      title: '關於頁面',
+    },
     downloadsPage: {
       title: '下載',
       clear: '清除',
@@ -106,7 +108,7 @@ export const guest = {
       noData: '無紀錄',
     },
     extensionsPage: {
-      title: '擴充套件',
+      title: '擴充功能',
       add: '新增',
       path: '位置：',
     },
@@ -224,6 +226,26 @@ export default {
       newTab: '新增分頁',
       duplicateTab: '複製分頁',
       closeTab: '關閉分頁',
+    },
+  },
+  lulumi: {
+    aboutPage: {
+      title: '關於頁面',
+    },
+    downloadsPage: {
+      title: '下載',
+    },
+    lulumiPage: {
+      title: '關於 Lulumi',
+    },
+    preferencesPage: {
+      title: '設定',
+    },
+    historyPage: {
+      title: '歷史紀錄',
+    },
+    extensionsPage: {
+      title: '擴充功能',
     },
   },
 };
