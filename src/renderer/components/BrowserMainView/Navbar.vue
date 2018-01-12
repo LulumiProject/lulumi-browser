@@ -45,13 +45,13 @@
           el-badge.badge(:ref="`badge-${extension.extensionId}`",
                          :value="showBrowserActionBadgeText(extension.extensionId)",
                          :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)",
+                         @click.native="sendIPC($event, extension)",
+                         @contextmenu.native="onContextmenu(extension)",
                          slot="reference")
             img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                           :src="loadIcon(extension)",
                           :class="showOrNot(extension)",
-                          :title="showTitle(extension)",
-                          @click.prevent="sendIPC($event, extension)",
-                          @contextmenu.prevent="onContextmenu(extension)")
+                          :title="showTitle(extension)")
           webview.extension(:ref="`webview-${extension.extensionId}`")
     .common-group
       a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
@@ -624,7 +624,11 @@
           `);
         });
         if (isPageAction) {
-          if ((event.target as HTMLAnchorElement).classList.contains('enabled')) {
+          const target: HTMLElement = (event.target as HTMLElement);
+          const img: HTMLImageElement = target.tagName === 'SUP'
+            ? (target.previousElementSibling! as HTMLImageElement)
+            : (target as HTMLImageElement);
+          if (img.classList.contains('enabled')) {
             if (extension.page_action.default_popup) {
               webview.setAttribute('src', `${url.format({
                 protocol: 'lulumi-extension',
