@@ -111,12 +111,8 @@ const requireTmp = require;
 const moduleTmp = module;
 const __dirnameTmp = __dirname;
 
-// about:newtab handler
 process.once('document-start', () => {
-  if (document.location.href === 'lulumi://about/#/newtab') {
-    ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
-    ipcRenderer.sendToHost('newtab');
-  }
+  
 });
 
 process.once('loaded', () => {
@@ -124,21 +120,27 @@ process.once('loaded', () => {
     global.require = requireTmp;
   }
 
-  if (document.location.href.startsWith('lulumi://')) {
-    ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
+  // about:newtab handler
+  if (document.location.href === 'lulumi://about/#/newtab') {
+    ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
+    ipcRenderer.sendToHost('newtab');
+  } else {
+    if (document.location.href.startsWith('lulumi://')) {
+      ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
-    global.about = remote.getGlobal('guestData');
-    global.backgroundPages = remote.getGlobal('backgroundPages');
-    global.manifestMap = remote.getGlobal('manifestMap');
-    global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
+      global.about = remote.getGlobal('guestData');
+      global.backgroundPages = remote.getGlobal('backgroundPages');
+      global.manifestMap = remote.getGlobal('manifestMap');
+      global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
 
-    global.require = requireTmp;
-    global.module = moduleTmp;
+      global.require = requireTmp;
+      global.module = moduleTmp;
+    }
+
+    global.ipcRenderer = ipcRenderer;
+
+    ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
+      ipcRenderer.send('lulumi-runtime-emit-on-message', message);
+    });
   }
-
-  global.ipcRenderer = ipcRenderer;
-
-  ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
-    ipcRenderer.send('lulumi-runtime-emit-on-message', message);
-  });
 });
