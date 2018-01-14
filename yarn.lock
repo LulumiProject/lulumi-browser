@@ -2633,9 +2633,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.1.tgz#6ffd5f63ab5d39332b71d8f43744f52604ba4e52"
+collect.js@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.2.tgz#477f75a58e1a85d2219a0982195f7513faa894c9"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -3065,9 +3065,9 @@ css-color-names@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/css-color-names/-/css-color-names-0.0.4.tgz#808adc2e79cf84738069b646cb20ec27beb629e0"
 
-css-element-queries@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-0.4.0.tgz#cb5bcde9d980ac3699e7471f798e70600088d3de"
+css-element-queries@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.0.1.tgz#dd14970dd66a7634ec59028fee3820f2a7eff8a8"
 
 css-loader@^0.28.8:
   version "0.28.8"
@@ -3421,6 +3421,10 @@ detect-indent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-5.0.0.tgz#3871cc0a6a002e8c3e5b3cf7f336264675f06b9d"
 
+detect-libc@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
+
 detect-node@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
@@ -3738,12 +3742,13 @@ electron-process-manager@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.1.0.tgz#6d3aefafdf446599f4407e049bf43d6710e96724"
 
-electron-rebuild@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.6.0.tgz#e8d26f4d8e9fe5388df35864b3658e5cfd4dcb7e"
+electron-rebuild@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.7.3.tgz#24ae06ad9dd61cb7e4d688961f49118c40a110eb"
   dependencies:
     colors "^1.1.2"
     debug "^2.6.3"
+    detect-libc "^1.0.3"
     fs-extra "^3.0.1"
     node-abi "^2.0.0"
     node-gyp "^3.6.0"
@@ -9316,9 +9321,9 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^4.1.4:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.1.4.tgz#36bb237bae38ddf9cc92dcc1b16c51e7785bbc9c"
+sinon@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.1.5.tgz#620a9b2ac599f88b0455763070f16f4057ed6395"
   dependencies:
     diff "^3.1.0"
     formatio "1.2.0"
@@ -10253,7 +10258,7 @@ tslint-microsoft-contrib@~5.0.1:
   dependencies:
     tsutils "^1.4.0"
 
-tslint@^5.8.0:
+tslint@5.8.0:
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.8.0.tgz#1f49ad5b2e77c76c3af4ddcae552ae4e3612eb13"
   dependencies:
@@ -10673,9 +10678,9 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@^7.3.3:
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.3.3.tgz#e162431fef05daae1a9b9b3992ac5be238eff954"
+vue-i18n@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.4.0.tgz#bd96cee90b3074e3f43e7347639e6fad0b45b6ae"
 
 vue-loader@^13.7.0:
   version "13.7.0"

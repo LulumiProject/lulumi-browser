@@ -19,8 +19,6 @@
 <script lang="ts">
   import { Component, Vue, Watch } from 'vue-property-decorator';
 
-  import ResizeSensor from 'css-element-queries/src/ResizeSensor';
-
   import urlUtil from '../../js/lib/url-util';
 
   import Event from '../../../api/extensions/event';
@@ -28,6 +26,8 @@
   import Notification from './Notification.vue';
 
   import { tab, store } from 'lulumi';
+
+  const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
   @Component({
     props: [
