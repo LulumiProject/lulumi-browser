@@ -22,7 +22,8 @@
                                          :fetch-suggestions="querySearch",
                                          v-focus="focused",
                                          :value="value",
-                                         popper-class="my-autocomplete")
+                                         popper-class="my-autocomplete",
+                                         :debounce="0")
         el-button(slot="prepend")
           div.secure(v-if="secure")
             awesome-icon(name="lock")
