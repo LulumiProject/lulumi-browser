@@ -5,7 +5,11 @@ const TIMEOUT = 3000;
 export default (provider: string, autocomplete: string): Promise<Object[]> => {
   if (provider === 'Google') {
     return fetchJsonp(autocomplete, { timeout: TIMEOUT })
-      .then(response => response.json()).catch(err => [undefined, []])
+      .then(response => response.json()).catch((err) => {
+        // tslint:disable-next-line:no-console
+        console.error(err);
+        return [undefined, []];
+      })
       .then(data => data[1]);
   }
 
@@ -14,7 +18,11 @@ export default (provider: string, autocomplete: string): Promise<Object[]> => {
       timeout: TIMEOUT,
       jsonpCallback: 'JsonCallback',
     })
-      .then(response => response.json()).catch(err => [undefined, []])
+      .then(response => response.json()).catch((err) => {
+        // tslint:disable-next-line:no-console
+        console.error(err);
+        return [undefined, []];
+      })
       .then(data => data[1].map(d => [d]));
   }
 

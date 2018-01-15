@@ -17,6 +17,7 @@ class Event {
       try {
         listener(...args);
       } catch (err) {
+        console.error(err);
         this.removeListener(listener);
       }
     }
