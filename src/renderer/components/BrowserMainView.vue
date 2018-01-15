@@ -21,6 +21,7 @@
   import { Component, Watch, Vue } from 'vue-property-decorator';
 
   import * as urlPackage from 'url';
+  import Worker from 'workerize-loader!../js/worker';
 
   import Tabs from './BrowserMainView/Tabs.vue';
   import Navbar from './BrowserMainView/Navbar.vue';
@@ -73,6 +74,8 @@
     onCommitted: Event = new Event();
     onCompleted: Event = new Event();
     onDOMContentLoaded: Event = new Event();
+
+    worker = new Worker();
 
     get dummyTabObject(): store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
@@ -145,18 +148,11 @@
       }
       return this.tabs[index];
     }
-    historyMappings() {
+    async historyMappings() {
       const history: store.TabHistory[] = this.$store.getters.history;
-      const out = {};
+      let out: any;
 
-      history.forEach((h) => {
-        if (!out[h.url]) {
-          out[h.url] = {
-            title: h.title,
-            icon: h.favIconUrl,
-          };
-        }
-      });
+      out = await this.worker.historyMappings(history);
       return out;
     }
     lastOpenedTabs(): store.LastOpenedTabObject[] {
@@ -999,7 +995,7 @@
       menu.popup(currentWindow, { async: true });
     }
     // onClickBackContextMenu
-    onClickBackContextMenu(): void {
+    async onClickBackContextMenu(): Promise<void> {
       const currentWindow: Electron.BrowserWindow
         = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
@@ -1012,7 +1008,7 @@
       const current = webContents.getActiveIndex();
       const urls = webContents.history;
 
-      const history = this.historyMappings();
+      const history = await this.historyMappings();
 
       if (goBack !== null && navbar !== null) {
         if (current <= urls.length - 1 && current !== 0) {
@@ -1045,7 +1041,7 @@
       }
     }
     // onClickForwardContextMenu
-    onClickForwardContextMenu(): void {
+    async onClickForwardContextMenu(): Promise<void> {
       const currentWindow: Electron.BrowserWindow
         = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
       const { Menu, MenuItem } = (this as any).$electron.remote;
@@ -1058,7 +1054,7 @@
       const current = webContents.getActiveIndex();
       const urls = webContents.history;
 
-      const history = this.historyMappings();
+      const history = await this.historyMappings();
 
       if (goForward !== null && navbar !== null) {
         if (current <= urls.length - 1 && current !== urls.length - 1) {

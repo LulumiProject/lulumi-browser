@@ -135,7 +135,8 @@
     "webpack-dev-middleware": "^2.0.4",
     "webpack-dev-server": "^2.10.1",
     "webpack-hot-middleware": "^2.21.0",
-    "webpack-merge": "^4.1.1"
+    "webpack-merge": "^4.1.1",
+    "workerize-loader": "^1.0.1"
   },
   "ava": {
     "files": [
