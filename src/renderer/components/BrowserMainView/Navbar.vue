@@ -1,5 +1,5 @@
 <template lang="pug">
-  #browser-navbar(@contextmenu.prevent="onNavbarContextMenu")
+  #browser-navbar
     .control-group
       a(@click="$parent.onClickHome", class="enabled")
         iview-icon(type="ios-home", size="16")
