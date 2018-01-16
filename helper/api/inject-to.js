@@ -10,22 +10,6 @@ const webRequestEvent = require('./extensions/web-request-event');
 const Event = require('./extensions/event');
 const Port = require('./extensions/port');
 
-String.prototype.hashCode = function () {
-  let hash = 0;
-  let i;
-  let chr;
-
-  if (this.length === 0) {
-    return hash;
-  }
-  for (i = 0; i < this.length; i++) {
-    chr = this.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // convert to 32bit integer
-  }
-  return hash;
-};
-
 // Generate all possible signatures for a given API function.
 function getSignatures(ParameterSignatureString) {
   // First match everything inside the function argument parens.

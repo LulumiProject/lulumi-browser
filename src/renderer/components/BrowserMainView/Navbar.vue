@@ -87,7 +87,6 @@
   import '../../css/el-badge';
   import '../../css/el-input';
   import urlUtil from '../../js/lib/url-util';
-  import urlSuggestion from '../../js/lib/url-suggestion';
   import recommendTopSite from '../../js/data/RecommendTopSite';
 
   import BrowserMainView from '../BrowserMainView.vue';
@@ -327,11 +326,12 @@
       this.secure = false;
     }
     showCertificate(): void {
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       const hostname = urlUtil.getHostname(this.url);
       if (hostname) {
         const certificateObject = this.certificates[hostname];
         if (certificateObject) {
-          (this as any).$electron.ipcRenderer.send('show-certificate',
+          ipc.send('show-certificate',
             certificateObject.certificate, `${hostname}\n${certificateObject.verificationResult}`);
         }
       }
@@ -399,12 +399,15 @@
       this.focused = false;
       if (item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
         (this.$parent as BrowserMainView).onEnterUrl(
-          `${this.currentSearchEngine.search}${encodeURIComponent(item.url)}`);
+          this.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(item.url)));
       } else {
-        (this.$parent as BrowserMainView).onEnterUrl(item.url);
+        (this.$parent as BrowserMainView).onEnterUrl(encodeURIComponent(item.url));
       }
     }
     querySearch(queryString: string, cb: Function): void {
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const currentSearchEngine: string = this.currentSearchEngine.name;
+      const navbarSearch = this.$t('navbar.search');
       let suggestions: renderer.SuggestionObject[] = [];
       this.suggestionItems.forEach(item => suggestions.push({ item }));
       if (queryString) {
@@ -412,7 +415,7 @@
       }
       suggestions.push({
         item: {
-          title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
+          title: `${currentSearchEngine} ${this.$t('navbar.search')}`,
           value: this.value,
           url: this.value,
           icon: 'search',
@@ -430,23 +433,34 @@
       // fuse results
       suggestions = suggestions.concat(this.fuse.search(queryString.toLowerCase()));
 
+      const timestamp: number = Date.now();
       // autocomplete suggestions
-      urlSuggestion(this.currentSearchEngine.name,
-                    `${this.currentSearchEngine.autocomplete}${this.value}`)
-        .then((final) => {
-          final.forEach((entry) => {
+      ipc.once(`fetch-search-suggestions-${timestamp}`, (event, result) => {
+        if (result.ok) {
+          const parsed = JSON.parse(result.body);
+          const returnedSuggestions = parsed[1];
+          returnedSuggestions.forEach((suggestion) => {
             suggestions.push({
               item: {
-                title: `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`,
-                value: entry[0],
-                url: entry[0],
+                title: `${currentSearchEngine} ${navbarSearch}`,
+                value: suggestion,
+                url: suggestion,
                 icon: 'search',
               },
             });
           })
-          cb(this.unique(suggestions));
-        });
-
+        } else {
+          // tslint:disable-next-line no-console
+          console.error(result.error);
+        }
+        cb(this.unique(suggestions));
+      });
+      ipc.send('fetch-search-suggestions',
+               currentSearchEngine,
+               this.currentSearchEngine.autocomplete
+                .replace('{queryString}', this.value)
+                .replace('{language}', this.$store.getters.lang),
+               timestamp);
     }
     createFilter(queryString: string): (suggestion: any) => boolean {
       return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
@@ -662,7 +676,7 @@
       }
     }
     removeLulumiExtension(extensionId: string): void {
-      const ipc = (this as any).$electron.ipcRenderer;
+      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
       ipc.send('remove-lulumi-extension', extensionId);
     }
     onContextmenu(extension: any): void {

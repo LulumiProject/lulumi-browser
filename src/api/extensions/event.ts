@@ -17,6 +17,7 @@ class Event {
       try {
         listener(...args);
       } catch (err) {
+        // tslint:disable-next-line:no-console
         console.error(err);
         this.removeListener(listener);
       }

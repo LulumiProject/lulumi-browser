@@ -9,13 +9,15 @@ declare const __static;
 const searchEngine = [
   {
     name: 'Google',
-    search: 'https://www.google.com/search?q=',
-    autocomplete: 'https://suggestqueries.google.com/complete/search?client=youtube&q=',
+    search: 'https://www.google.com/search?q={queryString}',
+    autocomplete:
+      'https://suggestqueries.google.com/complete/search?client=chrome&q={queryString}',
   },
   {
     name: 'Bing',
-    search: 'https://www.bing.com/search?q=',
-    autocomplete: 'https://api.bing.com/osjson.aspx?query=',
+    search: 'https://www.bing.com/search?q={queryString}',
+    autocomplete:
+      'https://api.bing.com/osjson.aspx?query={queryString}&language={language}&form=OSDJAS',
   },
 ];
 

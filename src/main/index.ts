@@ -18,6 +18,7 @@ import config from './js/constants/config';
 import localshortcut from 'electron-localshortcut';
 import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
+import request from './js/lib/request';
 
 import { api, scheme } from 'lulumi';
 
@@ -641,6 +642,14 @@ ipcMain.on('request-extension-objects', (event: Electron.Event) => {
     });
   });
 });
+
+ipcMain.on('fetch-search-suggestions',
+  // tslint:disable-next-line:align
+  (event: Electron.Event, provider: string, url: string, timestamp: number) => {
+    request(provider, url, (result) => {
+      event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
+    });
+  });
 
 // reload each BrowserView when we plug in our cable
 globalObjet.online = true;
