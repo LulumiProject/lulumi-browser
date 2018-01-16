@@ -401,7 +401,7 @@
         (this.$parent as BrowserMainView).onEnterUrl(
           this.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(item.url)));
       } else {
-        (this.$parent as BrowserMainView).onEnterUrl(encodeURIComponent(item.url));
+        (this.$parent as BrowserMainView).onEnterUrl(item.url);
       }
     }
     querySearch(queryString: string, cb: Function): void {
