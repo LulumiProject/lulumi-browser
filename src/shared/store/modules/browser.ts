@@ -560,6 +560,7 @@ const mutations = {
     state.currentTabIndexes = newState.currentTabIndexes;
     state.searchEngine = config.searchEngine;
     state.currentSearchEngine = newState.currentSearchEngine;
+    state.autoFetch = newState.autoFetch;
     state.homepage = newState.homepage;
     state.pdfViewer = newState.pdfViewer;
     state.tabConfig = newState.tabConfig;

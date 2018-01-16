@@ -309,7 +309,7 @@ function collect(getters, newStart: number, newTabs: store.TabObject[], newCurre
     tabs: newTabs,
     currentTabIndexes: newCurrentTabIndexes,
     currentSearchEngine: getters.currentSearchEngine,
-    autoFocus: getters.autoFocus,
+    autoFetch: getters.autoFetch,
     homepage: getters.homepage,
     pdfViewer: getters.pdfViewer,
     tabConfig: getters.tabConfig,
