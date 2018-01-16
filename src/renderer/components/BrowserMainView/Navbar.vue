@@ -217,6 +217,9 @@
       }
       return this.tabs[this.currentTabIndex];
     }
+    get autoFetch(): boolean {
+      return this.$store.getters.autoFetch;
+    }
     get pageActionMapping(): object {
       if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return {};
@@ -433,34 +436,40 @@
       // fuse results
       suggestions = suggestions.concat(this.fuse.search(queryString.toLowerCase()));
 
-      const timestamp: number = Date.now();
-      // autocomplete suggestions
-      ipc.once(`fetch-search-suggestions-${timestamp}`, (event, result) => {
-        if (result.ok) {
-          const parsed = JSON.parse(result.body);
-          const returnedSuggestions = parsed[1];
-          returnedSuggestions.forEach((suggestion) => {
-            suggestions.push({
-              item: {
-                title: `${currentSearchEngine} ${navbarSearch}`,
-                value: suggestion,
-                url: suggestion,
-                icon: 'search',
-              },
-            });
-          })
-        } else {
-          // tslint:disable-next-line no-console
-          console.error(result.error);
-        }
+      if (this.autoFetch && this.currentSearchEngine.autocomplete !== '') {
+        const timestamp: number = Date.now();
+        // autocomplete suggestions
+        ipc.once(`fetch-search-suggestions-${timestamp}`, (event, result) => {
+          if (result.ok) {
+            const parsed = JSON.parse(result.body);
+            const returnedSuggestions = (parsed[1] !== undefined)
+              ? parsed[1]
+              : parsed.items;
+            returnedSuggestions.forEach((suggestion) => {
+              suggestions.push({
+                item: {
+                  title: `${currentSearchEngine} ${navbarSearch}`,
+                  value: suggestion,
+                  url: suggestion,
+                  icon: 'search',
+                },
+              });
+            })
+          } else {
+            // tslint:disable-next-line no-console
+            console.error(result.error);
+          }
+          cb(this.unique(suggestions));
+        });
+        ipc.send('fetch-search-suggestions',
+                currentSearchEngine,
+                this.currentSearchEngine.autocomplete
+                  .replace('{queryString}', this.value)
+                  .replace('{language}', this.$store.getters.lang),
+                timestamp);
+      } else {
         cb(this.unique(suggestions));
-      });
-      ipc.send('fetch-search-suggestions',
-               currentSearchEngine,
-               this.currentSearchEngine.autocomplete
-                .replace('{queryString}', this.value)
-                .replace('{language}', this.$store.getters.lang),
-               timestamp);
+      }
     }
     createFilter(queryString: string): (suggestion: any) => boolean {
       return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);

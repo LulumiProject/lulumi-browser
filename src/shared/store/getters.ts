@@ -23,6 +23,9 @@ export const getters = {
   currentSearchEngine(state: BrowserState) {
     return state.browser.currentSearchEngine;
   },
+  autoFetch(state: BrowserState) {
+    return state.browser.autoFetch;
+  },
   homepage(state: BrowserState) {
     return state.browser.homepage;
   },

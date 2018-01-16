@@ -79,6 +79,8 @@ export const guest = {
         current: 'Current',
         searchEngine: 'Search Engine',
         name: 'Name',
+        options: 'Search Bar Options',
+        autoFetch: 'Autocomplete query string (autosuggestion)',
       },
       homePage: {
         title: 'Homepage',

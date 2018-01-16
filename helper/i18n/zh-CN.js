@@ -79,6 +79,8 @@ export const guest = {
         current: '当前使用',
         searchEngine: '搜索引擎',
         name: '提供者',
+        options: '搜索栏设置',
+        autoFetch: '提供搜索建议',
       },
       homePage: {
         title: '首页',

@@ -15,6 +15,7 @@ const state: store.State = {
   currentTabIndexes: [],
   searchEngine: config.searchEngine,
   currentSearchEngine: config.currentSearchEngine,
+  autoFetch: config.autoFetch,
   homepage: config.homepage,
   pdfViewer: config.pdfViewer,
   tabConfig: config.tabConfig,
@@ -445,7 +446,10 @@ const mutations = {
   },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: store.State, { val }) {
-    state.currentSearchEngine = val;
+    if (val.currentSearchEngine !== null) {
+      state.currentSearchEngine = val.currentSearchEngine;
+    }
+    state.autoFetch = val.autoFetch;
   },
   [types.SET_HOMEPAGE](state: store.State, { val }) {
     state.homepage = val.homepage;

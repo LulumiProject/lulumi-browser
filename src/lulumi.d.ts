@@ -139,6 +139,7 @@ declare module 'lulumi' {
       currentTabIndexes: number[];
       searchEngine: SearchEngineObject[];
       currentSearchEngine: SearchEngineObject;
+      autoFetch: boolean;
       homepage: string;
       pdfViewer: string;
       tabConfig: TabConfig;

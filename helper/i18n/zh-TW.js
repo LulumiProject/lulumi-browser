@@ -79,6 +79,8 @@ export const guest = {
         current: '現在',
         searchEngine: '搜尋引擎',
         name: '提供者',
+        options: '搜尋列選項',
+        autoFetch: '搜尋建議功能',
       },
       homePage: {
         title: '首頁',

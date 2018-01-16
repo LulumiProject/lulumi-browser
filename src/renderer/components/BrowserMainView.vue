@@ -713,6 +713,7 @@
         webContents.send('guest-here-your-data', {
           searchEngine: this.$store.getters.searchEngine,
           currentSearchEngine: this.$store.getters.currentSearchEngine,
+          autoFetch: this.$store.getters.autoFetch,
         });
       }
     }
@@ -723,6 +724,7 @@
         webContents.send('guest-here-your-data', {
           searchEngine: this.$store.getters.searchEngine,
           currentSearchEngine: this.$store.getters.currentSearchEngine,
+          autoFetch: this.$store.getters.autoFetch,
         });
       }, 0);
     }
