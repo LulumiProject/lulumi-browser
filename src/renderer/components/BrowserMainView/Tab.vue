@@ -2,7 +2,7 @@
   div
     transition(name="notification")
       #notification(v-show="showNotification && isActive")
-        notification
+        notification(:windowWebContentsId="windowWebContentsId")
     webview(plugins,
             :element-loading-text="$t('tab.loading')",
             ref="webview",
@@ -33,6 +33,7 @@
     props: [
       'isActive',
       'windowId',
+      'windowWebContentsId',
       'tabIndex',
       'tabId',
     ],
@@ -48,6 +49,7 @@
 
     isActive: boolean;
     windowId: number;
+    windowWebContentsId: number;
     tabIndex: number;
     tabId: number;
 

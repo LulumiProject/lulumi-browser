@@ -129,7 +129,10 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
     ipcMain.on('window-id', (event: Electron.Event) => {
       const window = BrowserWindow.fromWebContents(event.sender);
-      event.returnValue = window.id;
+      event.returnValue = {
+        windowId: window.id,
+        windowWebContentsId: window.webContents.id,
+      };
     });
 
     (window as any).callback(`any-new-tab-suggestion-for-window-${window.id}`);

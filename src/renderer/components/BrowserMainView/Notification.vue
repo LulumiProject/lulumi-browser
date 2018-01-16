@@ -18,6 +18,9 @@
   import Tab from './Tab.vue';
 
   @Component({
+    props: [
+      'windowWebContentsId',
+    ],
     components: {
       'el-button': Button,
       'el-button-group': ButtonGroup,
@@ -27,6 +30,8 @@
     },
   })
   export default class Notification extends Vue {
+    windowWebContentsId: number;
+
     permanent: boolean = false;
     type: string = '';
     template: VueI18n.LocaleMessage = '';
@@ -110,34 +115,18 @@
         (this.$parent as Tab).showNotification = true;
       });
       ipc.on('request-permission', (event, data) => {
-        if ((this.$parent.$refs.webview as Electron.WebviewTag).getWebContents().id === data.webContentsId) {
-          const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-          const webview = this.$parent.$refs.webview as Electron.WebviewTag;
-          this.id = data.webContentsId;
-          this.hostname = urlUtil.getHostname(webContents.getURL());
-          this.permission = data.permission;
-          if (this.hostname !== null) {
-            if (this.permission === 'setLanguage') {
-              this.type = 'permission';
-              this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
-              webview.style.height = 'calc((100vh - 73px) - 35px)';
-              (this.$parent as Tab).showNotification = true;
-              this.handler = setTimeout(() => {
-                ipc.send(`response-permission-${this.id}`, {
-                  accept: false,
-                });
-                webview.style.height = 'calc(100vh - 73px)';
-                (this.$parent as Tab).showNotification = false;
-              }, 10000);
-            } else {
-              if (this.permissions[`${this.hostname}`]
-                && this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
-                ipc.send(`response-permission-${this.id}`, {
-                  accept: this.permissions[`${this.hostname}`][`${this.permission}`],
-                });
-              } else {
+        const webContents: Electron.webContents | null
+          = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+        if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+          if (((this.$parent as Tab).$refs.webview as Electron.WebviewTag).getWebContents().id === data.webContentsId) {
+            const webview = this.$parent.$refs.webview as Electron.WebviewTag;
+            this.id = data.webContentsId;
+            this.hostname = urlUtil.getHostname(webContents.getURL());
+            this.permission = data.permission;
+            if (this.hostname !== null) {
+              if (this.permission === 'setLanguage') {
                 this.type = 'permission';
-                this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
+                this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
                 webview.style.height = 'calc((100vh - 73px) - 35px)';
                 (this.$parent as Tab).showNotification = true;
                 this.handler = setTimeout(() => {
@@ -146,7 +135,26 @@
                   });
                   webview.style.height = 'calc(100vh - 73px)';
                   (this.$parent as Tab).showNotification = false;
-                }, 5000);
+                }, 10000);
+              } else {
+                if (this.permissions[`${this.hostname}`]
+                  && this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
+                  ipc.send(`response-permission-${this.id}`, {
+                    accept: this.permissions[`${this.hostname}`][`${this.permission}`],
+                  });
+                } else {
+                  this.type = 'permission';
+                  this.template = this.$t('notification.permission.request.normal', { hostname: this.hostname, permission: this.permission });
+                  webview.style.height = 'calc((100vh - 73px) - 35px)';
+                  (this.$parent as Tab).showNotification = true;
+                  this.handler = setTimeout(() => {
+                    ipc.send(`response-permission-${this.id}`, {
+                      accept: false,
+                    });
+                    webview.style.height = 'calc(100vh - 73px)';
+                    (this.$parent as Tab).showNotification = false;
+                  }, 5000);
+                }
               }
             }
           }

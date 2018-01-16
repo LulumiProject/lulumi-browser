@@ -7,6 +7,7 @@
     tab(v-for="(tab, index) in tabs",
         :isActive="index === currentTabIndex",
         :windowId="windowId",
+        :windowWebContentsId="windowWebContentsId",
         :tabIndex="index",
         :tabId="tab.id",
         :ref="`tab-${index}`",
@@ -51,6 +52,7 @@
   })
   export default class BrowserMainView extends Vue {
     windowId: number = 0;
+    windowWebContentsId: number = 0;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
     isSwipeOnEdge: boolean = false;
@@ -569,19 +571,22 @@
       }
     }
     onOpenPDF(event: Electron.Event, data): void {
-      if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
-        const webview = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         if (this.pdfViewer === 'pdf-viewer') {
           const parsedURL = urlPackage.parse(data.url, true);
-          webview.downloadURL(`${parsedURL.query.file}?skip=true`);
+          webContents.downloadURL(`${parsedURL.query.file}?skip=true`);
         } else {
-          webview.loadURL(data.url);
+          webContents.loadURL(data.url);
         }
       }
     }
     onWillDownloadAnyFile(event: Electron.Event, data): void {
-      this.showDownloadBar = true;
-      if ((this as any).$electron.remote.webContents.fromId(data.webContentsId)) {
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.showDownloadBar = true;
         this.$store.dispatch('createDownloadTask', {
           name: data.name,
           url: data.url,
@@ -596,46 +601,50 @@
       }
     }
     onUpdateDownloadsProgress(event: Electron.Event, data): void {
-      this.$store.dispatch('updateDownloadsProgress', {
-        startTime: data.startTime,
-        getReceivedBytes: data.getReceivedBytes,
-        savePath: data.savePath,
-        isPaused: data.isPaused,
-        canResume: data.canResume,
-        dataState: data.dataState,
-      });
+      if (data.hostWebContentsId === this.windowWebContentsId) {
+        this.$store.dispatch('updateDownloadsProgress', {
+          startTime: data.startTime,
+          getReceivedBytes: data.getReceivedBytes,
+          savePath: data.savePath,
+          isPaused: data.isPaused,
+          canResume: data.canResume,
+          dataState: data.dataState,
+        });
+      }
     }
     onCompleteDownloadsProgress(event: Electron.Event, data): void {
-      this.$store.dispatch('completeDownloadsProgress', {
-        name: data.name,
-        startTime: data.startTime,
-        dataState: data.dataState,
-      });
-      const download =
-        this.$store.getters.downloads.filter(download => download.startTime === data.startTime);
-      if (download.length) {
-        let option: any;
-        if (data.dataState === 'completed') {
-          option = {
-            title: 'Success',
-            body: `${data.name} download successfully!`,
-          };
-        } else if (data.dataState === 'cancelled') {
-          option = {
-            title: 'Cancelled',
-            body: `${data.name} has been cancelled!`,
-          };
+      if (data.hostWebContentsId === this.windowWebContentsId) {
+        this.$store.dispatch('completeDownloadsProgress', {
+          name: data.name,
+          startTime: data.startTime,
+          dataState: data.dataState,
+        });
+        const download =
+          this.$store.getters.downloads.filter(download => download.startTime === data.startTime);
+        if (download.length) {
+          let option: any;
+          if (data.dataState === 'completed') {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          } else if (data.dataState === 'cancelled') {
+            option = {
+              title: 'Cancelled',
+              body: `${data.name} has been cancelled!`,
+            };
+          } else {
+            option = {
+              title: 'Success',
+              body: `${data.name} download successfully!`,
+            };
+          }
+          new Notification(option.title, option);
         } else {
-          option = {
-            title: 'Success',
-            body: `${data.name} download successfully!`,
-          };
+          this.showDownloadBar = this.$store.getters.downloads.every(download => download.style === 'hidden')
+            ? false
+            : this.showDownloadBar;
         }
-        new Notification(option.title, option);
-      } else {
-        this.showDownloadBar = this.$store.getters.downloads.every(download => download.style === 'hidden')
-          ? false
-          : this.showDownloadBar;
       }
     }
     onCloseDownloadBar(): void {
@@ -708,8 +717,9 @@
       });
     }
     onGetSearchEngineProvider(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           searchEngine: this.$store.getters.searchEngine,
           currentSearchEngine: this.$store.getters.currentSearchEngine,
@@ -718,105 +728,132 @@
       }
     }
     onSetSearchEngineProvider(event: Electron.Event, data): void {
-      this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', {
-          searchEngine: this.$store.getters.searchEngine,
-          currentSearchEngine: this.$store.getters.currentSearchEngine,
-          autoFetch: this.$store.getters.autoFetch,
-        });
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', {
+            searchEngine: this.$store.getters.searchEngine,
+            currentSearchEngine: this.$store.getters.currentSearchEngine,
+            autoFetch: this.$store.getters.autoFetch,
+          });
+        }, 0);
+      }
     }
     onGetHomepage(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           homepage: this.$store.getters.homepage,
         });
       }
     }
     onSetHomepage(event: Electron.Event, data): void {
-      this.$store.dispatch('setHomepage', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', {
-          homepage: this.$store.getters.homepage,
-        });
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setHomepage', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', {
+            homepage: this.$store.getters.homepage,
+          });
+        }, 0);
+      }
     }
     onGetPDFViewer(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           pdfViewer: this.$store.getters.pdfViewer,
         });
       }
     }
     onSetPDFViewer(event: Electron.Event, data): void {
-      this.$store.dispatch('setPDFViewer', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', {
-          pdfViewer: this.$store.getters.pdfViewer,
-        });
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setPDFViewer', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', {
+            pdfViewer: this.$store.getters.pdfViewer,
+          });
+        }, 0);
+      }
     }
     onGetTabConfig(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
       }
     }
     onSetTabConfig(event: Electron.Event, data): void {
-      this.$store.dispatch('setTabConfig', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setTabConfig', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
+        }, 0);
+      }
     }
     onGetLang(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           lang: this.$store.getters.lang,
         });
       }
     }
     onSetLang(event: Electron.Event, data): void {
-      this.$store.dispatch('setLang', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', {
-          lang: this.$store.getters.lang,
-        });
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setLang', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', {
+            lang: this.$store.getters.lang,
+          });
+        }, 0);
+      }
     }
     onGetDownloads(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.downloads);
       }
     }
     onSetDownloads(event: Electron.Event, data): void {
-      this.$store.dispatch('setDownloads', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', this.$store.getters.downloads);
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setDownloads', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', this.$store.getters.downloads);
+        }, 0);
+      }
     }
     onGetHistory(event: Electron.Event, webContentsId: number): void {
-      if ((this as any).$electron.remote.webContents.fromId(webContentsId)) {
-        const webContents = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.history);
       }
     }
     onSetHistory(event: Electron.Event, data): void {
-      this.$store.dispatch('setHistory', data.val);
-      const webContents = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      setTimeout(() => {
-        webContents.send('guest-here-your-data', this.$store.getters.history);
-      }, 0);
+      const webContents: Electron.webContents | null
+        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+        this.$store.dispatch('setHistory', data.val);
+        setTimeout(() => {
+          webContents.send('guest-here-your-data', this.$store.getters.history);
+        }, 0);
+      }
     }
     // tabHandlers
     onNewTab(windowId: number = this.windowId, url: string, follow: boolean = false): void {
@@ -1508,7 +1545,9 @@
       webFrame.setVisualZoomLevelLimits(1, 1);
 
       if (process.env.NODE_ENV !== 'testing') {
-        this.windowId = ipc.sendSync('window-id');
+        const windowProperty = ipc.sendSync('window-id');
+        this.windowId = windowProperty.windowId;
+        this.windowWebContentsId = windowProperty.windowWebContentsId;
 
         ipc.once(`new-tab-suggestion-for-window-${this.windowId}`,
           (event: Electron.Event, suggestion: main.BrowserWindowSuggestionItem | null) => {

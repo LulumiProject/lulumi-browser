@@ -9,31 +9,31 @@ declare const __static;
 const searchEngine = [
   {
     name: 'Google',
-    search: 'https://www.google.com/search?q={queryString}',
+    search: 'https://www.google.com/search?ie=UTF-8&q={queryString}',
     autocomplete:
-      'http://suggestqueries.google.com/complete/search?client=chrome&q={queryString}',
+      'https://www.google.com/complete/search?client=chrome&q={queryString}',
   },
   {
     name: 'Bing',
-    search: 'https://www.bing.com/search?q={queryString}',
+    search: 'http://www.bing.com/search?setmkt={language}&q={queryString}',
     autocomplete:
       'http://api.bing.com/osjson.aspx?query={queryString}&language={language}',
   },
   {
     name: 'Yahoo!',
-    search: 'http://search.yahoo.com/search?fr=crmas&p={queryString}',
+    search: 'http://search.yahoo.com/search?ei=UTF-8&fr=crmas&p={queryString}',
     autocomplete:
       'http://ff.search.yahoo.com/gossip?output=fxjson&command={queryString}',
   },
   {
     name: 'Yahoo! UK & Ireland',
-    search: 'http://uk.search.yahoo.com/search?fr=crmas&p={queryString}',
+    search: 'http://uk.search.yahoo.com/search?ei=UTF-8&fr=crmas&p={queryString}',
     autocomplete:
       'http://uk-sayt.ff.search.yahoo.com/gossip-uk-sayt?output=fxjson&command={queryString}',
   },
   {
     name: 'Yahoo! JAPAN',
-    search: 'http://search.yahoo.co.jp/search?fr=crmas&p={queryString}',
+    search: 'http://search.yahoo.co.jp/search?ei=UTF-8&fr=crmas&p={queryString}',
     autocomplete:
       // tslint:disable-next-line max-line-length
       'http://search.yahooapis.jp/AssistSearchService/V2/webassistSearch?appid=oQsoxcyxg66enp0TYoirkKoryq6rF8bK76mW0KYxZ0v0WPLtn.Lix6wy8F_LwGWHUII-&output=iejson&p={queryString}',
@@ -46,9 +46,9 @@ const searchEngine = [
   },
   {
     name: 'Naver',
-    search: 'http://search.naver.com/search.naver?query={queryString}',
+    search: 'http://search.naver.com/search.naver?ie=UTF-8&query={queryString}',
     autocomplete:
-      'http://ac.search.naver.com/nx/ac?of=os&oe=utf-8&q={queryString}',
+      'http://ac.search.naver.com/nx/ac?of=os&ie=utf-8&q={queryString}',
   },
 ];
 

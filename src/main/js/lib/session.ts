@@ -224,7 +224,7 @@ const registerCertificateVerifyProc = () => {
   });
 };
 
-const onWillDownload = (mainWindow: Electron.BrowserWindow, path: string): void => {
+const onWillDownload = (windows, path: string): void => {
   const sess = session.defaultSession as Electron.Session;
   sess.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
@@ -236,22 +236,30 @@ const onWillDownload = (mainWindow: Electron.BrowserWindow, path: string): void 
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
       const pdfViewerURL = `file://${path}/web/viewer.html`;
-      mainWindow.webContents.send('open-pdf', {
-        url: `${pdfViewerURL}?${param}`,
-        webContentsId: webContents.id,
+      Object.keys(windows).forEach((key) => {
+        const id = parseInt(key, 10);
+        const window = windows[id];
+        window.webContents.send('open-pdf', {
+          url: `${pdfViewerURL}?${param}`,
+          webContentsId: webContents.id,
+        });
       });
     } else {
       const totalBytes = item.getTotalBytes();
       const startTime = item.getStartTime();
-      mainWindow.webContents.send('will-download-any-file', {
-        totalBytes,
-        startTime,
-        webContentsId: webContents.id,
-        name: item.getFilename(),
-        url: item.getURL(),
-        isPaused: item.isPaused(),
-        canResume: item.canResume(),
-        dataState: 'init',
+      Object.keys(windows).forEach((key) => {
+        const id = parseInt(key, 10);
+        const window = windows[id];
+        window.webContents.send('will-download-any-file', {
+          totalBytes,
+          startTime,
+          webContentsId: webContents.id,
+          name: item.getFilename(),
+          url: item.getURL(),
+          isPaused: item.isPaused(),
+          canResume: item.canResume(),
+          dataState: 'init',
+        });
       });
 
       ipcMain.on('pause-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
@@ -271,13 +279,18 @@ const onWillDownload = (mainWindow: Electron.BrowserWindow, path: string): void 
       });
 
       item.on('updated', (event: Electron.Event, state: string) => {
-        mainWindow.webContents.send('update-downloads-progress', {
-          startTime: item.getStartTime(),
-          getReceivedBytes: item.getReceivedBytes(),
-          savePath: item.getSavePath(),
-          isPaused: item.isPaused(),
-          canResume: item.canResume(),
-          dataState: state,
+        Object.keys(windows).forEach((key) => {
+          const id = parseInt(key, 10);
+          const window = windows[id];
+          window.webContents.send('update-downloads-progress', {
+            hostWebContentsId: webContents.hostWebContents.id,
+            startTime: item.getStartTime(),
+            getReceivedBytes: item.getReceivedBytes(),
+            savePath: item.getSavePath(),
+            isPaused: item.isPaused(),
+            canResume: item.canResume(),
+            dataState: state,
+          });
         });
       });
 
@@ -285,22 +298,31 @@ const onWillDownload = (mainWindow: Electron.BrowserWindow, path: string): void 
         ipcMain.removeAllListeners('pause-downloads-progress');
         ipcMain.removeAllListeners('resume-downloads-progress');
         ipcMain.removeAllListeners('cancel-downloads-progress');
-        mainWindow.webContents.send('complete-downloads-progress', {
-          name: item.getFilename(),
-          startTime: item.getStartTime(),
-          dataState: state,
+        Object.keys(windows).forEach((key) => {
+          const id = parseInt(key, 10);
+          const window = windows[id];
+          window.webContents.send('complete-downloads-progress', {
+            hostWebContentsId: webContents.hostWebContents.id,
+            name: item.getFilename(),
+            startTime: item.getStartTime(),
+            dataState: state,
+          });
         });
       });
     }
   });
 };
 
-const setPermissionRequestHandler = (mainWindow: Electron.BrowserWindow): void => {
+const setPermissionRequestHandler = (windows): void => {
   const sess = session.defaultSession as Electron.Session;
   sess.setPermissionRequestHandler((webContents, permission, callback) => {
-    mainWindow.webContents.send('request-permission', {
-      permission,
-      webContentsId: webContents.id,
+    Object.keys(windows).forEach((key) => {
+      const id = parseInt(key, 10);
+      const window = windows[id];
+      window.webContents.send('request-permission', {
+        permission,
+        webContentsId: webContents.id,
+      });
     });
     ipcMain.once(`response-permission-${webContents.id}`, (event: Electron.Event, data) => {
       if (data.accept) {

@@ -18,11 +18,15 @@ export default {
     setTimeout(() => autoUpdater.checkForUpdates(), 1000 * 10);
     setInterval(() => autoUpdater.checkForUpdates(), 1000 * 60 * 5);
   },
-  listen(mainWindow) {
+  listen(windows) {
     autoUpdater.once('update-downloaded', (event, releaseNotes, releaseName) => {
-      mainWindow.webContents.send('update-available', {
-        releaseNotes,
-        releaseName,
+      Object.keys(windows).forEach((key) => {
+        const id = parseInt(key, 10);
+        const window = windows[id];
+        window.webContents.send('update-available', {
+          releaseNotes,
+          releaseName,
+        });
       });
     });
     ipcMain.once('quit-and-install', (event, data) => {

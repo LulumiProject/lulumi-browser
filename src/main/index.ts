@@ -140,17 +140,6 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   menu.init();
 
-  // Session related operations
-  session.registerScheme(config.lulumiPagesCustomProtocol);
-  session.registerCertificateVerifyProc();
-  session.onWillDownload(mainWindow, config.lulumiPDFJSPath);
-  session.setPermissionRequestHandler(mainWindow);
-
-  if (process.env.NODE_ENV !== 'development') {
-    autoUpdater.init();
-    autoUpdater.listen(mainWindow);
-  }
-
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.contextIsolation = true;
     // webPreferences.nativeWindowOpen = true;
@@ -200,7 +189,16 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', () => {
-  // register webRequest listeners
+  // autoUpdater
+  if (process.env.NODE_ENV !== 'development') {
+    autoUpdater.init();
+    autoUpdater.listen(windows);
+  }
+  // session related operations
+  session.onWillDownload(windows, config.lulumiPDFJSPath);
+  session.setPermissionRequestHandler(windows);
+  session.registerScheme(config.lulumiPagesCustomProtocol);
+  session.registerCertificateVerifyProc();
   session.registerWebRequestListeners();
   // load appState
   let data: string = '""';
@@ -239,7 +237,7 @@ app.on('ready', () => {
     }
   } catch (parseError) {
     // tslint:disable-next-line:no-console
-    console.error(`could not parse data from ${storagePath}, ${parseError}`);
+    console.log(`could not parse data from ${storagePath}, ${parseError}`);
     createWindow();
   }
 });
