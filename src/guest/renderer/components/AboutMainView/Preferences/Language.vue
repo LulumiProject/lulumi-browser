@@ -22,9 +22,9 @@
     },
   })
   export default class Language extends Vue {
-    options: object[] = [
+    options: any[] = [
       {
-        value: 'en',
+        value: 'en-US',
         label: 'English',
       },
       {
@@ -42,6 +42,7 @@
     setLang(): void {
       if (this.currentLang !== this.lang) {
         ipcRenderer.send('set-lang', {
+          label: this.options.find(opt => (opt.value === this.lang)).label,
           lang: this.lang,
         });
       }

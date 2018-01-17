@@ -74,6 +74,7 @@ const session = require('./js/lib/session').default;
 // ../shared/store/mainStore.ts
 const mainStore = require('../shared/store/mainStore').default;
 mainStore.register(storagePath, swipeGesture);
+const store = mainStore.getStore();
 const windows = mainStore.getWindows();
 
 // ../api/lulumi-extension.ts
@@ -161,7 +162,6 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   mainWindow.on('closed', () => {
     if (setLanguage) {
-      createWindow();
       setLanguage = false;
     }
     (mainWindow as any) = null;
@@ -231,13 +231,13 @@ app.on('ready', () => {
         }
       });
       (data as any).windows = [];
-      mainStore.dispatch(data);
+      store.dispatch('setAppState', data);
     } else {
       createWindow();
     }
   } catch (parseError) {
     // tslint:disable-next-line:no-console
-    console.log(`could not parse data from ${storagePath}, ${parseError}`);
+    console.error(`could not parse data from ${storagePath}, ${parseError}`);
     createWindow();
   }
 });
@@ -327,10 +327,10 @@ ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: an
       });
       const windowPropertyFilename = path.basename(windowProperty.path);
       const windowPropertyTmp = path.resolve(app.getPath('temp'), windowPropertyFilename);
-      rename(windowProperty.path, windowPropertyTmp, (err) => {
-        if (err) {
+      rename(windowProperty.path, windowPropertyTmp, (renameError) => {
+        if (renameError) {
           // tslint:disable-next-line:no-console
-          console.error(err);
+          console.error(renameError);
         }
       });
     });
@@ -549,19 +549,12 @@ ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
     window.webContents.send('request-permission', {
       webContentsId,
       permission: 'setLanguage',
-      lang: val.lang,
+      label: val.label,
     });
   });
   ipcMain.once(`response-permission-${eventOne.sender.id}`, (eventTwo: Electron.Event, data) => {
     if (data.accept) {
-      Object.keys(windows).forEach((key) => {
-        const id = parseInt(key, 10);
-        const window = windows[id];
-        window.webContents.send('set-lang', {
-          val,
-          webContentsId: eventTwo.sender.id,
-        });
-      });
+      store.dispatch('setLang', val);
       promisify(writeFile, langPath, JSON.stringify(val.lang))
         .then(() => {
           setLanguage = true;
@@ -614,8 +607,10 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
   let lang: string = '';
   try {
     lang = readFileSync(langPath, 'utf8');
-  } catch (event) {
-    lang = '"en"';
+  } catch (langError) {
+    lang = '"en-US"';
+    // tslint:disable-next-line:no-console
+    console.log(langError);
   }
   event.returnValue = JSON.parse(lang);
 });

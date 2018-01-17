@@ -125,8 +125,9 @@
             this.permission = data.permission;
             if (this.hostname !== null) {
               if (this.permission === 'setLanguage') {
+                this.hostname = urlUtil.getUrlIfAbout(webContents.getURL()).url;
                 this.type = 'permission';
-                this.template = this.$t('notification.permission.request.setLanguage', { hostname: webContents.getURL(), lang: data.lang });
+                this.template = this.$t('notification.permission.request.setLanguage', { hostname: this.hostname, lang: data.label });
                 webview.style.height = 'calc((100vh - 73px) - 35px)';
                 (this.$parent as Tab).showNotification = true;
                 this.handler = setTimeout(() => {

@@ -16,7 +16,7 @@ Vue.use(VueI18n);
 export default new VueI18n({
   locale: lang,
   messages: {
-    en: Object.assign(enElement, enUS),
+    'en-US': Object.assign(enElement, enUS),
     'zh-CN': Object.assign(zhElement, zhCN),
     'zh-TW': Object.assign(zhTWElement, zhTW),
   },

@@ -809,18 +809,6 @@
         });
       }
     }
-    onSetLang(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setLang', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', {
-            lang: this.$store.getters.lang,
-          });
-        }, 0);
-      }
-    }
     onGetDownloads(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
         = (this as any).$electron.remote.webContents.fromId(webContentsId);
@@ -1672,9 +1660,6 @@
       });
       ipc.on('get-lang', (event: Electron.Event, webContentsId: number) => {
         this.onGetLang(event, webContentsId);
-      });
-      ipc.on('set-lang', (event, val) => {
-        this.onSetLang(event, val);
       });
       ipc.on('get-downloads', (event: Electron.Event, webContentsId: number) => {
         this.onGetDownloads(event, webContentsId);

@@ -187,10 +187,6 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
   });
 };
 
-const dispatch = (state) => {
-  store.dispatch('setAppState', state);
-};
-
 const windowStateSave = (): void => {
   Object.values(windows).forEach((window) => {
     handleWindowProperty(store, window, 'update');
@@ -352,7 +348,32 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
 function bumpWindowIds(bumpWindowIdsBy: number) {
   saveAppState(true, bumpWindowIdsBy).then((state) => {
     if (state) {
-      store.dispatch('setAppState', JSON.parse(state));
+      const data = JSON.parse(state);
+      if (data) {
+        let tmpWindow: Electron.BrowserWindow;
+        (data as any).windows.forEach((window) => {
+          tmpWindow = (BrowserWindow as any).createWindow({
+            width: window.width,
+            height: window.height,
+            x: window.left,
+            y: window.top,
+          });
+          if (window.focused) {
+            tmpWindow.focus();
+          }
+          if (window.windowState === 'minimized') {
+            tmpWindow.minimize();
+          } else if (window.windowState === 'maximized') {
+            tmpWindow.maximize();
+          } else if (window.windowState === 'fullscreen') {
+            tmpWindow.setFullScreen(true);
+          }
+        });
+        (data as any).windows = [];
+        store.dispatch('setAppState', data);
+      } else {
+        (BrowserWindow as any).createWindow();
+      }
     }
   });
 }
@@ -372,7 +393,6 @@ function saveWindowState(windowId: number): Promise<any> {
 export default {
   getStore: () => store,
   register,
-  dispatch,
   windowStateSave,
   saveAppState,
   bumpWindowIds,
