@@ -41,7 +41,7 @@ declare module 'lulumi' {
       webContentsId: number;
     }
     export interface GlobalObject extends NodeJS.Global {
-      online: boolean;
+      isOnline: boolean;
       __static: string;
       renderProcessPreferences: any[];
       backgroundPages: BackgroundPages;

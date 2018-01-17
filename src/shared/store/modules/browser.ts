@@ -283,23 +283,23 @@ const mutations = {
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex] && url) {
-      state.tabs[tabsIndex].url = url;
-      if (url.match(regexp)) {
-        if (url.match(regexp)![1] === undefined) {
-          state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
+      if (state.tabs[tabsIndex].title !== 'error') {
+        state.tabs[tabsIndex].url = url;
+        if (url.match(regexp)) {
+          if (url.match(regexp)![1] === undefined) {
+            state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
+          } else {
+            state.tabs[tabsIndex].statusText = false;
+            state.tabs[tabsIndex].canGoBack = payload.canGoBack;
+            state.tabs[tabsIndex].canGoForward = payload.canGoForward;
+            state.tabs[tabsIndex].isLoading = false;
+          }
+          state.tabs[tabsIndex].favIconUrl = config.tabConfig.lulumiFavicon;
         } else {
-          state.tabs[tabsIndex].statusText = false;
-          state.tabs[tabsIndex].canGoBack = payload.canGoBack;
-          state.tabs[tabsIndex].canGoForward = payload.canGoForward;
-          state.tabs[tabsIndex].isLoading = false;
-        }
-        state.tabs[tabsIndex].favIconUrl = config.tabConfig.lulumiFavicon;
-      } else {
-        if (state.tabs[tabsIndex].title === '') {
-          state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
-        }
-        // history
-        if (state.tabs[tabsIndex].title !== 'error') {
+          if (state.tabs[tabsIndex].title === '') {
+            state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
+          }
+          // history
           if (state.history.length !== 0) {
             if (state.history[state.history.length - 1].url
               !== state.tabs[tabsIndex].url) {
