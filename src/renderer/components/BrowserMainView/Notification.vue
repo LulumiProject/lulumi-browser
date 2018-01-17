@@ -2,7 +2,7 @@
   el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
     el-col(:span="14") {{ `${template}` }}
     el-col(:span="10")
-      el-checkbox(v-model="permanent", style="padding-right: 10px;") {{ $t('notification.permission.request.permanent') }}
+      el-checkbox(v-show="visible", v-model="permanent", style="padding-right: 10px;") {{ $t('notification.permission.request.permanent') }}
       el-button(:plain="true", type="success", size="small", @click="onAllow") {{ $t('notification.permission.request.allow') }}
       el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
 </template>
@@ -32,6 +32,7 @@
   export default class Notification extends Vue {
     windowWebContentsId: number;
 
+    visible: boolean = true;
     permanent: boolean = false;
     type: string = '';
     template: VueI18n.LocaleMessage = '';
@@ -125,6 +126,7 @@
             this.permission = data.permission;
             if (this.hostname !== null) {
               if (this.permission === 'setLanguage') {
+                this.visible = false;
                 this.hostname = urlUtil.getUrlIfAbout(webContents.getURL()).url;
                 this.type = 'permission';
                 this.template = this.$t('notification.permission.request.setLanguage', { hostname: this.hostname, lang: data.label });
@@ -138,6 +140,7 @@
                   (this.$parent as Tab).showNotification = false;
                 }, 10000);
               } else {
+                this.visible = true;
                 if (this.permissions[`${this.hostname}`]
                   && this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
                   ipc.send(`response-permission-${this.id}`, {
