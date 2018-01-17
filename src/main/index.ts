@@ -38,17 +38,17 @@ let shuttingDown: boolean = (process.env.NODE_ENV === 'testing' || process.env.T
 
 let storagePath: string;
 if (process.env.NODE_ENV === 'development') {
-  storagePath = path.join(config.devUserData, 'lulumi-app-state');
+  storagePath = path.join(config.devUserData, 'app-state');
 } else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  storagePath = path.join(config.testUserData, 'lulumi-app-state');
+  storagePath = path.join(config.testUserData, 'app-state');
 } else {
   storagePath = path.join(app.getPath('userData'), 'app-state');
 }
 let langPath: string;
 if (process.env.NODE_ENV === 'development') {
-  langPath = path.join(config.devUserData, 'lulumi-lang');
+  langPath = path.join(config.devUserData, 'lang');
 } else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  langPath = path.join(config.testUserData, 'lulumi-lang');
+  langPath = path.join(config.testUserData, 'lang');
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
@@ -291,7 +291,7 @@ ipcMain.on('get-window-properties', (event: Electron.Event) => {
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
   const windowProperties
-    = collection.filter(v => (v.match(/lulumi-app-state-window-\d+/) !== null));
+    = collection.filter(v => (v.match(/app-state-window-\d+/) !== null));
   if (windowProperties.isNotEmpty()) {
     const windowPropertyFilenames = windowProperties.sort((a, b) => {
       return ((b.split('-') as any).pop() - (a.split('-') as any).pop());

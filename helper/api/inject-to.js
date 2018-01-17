@@ -128,7 +128,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
 
   if (LocalStorage) {
     storagePath = process.env.NODE_ENV === 'development'
-      ? path.join(path.resolve('./userData'), 'lulumi-local-storage')
+      ? path.join(path.resolve('./userData'), 'local-storage')
       : path.join(remote.app.getPath('userData'), 'local-storage');
 
     localStorage = new LocalStorage(storagePath);
