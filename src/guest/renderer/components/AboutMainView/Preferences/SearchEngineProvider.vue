@@ -89,8 +89,12 @@
   };
 </script>
 
-<style>
-  .el-table__body tr.current-row > td {
-    background-color: #f0f9eb;
+<style lang="less">
+  .el-table__body {
+    cursor: pointer;
+
+    tr.current-row > td {
+      background-color: #f0f9eb;
+    }
   }
 </style>

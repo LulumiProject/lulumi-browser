@@ -22,8 +22,6 @@
 
   import { Button, Col, Input, Row, Switch, Tree } from 'element-ui';
 
-  import '../../css/el-tree';
-
   interface HistoryItem {
     id: number;
     title: string;
@@ -156,34 +154,47 @@
   };
 </script>
 
-<style>
+<style lang="less">
+  .el-tree-node.is-expanded {
+    .el-tree-node__children {
+      display: flex;
+      flex-direction: column;
+    }
+    .el-tree-node__content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
   .history-list__item {
     display: inline-flex;
     align-items: center;
     width: 100vw;
-  }
-  a.history-list__item-link {
-    flex: 5;
-    background-size: 0;
-    padding-right: 100px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  a.history-list__item-link:hover {
-    color: green;
-  }
-  .history-list__item-time {
-    width: 50px;
-    color: gray;
-    padding-right: 30px;
-  }
-  .history-list__item-name {
-    width: 400px;
-    color: #48576a;
-    padding: 0 4px;
-    transition: color .3s;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+
+    .history-list__item-time {
+      width: 50px;
+      color: gray;
+      padding-right: 30px;
+    }
+    .history-list__item-name {
+      width: 400px;
+      color: #48576a;
+      padding: 0 4px;
+      transition: color .3s;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    a.history-list__item-link {
+      flex: 5;
+      background-size: 0;
+      padding-right: 100px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      &:hover {
+        color: green;
+      }
+    }
   }
 </style>

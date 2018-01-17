@@ -727,20 +727,6 @@
         });
       }
     }
-    onSetSearchEngineProvider(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setCurrentSearchEngineProvider', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', {
-            searchEngine: this.$store.getters.searchEngine,
-            currentSearchEngine: this.$store.getters.currentSearchEngine,
-            autoFetch: this.$store.getters.autoFetch,
-          });
-        }, 0);
-      }
-    }
     onGetHomepage(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
         = (this as any).$electron.remote.webContents.fromId(webContentsId);
@@ -748,18 +734,6 @@
         webContents.send('guest-here-your-data', {
           homepage: this.$store.getters.homepage,
         });
-      }
-    }
-    onSetHomepage(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setHomepage', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', {
-            homepage: this.$store.getters.homepage,
-          });
-        }, 0);
       }
     }
     onGetPDFViewer(event: Electron.Event, webContentsId: number): void {
@@ -771,33 +745,11 @@
         });
       }
     }
-    onSetPDFViewer(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setPDFViewer', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', {
-            pdfViewer: this.$store.getters.pdfViewer,
-          });
-        }, 0);
-      }
-    }
     onGetTabConfig(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
         = (this as any).$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
-      }
-    }
-    onSetTabConfig(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setTabConfig', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
-        }, 0);
       }
     }
     onGetLang(event: Electron.Event, webContentsId: number): void {
@@ -816,31 +768,11 @@
         webContents.send('guest-here-your-data', this.$store.getters.downloads);
       }
     }
-    onSetDownloads(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setDownloads', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', this.$store.getters.downloads);
-        }, 0);
-      }
-    }
     onGetHistory(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
         = (this as any).$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.history);
-      }
-    }
-    onSetHistory(event: Electron.Event, data): void {
-      const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
-      if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        this.$store.dispatch('setHistory', data.val);
-        setTimeout(() => {
-          webContents.send('guest-here-your-data', this.$store.getters.history);
-        }, 0);
       }
     }
     // tabHandlers
@@ -1637,26 +1569,14 @@
       ipc.on('get-search-engine-provider', (event: Electron.Event, webContentsId: number) => {
         this.onGetSearchEngineProvider(event, webContentsId);
       });
-      ipc.on('set-search-engine-provider', (event, val) => {
-        this.onSetSearchEngineProvider(event, val);
-      });
       ipc.on('get-homepage', (event: Electron.Event, webContentsId: number) => {
         this.onGetHomepage(event, webContentsId);
-      });
-      ipc.on('set-homepage', (event, val) => {
-        this.onSetHomepage(event, val);
       });
       ipc.on('get-pdf-viewer', (event: Electron.Event, webContentsId: number) => {
         this.onGetPDFViewer(event, webContentsId);
       });
-      ipc.on('set-pdf-viewer', (event, val) => {
-        this.onSetPDFViewer(event, val);
-      });
       ipc.on('get-tab-config', (event: Electron.Event, webContentsId: number) => {
         this.onGetTabConfig(event, webContentsId);
-      });
-      ipc.on('set-tab-config', (event, val) => {
-        this.onSetTabConfig(event, val);
       });
       ipc.on('get-lang', (event: Electron.Event, webContentsId: number) => {
         this.onGetLang(event, webContentsId);
@@ -1664,14 +1584,8 @@
       ipc.on('get-downloads', (event: Electron.Event, webContentsId: number) => {
         this.onGetDownloads(event, webContentsId);
       });
-      ipc.on('set-downloads', (event, val) => {
-        this.onSetDownloads(event, val);
-      });
       ipc.on('get-history', (event: Electron.Event, webContentsId: number) => {
         this.onGetHistory(event, webContentsId);
-      });
-      ipc.on('set-history', (event, val) => {
-        this.onSetHistory(event, val);
       });
 
       ipc.on('remove-non-bg-lulumi-extension', (event: Electron.Event, extensionId: string) => {

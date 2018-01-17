@@ -16,9 +16,9 @@ import config from './js/constants/config';
 
 let langPath;
 if (process.env.NODE_ENV === 'development') {
-  langPath = path.join(config.devUserData, 'lulumi-lang');
+  langPath = path.join(config.devUserData, 'lang');
 } else if (process.env.NODE_ENV === 'testing') {
-  langPath = path.join(config.testUserData, 'lulumi-lang');
+  langPath = path.join(config.testUserData, 'lang');
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
@@ -27,7 +27,7 @@ let lang: string = '';
 try {
   lang = readFileSync(langPath, 'utf8');
 } catch (event) {
-  lang = '"en"';
+  lang = '"en-US"';
 }
 lang = JSON.parse(lang);
 

@@ -498,47 +498,35 @@ ipcMain.on('guest-want-data', (event: Electron.Event, type: string) => {
 });
 
 ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setCurrentSearchEngineProvider', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-search-engine-provider', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-search-engine-provider', event.sender.id);
   });
 });
 ipcMain.on('set-homepage', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setHomepage', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-homepage', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-homepage', event.sender.id);
   });
 });
 ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setPDFViewer', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-pdf-viewer', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-pdf-viewer', event.sender.id);
   });
 });
 ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setTabConfig', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-tab-config', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-tab-config', event.sender.id);
   });
 });
 ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
@@ -565,25 +553,19 @@ ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
   });
 });
 ipcMain.on('set-downloads', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setDownloads', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-downloads', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-downloads', event.sender.id);
   });
 });
 ipcMain.on('set-history', (event: Electron.Event, val) => {
-  const webContentsId: number = event.sender.id;
+  store.dispatch('setHistory', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send('set-history', {
-      val,
-      webContentsId,
-    });
+    window.webContents.send('get-history', event.sender.id);
   });
 });
 

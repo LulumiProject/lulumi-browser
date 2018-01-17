@@ -27,8 +27,6 @@
 
   import { Button, Col, Row } from 'element-ui';
 
-  import '../../css/el-button';
-
   interface RenderProcessPreference {
     name: string;
     extensionId: string;
@@ -107,54 +105,61 @@
   };
 </script>
 
-<style>
+<style lang="less">
   .extensions-list {
     margin-top: 10px;
     padding: 0;
     list-style: none;
-  }
-  .extensions-list__item {
-    overflow: hidden;
-    background-color: #fff;
-    border: 1px solid #c0ccda;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 10px 2px;
-    padding: 5px 10px;
-    width: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-  }
-  .extensions-list__item-path {
-    font-size: 14px;
-    color: gray;
-  }
-  a.extensions-list__item-link {
-    font-size: 20px;
-    bottom: 10px;
-    cursor: pointer;
-    text-decoration: none;
-    background-image: none;
-  }
-  a.extensions-list__item-link:hover {
-    color: green;
-  }
-  .extensions-list__item-name {
-    color: #48576a;
-    transition: color .3s;
-    flex: 5;
-  }
-  .extensions-list__item-name > i {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    height: 20px;
-    width: 400px;
-  }
-  .extensions-list__item-progress {
-    right: 0;
-    flex: 1;
+
+    .extensions-list__item {
+      overflow: hidden;
+      background-color: #fff;
+      border: 1px solid #c0ccda;
+      border-radius: 6px;
+      box-sizing: border-box;
+      margin: 10px 2px;
+      padding: 5px 10px;
+      width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+
+      .el-button--mini {
+        padding: 4px 4px;
+      }
+      .extensions-list__item-name {
+        color: #48576a;
+        transition: color .3s;
+        flex: 5;
+
+        i {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          height: 20px;
+          width: 400px;
+        }
+      }
+      a.extensions-list__item-link {
+        font-size: 20px;
+        bottom: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        background-image: none;
+
+        &:hover {
+          color: green;
+        }
+      }
+      .extensions-list__item-path {
+        font-size: 14px;
+        color: gray;
+      }
+      .extensions-list__item-progress {
+        right: 0;
+        flex: 1;
+      }
+    }
   }
 </style>

@@ -110,7 +110,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .download-list {
     margin-top: 10px;
     padding: 0;
