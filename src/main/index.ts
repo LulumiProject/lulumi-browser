@@ -652,12 +652,15 @@ ipcMain.on('fetch-search-suggestions',
 // reload each BrowserView when we plug in our cable
 globalObjet.isOnline = true;
 ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
-  if (status && !globalObjet.isOnline) {
-    Object.keys(windows).forEach((key) => {
-      const id = parseInt(key, 10);
-      const window = windows[id];
-      window.webContents.send('reload');
-    });
+  if (status) {
+    if (!globalObjet.isOnline) {
+      Object.keys(windows).forEach((key) => {
+        const id = parseInt(key, 10);
+        const window = windows[id];
+        window.webContents.send('reload');
+      });
+      globalObjet.isOnline = true;
+    }
   } else {
     globalObjet.isOnline = false;
   }
