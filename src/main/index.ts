@@ -11,6 +11,7 @@ import {
   systemPreferences,
 } from 'electron';
 import collect from 'collect.js';
+import unhandled from 'electron-unhandled';
 import { is } from 'electron-util';
 
 import autoUpdater from './js/lib/auto-updater';
@@ -189,6 +190,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
 app.on('ready', () => {
+  unhandled();
   // autoUpdater
   if (process.env.NODE_ENV !== 'development') {
     autoUpdater.init();
