@@ -26,8 +26,6 @@
 
   import { Input } from 'element-ui';
 
-  import { store } from 'lulumi';
-
   declare const ipcRenderer: Electron.IpcRenderer;
 
   @Component({
@@ -47,7 +45,7 @@
     }
 
     mounted() {
-      ipcRenderer.on('guest-here-your-data', (event: Electron.Event, tabConfig: store.TabConfig) => {
+      ipcRenderer.on('guest-here-your-data', (event: Electron.Event, tabConfig: Lulumi.Store.TabConfig) => {
         this.defaultUrl = tabConfig.dummyTabObject.url;
         this.defaultFavicon = tabConfig.defaultFavicon;
       });

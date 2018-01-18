@@ -34,8 +34,6 @@
 
   import BrowserMainView from '../BrowserMainView.vue';
 
-  import { store } from 'lulumi';
-
   @Component({
     components: {
       'el-button-group': ButtonGroup,
@@ -63,14 +61,14 @@
     prettyReceivedSize(size: number): string {
       return prettySize.process(size);
     }
-    percentage(file: store.DownloadItem): number {
+    percentage(file: Lulumi.Store.DownloadItem): number {
       return (file.getReceivedBytes / file.totalBytes) * 100 || 0;
     }
     showItemInFolder(savePath: string): void {
-      (this as any).$electron.ipcRenderer.send('show-item-in-folder', savePath);
+      this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
     }
     openItem(savePath: string): void {
-      (this as any).$electron.ipcRenderer.send('open-item', savePath);
+      this.$electron.ipcRenderer.send('open-item', savePath);
     }
     checkStateForButtonGroup(state: string): boolean {
       switch (state) {
@@ -96,13 +94,13 @@
       }
     }
     pauseDownload(startTime: number): void {
-      (this as any).$electron.ipcRenderer.send('pause-downloads-progress', startTime);
+      this.$electron.ipcRenderer.send('pause-downloads-progress', startTime);
     }
     resumeDownload(startTime: number): void {
-      (this as any).$electron.ipcRenderer.send('resume-downloads-progress', startTime);
+      this.$electron.ipcRenderer.send('resume-downloads-progress', startTime);
     }
     cancelDownload(startTime: number): void {
-      (this as any).$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
+      this.$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
     }
     closeDownloadBar(): void {
       if ((this.$parent as BrowserMainView).onCloseDownloadBar) {

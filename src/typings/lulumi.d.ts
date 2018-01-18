@@ -1,13 +1,7 @@
-// *.vue
-declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
-}
-
-declare module 'lulumi' {
+declare namespace Lulumi {
   import VueI18n from 'vue-i18n';
 
-  export namespace scheme {
+  export namespace Scheme {
     // lulumi:// scheme
     export interface LulumiObject extends Object {
       lulumi: object[];
@@ -16,7 +10,7 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace api {
+  export namespace API {
     // extension api
     export interface BackgroundPageObject {
       html: Buffer;
@@ -28,8 +22,6 @@ declare module 'lulumi' {
     }
     export interface ManifestObject extends chrome.runtime.Manifest {
       extensionId: string;
-      manifest_version?: string;
-      version?: string;
     }
     export interface ManifestMap {
       [index: string]: ManifestObject | undefined;
@@ -47,11 +39,11 @@ declare module 'lulumi' {
       backgroundPages: BackgroundPages;
       manifestMap: ManifestMap;
       manifestNameMap: ManifestNameMap;
-      guestData: LulumiObject;
+      guestData: Scheme.LulumiObject;
     }
   }
 
-  export namespace store {
+  export namespace Store {
     // store
     export interface TabObject {
       webContentsId: number; // Id of the corresponding webContents
@@ -152,12 +144,12 @@ declare module 'lulumi' {
       windows: LulumiBrowserWindowProperty[];
     }
     export interface TabsOrdering {
-      tabObjects: store.TabObject[];
+      tabObjects: Store.TabObject[];
       currentTabIndexes: number[];
     }
   }
 
-  export namespace main {
+  export namespace Main {
     // src/main/index.js
     export interface BrowserWindowSuggestionItem {
       url: string;
@@ -165,7 +157,7 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace renderer {
+  export namespace Renderer {
     // src/renderer/js
     export interface SuggestionItem {
       title?: string;
@@ -187,7 +179,7 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace browserMainView {
+  export namespace BrowserMainView {
     // BrowserMainView.vue
     export interface Alarm {
       handler: any;
@@ -198,7 +190,7 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace tab {
+  export namespace Tab {
     // Tab.vue
     export interface FindInPageObject {
       container?: HTMLDivElement;
@@ -213,7 +205,7 @@ declare module 'lulumi' {
     }
   }
 
-  export namespace navbar {
+  export namespace Navbar {
     // Navbar.vue
     export interface BadgeTextArray {
       [index: string]: string[] | undefined;

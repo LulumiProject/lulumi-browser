@@ -10,8 +10,6 @@ import { writeFile } from 'fs';
 import promisify from '../../main/js/lib/promisify';
 import urlResource from '../../renderer/js/lib/url-resource';
 
-import { store } from 'lulumi';
-
 Vue.use(Vuex);
 
 /* tslint:disable:max-line-length */
@@ -193,7 +191,7 @@ const windowStateSave = (): void => {
   });
 };
 
-const tabsMapping = (tabs: store.TabObject[], tabsOrder: number[]): number[] => {
+const tabsMapping = (tabs: Lulumi.Store.TabObject[], tabsOrder: number[]): number[] => {
   const newOrder: number[] = [];
   for (let index = 0; index < tabs.length; index += 1) {
     if (tabsOrder) {
@@ -207,18 +205,18 @@ const tabsMapping = (tabs: store.TabObject[], tabsOrder: number[]): number[] => 
   return newOrder;
 };
 
-function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: number = -1): store.TabsOrdering {
+function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: number = -1): Lulumi.Store.TabsOrdering {
   let newTabId: number = newStart;
-  let newTabs: store.TabObject[] = [];
+  let newTabs: Lulumi.Store.TabObject[] = [];
   const newCurrentTabIndexes: number[] = [];
   let windowId: number = bumpWindowIdsBy === 0
     ? (1 + bumpWindowIdsBy)
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
   if (oneWindow !== -1) {
-    const tmpTabs: store.TabObject[] = [];
+    const tmpTabs: Lulumi.Store.TabObject[] = [];
     const id = oneWindow;
     const currentTabIndex: number = store.getters.currentTabIndexes[id];
-    const oldTabs: store.TabObject[]
+    const oldTabs: Lulumi.Store.TabObject[]
       = store.getters.tabs.filter(tab => tab.windowId === id);
     const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
     oldTabs.forEach((tab, index) => {
@@ -240,10 +238,10 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       : tabsOrder.indexOf(currentTabIndex);
   } else {
     Object.keys(windows).forEach((key) => {
-      const tmpTabs: store.TabObject[] = [];
+      const tmpTabs: Lulumi.Store.TabObject[] = [];
       const id = parseInt(key, 10);
       const currentTabIndex: number = store.getters.currentTabIndexes[id];
-      const oldTabs: store.TabObject[]
+      const oldTabs: Lulumi.Store.TabObject[]
         = store.getters.tabs.filter(tab => tab.windowId === id);
       const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
       oldTabs.forEach((tab, index) => {
@@ -272,27 +270,27 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
   };
 }
 
-function windowsOrdering(bumpWindowIdsBy: number, oneWindow: number = -1): store.LulumiBrowserWindowProperty[] {
-  const newWindows: store.LulumiBrowserWindowProperty[] = [];
+function windowsOrdering(bumpWindowIdsBy: number, oneWindow: number = -1): Lulumi.Store.LulumiBrowserWindowProperty[] {
+  const newWindows: Lulumi.Store.LulumiBrowserWindowProperty[] = [];
   let windowId: number = bumpWindowIdsBy === 0
     ? (1 + bumpWindowIdsBy)
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
   if (oneWindow !== -1) {
     const id = oneWindow;
-    const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
-    const value: store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
+    const oldWindows: Lulumi.Store.LulumiBrowserWindowProperty[] = store.getters.windows;
+    const value: Lulumi.Store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
     if (value !== undefined) {
-      const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, value);
+      const tmp: Lulumi.Store.LulumiBrowserWindowProperty = Object.assign({}, value);
       tmp.id = windowId;
       newWindows.push(tmp);
     }
   } else {
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
-      const oldWindows: store.LulumiBrowserWindowProperty[] = store.getters.windows;
-      const value: store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
+      const oldWindows: Lulumi.Store.LulumiBrowserWindowProperty[] = store.getters.windows;
+      const value: Lulumi.Store.LulumiBrowserWindowProperty | undefined = oldWindows.find(window => window.id === id);
       if (value !== undefined) {
-        const tmp: store.LulumiBrowserWindowProperty = Object.assign({}, value);
+        const tmp: Lulumi.Store.LulumiBrowserWindowProperty = Object.assign({}, value);
         tmp.id = windowId;
         newWindows.push(tmp);
         windowId += 1;
@@ -302,7 +300,7 @@ function windowsOrdering(bumpWindowIdsBy: number, oneWindow: number = -1): store
   return newWindows;
 }
 
-function collect(getters, newStart: number, newTabs: store.TabObject[], newCurrentTabIndexes: number[], newWindows: store.LulumiBrowserWindowProperty[], downloads) {
+function collect(getters, newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrentTabIndexes: number[], newWindows: Lulumi.Store.LulumiBrowserWindowProperty[], downloads) {
   return {
     pid: newStart + newTabs.length,
     tabs: newTabs,

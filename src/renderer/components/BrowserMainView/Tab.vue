@@ -25,8 +25,6 @@
 
   import Notification from './Notification.vue';
 
-  import { tab, store } from 'lulumi';
-
   const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
   @Component({
@@ -53,18 +51,18 @@
     tabIndex: number;
     tabId: number;
 
-    findinpage: tab.FindInPageObject;
+    findinpage: Lulumi.Tab.FindInPageObject;
 
-    get dummyTabObject(): store.TabObject {
+    get dummyTabObject(): Lulumi.Store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get tabs(): Array<store.TabObject> {
+    get tabs(): Array<Lulumi.Store.TabObject> {
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
-    get tab(): store.TabObject {
+    get tab(): Lulumi.Store.TabObject {
       if (this.tabs.length === 0) {
         return this.dummyTabObject;
       }

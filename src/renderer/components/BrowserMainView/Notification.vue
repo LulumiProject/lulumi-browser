@@ -51,7 +51,7 @@
       }
     }
     onAllow() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const ipc = this.$electron.ipcRenderer;
 
       if (this.type === 'permission') {
         ipc.send(`response-permission-${this.id}`, {
@@ -77,7 +77,7 @@
       }
     }
     onDeny() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const ipc = this.$electron.ipcRenderer;
 
       if (this.type === 'permission') {
         ipc.send(`response-permission-${this.id}`, {
@@ -104,7 +104,7 @@
     }
 
     mounted() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const ipc = this.$electron.ipcRenderer;
 
       // Every page would add a listenter to the request-permission and
       // update-available event, so ignore the listenters warning.
@@ -117,7 +117,7 @@
       });
       ipc.on('request-permission', (event, data) => {
         const webContents: Electron.webContents | null
-          = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+          = this.$electron.remote.webContents.fromId(data.webContentsId);
         if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
           if (((this.$parent as Tab).$refs.webview as Electron.WebviewTag).getWebContents().id === data.webContentsId) {
             const webview = this.$parent.$refs.webview as Electron.WebviewTag;
@@ -166,7 +166,7 @@
       });
     }
     beforeDestroy() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const ipc = this.$electron.ipcRenderer;
       ipc.removeAllListeners('update-available');
       ipc.removeAllListeners('request-permission');
 

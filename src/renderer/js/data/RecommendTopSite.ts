@@ -1,7 +1,5 @@
-import { renderer } from 'lulumi';
-
 // Top 500 alexa sites sorted by popularity
-const recommendTopSite: renderer.SuggestionItem[] = [
+const recommendTopSite: Lulumi.Renderer.SuggestionItem[] = [
   {
     title: 'Gmail',
     value: 'gmail.com',

@@ -9,21 +9,19 @@ import * as url from 'url';
 import config from '../main/js/constants/config';
 import './extensions/listeners';
 
-import { api } from 'lulumi';
-
 /* tslint:disable:no-console */
 /* tslint:disable:max-line-length */
 
-const globalObjet = global as api.GlobalObject;
+const globalObjet = global as Lulumi.API.GlobalObject;
 let loaded = false;
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
 globalObjet.renderProcessPreferences = [];
 // extensionId => manifest
-const manifestMap: api.ManifestMap = {};
+const manifestMap: Lulumi.API.ManifestMap = {};
 // name => manifest
-const manifestNameMap: api.ManifestNameMap = {};
+const manifestNameMap: Lulumi.API.ManifestNameMap = {};
 
 const generateExtensionIdFromName = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
 
@@ -33,9 +31,9 @@ const isWindowOrWebView = (webContents) => {
 };
 
 // Create or get manifest object from |srcDirectory|.
-const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
-  (srcDirectory: string): api.ManifestObject | null => {
-    let manifest: api.ManifestObject;
+const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject | null =
+  (srcDirectory: string): Lulumi.API.ManifestObject | null => {
+    let manifest: Lulumi.API.ManifestObject;
     let manifestContent: string;
 
     try {
@@ -97,9 +95,9 @@ const getManifestFromPath: (srcDirectory: string) => api.ManifestObject | null =
   };
 
 // manage the background pages
-const backgroundPages: api.BackgroundPages = {};
+const backgroundPages: Lulumi.API.BackgroundPages = {};
 
-const startBackgroundPages = (manifest: api.ManifestObject) => {
+const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
   if (backgroundPages[manifest.extensionId] || !manifest.background) {
     return;
   }

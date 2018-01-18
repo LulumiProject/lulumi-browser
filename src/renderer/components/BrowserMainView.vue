@@ -38,8 +38,6 @@
   import ExtensionService from '../../api/extension-service';
   import Event from '../../api/extensions/event';
 
-  import { browserMainView, main, store } from 'lulumi';
-
   @Component({
     name: 'browser-main',
     components: {
@@ -68,7 +66,7 @@
     onUpdatedEvent: Event = new Event();
     onCreatedEvent: Event = new Event();
     onRemovedEvent: Event = new Event();
-    alarms: browserMainView.AlarmArray = {};
+    alarms: Lulumi.BrowserMainView.AlarmArray = {};
     onActivatedEvent: Event = new Event();
     onAlarmEvent: Event = new Event();
     onBeforeNavigate: Event = new Event();
@@ -79,19 +77,19 @@
 
     worker = new Worker();
 
-    get dummyTabObject(): store.TabObject {
+    get dummyTabObject(): Lulumi.Store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
     }
-    get window(): store.LulumiBrowserWindowProperty {
+    get window(): Lulumi.Store.LulumiBrowserWindowProperty {
       return this.$store.getters.windows.find(window => window.id === this.windowId);
     }
     get currentTabIndex(): number | undefined {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get tabs(): Array<store.TabObject> {
+    get tabs(): Array<Lulumi.Store.TabObject> {
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
-    get tab(): store.TabObject {
+    get tab(): Lulumi.Store.TabObject {
       if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
         return this.dummyTabObject;
       }
@@ -106,14 +104,14 @@
     get pdfViewer(): string {
       return this.$store.getters.pdfViewer;
     }
-    get certificates(): store.Certificates {
+    get certificates(): Lulumi.Store.Certificates {
       return this.$store.getters.certificates;
     }
 
     @Watch('ready')
     onReady(ready: boolean): void {
       if (ready) {
-        (this as any).$electron.ipcRenderer.send('request-app-state');
+        this.$electron.ipcRenderer.send('request-app-state');
       }
     }
 
@@ -139,7 +137,7 @@
       }
       return this.$refs[`tab-${index}`][0];
     }
-    getTabObject(tabIndex?: number): store.TabObject {
+    getTabObject(tabIndex?: number): Lulumi.Store.TabObject {
       let index: number | undefined = tabIndex;
       if (index === undefined) {
         if (this.currentTabIndex === undefined) {
@@ -151,15 +149,15 @@
       return this.tabs[index];
     }
     async historyMappings() {
-      const history: store.TabHistory[] = this.$store.getters.history;
+      const history: Lulumi.Store.TabHistory[] = this.$store.getters.history;
       let out: any;
 
       out = await this.worker.historyMappings(history);
       return out;
     }
-    lastOpenedTabs(): store.LastOpenedTabObject[] {
-      const tabs: store.LastOpenedTabObject[] = this.$store.getters.lastOpenedTabs.slice(0, 8);
-      const lastOpenedTabs: store.LastOpenedTabObject[] = [];
+    lastOpenedTabs(): Lulumi.Store.LastOpenedTabObject[] {
+      const tabs: Lulumi.Store.LastOpenedTabObject[] = this.$store.getters.lastOpenedTabs.slice(0, 8);
+      const lastOpenedTabs: Lulumi.Store.LastOpenedTabObject[] = [];
       tabs.forEach((tab) => {
         switch (tab.title) {
           case 'about:about':
@@ -216,10 +214,10 @@
       return lastOpenedTabs;
     }
     // lulumi.alarms
-    getAlarm(name): browserMainView.Alarm | undefined {
+    getAlarm(name): Lulumi.BrowserMainView.Alarm | undefined {
       return this.alarms[name];
     }
-    getAllAlarm(): browserMainView.AlarmArray {
+    getAllAlarm(): Lulumi.BrowserMainView.AlarmArray {
       return this.alarms;
     }
     clearAlarm(name: string): boolean {
@@ -241,7 +239,7 @@
       return Object.keys(this.getAllAlarm()).every(name => (this.clearAlarm(name)));
     }
     createAlarm(name: string, alarmInfo): void {
-      let alarm: browserMainView.Alarm = {
+      let alarm: Lulumi.BrowserMainView.Alarm = {
         handler: () => {},
       };
       let timeout: number = 0;
@@ -315,7 +313,7 @@
     }
     onPageTitleSet(event: Electron.PageTitleUpdatedEvent, tabIndex: number, tabId: number): void {
       const webview = this.getWebView(tabIndex);
-      (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+      this.$electron.ipcRenderer.send('set-browser-window-title', {
         windowId: this.windowId,
         title: webview.getTitle(),
       });
@@ -413,7 +411,7 @@
       });
       const appPath = process.env.NODE_ENV === 'development'
         ? process.cwd()
-        : (this as any).$electron.remote.app.getAppPath();
+        : this.$electron.remote.app.getAppPath();
       let errorCode = event.errorCode;
       let errorPage = `file://${appPath}/helper/pages/error/index.html`;
 
@@ -488,7 +486,7 @@
         nav.style.display = 'none';
         this.getWebView().style.height = '100vh';
       }
-      (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(true);
+      this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(true);
     }
     onLeaveHtmlFullScreen(): void {
       const nav = this.$el.querySelector('#nav') as HTMLDivElement;
@@ -496,13 +494,13 @@
         nav.style.display = 'block';
         this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
       }
-      (this as any).$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
+      this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
     }
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       const disposition: string = event.disposition;
       if (disposition === 'new-window') {
         event.preventDefault();
-        (event as any).newGuest = (this as any).$electron.ipcRenderer.sendSync('new-lulumi-window', {
+        (event as any).newGuest = this.$electron.ipcRenderer.sendSync('new-lulumi-window', {
           url: event.url,
           follow: true,
         });
@@ -572,7 +570,7 @@
     }
     onOpenPDF(event: Electron.Event, data): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+        = this.$electron.remote.webContents.fromId(data.webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         if (this.pdfViewer === 'pdf-viewer') {
           const parsedURL = urlPackage.parse(data.url, true);
@@ -584,7 +582,7 @@
     }
     onWillDownloadAnyFile(event: Electron.Event, data): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(data.webContentsId);
+        = this.$electron.remote.webContents.fromId(data.webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         this.showDownloadBar = true;
         this.$store.dispatch('createDownloadTask', {
@@ -718,7 +716,7 @@
     }
     onGetSearchEngineProvider(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           searchEngine: this.$store.getters.searchEngine,
@@ -729,7 +727,7 @@
     }
     onGetHomepage(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           homepage: this.$store.getters.homepage,
@@ -738,7 +736,7 @@
     }
     onGetPDFViewer(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           pdfViewer: this.$store.getters.pdfViewer,
@@ -747,14 +745,14 @@
     }
     onGetTabConfig(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.tabConfig);
       }
     }
     onGetLang(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', {
           lang: this.$store.getters.lang,
@@ -763,14 +761,14 @@
     }
     onGetDownloads(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.downloads);
       }
     }
     onGetHistory(event: Electron.Event, webContentsId: number): void {
       const webContents: Electron.webContents | null
-        = (this as any).$electron.remote.webContents.fromId(webContentsId);
+        = this.$electron.remote.webContents.fromId(webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         webContents.send('guest-here-your-data', this.$store.getters.history);
       }
@@ -812,7 +810,7 @@
       if (tabIndex === -1) {
         tabIndex = this.tabs.length - 1;
       }
-      const TabObject: store.TabObject = this.getTabObject(tabIndex);
+      const TabObject: Lulumi.Store.TabObject = this.getTabObject(tabIndex);
       if (TabObject) {
         const tabId: number = TabObject.id;
         const tabTitle: string | null = TabObject.title;
@@ -822,7 +820,7 @@
           tabIndex,
         });
         if (tabTitle) {
-          (this as any).$electron.ipcRenderer.send('set-browser-window-title', {
+          this.$electron.ipcRenderer.send('set-browser-window-title', {
             windowId: this.windowId,
             title: tabTitle,
           });
@@ -833,7 +831,7 @@
       if (tabIndex === -1) {
         tabIndex = this.tabs.length - 1;
       }
-      const TabObject: store.TabObject = this.getTabObject(tabIndex);
+      const TabObject: Lulumi.Store.TabObject = this.getTabObject(tabIndex);
       if (TabObject) {
         const tabId: number = TabObject.id;
         this.onRemovedEvent.emit(TabObject);
@@ -926,536 +924,556 @@
     }
     // onTabContextMenu
     onTabContextMenu(event: Electron.Event, tabIndex: number): void {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
 
-      menu.append(new MenuItem({
-        label: this.$t('tabs.contextMenu.newTab'),
-        accelerator: 'CmdOrCtrl+T',
-        click: () => this.onNewTab(this.windowId, 'about:newtab', false),
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('tabs.contextMenu.duplicateTab'),
-        click: () => {
-          this.onTabDuplicate(tabIndex);
-        },
-      }));
-      menu.append(new MenuItem({ type: 'separator' }));
-      menu.append(new MenuItem({
-        label: this.$t('tabs.contextMenu.closeTab'),
-        accelerator: 'CmdOrCtrl+W',
-        click: () => {
-          this.onTabClose(tabIndex);
-        },
-      }));
+        menu.append(new MenuItem({
+          label: this.$t('tabs.contextMenu.newTab') as string,
+          accelerator: 'CmdOrCtrl+T',
+          click: () => this.onNewTab(this.windowId, 'about:newtab', false),
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('tabs.contextMenu.duplicateTab') as string,
+          click: () => {
+            this.onTabDuplicate(tabIndex);
+          },
+        }));
+        menu.append(new MenuItem({ type: 'separator' }));
+        menu.append(new MenuItem({
+          label: this.$t('tabs.contextMenu.closeTab') as string,
+          accelerator: 'CmdOrCtrl+W',
+          click: () => {
+            this.onTabClose(tabIndex);
+          },
+        }));
 
-      menu.popup(currentWindow, { async: true });
+        menu.popup(currentWindow, { async: true });
+      }
     }
     // onClickBackContextMenu
     async onClickBackContextMenu(): Promise<void> {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
-      const webview = this.getWebView();
-      const webContents: any = webview.getWebContents();
-      const navbar = document.getElementById('browser-navbar');
-      const goBack = document.getElementById('browser-navbar__goBack');
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const webview = this.getWebView();
+        const webContents: any = webview.getWebContents();
+        const navbar = document.getElementById('browser-navbar');
+        const goBack = document.getElementById('browser-navbar__goBack');
 
-      const current = webContents.getActiveIndex();
-      const urls = webContents.history;
+        const current = webContents.getActiveIndex();
+        const urls = webContents.history;
 
-      const history = await this.historyMappings();
+        const history = await this.historyMappings();
 
-      if (goBack !== null && navbar !== null) {
-        if (current <= urls.length - 1 && current !== 0) {
-          for (let i = current - 1; i >= 0; i--) {
-            try {
-              menu.append(new MenuItem({
-                label: history[urls[i]].title,
-                click: () => webview.goToIndex(i),
-              }));
-            } catch (e) {
-              menu.append(new MenuItem({
-                label: urls[i],
-                click: () => webview.goToIndex(i),
-              }));
+        if (goBack !== null && navbar !== null) {
+          if (current <= urls.length - 1 && current !== 0) {
+            for (let i = current - 1; i >= 0; i--) {
+              try {
+                menu.append(new MenuItem({
+                  label: history[urls[i]].title,
+                  click: () => webview.goToIndex(i),
+                }));
+              } catch (e) {
+                menu.append(new MenuItem({
+                  label: urls[i],
+                  click: () => webview.goToIndex(i),
+                }));
+              }
             }
+
+            menu.append(new MenuItem({ type: 'separator' }));
+            menu.append(new MenuItem({
+              label: this.$t('navbar.navigator.history') as string,
+              click: () => this.onNewTab(this.windowId, 'about:history', false),
+            }));
+
+            menu.popup(currentWindow, {
+              async: true,
+              x: Math.floor(goBack.getBoundingClientRect().left),
+              y: Math.floor(navbar.getBoundingClientRect().bottom),
+            });
           }
-
-          menu.append(new MenuItem({ type: 'separator' }));
-          menu.append(new MenuItem({
-            label: this.$t('navbar.navigator.history'),
-            click: () => this.onNewTab(this.windowId, 'about:history', false),
-          }));
-
-          menu.popup(currentWindow, {
-            async: true,
-            x: Math.floor(goBack.getBoundingClientRect().left),
-            y: Math.floor(navbar.getBoundingClientRect().bottom),
-          });
         }
       }
     }
     // onClickForwardContextMenu
     async onClickForwardContextMenu(): Promise<void> {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
-      const webview = this.getWebView();
-      const webContents: any = webview.getWebContents();
-      const navbar = document.getElementById('browser-navbar');
-      const goForward = document.getElementById('browser-navbar__goForward');
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const webview = this.getWebView();
+        const webContents: any = webview.getWebContents();
+        const navbar = document.getElementById('browser-navbar');
+        const goForward = document.getElementById('browser-navbar__goForward');
 
-      const current = webContents.getActiveIndex();
-      const urls = webContents.history;
+        const current = webContents.getActiveIndex();
+        const urls = webContents.history;
 
-      const history = await this.historyMappings();
+        const history = await this.historyMappings();
 
-      if (goForward !== null && navbar !== null) {
-        if (current <= urls.length - 1 && current !== urls.length - 1) {
-          for (let i = current + 1; i < urls.length; i++) {
-            try {
-              menu.append(new MenuItem({
-                label: history[urls[i]].title,
-                click: () => webview.goToIndex(i),
-              }));
-            } catch (e) {
-              menu.append(new MenuItem({
-                label: urls[i],
-                click: () => webview.goToIndex(i),
-              }));
+        if (goForward !== null && navbar !== null) {
+          if (current <= urls.length - 1 && current !== urls.length - 1) {
+            for (let i = current + 1; i < urls.length; i++) {
+              try {
+                menu.append(new MenuItem({
+                  label: history[urls[i]].title,
+                  click: () => webview.goToIndex(i),
+                }));
+              } catch (e) {
+                menu.append(new MenuItem({
+                  label: urls[i],
+                  click: () => webview.goToIndex(i),
+                }));
+              }
             }
+
+            menu.append(new MenuItem({ type: 'separator' }));
+            menu.append(new MenuItem({
+              label: this.$t('navbar.navigator.history') as string,
+              click: () => this.onNewTab(this.windowId, 'about:history', false),
+            }));
+
+            menu.popup(currentWindow, {
+              async: true,
+              x: Math.floor(goForward.getBoundingClientRect().left),
+              y: Math.floor(navbar.getBoundingClientRect().bottom),
+            });
           }
-
-          menu.append(new MenuItem({ type: 'separator' }));
-          menu.append(new MenuItem({
-            label: this.$t('navbar.navigator.history'),
-            click: () => this.onNewTab(this.windowId, 'about:history', false),
-          }));
-
-          menu.popup(currentWindow, {
-            async: true,
-            x: Math.floor(goForward.getBoundingClientRect().left),
-            y: Math.floor(navbar.getBoundingClientRect().bottom),
-          });
         }
       }
     }
     // onNavContextMenu
     onNavContextMenu(event: Electron.Event): void {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
-      const el = event.target as HTMLInputElement;
-      const clipboard = (this as any).$electron.clipboard;
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const el = event.target as HTMLInputElement;
+        const clipboard = this.$electron.clipboard;
 
-      menu.append(new MenuItem({
-        label: this.$t('navbar.contextMenu.cut'),
-        accelerator: 'CmdOrCtrl+X',
-        role: 'cut',
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('navbar.contextMenu.copy'),
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy',
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('navbar.contextMenu.paste'),
-        accelerator: 'CmdOrCtrl+V',
-        role: 'paste',
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('navbar.contextMenu.pasteAndGo'),
-        click: () => {
-          let url = el.value.slice(0, el.selectionStart);
-          url += clipboard.readText();
-          url += el.value.slice(el.selectionEnd);
-          this.onEnterUrl(url);
-        },
-      }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.contextMenu.cut') as string,
+          accelerator: 'CmdOrCtrl+X',
+          role: 'cut',
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.contextMenu.copy') as string,
+          accelerator: 'CmdOrCtrl+C',
+          role: 'copy',
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.contextMenu.paste') as string,
+          accelerator: 'CmdOrCtrl+V',
+          role: 'paste',
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('navbar.contextMenu.pasteAndGo') as string,
+          click: () => {
+            let url = el.value.slice(0, el.selectionStart);
+            url += clipboard.readText();
+            url += el.value.slice(el.selectionEnd);
+            this.onEnterUrl(url);
+          },
+        }));
 
-      menu.popup(currentWindow, { async: true });
+        menu.popup(currentWindow, { async: true });
+      }
     }
     // onCommonMenu
     onCommonMenu(): void {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
-      const navbar = document.getElementById('browser-navbar');
-      const common = document.getElementById('browser-navbar__common');
-      let sub: Electron.MenuItem[] = [
-        new MenuItem({
-          label: this.$t('navbar.common.options.lulumi'),
-          click: () => this.onNewTab(this.windowId, 'about:lulumi', false),
-        }),
-      ];
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const navbar = document.getElementById('browser-navbar');
+        const common = document.getElementById('browser-navbar__common');
+        let sub: Electron.MenuItemConstructorOptions[] = [
+          {
+            label: this.$t('navbar.common.options.lulumi') as string,
+            click: () => this.onNewTab(this.windowId, 'about:lulumi', false),
+          },
+        ];
 
-      if (navbar !== null && common !== null) {
-        if (is.windows) {
+        if (navbar !== null && common !== null) {
+          if (is.windows) {
+            menu.append(new MenuItem({
+              label: this.$t('file.newTab') as string,
+              accelerator: 'CmdOrCtrl+T',
+              click: () => this.onNewTab(this.windowId, 'about:newtab', false),
+            }));
+            menu.append(new MenuItem({
+              label: this.$t('file.newWindow') as string,
+              accelerator: 'CmdOrCtrl+N',
+              click: () => this.$electron.remote.BrowserWindow.createWindow(),
+            }));
+            menu.append(new MenuItem({ type: 'separator' }));
+          }
+
+          const lastOpenedTabs: Electron.MenuItemConstructorOptions[] = [];
+          this.lastOpenedTabs().forEach((tab) => {
+            lastOpenedTabs.push(
+              {
+                label: tab.title,
+                click: () => this.onNewTab(this.windowId, tab.url, true),
+              },
+            );
+          });
+
+          const windowHistories: Electron.MenuItemConstructorOptions[] = [];
+          const data: any = this.$electron.ipcRenderer.sendSync('get-window-properties');
+          data.forEach((windowProperty) => {
+            windowHistories.push(
+              {
+                label: this.$t(
+                  'navbar.common.options.history.tabs',{ amount: windowProperty.amount }) as string,
+                click: () => this.$electron.ipcRenderer
+                  .send('restore-window-property', windowProperty),
+              }
+            );
+          });
+
           menu.append(new MenuItem({
-            label: this.$t('file.newTab'),
-            accelerator: 'CmdOrCtrl+T',
-            click: () => this.onNewTab(this.windowId, 'about:newtab', false),
+            label: this.$t('navbar.common.options.history.title') as string,
+            submenu: ([
+              {
+                label: this.$t('navbar.common.options.history.history') as string,
+                click: () => this.onNewTab(this.windowId, 'about:history', false),
+              },
+              { type: 'separator' },
+              {
+                label: this.$t('navbar.common.options.history.recentlyClosed') as string,
+                enabled: false,
+              },
+            ] as Array<Electron.MenuItemConstructorOptions>)
+              .concat(windowHistories.concat(lastOpenedTabs)),
           }));
           menu.append(new MenuItem({
-            label: this.$t('file.newWindow'),
-            accelerator: 'CmdOrCtrl+N',
-            click: () => (this as any).$electron.remote.BrowserWindow.createWindow(),
+            label: this.$t('navbar.common.options.downloads') as string,
+            click: () => this.onNewTab(this.windowId, 'about:downloads', false),
           }));
           menu.append(new MenuItem({ type: 'separator' }));
-        }
-
-        const lastOpenedTabs: store.LastOpenedTabObject[] = [];
-        this.lastOpenedTabs().forEach((tab) => {
-          lastOpenedTabs.push(new MenuItem({
-            label: tab.title,
-            click: () => this.onNewTab(this.windowId, tab.url, true),
+          menu.append(new MenuItem({
+            label: this.$t('navbar.common.options.extensions') as string,
+            click: () => this.onNewTab(this.windowId, 'about:extensions', false),
           }));
-        });
-
-        const windowHistories: any[] = [];
-        const data: any = (this as any).$electron.ipcRenderer.sendSync('get-window-properties');
-        data.forEach((windowProperty) => {
-          windowHistories.push(new MenuItem({
-            label: this.$t(
-              'navbar.common.options.history.tabs',{ amount: windowProperty.amount }),
-            click: () => (this as any).$electron.ipcRenderer
-              .send('restore-window-property', windowProperty),
+          menu.append(new MenuItem({ type: 'separator' }));
+          menu.append(new MenuItem({
+            label: this.$t('navbar.common.options.preferences') as string,
+            click: () => this.onNewTab(this.windowId, 'about:preferences', false),
           }));
-        });
+          if (is.windows) {
+            sub = sub.concat([
+              {
+                label: this.$t('help.reportIssue') as string,
+                click: () => this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser/issues', true),
+              },
+              {
+                label: this.$t('help.forceReload') as string,
+                click: () => currentWindow.webContents.reloadIgnoringCache(),
+              },
+              {
+                label: this.$t('help.toggleDevTools') as string,
+                click: () => currentWindow.webContents.toggleDevTools(),
+              },
+              { type: 'separator' },
+              {
+                label: this.$t('window.processManager') as string,
+                click: () => this.$electron.ipcRenderer.send('open-process-manager'),
+              },
+            ]);
+          }
+          menu.append(new MenuItem({
+            label: this.$t('navbar.common.options.help') as string,
+            submenu: sub,
+          }));
 
-        menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.history.title'),
-          submenu: [
-            new MenuItem({
-              label: this.$t('navbar.common.options.history.history'),
-              click: () => this.onNewTab(this.windowId, 'about:history', false),
-            }),
-            new MenuItem({ type: 'separator' }),
-            new MenuItem({ label: this.$t(
-              'navbar.common.options.history.recentlyClosed'), enabled: false }),
-          ].concat(windowHistories.concat(lastOpenedTabs)),
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.downloads'),
-          click: () => this.onNewTab(this.windowId, 'about:downloads', false),
-        }));
-        menu.append(new MenuItem({ type: 'separator' }));
-        menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.extensions'),
-          click: () => this.onNewTab(this.windowId, 'about:extensions', false),
-        }));
-        menu.append(new MenuItem({ type: 'separator' }));
-        menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.preferences'),
-          click: () => this.onNewTab(this.windowId, 'about:preferences', false),
-        }));
-        if (is.windows) {
-          sub = sub.concat([
-            new MenuItem({
-              label: this.$t('help.reportIssue'),
-              click: () => this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser/issues', true),
-            }),
-            new MenuItem({
-              label: this.$t('help.forceReload'),
-              click: () => currentWindow.webContents.reloadIgnoringCache(),
-            }),
-            new MenuItem({
-              label: this.$t('help.toggleDevTools'),
-              click: () => currentWindow.webContents.toggleDevTools(),
-            }),
-            new MenuItem({ type: 'separator' }),
-            new MenuItem({
-              label: this.$t('window.processManager'),
-              click: () => (this as any).$electron.ipcRenderer.send('open-process-manager'),
-            }),
-          ]);
+          menu.popup(currentWindow, {
+            async: true,
+            x: Math.floor(common.getBoundingClientRect().right),
+            y: Math.floor(navbar.getBoundingClientRect().bottom),
+          });
         }
-        menu.append(new MenuItem({
-          label: this.$t('navbar.common.options.help'),
-          submenu: sub,
-        }));
-
-        menu.popup(currentWindow, {
-          async: true,
-          x: Math.floor(common.getBoundingClientRect().right),
-          y: Math.floor(navbar.getBoundingClientRect().bottom),
-        });
       }
     }
     // onWebviewContextMenu
     onWebviewContextMenu(event: Electron.Event): void {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      const { Menu, MenuItem } = (this as any).$electron.remote;
-      const menu = new Menu();
-      const clipboard = (this as any).$electron.clipboard;
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        const { Menu, MenuItem } = this.$electron.remote;
+        const menu = new Menu();
+        const clipboard = this.$electron.clipboard;
 
-      const webview = this.getWebView();
-      const tab = this.getTabObject();
-      const params: Electron.ContextMenuParams = (event as any).params;
-      const editFlags = params.editFlags;
+        const webview = this.getWebView();
+        const tab = this.getTabObject();
+        const params: Electron.ContextMenuParams = (event as any).params;
+        const editFlags = params.editFlags;
 
-      const registerExtensionContextMenus = (menu) => {
-        const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
-        Object.keys(contextMenus).forEach((webContentsIdInString) => {
-          contextMenus[webContentsIdInString].forEach((menuItems) => {
-            menuItems.forEach((menuItem) => {
-              if (menuItem.type !== 'separator') {
-                menuItem.label = menuItem.label.replace('%s', params.selectionText);
-                menuItem.click = (menuItem, BrowserWindow) => {
-                  (this as any).$electron.remote.webContents.fromId(menuItem.webContentsId)
-                    .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}`,
-                      params,
-                      this.getTabObject(this.currentTabIndex).id,
-                      menuItem,
-                      BrowserWindow,
-                    );
-                };
-                const submenu = menuItem.submenu;
-                if (submenu) {
-                  submenu.forEach((sub) => {
-                    sub.label.replace('%s', params.selectionText);
-                    sub.click = (menuItem, BrowserWindow) => {
-                      (this as any).$electron.remote.webContents.fromId(sub.webContentsId)
-                        .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}`,
-                          params,
-                          this.getTabObject(this.currentTabIndex).id,
-                          menuItem,
-                          BrowserWindow,
-                        );
-                    };
-                  });
-                }
-              }
-            });
-            Menu.buildFromTemplate(menuItems).items
-              .forEach(menuItem => menu.append(menuItem));
-          });
-        });
-        if (Object.keys(contextMenus).length !== 0) {
-          menu.append(new MenuItem({ type: 'separator' }));
-        }
-      };
-
-      if (params.isEditable) {
-        if (editFlags.canUndo) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.undo'),
-            accelerator: 'CmdOrCtrl+Z',
-            role: 'undo',
-          }));
-        }
-
-        if (editFlags.canRedo) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.redo'),
-            accelerator: 'CmdOrCtrl+Shift+Z',
-            role: 'redo',
-          }));
-        }
-
-        menu.append(new MenuItem({ type: 'separator' }));
-
-        if (editFlags.canCut) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.cut'),
-            accelerator: 'CmdOrCtrl+X',
-            role: 'cut',
-          }));
-        }
-
-        if (editFlags.canCopy) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.copy'),
-            accelerator: 'CmdOrCtrl+C',
-            role: 'copy',
-          }));
-        }
-
-        if (editFlags.canPaste) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.paste'),
-            accelerator: 'CmdOrCtrl+V',
-            role: 'paste',
-          }));
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.pasteAndMatchStyle'),
-            accelerator: 'CmdOrCtrl+Shift+V',
-            role: 'pasteandmatchstyle',
-          }));
-        }
-
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.selectAll'),
-          accelerator: 'CmdOrCtrl+A',
-          role: 'selectall',
-        }));
-      } else if (params.linkURL) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.openLinkInNewTab'),
-          click: () => this.onNewTab(this.windowId, params.linkURL, false),
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.openLinkInNewWindow'),
-          click: () => {
-            const webContent = webview.getWebContents();
-            webContent.executeJavaScript(`window.open('${params.linkURL}')`);
-          }
-        }));
-
-        menu.append(new MenuItem({ type: 'separator' }));
-
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.copyLinkAddress'),
-          click: () => {
-            clipboard.writeText(params.linkURL);
-          },
-        }));
-      } else if (params.hasImageContents) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.openImageInNewTab'),
-          click: () => this.onNewTab(this.windowId, params.srcURL, false),
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.saveImageAs'),
-          click: () => {
-            const fs = require('fs');
-            const path = require('path');
-            const electron = (this as any).$electron;
-            urlUtil.getFilenameFromUrl(params.srcURL).then(
-              (filename) => {
-                const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
-                electron.remote.dialog.showSaveDialog(
-                  currentWindow, {
-                    defaultPath,
-                    filters: [
-                      {
-                        name: 'Images',
-                        extensions: ['jpg', 'jpeg', 'png', 'gif'],
-                      },
-                    ],
-                  }, async (filename) => {
-                    if (filename) {
-                      const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
-                      fs.writeFileSync(
-                        filename, electron.nativeImage.createFromDataURL(dataURL).toPNG());
-                    }
-                  },
-                );
-              },
-            );
-          },
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.copyImage'),
-          click: () => {
-            const electron = (this as any).$electron;
-            urlUtil.getFilenameFromUrl(params.srcURL).then(
-              async (filename) => {
-                  if (filename) {
-                    const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
-                    clipboard.writeImage(electron.nativeImage.createFromDataURL(dataURL));
+        const registerExtensionContextMenus = (menu) => {
+          const contextMenus = JSON.parse(JSON.stringify(this.contextMenus));
+          Object.keys(contextMenus).forEach((webContentsIdInString) => {
+            contextMenus[webContentsIdInString].forEach((menuItems) => {
+              menuItems.forEach((menuItem) => {
+                if (menuItem.type !== 'separator') {
+                  menuItem.label = menuItem.label.replace('%s', params.selectionText);
+                  menuItem.click = (menuItem, BrowserWindow) => {
+                    this.$electron.remote.webContents.fromId(menuItem.webContentsId)
+                      .send(`lulumi-context-menus-clicked-${menuItem.extensionId}-${menuItem.id}`,
+                        params,
+                        this.getTabObject(this.currentTabIndex).id,
+                        menuItem,
+                        BrowserWindow,
+                      );
+                  };
+                  const submenu = menuItem.submenu;
+                  if (submenu) {
+                    submenu.forEach((sub) => {
+                      sub.label.replace('%s', params.selectionText);
+                      sub.click = (menuItem, BrowserWindow) => {
+                        this.$electron.remote.webContents.fromId(sub.webContentsId)
+                          .send(`lulumi-context-menus-clicked-${sub.extensionId}-${sub.id}`,
+                            params,
+                            this.getTabObject(this.currentTabIndex).id,
+                            menuItem,
+                            BrowserWindow,
+                          );
+                      };
+                    });
                   }
-              },
-            );
-          },
-        }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.copyImageUrl'),
-          click: () => {
-            clipboard.writeText(params.srcURL);
-          },
-        }));
-      } else if (params.selectionText) {
-        if (is.macos) {
+                }
+              });
+              Menu.buildFromTemplate(menuItems).items
+                .forEach(menuItem => menu.append(menuItem));
+            });
+          });
+          if (Object.keys(contextMenus).length !== 0) {
+            menu.append(new MenuItem({ type: 'separator' }));
+          }
+        };
+
+        if (params.isEditable) {
+          if (editFlags.canUndo) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.undo') as string,
+              accelerator: 'CmdOrCtrl+Z',
+              role: 'undo',
+            }));
+          }
+
+          if (editFlags.canRedo) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.redo') as string,
+              accelerator: 'CmdOrCtrl+Shift+Z',
+              role: 'redo',
+            }));
+          }
+
+          menu.append(new MenuItem({ type: 'separator' }));
+
+          if (editFlags.canCut) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.cut') as string,
+              accelerator: 'CmdOrCtrl+X',
+              role: 'cut',
+            }));
+          }
+
+          if (editFlags.canCopy) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.copy') as string,
+              accelerator: 'CmdOrCtrl+C',
+              role: 'copy',
+            }));
+          }
+
+          if (editFlags.canPaste) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.paste') as string,
+              accelerator: 'CmdOrCtrl+V',
+              role: 'paste',
+            }));
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.pasteAndMatchStyle') as string,
+              accelerator: 'CmdOrCtrl+Shift+V',
+              role: 'pasteandmatchstyle',
+            }));
+          }
+
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.lookUp', { selectionText: params.selectionText }),
+            label: this.$t('webview.contextMenu.selectAll') as string,
+            accelerator: 'CmdOrCtrl+A',
+            role: 'selectall',
+          }));
+        } else if (params.linkURL) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.openLinkInNewTab') as string,
+            click: () => this.onNewTab(this.windowId, params.linkURL, false),
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.openLinkInNewWindow') as string,
             click: () => {
-              webview.showDefinitionForSelection();
+              const webContent = webview.getWebContents();
+              webContent.executeJavaScript(`window.open('${params.linkURL}')`);
+            }
+          }));
+
+          menu.append(new MenuItem({ type: 'separator' }));
+
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.copyLinkAddress') as string,
+            click: () => {
+              clipboard.writeText(params.linkURL);
             },
           }));
-
-          menu.append(new MenuItem({ type: 'separator' }));
-        }
-
-        if (editFlags.canCopy) {
+        } else if (params.hasImageContents) {
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.copy'),
-            accelerator: 'CmdOrCtrl+C',
-            role: 'copy',
+            label: this.$t('webview.contextMenu.openImageInNewTab') as string,
+            click: () => this.onNewTab(this.windowId, params.srcURL, false),
           }));
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.searchFor', {
-              selectionText: params.selectionText,
-              searchEngine: this.$store.getters.currentSearchEngine.name,
-            }),
-            click: () => this.onNewTab(this.windowId, params.selectionText, false),
+            label: this.$t('webview.contextMenu.saveImageAs') as string,
+            click: () => {
+              const fs = require('fs');
+              const path = require('path');
+              const electron = this.$electron;
+              urlUtil.getFilenameFromUrl(params.srcURL).then(
+                (filename) => {
+                  const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
+                  electron.remote.dialog.showSaveDialog(
+                    currentWindow, {
+                      defaultPath,
+                      filters: [
+                        {
+                          name: 'Images',
+                          extensions: ['jpg', 'jpeg', 'png', 'gif'],
+                        },
+                      ],
+                    }, async (filename) => {
+                      if (filename) {
+                        const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
+                        fs.writeFileSync(
+                          filename, electron.nativeImage.createFromDataURL(dataURL).toPNG());
+                      }
+                    },
+                  );
+                },
+              );
+            },
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.copyImage') as string,
+            click: () => {
+              const electron = this.$electron;
+              urlUtil.getFilenameFromUrl(params.srcURL).then(
+                async (filename) => {
+                    if (filename) {
+                      const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
+                      clipboard.writeImage(electron.nativeImage.createFromDataURL(dataURL));
+                    }
+                },
+              );
+            },
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.copyImageUrl') as string,
+            click: () => {
+              clipboard.writeText(params.srcURL);
+            },
+          }));
+        } else if (params.selectionText) {
+          if (is.macos) {
+            menu.append(new MenuItem({
+              label: this.$t(
+                'webview.contextMenu.lookUp', { selectionText: params.selectionText }) as string,
+              click: () => {
+                webview.showDefinitionForSelection();
+              },
+            }));
+
+            menu.append(new MenuItem({ type: 'separator' }));
+          }
+
+          if (editFlags.canCopy) {
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.copy') as string,
+              accelerator: 'CmdOrCtrl+C',
+              role: 'copy',
+            }));
+            menu.append(new MenuItem({
+              label: this.$t('webview.contextMenu.searchFor', {
+                selectionText: params.selectionText,
+                searchEngine: this.$store.getters.currentSearchEngine.name,
+              }) as string,
+              click: () => this.onNewTab(this.windowId, params.selectionText, false),
+            }));
+          }
+        } else {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.back') as string,
+            click: () => {
+              this.onClickBack();
+            },
+            enabled: tab.canGoBack,
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.forward') as string,
+            click: () => {
+              this.onClickForward();
+            },
+            enabled: tab.canGoForward,
+          }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.reload') as string,
+            accelerator: 'CmdOrCtrl+R',
+            click: () => {
+              this.onClickRefresh();
+            },
+            enabled: tab.canRefresh,
           }));
         }
-      } else {
+
+        menu.append(new MenuItem({ type: 'separator' }));
+
+        // lulumi.contextMenus
+        registerExtensionContextMenus(menu);
+
+        const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
+        if (sourceUrl !== null) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.viewSource') as string,
+            accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
+            click: this.onClickViewSource,
+          }));
+        }
         menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.back'),
-          click: () => {
-            this.onClickBack();
-          },
-          enabled: tab.canGoBack,
+          label: this.$t('webview.contextMenu.javascriptPanel') as string,
+          accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
+          click: this.onClickJavaScriptPanel,
         }));
         menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.forward'),
+          label: this.$t('webview.contextMenu.inspectElement') as string,
+          accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
           click: () => {
-            this.onClickForward();
+            webview.inspectElement(params.x, params.y);
           },
-          enabled: tab.canGoForward,
         }));
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.reload'),
-          accelerator: 'CmdOrCtrl+R',
-          click: () => {
-            this.onClickRefresh();
-          },
-          enabled: tab.canRefresh,
-        }));
+
+        menu.popup(currentWindow, { async: true });
       }
-
-      menu.append(new MenuItem({ type: 'separator' }));
-
-      // lulumi.contextMenus
-      registerExtensionContextMenus(menu);
-
-      const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
-      if (sourceUrl !== null) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.viewSource'),
-          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
-          click: this.onClickViewSource,
-        }));
-      }
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.javascriptPanel'),
-        accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
-        click: this.onClickJavaScriptPanel,
-      }));
-      menu.append(new MenuItem({
-        label: this.$t('webview.contextMenu.inspectElement'),
-        accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-        click: () => {
-          webview.inspectElement(params.x, params.y);
-        },
-      }));
-
-      menu.popup(currentWindow, { async: true });
     }
 
     beforeMount() {
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
-      const webFrame: Electron.WebFrame = (this as any).$electron.webFrame;
+      const ipc = this.$electron.ipcRenderer;
+      const webFrame = this.$electron.webFrame;
 
       ipc.once('window-close', () => {
         this.$store.dispatch('closeAllTab', this.windowId);
@@ -1470,7 +1488,7 @@
         this.windowWebContentsId = windowProperty.windowWebContentsId;
 
         ipc.once(`new-tab-suggestion-for-window-${this.windowId}`,
-          (event: Electron.Event, suggestion: main.BrowserWindowSuggestionItem | null) => {
+          (event: Electron.Event, suggestion: Lulumi.Main.BrowserWindowSuggestionItem | null) => {
           if (suggestion !== null && this.tabs.length === 0) {
             this.onNewTab(this.windowId, suggestion.url, suggestion.follow);
           }
@@ -1494,7 +1512,7 @@
       // removed unneeded tabs
       this.$store.dispatch('closeAllTab', 0);
 
-      const ipc: Electron.IpcRenderer = (this as any).$electron.ipcRenderer;
+      const ipc = this.$electron.ipcRenderer;
 
       ipc.on('go-back', () => {
         this.onClickBack();
@@ -1596,7 +1614,7 @@
         const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
         if (pendingDownloads.length !== 0) {
-          (this as any).$electron.remote.dialog.showMessageBox({
+          this.$electron.remote.dialog.showMessageBox({
             type: 'warning',
             title: 'Warning',
             message: 'You still have some files progressing.',
@@ -1604,7 +1622,7 @@
           }, (index) => {
             if (index === 0) {
               pendingDownloads.forEach((download) => {
-                (this as any).$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
+                this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
               });
               ipc.send('okay-to-quit', true);
             } else {

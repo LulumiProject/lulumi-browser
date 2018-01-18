@@ -50,8 +50,6 @@
   import { Button, Tooltip } from 'element-ui';
   import IViewIcon from 'iview/src/components/icon';
 
-  import { store } from 'lulumi';
-
   declare const __static: string;
 
   @Component({
@@ -91,13 +89,13 @@
     windowId: number;
     enableCustomButtons: boolean = !is.macos;
 
-    get window(): store.LulumiBrowserWindowProperty {
+    get window(): Lulumi.Store.LulumiBrowserWindowProperty {
       return this.$store.getters.windows.find(window => window.id === this.windowId);
     }
     get currentTabIndex(): number {
       return this.$store.getters.currentTabIndexes[this.windowId];
     }
-    get tabs(): Array<store.TabObject> {
+    get tabs(): Array<Lulumi.Store.TabObject> {
       return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
     }
 
@@ -110,30 +108,34 @@
       (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
     }
     onCustomButtonClick(event) {
-      const currentWindow: Electron.BrowserWindow
-        = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-      this.$nextTick(() => {
-        const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
-        const state: string = pattern.split('#').reverse()[0].split('-')[0];
-        if (state === 'minimize') {
-          currentWindow.minimize();
-        } else if (state === 'restore') {
-          currentWindow.unmaximize();
-        } else if (state === 'maximize') {
-          currentWindow.maximize();
-        } else if (state === 'close') {
-          currentWindow.close();
-        }
-      });
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      if (currentWindow) {
+        this.$nextTick(() => {
+          const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
+          const state: string = pattern.split('#').reverse()[0].split('-')[0];
+          if (state === 'minimize') {
+            currentWindow.minimize();
+          } else if (state === 'restore') {
+            currentWindow.unmaximize();
+          } else if (state === 'maximize') {
+            currentWindow.maximize();
+          } else if (state === 'close') {
+            currentWindow.close();
+          }
+        });
+      }
     }
     onDoubleClick(event: Electron.Event) {
       if (event.target) {
-        const currentWindow: Electron.BrowserWindow
-          = (this as any).$electron.remote.BrowserWindow.fromId(this.windowId);
-        if (currentWindow.isMaximized()) {
-          currentWindow.unmaximize();
-        } else {
-          currentWindow.maximize();
+        const currentWindow: Electron.BrowserWindow | null
+          = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+        if (currentWindow) {
+          if (currentWindow.isMaximized()) {
+            currentWindow.unmaximize();
+          } else {
+            currentWindow.maximize();
+          }
         }
       }
     }

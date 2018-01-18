@@ -1,4 +1,4 @@
-export function historyMappings(history: any): any {
+export function historyMappings(history: Lulumi.Store.TabHistory[]): any {
   const out: any = {};
   history.forEach((h) => {
     if (!out[h.url]) {

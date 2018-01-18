@@ -1,4 +1,4 @@
-declare module "workerize-loader!*" {
+declare module 'workerize-loader!*' {
   import { renderer, store } from 'lulumi';
   import VueI18n from 'vue-i18n';
 

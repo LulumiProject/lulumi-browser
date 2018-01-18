@@ -21,11 +21,9 @@ import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
 import request from './js/lib/request';
 
-import { api, scheme } from 'lulumi';
-
 const { openProcessManager } = require('electron-process-manager');
 
-const globalObjet = global as api.GlobalObject;
+const globalObjet = global as Lulumi.API.GlobalObject;
 
 /**
  * Set `__static` path to static files in production
@@ -394,7 +392,7 @@ ipcMain.on('open-item', (event, path) => {
 // load preference things into global when users accessing 'lulumi://' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type: string = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
-  const data: scheme.LulumiObject = {} as scheme.LulumiObject;
+  const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
   if (type === 'about') {
     const versions = process.versions;
 

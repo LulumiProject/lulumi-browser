@@ -30,7 +30,7 @@ const Newtab = () =>
 Vue.use(Router);
 
 // TODO: https://github.com/vuejs/vue-router/pull/1619
-export default new (Router as any)({
+export default new Router({
   routes: [
     {
       path: '/',

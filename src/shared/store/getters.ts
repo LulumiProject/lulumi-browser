@@ -1,14 +1,12 @@
-import { store } from 'lulumi';
-
-interface BrowserState extends store.State {
-  browser: store.State;
+interface BrowserState extends Lulumi.Store.State {
+  browser: Lulumi.Store.State;
 }
 
 export const getters = {
   pid(state: BrowserState): number {
     return state.browser.tabId;
   },
-  tabs(state: BrowserState): store.TabObject[] {
+  tabs(state: BrowserState): Lulumi.Store.TabObject[] {
     return state.browser.tabs;
   },
   tabsOrder(state: BrowserState) {

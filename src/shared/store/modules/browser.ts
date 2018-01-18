@@ -2,13 +2,12 @@ import Vue from 'vue';
 
 import * as types from '../mutation-types';
 import config from '../../../renderer/js/constants/config';
-import { store } from 'lulumi';
 import timeUtil from '../../../renderer/js/lib/time-util';
 import urlUtil from '../../../renderer/js/lib/url-util';
 
 /* tslint:disable:object-shorthand-properties-first */
 
-const state: store.State = {
+const state: Lulumi.Store.State = {
   tabId: 0,
   tabs: [],
   tabsOrder: [],
@@ -29,7 +28,7 @@ const state: store.State = {
 };
 
 // tslint:disable-next-line:max-line-length
-function createTabObject(state: store.State, wid: number, openUrl: string | null = null): store.TabObject {
+function createTabObject(state: Lulumi.Store.State, wid: number, openUrl: string | null = null): Lulumi.Store.TabObject {
   return {
     webContentsId: -1,
     id: 0,
@@ -59,11 +58,11 @@ function createTabObject(state: store.State, wid: number, openUrl: string | null
 /* tslint:disable:function-name */
 const mutations = {
   // global counter
-  [types.INCREMENT_TAB_ID](state: store.State) {
+  [types.INCREMENT_TAB_ID](state: Lulumi.Store.State) {
     state.tabId += 1;
   },
   // tab handler
-  [types.CREATE_TAB](state: store.State, payload) {
+  [types.CREATE_TAB](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const url: string = payload.url;
     const isURL: boolean = payload.isURL;
@@ -98,7 +97,7 @@ const mutations = {
       Vue.set(state.currentTabIndexes, windowId, last);
     }
   },
-  [types.CLOSE_TAB](state: store.State, payload) {
+  [types.CLOSE_TAB](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     const tabIndex: number = payload.tabIndex;
@@ -131,7 +130,7 @@ const mutations = {
         Vue.set(state.currentTabIndexes, windowId, 0);
       } else {
         // find the nearest adjacent tab to make active
-        const tabsMapping = (tabs: store.TabObject[], tabsOrder: number[]): number[] => {
+        const tabsMapping = (tabs: Lulumi.Store.TabObject[], tabsOrder: number[]): number[] => {
           const newOrder: number[] = [];
           for (let index = 0; index < tabs.length; index += 1) {
             if (tabsOrder) {
@@ -197,14 +196,14 @@ const mutations = {
       }
     }
   },
-  [types.CLOSE_ALL_TAB](state: store.State, { windowId }) {
+  [types.CLOSE_ALL_TAB](state: Lulumi.Store.State, { windowId }) {
     state.tabs.map((tab, index) => {
       if (tab.windowId === windowId) {
         Vue.delete(state.tabs, index);
       }
     });
   },
-  [types.CLICK_TAB](state: store.State, payload) {
+  [types.CLICK_TAB](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     const tabIndex: number = payload.tabIndex;
@@ -220,7 +219,7 @@ const mutations = {
     Vue.set(state.tabs[index], 'active', true);
   },
   // tab handlers
-  [types.DID_START_LOADING](state: store.State, payload) {
+  [types.DID_START_LOADING](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const webContentsId: number = payload.webContentsId;
     const tabId: number = payload.tabId;
@@ -237,7 +236,7 @@ const mutations = {
       state.tabs[tabsIndex].error = false;
     }
   },
-  [types.LOAD_COMMIT](state: store.State, payload) {
+  [types.LOAD_COMMIT](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -248,7 +247,7 @@ const mutations = {
       state.tabs[tabsIndex].hasMedia = false;
     }
   },
-  [types.PAGE_TITLE_SET](state: store.State, payload) {
+  [types.PAGE_TITLE_SET](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -260,7 +259,7 @@ const mutations = {
       state.tabs[tabsIndex].title = title;
     }
   },
-  [types.DOM_READY](state: store.State, payload) {
+  [types.DOM_READY](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -273,7 +272,7 @@ const mutations = {
       state.tabs[tabsIndex].canRefresh = true;
     }
   },
-  [types.DID_FRAME_FINISH_LOAD](state: store.State, payload) {
+  [types.DID_FRAME_FINISH_LOAD](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -328,7 +327,7 @@ const mutations = {
       state.tabs[tabsIndex].status = 'complete';
     }
   },
-  [types.PAGE_FAVICON_UPDATED](state: store.State, payload) {
+  [types.PAGE_FAVICON_UPDATED](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -340,7 +339,7 @@ const mutations = {
       state.tabs[tabsIndex].favIconUrl = url;
     }
   },
-  [types.DID_STOP_LOADING](state: store.State, payload) {
+  [types.DID_STOP_LOADING](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -369,7 +368,7 @@ const mutations = {
       state.tabs[tabsIndex].isLoading = false;
     }
   },
-  [types.DID_FAIL_LOAD](state: store.State, payload) {
+  [types.DID_FAIL_LOAD](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -382,7 +381,7 @@ const mutations = {
       state.tabs[tabsIndex].error = true;
     }
   },
-  [types.UPDATE_TARGET_URL](state: store.State, payload) {
+  [types.UPDATE_TARGET_URL](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -394,7 +393,7 @@ const mutations = {
       state.tabs[tabsIndex].statusText = url;
     }
   },
-  [types.MEDIA_STARTED_PLAYING](state: store.State, payload) {
+  [types.MEDIA_STARTED_PLAYING](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -407,7 +406,7 @@ const mutations = {
       state.tabs[tabsIndex].isAudioMuted = isAudioMuted;
     }
   },
-  [types.MEDIA_PAUSED](state: store.State, payload) {
+  [types.MEDIA_PAUSED](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -418,7 +417,7 @@ const mutations = {
       state.tabs[tabsIndex].hasMedia = false;
     }
   },
-  [types.TOGGLE_AUDIO](state: store.State, payload) {
+  [types.TOGGLE_AUDIO](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -430,7 +429,7 @@ const mutations = {
       state.tabs[tabsIndex].isAudioMuted = muted;
     }
   },
-  [types.UPDATE_CERTIFICATE](state: store.State, payload) {
+  [types.UPDATE_CERTIFICATE](state: Lulumi.Store.State, payload) {
     const hostname: string = payload.hostname;
     const certificate: Electron.Certificate = payload.certificate;
     const verificationResult: string = payload.verificationResult;
@@ -445,32 +444,32 @@ const mutations = {
     Vue.set(state.certificates[hostname]!, 'errorCode', errorCode);
   },
   // preferences handlers
-  [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: store.State, { val }) {
+  [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: Lulumi.Store.State, { val }) {
     if (val.currentSearchEngine !== null) {
       state.currentSearchEngine = val.currentSearchEngine;
     }
     state.autoFetch = val.autoFetch;
   },
-  [types.SET_HOMEPAGE](state: store.State, { val }) {
+  [types.SET_HOMEPAGE](state: Lulumi.Store.State, { val }) {
     state.homepage = val.homepage;
   },
-  [types.SET_PDF_VIEWER](state: store.State, { val }) {
+  [types.SET_PDF_VIEWER](state: Lulumi.Store.State, { val }) {
     state.pdfViewer = val.pdfViewer;
   },
-  [types.SET_TAB_CONFIG](state: store.State, { val }) {
+  [types.SET_TAB_CONFIG](state: Lulumi.Store.State, { val }) {
     Vue.set(state.tabConfig, 'defaultFavicon', val.defaultFavicon);
     Vue.set(state.tabConfig.dummyTabObject, 'url', val.defaultUrl);
   },
-  [types.SET_LANG](state: store.State, { val }) {
+  [types.SET_LANG](state: Lulumi.Store.State, { val }) {
     state.lang = val.lang;
   },
-  [types.SET_DOWNLOADS](state: store.State, { val }) {
+  [types.SET_DOWNLOADS](state: Lulumi.Store.State, { val }) {
     state.downloads = val;
   },
-  [types.SET_HISTORY](state: store.State, { val }) {
+  [types.SET_HISTORY](state: Lulumi.Store.State, { val }) {
     state.history = val;
   },
-  [types.SET_TABS_ORDER](state: store.State, payload) {
+  [types.SET_TABS_ORDER](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const tabsOrder: string[] = payload.tabsOrder;
     if (tabsOrder.length !== 0) {
@@ -484,7 +483,7 @@ const mutations = {
       }
     }
   },
-  [types.SET_PAGE_ACTION](state: store.State, payload) {
+  [types.SET_PAGE_ACTION](state: Lulumi.Store.State, payload) {
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
     const extensionId: string = payload.extensionId;
@@ -501,7 +500,7 @@ const mutations = {
       }
     }
   },
-  [types.CLEAR_PAGE_ACTION](state: store.State, payload) {
+  [types.CLEAR_PAGE_ACTION](state: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
@@ -513,10 +512,10 @@ const mutations = {
     }
   },
   // downloads handlers
-  [types.CREATE_DOWNLOAD_TASK](state: store.State, payload) {
+  [types.CREATE_DOWNLOAD_TASK](state: Lulumi.Store.State, payload) {
     state.downloads.unshift(payload);
   },
-  [types.UPDATE_DOWNLOADS_PROGRESS](state: store.State, payload) {
+  [types.UPDATE_DOWNLOADS_PROGRESS](state: Lulumi.Store.State, payload) {
     const index = state.downloads.findIndex(download => download.startTime === payload.startTime);
     if (index !== -1) {
       const download = state.downloads[index];
@@ -527,7 +526,7 @@ const mutations = {
       download.dataState = payload.dataState;
     }
   },
-  [types.COMPLETE_DOWNLOADS_PROGRESS](state: store.State, payload) {
+  [types.COMPLETE_DOWNLOADS_PROGRESS](state: Lulumi.Store.State, payload) {
     const index = state.downloads.findIndex(download => download.startTime === payload.startTime);
     if (index !== -1) {
       const download = state.downloads[index];
@@ -543,7 +542,7 @@ const mutations = {
     state.downloads.forEach(download => (download.style = 'hidden'));
   },
   // permissions
-  [types.SET_PERMISSIONS](state: store.State, payload) {
+  [types.SET_PERMISSIONS](state: Lulumi.Store.State, payload) {
     const hostname: string = payload.hostname;
     const permission: string = payload.permission;
     const accept: boolean = payload.accept;
@@ -554,7 +553,7 @@ const mutations = {
     Vue.set(state.permissions[hostname], permission, accept);
   },
   // app state
-  [types.SET_APP_STATE](state: store.State, { newState }) {
+  [types.SET_APP_STATE](state: Lulumi.Store.State, { newState }) {
     state.tabId = newState.pid;
     state.tabs = newState.tabs;
     state.currentTabIndexes = newState.currentTabIndexes;
@@ -570,7 +569,7 @@ const mutations = {
     state.windows = newState.windows;
   },
   // window state
-  [types.CREATE_WINDOW](state: store.State, payload) {
+  [types.CREATE_WINDOW](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const width: number = payload.width;
     const height: number = payload.height;
@@ -602,13 +601,13 @@ const mutations = {
       });
     }
   },
-  [types.CLOSE_WINDOW](state: store.State, { windowId }) {
+  [types.CLOSE_WINDOW](state: Lulumi.Store.State, { windowId }) {
     const index: number = state.windows.findIndex(window => (window.id === windowId));
     if (index !== -1) {
       Vue.delete(state.windows, index);
     }
   },
-  [types.UPDATE_WINDOW_PROPERTY](state: store.State, payload) {
+  [types.UPDATE_WINDOW_PROPERTY](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
     const width: number = payload.width;
     const height: number = payload.height;

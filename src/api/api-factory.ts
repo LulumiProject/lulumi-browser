@@ -1,10 +1,9 @@
 import Event from './extensions/event';
-import { api, store } from 'lulumi';
 
 /* tslint:disable:max-line-length */
 
-function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number, tabIndex?: number): store.TabObject {
-  const dummyTabObject: store.TabObject = vueInstance.$store.getters.tabConfig.dummyTabObject;
+function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number, tabIndex?: number): Lulumi.Store.TabObject {
+  const dummyTabObject: Lulumi.Store.TabObject = vueInstance.$store.getters.tabConfig.dummyTabObject;
   // if tabId === -1, we then just return a Tab instance with id = -1
   if (tabId === -1) {
     return dummyTabObject;
@@ -12,7 +11,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
 
   if (tabId === 0) {
     // if tabId === 0, then we just find the Tab having located at that tabIndex
-    const tabObject: store.TabObject = vueInstance.getTabObject(tabIndex);
+    const tabObject: Lulumi.Store.TabObject = vueInstance.getTabObject(tabIndex);
     if (tabObject === undefined) {
       return dummyTabObject;
     }
@@ -23,7 +22,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
   }
 
   // if we have tabId, then we just find one
-  const tabObject: store.TabObject = vueInstance.tabs.find(tab => (tab.id === tabId));
+  const tabObject: Lulumi.Store.TabObject = vueInstance.tabs.find(tab => (tab.id === tabId));
   if (tabObject === undefined) {
     return dummyTabObject;
   }
@@ -101,7 +100,7 @@ export default (vueInstance: any) => {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       }
-      const backgroundPages: api.BackgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
+      const backgroundPages: Lulumi.API.BackgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
       const extension = backgroundPages[extensionId];
       if (extension) {
         vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)
@@ -126,11 +125,11 @@ export default (vueInstance: any) => {
   };
 
   const tabs = {
-    get: (tabId: number): store.TabObject => {
+    get: (tabId: number): Lulumi.Store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       return tab;
     },
-    getCurrent: (guestInstanceId: number): store.TabObject => {
+    getCurrent: (guestInstanceId: number): Lulumi.Store.TabObject => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
       if (!((webContents as any).type && (webContents as any).type === 'exception')) {
@@ -153,12 +152,12 @@ export default (vueInstance: any) => {
       }
       webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
     },
-    query: (queryInfo: api.CustomTabsQueryInfo): store.TabObject[] => {
+    query: (queryInfo: Lulumi.API.CustomTabsQueryInfo): Lulumi.Store.TabObject[] => {
       if (Object.keys(queryInfo).length === 0 || queryInfo.url === '<all_urls>') {
         return vueInstance.tabs;
       }
 
-      const tabs: store.TabObject[] = [];
+      const tabs: Lulumi.Store.TabObject[] = [];
       if (queryInfo.currentWindow) {
         delete queryInfo.currentWindow;
         queryInfo.windowId = vueInstance.windowId;
@@ -170,7 +169,7 @@ export default (vueInstance: any) => {
       });
       return tabs;
     },
-    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): store.TabObject => {
+    update: (tabId: number, updateProperties: chrome.tabs.UpdateProperties = {}): Lulumi.Store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         if (updateProperties.url) {
@@ -253,9 +252,9 @@ export default (vueInstance: any) => {
   };
 
   const windows = {
-    get: (windowId: number, getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty | undefined => {
+    get: (windowId: number, getInfo: chrome.windows.GetInfo = {}): Lulumi.Store.LulumiBrowserWindowProperty | undefined => {
       if (windowId === vueInstance.windowId) {
-        const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
+        const window: Lulumi.Store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
         if (getInfo.populate) {
           window.tabs = vueInstance.tabs;
         }
@@ -263,14 +262,14 @@ export default (vueInstance: any) => {
       }
       return;
     },
-    getCurrent: (getInfo: chrome.windows.GetInfo = {}, guestInstanceId: number): store.LulumiBrowserWindowProperty | undefined => {
+    getCurrent: (getInfo: chrome.windows.GetInfo = {}, guestInstanceId: number): Lulumi.Store.LulumiBrowserWindowProperty | undefined => {
       const webContents: Electron.WebContents = vueInstance.$electron.remote.getGuestWebContents(guestInstanceId);
       // https://github.com/electron/electron/blob/master/lib/browser/rpc-server.js#L133-L140
       if (!((webContents as any).type && (webContents as any).type === 'exception')) {
         if (tabs.query({ webContentsId: webContents.id })[0].index === undefined) {
           return;
         }
-        const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
+        const window: Lulumi.Store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
         if (getInfo.populate) {
           window.tabs = vueInstance.tabs;
         }
@@ -278,8 +277,8 @@ export default (vueInstance: any) => {
       }
       return;
     },
-    getAll: (getInfo: chrome.windows.GetInfo = {}): store.LulumiBrowserWindowProperty => {
-      const window: store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
+    getAll: (getInfo: chrome.windows.GetInfo = {}): Lulumi.Store.LulumiBrowserWindowProperty => {
+      const window: Lulumi.Store.LulumiBrowserWindowProperty = Object.assign({}, vueInstance.window);
       if (getInfo.populate) {
         window.tabs = vueInstance.tabs;
       }

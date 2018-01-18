@@ -111,10 +111,6 @@ const requireTmp = require;
 const moduleTmp = module;
 const __dirnameTmp = __dirname;
 
-process.once('document-start', () => {
-  
-});
-
 process.once('loaded', () => {
   if (process.env.TEST_ENV === 'e2e') {
     global.require = requireTmp;

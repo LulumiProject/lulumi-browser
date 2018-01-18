@@ -1,35 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "target": "es5",
-    "noImplicitAny": false,
-    "removeComments": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "sourceMap": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "lib": [
-      "dom",
-      "es2015",
-      "es7",
-      "es2017.object"
-    ],
-    "types": [
-      "chrome",
-      "node",
-      "mocha",
-      "webpack",
-      "webpack-env",
-      "webpack-hot-middleware"
-    ]
-  },
-  "include": [
-    "./src/**/*.ts"
-  ]
+    "experimentalDecorators": true
+  }
 }

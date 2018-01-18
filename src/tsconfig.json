@@ -20,17 +20,15 @@
       "es7",
       "es2017.object"
     ],
-    "types": [
-      "chrome",
-      "node",
-      "mocha",
-      "webpack",
-      "webpack-env",
-      "webpack-hot-middleware"
+    "typeRoots": [
+      "../node_modules/@types",
+      "./typings"
     ]
   },
   "include": [
-    "**/*.ts",
-    "../node_modules/electron/electron.d.ts"
+    "**/*"
+  ],
+  "exclude": [
+    "../node_modules"
   ]
 }
