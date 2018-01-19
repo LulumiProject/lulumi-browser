@@ -344,7 +344,7 @@
             canGoForward: webview.canGoForward(),
           });
         } else {
-          webview.getWebContents().downloadURL(parsedURL.query.src);
+          webview.getWebContents().downloadURL(parsedURL.query.src as string);
         }
       } else {
         this.$store.dispatch('domReady', {

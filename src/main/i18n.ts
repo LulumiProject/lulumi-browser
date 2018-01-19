@@ -14,7 +14,7 @@ import * as zhTW from '../../helper/i18n/zh-TW';
 
 import config from './js/constants/config';
 
-let langPath;
+let langPath: string;
 if (process.env.NODE_ENV === 'development') {
   langPath = path.join(config.devUserData, 'lang');
 } else if (process.env.NODE_ENV === 'testing') {
@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'development') {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
 
-let lang: string = '';
+let lang: string;
 try {
   lang = readFileSync(langPath, 'utf8');
 } catch (event) {
