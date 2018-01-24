@@ -26,7 +26,8 @@ let mainConfig = {
         use: {
           loader: 'tslint-loader',
           options: {
-            typeCheck: true
+            typeCheck: true,
+            tsConfigFile: './src/tsconfig.json'
           }
         }
       },

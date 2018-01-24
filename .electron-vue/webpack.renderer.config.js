@@ -38,7 +38,8 @@ let rendererConfig = {
         use: {
           loader: 'tslint-loader',
           options: {
-            typeCheck: true
+            typeCheck: true,
+            tsConfigFile: './src/tsconfig.json'
           }
         }
       },
@@ -213,7 +214,8 @@ let aboutConfig = {
         use: {
           loader: 'tslint-loader',
           options: {
-            typeCheck: true
+            typeCheck: true,
+            tsConfigFile: './src/tsconfig.json'
           }
         }
       },
