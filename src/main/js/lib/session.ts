@@ -26,14 +26,25 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       if (details.requestHeaders) {
         const requestHeaders: object[] = [];
         Object.keys(details.requestHeaders).forEach((k) => {
-          requestHeaders.push({ name: k, value: details.requestHeaders[k][0] });
+          requestHeaders.push({ name: k, value: details.requestHeaders[k] });
         });
         details.requestHeaders = requestHeaders;
       }
 
-      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
-        if (response) {
-          callback(response);
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, request) => {
+        if (request) {
+          if (request.requestHeaders) {
+            const requestHeaders: object = {};
+            request.requestHeaders.forEach((requestHeader) => {
+              requestHeaders[requestHeader.name] = requestHeader.value;
+            });
+            callback({ requestHeaders, cancel: false });
+          } else if (request.redirectURL) {
+            callback({ redirectURL: request.redirectURL, cancel: false });
+          } else {
+            // in case we don't cover some unexpected cases
+            callback(request);
+          }
         } else {
           callback({ cancel: false });
         }
@@ -59,8 +70,16 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
       }
 
       ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
-        if (response) {
-          callback(response);
+        if (response && response.responseHeaders) {
+          const responseHeaders: object = {};
+          response.responseHeaders.forEach((responseHeader) => {
+            responseHeaders[responseHeader.name] = responseHeader.value;
+          });
+          if (response.statusLine) {
+            callback({ responseHeaders, statusLine: response.statusLine, cancel: false });
+          } else {
+            callback({ responseHeaders, statusLine: details.statusLine, cancel: false });
+          }
         } else {
           callback({ cancel: false });
         }
