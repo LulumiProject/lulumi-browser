@@ -183,6 +183,13 @@ export default {
       paste: '粘贴',
       pasteAndGo: '粘贴并前往',
     },
+    extensions: {
+      contextMenu: {
+        inspectElement: '检查',
+        manage: '管理扩展程序',
+        remove: '卸载扩展程序',
+      },
+    },
     common: {
       options: {
         preferences: '设置',

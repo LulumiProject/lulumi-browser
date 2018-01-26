@@ -183,6 +183,13 @@ export default {
       paste: '貼上',
       pasteAndGo: '貼上並搜尋',
     },
+    extensions: {
+      contextMenu: {
+        inspectElement: '檢查',
+        manage: '管理擴充功能',
+        remove: '從 Lulumi 中移除...',
+      },
+    },
     common: {
       options: {
         preferences: '設定',

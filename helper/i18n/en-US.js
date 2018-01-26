@@ -183,6 +183,13 @@ export default {
       paste: 'Paste',
       pasteAndGo: 'Paste and Go',
     },
+    extensions: {
+      contextMenu: {
+        inspectElement: 'Inspect Element',
+        manage: 'Manage Extensions',
+        remove: 'Remove extension',
+      },
+    },
     common: {
       options: {
         preferences: 'Preferences',
