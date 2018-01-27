@@ -7,6 +7,7 @@ const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
+const openInEditor = require('launch-editor-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
 const mainConfig = require('./webpack.main.config')
@@ -67,6 +68,7 @@ function startRenderer () {
         contentBase: path.join(__dirname, '../'),
         quiet: true,
         before(app, ctx) {
+          app.use('/__open-in-editor', openInEditor())
           app.use(hotMiddleware)
           ctx.middleware.waitUntilValid(() => {
             resolve()
