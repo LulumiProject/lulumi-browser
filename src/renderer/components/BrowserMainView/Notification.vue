@@ -18,9 +18,12 @@
   import Tab from './Tab.vue';
 
   @Component({
-    props: [
-      'windowWebContentsId',
-    ],
+    props: {
+      windowWebContentsId: {
+        type: Number,
+        required: true,
+      },
+    },
     components: {
       'el-button': Button,
       'el-button-group': ButtonGroup,
@@ -36,11 +39,11 @@
     permanent: boolean = false;
     type: string = '';
     template: VueI18n.LocaleMessage = '';
-    permission: string = ''; 
+    permission: string = '';
     hostname: string | null;
     id: number = -1;
     handler: any;
-    
+
     get permissions() {
       return this.$store.getters.permissions;
     }

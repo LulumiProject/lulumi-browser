@@ -173,9 +173,12 @@
         },
       },
     },
-    props: [
-      'windowId',
-    ],
+    props: {
+      windowId: {
+        type: Number,
+        required: true,
+      },
+    },
     components: {
       'awesome-icon': AwesomeIcon,
       'el-badge': Badge,

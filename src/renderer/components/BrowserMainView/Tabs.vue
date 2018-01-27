@@ -73,9 +73,12 @@
         },
       },
     },
-    props: [
-      'windowId',
-    ],
+    props: {
+      windowId: {
+        type: Number,
+        required: true,
+      },
+    },
     components: {
       'awesome-icon': AwesomeIcon,
       'el-button': Button,
@@ -392,7 +395,7 @@
   .chrome-tab-draggable {
     cursor: move;
 	  cursor: -webkit-grabbing;
-  
+
     &.ghost {
       opacity: .5;
     }

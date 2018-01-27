@@ -28,13 +28,28 @@
   const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
   @Component({
-    props: [
-      'isActive',
-      'windowId',
-      'windowWebContentsId',
-      'tabIndex',
-      'tabId',
-    ],
+    props: {
+      isActive: {
+        type: Boolean,
+        required: true,
+      },
+      windowId: {
+        type: Number,
+        required: true,
+      },
+      windowWebContentsId: {
+        type: Number,
+        required: true,
+      },
+      tabIndex: {
+        type: Number,
+        required: true,
+      },
+      tabId: {
+        type: Number,
+        required: true,
+      },
+    },
     components: {
       Notification,
     },
