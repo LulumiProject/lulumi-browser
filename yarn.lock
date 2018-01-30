@@ -109,9 +109,9 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
-"@types/chrome@^0.0.58":
-  version "0.0.58"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.58.tgz#adf75cecfd29cd2923b019315bc2ea2ac1b49962"
+"@types/chrome@^0.0.59":
+  version "0.0.59"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.59.tgz#2a93f5d9f4558163cead1aaefc94a74e69cf9aa8"
   dependencies:
     "@types/filesystem" "*"
 
@@ -167,9 +167,9 @@
   dependencies:
     "@types/source-map" "*"
 
-"@types/webpack-env@^1.13.3":
-  version "1.13.3"
-  resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.13.3.tgz#0ecbe70f87341767793774d3683b51aa3246434c"
+"@types/webpack-env@^1.13.4":
+  version "1.13.4"
+  resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.13.4.tgz#ca3578299323f4fbec770bb32ed581198f0a8ed9"
 
 "@types/webpack-hot-middleware@^2.16.2":
   version "2.16.2"
@@ -2646,9 +2646,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.0.7:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.7.tgz#46dfc8667cfc65ab847eaed66a5851fe4b691bd8"
+collect.js@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.8.tgz#7119abb007bb9ed3752606b313f1a161b6229d9b"
 
 collection-visit@^1.0.0:
   version "1.0.0"

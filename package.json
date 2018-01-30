@@ -33,7 +33,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^0.17.1",
-    "collect.js": "^4.0.7",
+    "collect.js": "^4.0.8",
     "css-element-queries": "^1.0.1",
     "electron-localshortcut": "^3.1.0",
     "electron-process-manager": "^0.5.1",
@@ -48,10 +48,10 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.58",
+    "@types/chrome": "^0.0.59",
     "@types/mocha": "^2.2.47",
     "@types/webpack": "^3.8.4",
-    "@types/webpack-env": "^1.13.3",
+    "@types/webpack-env": "^1.13.4",
     "@types/webpack-hot-middleware": "^2.16.2",
     "ava": "^0.25.0",
     "babel-cli": "^6.26.0",
