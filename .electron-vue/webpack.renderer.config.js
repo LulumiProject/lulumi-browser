@@ -173,7 +173,10 @@ let rendererConfig = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    })
   ],
   output: {
     filename: '[name].js',
@@ -347,7 +350,10 @@ let aboutConfig = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    })
   ],
   output: {
     filename: '[name].js',

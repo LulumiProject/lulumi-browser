@@ -80,7 +80,10 @@ let mainConfig = {
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    })
   ],
   resolve: {
     alias: {
