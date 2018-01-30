@@ -53,7 +53,9 @@
                           :src="loadIcon(extension)",
                           :class="showOrNot(extension)",
                           :title="showTitle(extension)")
-          webview.extension(:ref="`webview-${extension.extensionId}`")
+          webview.extension(:ref="`webview-${extension.extensionId}`",
+                            webpreferences="nativeWindowOpen=1",
+                            allowpopups="")
     .common-group
       a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
         iview-icon(type="android-more-vertical", size="22")
