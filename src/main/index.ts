@@ -1,3 +1,4 @@
+import { Store } from 'vuex';
 import { readdirSync, readFileSync, rename, writeFile } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -73,8 +74,8 @@ const session = require('./js/lib/session').default;
 // ../shared/store/mainStore.ts
 const mainStore = require('../shared/store/mainStore').default;
 mainStore.register(storagePath, swipeGesture);
-const store = mainStore.getStore();
-const windows = mainStore.getWindows();
+const store: Store<any> = mainStore.getStore();
+const windows: Electron.BrowserWindow[] = mainStore.getWindows();
 
 // ../api/lulumi-extension.ts
 const lulumiExtension = require('../api/lulumi-extension').default;
@@ -263,7 +264,7 @@ app.on('before-quit', (event: Electron.Event) => {
       Object.values(windows).forEach((window) => {
         window.removeAllListeners('close');
         delete windows[window.id];
-        windows[window.id] = -1;
+        (windows[window.id] as any) = -1;
         window.close();
         bumpWindowIdsBy += 1;
       });
