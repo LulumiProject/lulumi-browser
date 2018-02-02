@@ -1,5 +1,6 @@
 class Event {
   listeners: Function[];
+
   constructor() {
     this.listeners = [];
   }
@@ -17,8 +18,9 @@ class Event {
       try {
         listener(...args);
       } catch (err) {
+        // (TODO) we got here becase we didn't clear all listeners related to certain extension
         // tslint:disable-next-line:no-console
-        console.error(err);
+        // console.error(err);
         this.removeListener(listener);
       }
     }

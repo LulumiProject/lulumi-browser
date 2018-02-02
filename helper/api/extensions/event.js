@@ -16,7 +16,8 @@ class Event {
       try {
         listener(...args);
       } catch (err) {
-        console.error(err);
+        // (TODO) we got here becase we didn't clear all listeners related to certain extension
+        // console.error(err);
         this.removeListener(listener);
       }
     }
