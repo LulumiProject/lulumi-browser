@@ -18,7 +18,7 @@ ipcMain.on('add-lulumi-extension', (event) => {
       try {
         if (dir) {
           // an array of directory paths chosen by the user will be returned, but we only want one path
-          name = ((BrowserWindow as any) as Lulumi.Electron.BrowserWindow).addLulumiExtension(dir);
+          name = ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension(dir);
         }
       } catch (readError) {
         result = readError.message;
@@ -42,7 +42,7 @@ ipcMain.on('add-lulumi-extension', (event) => {
 ipcMain.on('remove-lulumi-extension', (event, extensionId) => {
   let result: string = 'OK';
   try {
-    const ret: string = ((BrowserWindow as any) as Lulumi.Electron.BrowserWindow).removeLulumiExtension(extensionId);
+    const ret: string = ((BrowserWindow as any) as Lulumi.BrowserWindow).removeLulumiExtension(extensionId);
     ipcMain.once(`remove-lulumi-extension-${extensionId}`, () => {
       Object.keys(windows).forEach((key) => {
         const id = parseInt(key, 10);
