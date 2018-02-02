@@ -7,7 +7,7 @@ declare module 'vue/types/vue' {
     static createWindow(options?: Electron.BrowserWindowConstructorOptions,
                         callback?: Function): Electron.BrowserWindow;
   }
-  interface Remote extends Electron.MainInterface {
+  interface Remote extends Electron.Remote {
     BrowserWindow: BrowserWindow & typeof Electron.BrowserWindow;
   }
   interface MyElectron {

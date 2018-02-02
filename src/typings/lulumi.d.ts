@@ -1,6 +1,14 @@
 declare namespace Lulumi {
   import VueI18n from 'vue-i18n';
 
+  export namespace Electron {
+    export interface BrowserWindow {
+      addLulumiExtension(srcDirectory: string): string;
+      removeLulumiExtension(extensionId: string): string;
+      getLulumiExtensions(): any;
+    }
+  }
+
   export namespace Scheme {
     // lulumi:// scheme
     export interface LulumiObject extends Object {

@@ -330,7 +330,7 @@ app.on('will-quit', () => {
 
 app.once('ready', () => {
   // the public API to add/remove extensions
-  (BrowserWindow as any).addLulumiExtension = (srcDirectory: string): string => {
+  ((BrowserWindow as any) as Lulumi.Electron.BrowserWindow).addLulumiExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);
     if (manifest !== null) {
       loadExtension(manifest);
@@ -340,7 +340,7 @@ app.once('ready', () => {
     return '';
   };
 
-  (BrowserWindow as any).removeLulumiExtension = (extensionId: string): string => {
+  ((BrowserWindow as any) as Lulumi.Electron.BrowserWindow).removeLulumiExtension = (extensionId: string): string => {
     const manifest = manifestMap[extensionId];
     if (manifest) {
       removeBackgroundPages(manifest);
@@ -352,7 +352,7 @@ app.once('ready', () => {
     return '';
   };
 
-  (BrowserWindow as any).getLulumiExtensions = () => {
+  ((BrowserWindow as any) as Lulumi.Electron.BrowserWindow).getLulumiExtensions = (): any => {
     const extensions = {};
     Object.keys(manifestNameMap).forEach((name) => {
       const manifest = manifestNameMap[name];

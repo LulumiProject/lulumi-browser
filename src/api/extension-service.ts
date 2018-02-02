@@ -12,7 +12,7 @@ export default class ExtensionService {
   instance: Vue;
   constructor(vueInstance) {
     this.instance = vueInstance;
-    (this.instance as any).$electron
+    this.instance.$electron
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
         initializeExtensionApi(apiFactory(this.instance)).then(() => {
           this.notifyParentWhenReady();
@@ -21,7 +21,7 @@ export default class ExtensionService {
           this.registerAction();
         });
       });
-    (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
+    this.instance.$electron.ipcRenderer.send('request-extension-objects');
   }
 
   notifyParentWhenReady() {
@@ -763,17 +763,17 @@ export default class ExtensionService {
   }
 
   update(): void {
-    (this.instance as any).$electron
+    this.instance.$electron
       .ipcRenderer.once('response-extension-objects', (event, manifestMap) => {
         this.manifestMap = manifestMap;
         this.registerAction();
       });
-    (this.instance as any).$electron.ipcRenderer.send('request-extension-objects');
+    this.instance.$electron.ipcRenderer.send('request-extension-objects');
   }
 
   registerAction() {
     const manifest: object[] = [];
-    const remote = (this.instance as any).$electron.remote;
+    const remote = this.instance.$electron.remote;
     const backgroundPages = remote.getGlobal('backgroundPages');
 
     this.newtabOverrides = '';
