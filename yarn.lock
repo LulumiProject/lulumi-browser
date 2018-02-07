@@ -186,9 +186,9 @@
     "@types/tapable" "*"
     "@types/uglify-js" "*"
 
-"@types/webpack@^3.8.4":
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-3.8.4.tgz#82069b43851ac7fdb94f96245758903c2a989107"
+"@types/webpack@^3.8.5":
+  version "3.8.5"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/@types/webpack-3.8.5.tgz#793a0dc6c49900095313c4f424eda6fb814dd76b"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
@@ -3800,9 +3800,9 @@ electron-util@^0.6.0:
   dependencies:
     electron-is-dev "^0.3.0"
 
-electron@1.8.2-beta.5:
-  version "1.8.2-beta.5"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.8.2-beta.5.tgz#8324c483ed8cb4b052b3e13e514ddc858707fdeb"
+electron@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.8.2.tgz#a817cd733c2972b3c7cc4f777caf6e424b88014d"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
