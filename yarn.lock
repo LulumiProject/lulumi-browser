@@ -7151,6 +7151,10 @@ mockery@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/mockery/-/mockery-2.1.0.tgz#5b0aef1ff564f0f8139445e165536c7909713470"
 
+modern-normalize@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/modern-normalize/-/modern-normalize-0.1.0.tgz#dd894238748ed9fca37b6592bb0440c75b85dcb0"
+
 module-deps@^4.0.8:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/module-deps/-/module-deps-4.1.1.tgz#23215833f1da13fd606ccb8087b44852dcb821fd"

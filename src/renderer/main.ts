@@ -4,6 +4,7 @@ import unhandled from 'electron-unhandled';
 import { Autocomplete } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'iview/dist/styles/iview.css';
+import 'modern-normalize/modern-normalize.css';
 
 import App from './App.vue';
 import router from './router';
