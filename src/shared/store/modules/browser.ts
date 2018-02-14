@@ -78,7 +78,7 @@ const mutations = {
       newUrl = url;
       state.tabs.push(createTabObject(state, windowId, newUrl));
     } else if (url) {
-      newUrl = `${config.currentSearchEngine.search}${url}`;
+      newUrl = config.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(url));
       state.tabs.push(createTabObject(state, windowId, newUrl));
     } else {
       state.tabs.push(createTabObject(state, windowId));
