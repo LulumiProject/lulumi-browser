@@ -131,11 +131,11 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   // register 'Escape' shortcut
   localshortcut.register(mainWindow, 'Escape', () => {
     if (mainWindow.isFullScreen()) {
-      mainWindow.webContents.send('escape-click');
+      mainWindow.webContents.send('escape-full-screen');
     }
   });
   // special case: go to the last tab
-  localshortcut.register(mainWindow, `CmdOrCtrl+9`, () => {
+  localshortcut.register(mainWindow, 'CmdOrCtrl+9', () => {
     mainWindow.webContents.send('tab-click', -1);
   });
 

@@ -147,7 +147,7 @@
       };
 
       Object.keys(webviewEvents).forEach((key) => {
-        webview.addEventListener((key as any), this.webviewHandler(this, webviewEvents[key]));
+        webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
       });
 
       this.findinpage = {

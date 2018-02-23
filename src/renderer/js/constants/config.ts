@@ -2,8 +2,6 @@ import { nativeImage } from 'electron';
 import { fixPathForAsarUnpack } from 'electron-util';
 import * as path from 'path';
 
-import { store } from 'lulumi';
-
 declare const __static;
 
 const searchEngine = [
@@ -55,7 +53,7 @@ const searchEngine = [
 const homepage = 'https://github.com/LulumiProject/lulumi-browser';
 const pdfViewer = 'pdf-viewer';
 
-const tabConfig: store.TabConfig = {
+const tabConfig: Lulumi.Store.TabConfig = {
   dummyTabObject: {
     webContentsId: -1,
     id: -1,

@@ -1556,7 +1556,7 @@
           el.click();
         }
       });
-      ipc.on('escape-click', () => {
+      ipc.on('escape-full-screen', () => {
         this.onLeaveHtmlFullScreen();
       });
       ipc.on('start-find-in-page', () => {
