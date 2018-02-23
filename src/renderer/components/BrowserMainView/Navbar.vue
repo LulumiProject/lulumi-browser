@@ -629,7 +629,7 @@
               },
             }));
 
-            menu.popup(currentWindow, { async: true });
+            menu.popup({ window: currentWindow });
           });
           webview.addEventListener('ipc-message', (event: Electron.IpcMessageEvent) => {
             if (event.channel === 'resize') {
@@ -725,7 +725,7 @@
           },
         }));
 
-        menu.popup(currentWindow, { async: true });
+        menu.popup({ window: currentWindow });
       }
     }
 

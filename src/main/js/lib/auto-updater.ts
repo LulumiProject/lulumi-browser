@@ -13,7 +13,7 @@ export default {
       console.error(`Error fetching updates, ${msg} (${err.stack})`);
     });
 
-    autoUpdater.setFeedURL(`${FEED_URL}/${version}`);
+    autoUpdater.setFeedURL({ url: `${FEED_URL}/${version}` });
 
     setTimeout(() => autoUpdater.checkForUpdates(), 1000 * 10);
     setInterval(() => autoUpdater.checkForUpdates(), 1000 * 60 * 5);

@@ -173,6 +173,7 @@
     height: 38px;
     padding-left: 10px;
     border-bottom: 1px solid #999;
+    user-select: none;
     -webkit-user-select: none;
     -webkit-app-region: drag;
   }
@@ -182,6 +183,7 @@
     display: flex;
 
     * {
+      user-select: none;
       -webkit-user-select: none;
       cursor: default;
       font-size: 12px;
@@ -323,8 +325,6 @@
         &:hover,
         &:active {
           background: #f17469;
-        }
-        &:active:before {
         }
       }
 

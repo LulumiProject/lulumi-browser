@@ -144,7 +144,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.contextIsolation = true;
     // webPreferences.nativeWindowOpen = true;
-    webPreferences.blinkfeatures = 'OverlayScrollbars';
+    webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
 
     const backgroundRegExp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {
@@ -186,8 +186,8 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register createWindow method to BrowserWindow
 (BrowserWindow as any).createWindow = createWindow;
 
-// register 'lulumi://' and 'lulumi-extension://' as standard protocols
-protocol.registerStandardSchemes(['lulumi', 'lulumi-extension']);
+// register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
+protocol.registerStandardSchemes(['lulumi', 'lulumi-extension'], { secure: true });
 app.on('ready', () => {
   unhandled();
   // autoUpdater

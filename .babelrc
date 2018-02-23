@@ -4,7 +4,7 @@
     "test": {
       "presets": [
         ["env", {
-          "targets": { "node": "8.2.1" }
+          "targets": { "node": "8.9.3" }
         }],
         "stage-0"
       ],
@@ -13,7 +13,7 @@
     "main": {
       "presets": [
         ["env", {
-          "targets": { "node": "8.2.1" }
+          "targets": { "node": "8.9.3" }
         }],
         "stage-0"
       ]

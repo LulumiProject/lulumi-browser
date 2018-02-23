@@ -950,7 +950,7 @@
           },
         }));
 
-        menu.popup(currentWindow, { async: true });
+        menu.popup({ window: currentWindow });
       }
     }
     // onClickBackContextMenu
@@ -992,8 +992,8 @@
               click: () => this.onNewTab(this.windowId, 'about:history', false),
             }));
 
-            menu.popup(currentWindow, {
-              async: true,
+            menu.popup({
+              window: currentWindow,
               x: Math.floor(goBack.getBoundingClientRect().left),
               y: Math.floor(navbar.getBoundingClientRect().bottom),
             });
@@ -1040,8 +1040,8 @@
               click: () => this.onNewTab(this.windowId, 'about:history', false),
             }));
 
-            menu.popup(currentWindow, {
-              async: true,
+            menu.popup({
+              window: currentWindow,
               x: Math.floor(goForward.getBoundingClientRect().left),
               y: Math.floor(navbar.getBoundingClientRect().bottom),
             });
@@ -1084,7 +1084,7 @@
           },
         }));
 
-        menu.popup(currentWindow, { async: true });
+        menu.popup({ window: currentWindow });
       }
     }
     // onCommonMenu
@@ -1196,8 +1196,8 @@
             submenu: sub,
           }));
 
-          menu.popup(currentWindow, {
-            async: true,
+          menu.popup({
+            window: currentWindow,
             x: Math.floor(common.getBoundingClientRect().right),
             y: Math.floor(navbar.getBoundingClientRect().bottom),
           });
@@ -1467,7 +1467,7 @@
           },
         }));
 
-        menu.popup(currentWindow, { async: true });
+        menu.popup({ window: currentWindow });
       }
     }
 
