@@ -404,8 +404,8 @@
   .custom-buttons {
     display: flex;
     width: 120px;
-    height: 20px;
     padding-right: 10px;
+    align-items: center;
     justify-content: space-between;
     -webkit-app-region: no-drag;
 
