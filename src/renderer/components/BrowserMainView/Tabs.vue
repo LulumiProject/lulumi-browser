@@ -170,7 +170,7 @@
 <style lang="less" scoped>
   #chrome-tabs-shell {
     display: flex;
-    height: 38px;
+    height: 31px;
     padding-left: 10px;
     border-bottom: 1px solid #999;
     user-select: none;
@@ -194,7 +194,6 @@
       border: 0 !important;
       position: relative;
       margin: 0 -5px;
-      top: 7px;
       height: 30px;
       z-index: 1;
       transition: .1s transform;
@@ -404,15 +403,15 @@
   .custom-buttons {
     display: flex;
     width: 120px;
-    height: 20px;
-    padding-right: 10px;
+    padding-left: 30px;
+    align-items: center;
     justify-content: space-between;
     -webkit-app-region: no-drag;
 
     svg {
-      width: 30px;
+      width: 10px;
       height: 10px;
-      padding: 5px 15px;
+      padding: 11px 15px;
       opacity: 1;
 
       &:hover {
