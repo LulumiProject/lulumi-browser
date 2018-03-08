@@ -22,7 +22,7 @@
         if (window.about) {
           this.$store.dispatch('updateAbout', window.about);
         } else {
-          alert('Error: window.about not found!');
+          console.warn('Error: window.about not found!');
         }
         if (window.manifestMap) {
           const backgroundPages = window.backgroundPages;
@@ -37,7 +37,7 @@
           });
           this.$store.dispatch('updateExtensions', extensions);
         } else {
-          alert('Error: window.extensions not found!');
+          console.warn('Error: window.extensions not found!');
         }
       }
     }

@@ -10,7 +10,7 @@
       h3 {{ $t('about.preferencesPage.searchEngineProviderPage.options') }}
     el-row(type="flex", justify="start")
       el-col(:span="2")
-        el-switch(@change="toggleAutoFetch", v-model="autoFetch", on-color="#13ce66", off-color="#ff4949")
+        el-switch(@change="toggleAutoFetch", v-model="autoFetch", active-color="#13ce66", inactive-color="#ff4949")
       el-col(style="text-align: start;")
         | {{ $t('about.preferencesPage.searchEngineProviderPage.autoFetch') }}
 </template>

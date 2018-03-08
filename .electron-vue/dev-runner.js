@@ -45,25 +45,25 @@ function startRenderer () {
       Object.keys(config.entry).forEach(key => config.entry[key] = [path.join(__dirname, `dev-client-${key}`)].concat(config.entry[key]));
     })
 
-    const compiler = webpack(Configs)
-    hotMiddleware = webpackHotMiddleware(compiler, {
-      log: false,
+    const multiCompiler = webpack(Configs)
+    hotMiddleware = webpackHotMiddleware(multiCompiler, {
+      logLevel: 'warn',
       heartbeat: 2500
     })
 
-    compiler.plugin('compilation', compilation => {
-      compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
+    multiCompiler.compilers.map(c => c.hooks.compilation.tap('dev-runner', compilation => {
+      compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('dev-runner', (data, cb) => {
         hotMiddleware.publish({ action: 'reload' })
         cb()
       })
-    })
+    }))
 
-    compiler.plugin('done', stats => {
+    multiCompiler.compilers.map(c => c.hooks.done.tap('dev-runner', stats => {
       logStats('Renderer', stats)
-    })
+    }))
 
     const server = new WebpackDevServer(
-      compiler,
+      multiCompiler,
       {
         contentBase: path.join(__dirname, '../'),
         quiet: true,
@@ -87,7 +87,7 @@ function startMain () {
 
     const compiler = webpack(mainConfig)
 
-    compiler.plugin('watch-run', (compilation, done) => {
+    compiler.hooks.watchRun.tapAsync('dev-runner', (compilation, done) => {
       logStats('Main', chalk.white.bold('compiling...'))
       hotMiddleware.publish({ action: 'compiling' })
       done()

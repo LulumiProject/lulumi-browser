@@ -2,14 +2,29 @@
 
 process.env.BABEL_ENV = 'renderer'
 
+const os = require('os')
 const path = require('path')
 const { dependencies } = require('../package.json')
 const settings = require('./config.js')
 const webpack = require('webpack')
 
-const MinifyPlugin = require('babel-minify-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+
+const extractCSS = new ExtractTextPlugin('[name].[contenthash].css')
+const extractLESS = new ExtractTextPlugin('[name].[contenthash].less.css')
+
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
+function createHappyPlugin(id, loaders) {
+  return new HappyPack({
+    id: id,
+    loaders: loaders,
+    threadPool: happyThreadPool,
+    verbose: false
+  })
+}
 
 /**
  * List of node_modules to include in webpack bundle
@@ -27,6 +42,7 @@ let rendererConfig = {
     renderer: path.join(__dirname, '../src/renderer/main.ts')
   },
   externals: [
+    /^electron-debug/,
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
   ],
   module: {
@@ -34,94 +50,102 @@ let rendererConfig = {
       {
         test: /\.(ts)$/,
         enforce: 'pre',
-        exclude: /node_modules/,
         use: {
           loader: 'tslint-loader',
           options: {
             typeCheck: true,
             tsConfigFile: './src/tsconfig.json'
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
           options: {
             appendTsSuffixTo: [/\.vue$/],
             onlyCompileBundledFiles: true
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
         enforce: 'pre',
-        exclude: /node_modules/,
         use: {
           loader: 'eslint-loader',
           options: {
             formatter: require('eslint-friendly-formatter')
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
+        use: extractLESS.extract({
+          fallback: 'style-loader',
           use: [{
-            loader: "css-loader"
-          },{
-            loader: "less-loader"
-          }],
-          fallback: "style-loader"
+            loader: 'happypack/loader?id=happy-less'
+          }]
         })
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
+        use: extractCSS.extract({
+          fallback: 'style-loader',
           use: [{
-            loader: "css-loader"
-          }],
-          fallback: "style-loader"
+            loader: 'happypack/loader?id=happy-css'
+          }]
         })
       },
       {
         test: /\.html$/,
-        use: 'vue-html-loader'
+        use: [{
+          loader: 'happypack/loader?id=happy-html'
+        }]
       },
       {
         test: /\.js$/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true
-          }
+          loader: 'happypack/loader?id=happy-babel'
         },
         include: [ path.resolve(__dirname, '../src/renderer'), path.resolve(__dirname, '../src/api') ],
         exclude: /node_modules/
       },
       {
         test: /\.pug$/,
-        use: 'pug-html-loader'
-      },
-      {
-        test: /\.node$/,
-        use: 'node-loader'
+        use: [{
+          loader: 'happypack/loader?id=happy-pug'
+        }]
       },
       {
         test: /\.vue$/,
         use: {
           loader: 'vue-loader',
           options: {
-            extractCSS: process.env.NODE_ENV === 'production',
             loaders: {
-              pug: 'pug-html-loader',
-              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader',
-              less: 'vue-style-loader!css-loader!less-loader'
-            },
+              css: extractCSS.extract({
+                fallback: 'vue-style-loader',
+                use: [{
+                  loader: 'happypack/loader?id=happy-css'
+                }]
+              }),
+              less: extractLESS.extract({
+                fallback: 'vue-style-loader',
+                use: [{
+                  loader: 'happypack/loader?id=happy-less'
+                }]
+              }),
+              js: 'happypack/loader?id=happy-babel'
+            }
           },
-        }
+        },
+        include: [
+          path.resolve(__dirname, '../src/renderer'),
+          path.resolve(__dirname, '../node_modules/iview/src/components/icon'),
+          path.resolve(__dirname, '../node_modules/vue-awesome/components')
+        ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -158,7 +182,12 @@ let rendererConfig = {
     __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
-    new ExtractTextPlugin('[name].css'),
+    extractCSS,
+    extractLESS,
+    new OptimizeCssAssetsPlugin({
+      cssProcessorOptions: { discardComments: { removeAll: true } },
+      canPrint: false
+    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),
@@ -172,10 +201,28 @@ let rendererConfig = {
         : false
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
       minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    }),
+    createHappyPlugin('happy-babel', ['babel-loader?cacheDirectory=true']),
+    createHappyPlugin('happy-css', ['css-loader']),
+    createHappyPlugin('happy-html', ['vue-html-loader']),
+    createHappyPlugin('happy-less', ['css-loader', 'less-loader']),
+    createHappyPlugin('happy-pug', ['pug-html-loader']),
+    // https://github.com/amireh/happypack/pull/131
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          loaders: {
+            pug: 'pug-html-loader'
+          }
+        }
+      }]
     })
   ],
   output: {
@@ -213,94 +260,98 @@ let aboutConfig = {
       {
         test: /\.(ts)$/,
         enforce: 'pre',
-        exclude: /node_modules/,
         use: {
           loader: 'tslint-loader',
           options: {
             typeCheck: true,
             tsConfigFile: './src/tsconfig.json'
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
           options: {
             appendTsSuffixTo: [/\.vue$/],
             onlyCompileBundledFiles: true
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
         enforce: 'pre',
-        exclude: /node_modules/,
         use: {
           loader: 'eslint-loader',
           options: {
             formatter: require('eslint-friendly-formatter')
           }
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
+        use: extractLESS.extract({
+          fallback: 'style-loader',
           use: [{
-            loader: "css-loader"
-          },{
-            loader: "less-loader"
-          }],
-          fallback: "style-loader"
+            loader: 'happypack/loader?id=happy-less'
+          }]
         })
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
+        use: extractCSS.extract({
+          fallback: 'style-loader',
           use: [{
-            loader: "css-loader"
-          }],
-          fallback: "style-loader"
+            loader: 'happypack/loader?id=happy-css'
+          }]
         })
       },
       {
         test: /\.html$/,
-        use: 'vue-html-loader'
+        use: [{
+          loader: 'happypack/loader?id=happy-html'
+        }]
       },
       {
         test: /\.js$/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true
-          }
+          loader: 'happypack/loader?id=happy-babel'
         },
         include: [ path.resolve(__dirname, '../src/guest/renderer') ],
         exclude: /node_modules/
       },
       {
         test: /\.pug$/,
-        use: 'pug-html-loader'
-      },
-      {
-        test: /\.node$/,
-        use: 'node-loader'
+        use: [{
+          loader: 'happypack/loader?id=happy-pug'
+        }]
       },
       {
         test: /\.vue$/,
         use: {
           loader: 'vue-loader',
           options: {
-            extractCSS: process.env.NODE_ENV === 'production',
             loaders: {
-              pug: 'pug-html-loader',
-              sass: 'vue-style-loader!css-loader!less-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!less-loader!sass-loader',
-              less: 'vue-style-loader!css-loader!less-loader'
+              css: extractCSS.extract({
+                fallback: 'vue-style-loader',
+                use: [{
+                  loader: 'happypack/loader?id=happy-css'
+                }]
+              }),
+              less: extractLESS.extract({
+                fallback: 'vue-style-loader',
+                use: [{
+                  loader: 'happypack/loader?id=happy-less'
+                }]
+              }),
+              js: 'happypack/loader?id=happy-babel'
             },
-          },
-        }
+          }
+        },
+        include: [ path.resolve(__dirname, '../src/guest') ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -337,7 +388,12 @@ let aboutConfig = {
     __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
-    new ExtractTextPlugin('[name].css'),
+    extractCSS,
+    extractLESS,
+    new OptimizeCssAssetsPlugin({
+      cssProcessorOptions: { discardComments: { removeAll: true } },
+      canPrint: false
+    }),
     new HtmlWebpackPlugin({
       filename: 'about.html',
       template: path.resolve(__dirname, '../src/guest/index.ejs'),
@@ -349,10 +405,28 @@ let aboutConfig = {
       nodeModules: false
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
       minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    }),
+    createHappyPlugin('happy-babel', ['babel-loader?cacheDirectory=true']),
+    createHappyPlugin('happy-css', ['css-loader']),
+    createHappyPlugin('happy-html', ['vue-html-loader']),
+    createHappyPlugin('happy-less', ['css-loader', 'less-loader']),
+    createHappyPlugin('happy-pug', ['pug-html-loader']),
+    // https://github.com/amireh/happypack/pull/131
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          loaders: {
+            pug: 'pug-html-loader'
+          }
+        }
+      }]
     })
   ],
   output: {
@@ -377,6 +451,9 @@ let aboutConfig = {
  * Adjust rendererConfig and aboutConfig for development settings
  */
 if (process.env.NODE_ENV !== 'production') {
+  rendererConfig.mode = 'development'
+  aboutConfig.mode = 'development'
+
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
@@ -393,6 +470,8 @@ if (process.env.NODE_ENV !== 'production') {
  * Adjust rendererConfig and aboutConfig for e2e testing settings
  */
 if (process.env.TEST_ENV === 'e2e') {
+  rendererConfig.mode = 'production'
+  aboutConfig.mode = 'production'
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
@@ -416,23 +495,19 @@ if (process.env.TEST_ENV === 'e2e') {
    * Adjust rendererConfig and aboutConfig for production settings
    */
   if (process.env.NODE_ENV === 'production') {
-    rendererConfig.devtool = ''
-    aboutConfig.devtool = ''
+    rendererConfig.mode = 'production'
+    rendererConfig.performance = { hints: false }
+    aboutConfig.mode = 'production'
+    aboutConfig.performance = { hints: false }
+    rendererConfig.devtool = false
+    aboutConfig.devtool = false
 
     rendererConfig.plugins.push(
-      new MinifyPlugin(),
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }),
       new webpack.LoaderOptionsPlugin({
         minimize: true
       })
     )
     aboutConfig.plugins.push(
-      new MinifyPlugin(),
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }),
       new webpack.LoaderOptionsPlugin({
         minimize: true
       })

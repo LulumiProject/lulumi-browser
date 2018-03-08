@@ -22,7 +22,6 @@
   import { Component, Watch, Vue } from 'vue-property-decorator';
 
   import * as urlPackage from 'url';
-  import Worker from 'workerize-loader!../js/worker';
 
   import Tabs from './BrowserMainView/Tabs.vue';
   import Navbar from './BrowserMainView/Navbar.vue';
@@ -74,8 +73,6 @@
     onCommitted: Event = new Event();
     onCompleted: Event = new Event();
     onDOMContentLoaded: Event = new Event();
-
-    worker = new Worker();
 
     get dummyTabObject(): Lulumi.Store.TabObject {
       return this.$store.getters.tabConfig.dummyTabObject;
@@ -149,10 +146,15 @@
       return this.tabs[index];
     }
     async historyMappings() {
-      const history: Lulumi.Store.TabHistory[] = this.$store.getters.history;
-      let out: any;
-
-      out = await this.worker.historyMappings(history);
+      const out: any = {};
+      this.$store.getters.history.forEach((h) => {
+        if (!out[h.url]) {
+          out[h.url] = {
+            title: h.title,
+            icon: h.favIconUrl,
+          };
+        }
+      });
       return out;
     }
     lastOpenedTabs(): Lulumi.Store.LastOpenedTabObject[] {
@@ -425,8 +427,8 @@
         }
       }
       errorPage += `?ec=${encodeURIComponent(errorCode.toString())}`;
-      errorPage += `&url=${encodeURIComponent((event.target as any).getURL())}`;
-      if (errorCode !== -3 && event.validatedURL === (event.target as any).getURL()) {
+      errorPage += `&url=${encodeURIComponent((event.target as Electron.WebviewTag).getURL())}`;
+      if (errorCode !== -3 && event.validatedURL === (event.target as Electron.WebviewTag).getURL()) {
         this.getTab(tabIndex).navigateTo(
           `${errorPage}`);
       }
@@ -434,9 +436,9 @@
     onIpcMessage(event: Electron.IpcMessageEvent): void {
       if (event.channel === 'newtab') {
         if (this.extensionService.newtabOverrides !== '') {
-          (event.target as any).send('newtab', this.extensionService.newtabOverrides);
+          (event.target as Electron.WebviewTag).send('newtab', this.extensionService.newtabOverrides);
         } else {
-          (event.target as any).send('newtab', this.$store.getters.tabConfig.dummyTabObject.url);
+          (event.target as Electron.WebviewTag).send('newtab', this.$store.getters.tabConfig.dummyTabObject.url);
         }
       }
     }

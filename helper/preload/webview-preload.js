@@ -114,27 +114,29 @@ process.once('loaded', () => {
     global.require = requireTmp;
   }
 
-  // about:newtab handler
-  if (document.location.href === 'lulumi://about/#/newtab') {
-    ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
-    ipcRenderer.sendToHost('newtab');
-  } else {
-    if (document.location.href.startsWith('lulumi://')) {
+  if (document.location.href.startsWith('lulumi://')) {
+    // about:newtab handler
+    if (document.location.href === 'lulumi://about/#/newtab') {
+      setTimeout(() => {
+        ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
+        ipcRenderer.sendToHost('newtab');
+      });
+
+      global.console.warn = function () {}
+    } else {
       ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
       global.about = remote.getGlobal('guestData');
       global.backgroundPages = remote.getGlobal('backgroundPages');
       global.manifestMap = remote.getGlobal('manifestMap');
       global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
-
-      global.require = requireTmp;
-      global.module = moduleTmp;
     }
-
-    global.ipcRenderer = ipcRenderer;
-
-    ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
-      ipcRenderer.send('lulumi-runtime-emit-on-message', message);
-    });
+    global.require = requireTmp;
+    global.module = moduleTmp;
   }
+  global.ipcRenderer = ipcRenderer;
+
+  ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
+    ipcRenderer.send('lulumi-runtime-emit-on-message', message);
+  });
 });

@@ -1,4 +1,4 @@
-const hotClient = require('webpack-hot-middleware/client?name=renderer&noInfo=true&reload=true')
+const hotClient = require('webpack-hot-middleware/client?name=renderer&reload=true')
 const { remote } = require('electron')
 
 hotClient.subscribe((event) => {

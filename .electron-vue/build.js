@@ -11,6 +11,7 @@ const webpack = require('webpack')
 const Multispinner = require('multispinner')
 
 const buildConfig = require('./config').building
+const dllConfig = require('./webpack.dll.config')
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
 
@@ -53,39 +54,68 @@ function build () {
 
   del.sync(['dist/*', '!.gitkeep'])
 
-  const tasks = ['main', 'renderer']
-  const m = new Multispinner(tasks, {
-    preText: 'building',
-    postText: 'process'
-  })
+  console.log('prebuild vendor.dll.js')
+  webpack(dllConfig, (err, stats) => {
+    if (err) {
+      console.log(`\n  ${errorLog}failed to build vendor.dll.js`)
+      console.error(`\n${err}\n`)
+      process.exit(1)
+    } else if (stats.hasErrors()) {
+      let err = ''
 
-  let results = ''
+      stats.toString({
+        chunks: false,
+        colors: true
+      })
+      .split(/\r?\n/)
+      .forEach(line => {
+        err += `    ${line}\n`
+      })
 
-  m.on('success', () => {
-    process.stdout.write('\x1B[2J\x1B[0f')
-    console.log(`\n\n${results}`)
-    console.log(`${okayLog}take it away ${chalk.yellow('electron-packager')}\n`)
-    bundleApp()
-  })
+      console.log(`\n  ${errorLog}failed to build vendor.dll.js`)
+      console.error(`\n${err}\n`)
+      process.exit(1)
+    } else {
+      console.log(`\n${okayLog}\n${stats.toString({
+        chunks: false,
+        colors: true
+      })}\n`)
 
-  pack(mainConfig).then(result => {
-    results += result + '\n\n'
-    m.success('main')
-  }).catch(err => {
-    m.error('main')
-    console.log(`\n  ${errorLog}failed to build main process`)
-    console.error(`\n${err}\n`)
-    process.exit(1)
-  })
+      const tasks = ['main', 'renderer']
+      const m = new Multispinner(tasks, {
+        preText: 'building',
+        postText: 'process'
+      })
 
-  pack(rendererConfig).then(result => {
-    results += result + '\n\n'
-    m.success('renderer')
-  }).catch(err => {
-    m.error('renderer')
-    console.log(`\n  ${errorLog}failed to build renderer process`)
-    console.error(`\n${err}\n`)
-    process.exit(1)
+      let results = ''
+
+      m.on('success', () => {
+        process.stdout.write('\x1B[2J\x1B[0f')
+        console.log(`\n\n${results}`)
+        console.log(`${okayLog}take it away ${chalk.yellow('electron-packager')}\n`)
+        bundleApp()
+      })
+
+      pack(mainConfig).then(result => {
+        results += result + '\n\n'
+        m.success('main')
+      }).catch(err => {
+        m.error('main')
+        console.log(`\n  ${errorLog}failed to build main process`)
+        console.error(`\n${err}\n`)
+        process.exit(1)
+      })
+
+      pack(rendererConfig).then(result => {
+        results += result + '\n\n'
+        m.success('renderer')
+      }).catch(err => {
+        m.error('renderer')
+        console.log(`\n  ${errorLog}failed to build renderer process`)
+        console.error(`\n${err}\n`)
+        process.exit(1)
+      })
+    }
   })
 }
 

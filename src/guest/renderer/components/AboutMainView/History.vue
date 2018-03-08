@@ -5,7 +5,7 @@
         h1 {{ $t('about.historyPage.title') }}
       el-col(:span="4")
         div {{ `${$t('about.historyPage.sync')} ${syncStatus()}` }}
-        el-switch(@change="toggleSync", v-model="sync", on-color="#13ce66", off-color="#ff4949")
+        el-switch(@change="toggleSync", v-model="sync", active-color="#13ce66", inactive-color="#ff4949")
       el-col(:span="12")
         el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.historyPage.placeholder')", v-model="filterText")
       el-col(:span="2")
@@ -26,7 +26,7 @@
     id: number;
     title: string;
     label: string;
-    favicon: string;
+    favIconUrl: string;
     url: string;
     time: string;
     flag: boolean;
@@ -51,7 +51,7 @@
     handler: any = null;
     filterText: string = '';
     sync: boolean = false;
-  
+
     @Watch('filterText')
     onFilterText(val: string): void {
       (this.$refs.tree as any).filter(val);
@@ -132,7 +132,7 @@
       return h('span', { attrs: { class: 'history-list__item' } },
         [
           h('span', { attrs: { class: 'history-list__item-time' } }, history.time),
-          h('img', { attrs: { src: history.favicon, width: '20px' } }),
+          h('img', { attrs: { src: history.favIconUrl, width: '20px' } }),
           h('span', { attrs: { class: 'history-list__item-name' } }, history.title),
           h('a', { attrs: { href: history.url, class: 'history-list__item-link' } }, history.url),
         ],
@@ -172,7 +172,7 @@
     width: 100vw;
 
     .history-list__item-time {
-      width: 50px;
+      width: 100px;
       color: gray;
       padding-right: 30px;
     }

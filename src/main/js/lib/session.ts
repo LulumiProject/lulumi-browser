@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { BrowserWindow, ipcMain, session } from 'electron';
 
 import mainStore from '../../../shared/store/mainStore';
@@ -184,23 +183,23 @@ const registerWebRequestListeners = (): void => {
 const registerScheme = (scheme: string): void => {
   const sess = session.defaultSession as Electron.Session;
   if (process.env.NODE_ENV === 'development') {
-    sess.protocol.registerBufferProtocol('lulumi', (request, callback) => {
+    sess.protocol.registerHttpProtocol('lulumi', async (request, callback) => {
       const url: string = request.url.substr(scheme.length);
-      const [type, param] = url.split('/');
+      const [type, tmpParam] = url.split('/');
       if (type === 'about') {
-        if (param.indexOf('#') === 0) {
-          axios.get(`http://localhost:${require('../../../../.electron-vue/config').port}/about.html`).then((response) => {
-            callback({
-              mimeType: 'text/html',
-              data: Buffer.from(response.data, 'utf8'),
-            });
+        if (tmpParam.indexOf('#') === 0) {
+          callback({
+            method: request.method,
+            url: `http://localhost:${require('../../../../.electron-vue/config').port}/about.html`,
           });
         } else {
-          axios.get(`http://localhost:${require('../../../../.electron-vue/config').port}/${param}`).then((response) => {
-            callback({
-              mimeType: 'text/html',
-              data: Buffer.from(response.data, 'utf8'),
-            });
+          let param = tmpParam;
+          if (tmpParam === 'vendor.dll.js') {
+            param = `dist/${tmpParam}`;
+          }
+          callback({
+            method: request.method,
+            url: `http://localhost:${require('../../../../.electron-vue/config').port}/${param}`,
           });
         }
       }
@@ -212,11 +211,15 @@ const registerScheme = (scheme: string): void => {
   } else {
     sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
       const url: string = request.url.substr(scheme.length);
-      const [type, param] = url.split('/');
+      const [type, tmpParam] = url.split('/', 2);
       if (type === 'about') {
-        if (param.indexOf('#') === 0) {
+        if (tmpParam.indexOf('#') === 0) {
           callback(`${__dirname}/about.html`);
         } else {
+          let param = tmpParam;
+          if (url.split('/').length > 2) {
+            param = url.substr(6);
+          }
           callback(`${__dirname}/${param}`);
         }
       }
