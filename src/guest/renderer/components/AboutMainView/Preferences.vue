@@ -1,8 +1,7 @@
 <template lang="pug">
   el-row#preferences-menu
     el-col(:span="4")
-      el-menu#menu(:default-active="`${path}/search`",
-                   background-color="#545c64",
+      el-menu#menu(background-color="#545c64",
                    text-color="#fff",
                    active-text-color="#ffd04b",
                    :router="true")

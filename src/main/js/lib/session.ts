@@ -211,15 +211,11 @@ const registerScheme = (scheme: string): void => {
   } else {
     sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
       const url: string = request.url.substr(scheme.length);
-      const [type, tmpParam] = url.split('/', 2);
+      const [type, param] = url.split('/');
       if (type === 'about') {
-        if (tmpParam.indexOf('#') === 0) {
+        if (param.indexOf('#') === 0) {
           callback(`${__dirname}/about.html`);
         } else {
-          let param = tmpParam;
-          if (url.split('/').length > 2) {
-            param = url.substr(6);
-          }
           callback(`${__dirname}/${param}`);
         }
       }
