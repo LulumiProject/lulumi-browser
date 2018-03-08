@@ -406,13 +406,13 @@
     padding-left: 30px;
     align-items: center;
     justify-content: space-between;
-    -webkit-app-region: no-drag;
 
     svg {
       width: 10px;
       height: 10px;
       padding: 11px 15px;
       opacity: 1;
+      -webkit-app-region: no-drag;
 
       &:hover {
         background: #bbb;
