@@ -263,10 +263,10 @@
 <style lang="less" scoped>
   .tab {
     &[hidden] {
-      display: none;
+      height: 0px;
     }
     &.hidden {
-      display: none;
+      height: 0px;
     }
   }
 
