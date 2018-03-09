@@ -818,6 +818,7 @@
     padding: 0 5px;
     font-size: 15px;
     font-weight: 100;
+    background: #f5f5f5;
     border-bottom: 1px solid #aaa;
 
     a {

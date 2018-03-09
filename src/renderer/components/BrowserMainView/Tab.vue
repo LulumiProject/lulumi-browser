@@ -1,12 +1,11 @@
 <template lang="pug">
-  div
+  div.tab(:class="isActive ? 'active' : 'hidden'")
     transition(name="notification")
       #notification(v-show="showNotification && isActive")
         notification(:windowWebContentsId="windowWebContentsId")
     webview(plugins,
             :element-loading-text="$t('tab.loading')",
-            ref="webview",
-            :class="isActive ? 'active' : 'hidden'")
+            ref="webview")
     .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
       input(ref="findinpageInput", :placeholder="$t('tab.findInPage.placeholder')")
       span(ref="findinpageCount")
@@ -262,6 +261,15 @@
 </script>
 
 <style lang="less" scoped>
+  .tab {
+    &[hidden] {
+      display: none;
+    }
+    &.hidden {
+      display: none;
+    }
+  }
+
   #notification {
     width: 100vw;
     height: 35px;
@@ -283,12 +291,6 @@
     outline: none;
     position: relative;
 
-    &[hidden] {
-      flex: 0 1;
-      width: 100vw;
-      height: 0px !important;
-    }
-
     &.fullscreen {
       position: fixed;
       top: 0;
@@ -296,13 +298,6 @@
       width: 100vw;
       height: 100vh;
       z-index: 99;
-    }
-
-    /* hack to work around display: none issues with webviews */
-    &.hidden {
-      flex: 0 1;
-      width: 100vw;
-      height: 0px !important;
     }
   }
 

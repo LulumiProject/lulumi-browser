@@ -4,7 +4,7 @@
       div(v-for="(tab, index) in tabs", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${tab.id}`")
         svg.left-edge(width="15", height="30")
           path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path.edge-border(d="m0.5,32l13,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+          path.edge-border(d="m0.5,31l14,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
           .chrome-tab-favicon
             iview-icon.spin(v-if="tab.isLoading", type="load-c", size="16")
@@ -16,8 +16,8 @@
               | {{ tab.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
         svg.right-edge(width="15", height="30")
-          path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path.edge-border(d="m0.5,32l13,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+          path.edge-bg(d="m15,32l0,-32l-2,3l-15,34l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-border(d="m0.5,30l14,-30l4,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
       div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab(windowId, 'about:newtab', false)")
         svg.left-edge(width="15", height="30")
           path.edge-bg(d="m14,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
@@ -321,7 +321,7 @@
           }
           &:hover:before,
           &:active:before {
-            color: white;
+            color: #cacaca;
           }
           &:hover,
           &:active {
@@ -354,12 +354,12 @@
           svg {
             height: 32px;
             .edge-bg {
-              fill: #f5f5f5;
+              fill: #f1f1f1;
             }
           }
           .chrome-tab-bg {
             padding-top: 2px;
-            background: #f5f5f5;
+            background: #f1f1f1;
           }
         }
 
