@@ -254,7 +254,7 @@
           img {
             width: 16px;
             height: 16px;
-            margin-right: -2px;
+            padding-right: 1px;
           }
 
           .spin {
@@ -273,7 +273,7 @@
             flex: 1;
             width: 16px;
             height: 16px;
-            padding: 0 3px;
+            padding: 0 2px;
           }
         }
 
@@ -291,20 +291,20 @@
 
         .chrome-tab-title {
           color: #222222;
-          padding: 15px 0 0 16px;
+          padding: 15px 0 0 10px;
           height: 28px;
           overflow: hidden;
           white-space: nowrap;
         }
 
         &.chrome-tab-nofavicon .chrome-tab-title {
-          padding-left: 16px;
+          padding-left: 15px;
         }
 
         .chrome-tab-close {
           display: none;
           position: absolute;
-          right: 14px;
+          right: 18px;
           top: 8px;
           width: 15px;
           height: 15px;
@@ -321,7 +321,7 @@
           }
           &:hover:before,
           &:active:before {
-            color: #cacaca;
+            color: #f1f1f1;
           }
           &:hover,
           &:active {
@@ -353,13 +353,23 @@
 
           svg {
             height: 32px;
+
             .edge-bg {
               fill: #f1f1f1;
             }
           }
+
           .chrome-tab-bg {
             padding-top: 2px;
             background: #f1f1f1;
+
+            .chrome-tab-title {
+              padding: 13px 0 0 15px;
+            }
+          }
+
+          .chrome-tab-close {
+            top: 10px;
           }
         }
 
