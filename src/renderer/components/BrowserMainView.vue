@@ -50,6 +50,7 @@
   export default class BrowserMainView extends Vue {
     windowId: number = 0;
     windowWebContentsId: number = 0;
+    htmlFullscreen: boolean = false;
     trackingFingers: boolean = false;
     swipeGesture: boolean = false;
     isSwipeOnEdge: boolean = false;
@@ -489,14 +490,23 @@
         this.getWebView().style.height = '100vh';
       }
       this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(true);
+      this.htmlFullscreen = true;
     }
     onLeaveHtmlFullScreen(): void {
-      const nav = this.$el.querySelector('#nav') as HTMLDivElement;
-      if (nav) {
-        nav.style.display = 'block';
-        this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+      if (this.htmlFullscreen) {
+        const nav = this.$el.querySelector('#nav') as HTMLDivElement;
+        if (nav) {
+          nav.style.display = 'block';
+          this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+          const jsScript = "document.webkitExitFullscreen()"
+          this.getWebView().executeJavaScript(jsScript, true)
+        }
+        this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
+        if (is.macos) {
+          this.$electron.remote.BrowserWindow.fromId(this.windowId).setSimpleFullScreen(false);
+        }
+        this.htmlFullscreen = false;
       }
-      this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
     }
     onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
       const disposition: string = event.disposition;
@@ -687,6 +697,17 @@
     }
     onScrollTouchEdge(): void {
       this.isSwipeOnEdge = true;
+    }
+    onEnterFullscreen(isDarwin: boolean): void {
+      document.body.classList.add("fullscreen");
+    }
+    onLeaveFullscreen(isDarwin: boolean): void {
+      document.body.classList.remove("fullscreen");
+      if (this.htmlFullscreen) {
+        this.onLeaveHtmlFullScreen();
+      } else {
+        this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
+      }
     }
     onContextMenu(event: Electron.Event): void {
       this.onWebviewContextMenu(event);
@@ -1575,6 +1596,12 @@
       });
       ipc.on('scroll-touch-edge', () => {
         this.onScrollTouchEdge();
+      });
+      ipc.on('enter-full-screen', (event, isDarwin) => {
+        this.onEnterFullscreen(isDarwin);
+      });
+      ipc.on('leave-full-screen', (event, isDarwin) => {
+        this.onLeaveFullscreen(isDarwin);
       });
       ipc.on('will-download-any-file', (event, data) => {
         this.onWillDownloadAnyFile(event, data);

@@ -25,20 +25,34 @@
 
   body {
     background:
-      radial-gradient(
-        ellipse at center,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(229, 229, 229, .85) 100%
-      );
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(229, 229, 229, .85) 100%
+    );
     background-position: center;
     display: flex;
     font-family: 'Source Code Pro', Courier, monospace;;
     justify-content: center;
     text-align: center;
 
-    &.darwin #chrome-tabs-shell {
-      -webkit-app-region: drag;
-      padding-right: 26px;
+    &.darwin {
+      &:not(.fullscreen) {
+        // make room for the traffic lights
+        .chrome-tabs {
+          padding-left: 70px;
+        }
+      }
+
+      #chrome-tabs-shell {
+        height: 38px;
+        padding-right: 26px;
+        -webkit-app-region: drag;
+
+        .chrome-tab {
+          top: 7px;
+        }
+      }
     }
   }
 </style>

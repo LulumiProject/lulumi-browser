@@ -3,8 +3,8 @@
     .chrome-tabs(v-sortable="")
       div(v-for="(tab, index) in tabs", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${tab.id}`")
         svg.left-edge(width="15", height="30")
-          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path.edge-border(d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+          path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-border(d="m0.5,32l13,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
         .chrome-tab-bg
           .chrome-tab-favicon
             iview-icon.spin(v-if="tab.isLoading", type="load-c", size="16")
@@ -16,16 +16,16 @@
               | {{ tab.title || $t('tabs.loading') }}
         a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
         svg.right-edge(width="15", height="30")
-          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-          path.edge-border(d="m1,28.5l11.1,-28l1.9,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
+          path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-border(d="m0.5,32l13,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
       div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab(windowId, 'about:newtab', false)")
         svg.left-edge(width="15", height="30")
-          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-        .chrome-tab-bg(style="padding-right: 10px;")
+          path.edge-bg(d="m14,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+        .chrome-tab-bg(style="width: 10px;padding: 1px 0 0 7px;")
         .chrome-tab-favicon
           i.el-icon-plus
         svg(width="15", height="30", class="right-edge")
-          path.edge-bg(d="m14,29l0,-28l-2,0.1l-11.45,27.9l13.2,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+          path.edge-bg(d="m14,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
     .custom-buttons(v-if="enableCustomButtons")
       svg(@click="onCustomButtonClick")
         use(:xlink:href="loadButton('minimize-window')")
@@ -176,227 +176,227 @@
     user-select: none;
     -webkit-user-select: none;
     -webkit-app-region: drag;
-  }
 
-  .chrome-tabs {
-    flex: 1;
-    display: flex;
+    .chrome-tabs {
+      flex: 1;
+      display: flex;
 
-    * {
-      user-select: none;
-      -webkit-user-select: none;
-      cursor: default;
-      font-size: 12px;
-      line-height: 16px;
-    }
-
-    .chrome-tab {
-      border: 0 !important;
-      position: relative;
-      margin: 0 -5px;
-      height: 30px;
-      z-index: 1;
-      transition: .1s transform;
-      border-bottom: 1px solid #999;
-      text-align: start;
-      -webkit-app-region: no-drag;
-
-      &:not(:last-child) {
-        flex: 1;
+      * {
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: default;
+        font-size: 12px;
+        line-height: 16px;
       }
 
-      &:last-child {
-        width: 45px;
-        opacity: .7;
-        z-index: 0;
-      }
-
-      // tab decoration
-      svg {
-        position: absolute;
-        top: 0;
-        height: 29px;
-
-        .edge-bg {
-          fill: #ddd;
-          transition: .2s fill;
-        }
-        .edge-border {
-          stroke: #808080;
-          stroke-width: 1px;
-        }
-
-        &.right-edge {
-          transform: scaleX(-1);
-          right: 0;
-        }
-      }
-      .chrome-tab-bg {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        top: 0;
-        left: 14px;
-        right: 14px;
-        height: 29px;
-        padding-right: 20px;
-        background: #ddd;
-        border-top: 1px solid #808080;
-        transition: .2s background;
-      }
-
-      .chrome-tab-favicon {
+      .chrome-tab {
+        border: 0 !important;
         position: relative;
-        display: flex;
-        align-items: center;
-        left: 10px;
+        margin: 0 -5px;
+        height: 30px;
+        z-index: 1;
+        transition: .1s transform;
+        border-bottom: 1px solid #999;
+        text-align: start;
+        -webkit-app-region: no-drag;
 
-        img {
-          width: 16px;
-          height: 16px;
-          margin-right: -2px;
-        }
-
-        .spin {
-          color: #2d8cf0;
-          animation: ani-spin 1s linear infinite;
-        }
-
-        @keyframes ani-spin {
-          from { transform: rotate(0deg); }
-          50%  { transform: rotate(180deg); }
-          to   { transform: rotate(360deg); }
-        }
-
-        svg.volume {
-          position: relative;
+        &:not(:last-child) {
           flex: 1;
-          width: 16px;
-          height: 16px;
-          padding: 0 3px;
         }
-      }
-
-      .spinner {
-        position: relative;
-        left: 1px;
-        top: 1px;
-      }
-      &.chrome-tab-pinned {
-        .chrome-tab-favicon {
-          left: 20px;
+        &:last-child {
+          width: 45px;
+          opacity: .7;
+          z-index: 0;
         }
-      }
-
-      .chrome-tab-title {
-        color: #222222;
-        padding: 15px 0 0 16px;
-        height: 28px;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-      &.chrome-tab-nofavicon .chrome-tab-title {
-        padding-left: 16px;
-      }
-
-      .chrome-tab-close {
-        display: none;
-        position: absolute;
-        right: 14px;
-        top: 8px;
-        width: 15px;
-        height: 15px;
-        border-radius: 8px;
-
-        &:before {
-          content: "\00D7";
-          position: absolute;
-          top: 1px;
-          right: 3px;
-          font-size: 12px;
-          line-height: 12px;
-          color: #777777;
+        &.ghost {
+          opacity: .5;
         }
-        &:hover:before,
-        &:active:before {
-          color: white;
-        }
-        &:hover,
-        &:active {
-          background: #f17469;
-        }
-      }
 
-      &:hover {
-        .chrome-tab-bg {
-          background: #f0f0f0;
-        }
-        svg .edge-bg {
-          fill: #f0f0f0;
-        }
-        .chrome-tab-close {
-          display: block;
-        }
-      }
-
-      &.chrome-tab-dragging {
-        transition: none !important;
-      }
-
-      &.chrome-tab-current {
-        border: 0;
-        z-index: 2;
-
+        // tab decoration
         svg {
+          position: absolute;
+
           .edge-bg {
-            fill: #f5f5f5;
+            fill: #ddd;
+            transition: .2s fill;
+          }
+          .edge-border {
+            stroke: #808080;
+            stroke-width: 1px;
+          }
+
+          &.right-edge {
+            transform: scaleX(-1);
+            right: 0;
           }
         }
-        .chrome-tab-bg {
-          background: #f5f5f5;
-        }
-      }
 
-      &.chrome-tab-add-btn {
-        svg, .chrome-tab-bg {
-          visibility: hidden;
-          border: 0;
+        .chrome-tab-bg {
+          position: absolute;
+          display: flex;
+          align-items: center;
+          top: 0;
+          left: 14px;
+          right: 14px;
+          height: 29px;
+          padding-right: 20px;
+          background: #ddd;
+          border-top: 1px solid #808080;
+          transition: .2s background;
         }
 
         .chrome-tab-favicon {
-          top: 6px;
-          padding: 0 6px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          left: 10px;
+
+          img {
+            width: 16px;
+            height: 16px;
+            margin-right: -2px;
+          }
+
+          .spin {
+            color: #2d8cf0;
+            animation: ani-spin 1s linear infinite;
+          }
+
+          @keyframes ani-spin {
+            from { transform: rotate(0deg); }
+            50%  { transform: rotate(180deg); }
+            to   { transform: rotate(360deg); }
+          }
+
+          svg.volume {
+            position: relative;
+            flex: 1;
+            width: 16px;
+            height: 16px;
+            padding: 0 3px;
+          }
         }
-        .icon {
-          font-size: 17px;
-          line-height: 15px;
-          color: #666;
+
+        .spinner {
+          position: relative;
+          left: 1px;
+          top: 1px;
+        }
+
+        &.chrome-tab-pinned {
+          .chrome-tab-favicon {
+            left: 20px;
+          }
+        }
+
+        .chrome-tab-title {
+          color: #222222;
+          padding: 15px 0 0 16px;
+          height: 28px;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        &.chrome-tab-nofavicon .chrome-tab-title {
+          padding-left: 16px;
+        }
+
+        .chrome-tab-close {
+          display: none;
+          position: absolute;
+          right: 14px;
+          top: 8px;
+          width: 15px;
+          height: 15px;
+          border-radius: 8px;
+
+          &:before {
+            content: "\00D7";
+            position: absolute;
+            top: 1px;
+            right: 3px;
+            font-size: 12px;
+            line-height: 12px;
+            color: #777777;
+          }
+          &:hover:before,
+          &:active:before {
+            color: white;
+          }
+          &:hover,
+          &:active {
+            background: #f17469;
+          }
         }
 
         &:hover {
-          svg, .chrome-tab-bg {
-            visibility: visible;
+          .chrome-tab-bg {
+            background: #f0f0f0;
           }
+
           svg .edge-bg {
-            fill: #ccc;
+            fill: #f0f0f0;
+          }
+
+          .chrome-tab-close {
+            display: block;
+          }
+        }
+
+        &.chrome-tab-dragging {
+          transition: none !important;
+        }
+
+        &.chrome-tab-current {
+          border: 0;
+          z-index: 2;
+
+          svg {
+            height: 32px;
+            .edge-bg {
+              fill: #f5f5f5;
+            }
           }
           .chrome-tab-bg {
-            background: #ccc;
+            padding-top: 2px;
+            background: #f5f5f5;
+          }
+        }
+
+        &.chrome-tab-add-btn {
+          svg, .chrome-tab-bg {
+            visibility: hidden;
+            border: 0;
+          }
+
+          .chrome-tab-favicon {
+            top: 16px;
+            width: 25px;
+            height: 0px;
+            justify-content: center;
           }
           .icon {
-            color: #444;
+            font-size: 17px;
+            line-height: 15px;
+            color: #666;
+          }
+
+          &:hover {
+            svg, .chrome-tab-bg {
+              visibility: visible;
+            }
+            svg .edge-bg {
+              fill: #ccc;
+            }
+            .chrome-tab-bg {
+              background: #ccc;
+            }
+            .icon {
+              color: #444;
+            }
           }
         }
       }
-    }
-  }
-
-  .chrome-tab-draggable {
-    cursor: move;
-	  cursor: -webkit-grabbing;
-
-    &.ghost {
-      opacity: .5;
     }
   }
 
@@ -426,10 +426,5 @@
         opacity: 0.8;
       }
     }
-  }
-
-  // make room for the traffic lights
-  .darwin:not(.fullscreen) .chrome-tabs {
-    padding-left: 70px;
   }
 </style>

@@ -84,7 +84,36 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.toggleFullscreen') as string,
-          role: 'togglefullscreen',
+          accelerator: is.macos ? 'Ctrl+Command+F' : 'F11',
+          click: () => {
+            const window = BrowserWindow.getFocusedWindow();
+            if (is.macos) {
+              const isSimpleFullScreen = window.isSimpleFullScreen();
+              /* if the value of `isFullScreen` is true, it means:
+               * 1. the fullscreen is triggered by HTML API, or
+               * 2. the window has been toggled by the control button
+               */
+              const isFullScreen = window.isFullScreen();
+              if (isFullScreen) {
+                window.webContents.send('leave-full-screen', true);
+              } else {
+                if (isSimpleFullScreen) {
+                  window.webContents.send('leave-full-screen', true);
+                } else {
+                  window.webContents.send('enter-full-screen', true);
+                }
+                window.setSimpleFullScreen(!window.isSimpleFullScreen());
+              }
+            } else {
+              const isFullScreen = window.isFullScreen();
+              if (isFullScreen) {
+                window.webContents.send('leave-full-screen', false);
+              } else {
+                window.webContents.send('enter-full-screen', false);
+              }
+              window.setFullScreen(!window.isFullScreen());
+            }
+          },
         },
         {
           label: i18n.t('view.resetZoom') as string,

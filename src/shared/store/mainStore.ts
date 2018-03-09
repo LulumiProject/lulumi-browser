@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 import { BrowserWindow, ipcMain } from 'electron';
+import { is } from 'electron-util';
 
 import { actions } from './actions';
 import { getters } from './getters';
@@ -16,7 +17,9 @@ Vue.use(Vuex);
 /* tslint:disable:no-console */
 /* tslint:disable:object-shorthand-properties-first */
 
-const isWindows: boolean = process.platform === 'win32';
+const isDarwin: boolean = is.macos;
+const isWindows: boolean = is.windows;
+
 const windows: Electron.BrowserWindow[] = [];
 
 let close: boolean = false;
@@ -123,6 +126,13 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     });
     window.on('scroll-touch-edge', () => {
       window.webContents.send('scroll-touch-edge');
+    });
+
+    window.on('enter-full-screen', (event) => {
+      window.webContents.send('enter-full-screen', isDarwin);
+    });
+    window.on('leave-full-screen', () => {
+      window.webContents.send('leave-full-screen', isDarwin);
     });
 
     ipcMain.on('window-id', (event: Electron.Event) => {
