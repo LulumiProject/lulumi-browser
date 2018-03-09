@@ -1,4 +1,4 @@
-# Lulumi-browser
+# Lulumi-browser [![Dependencies Status](https://david-dm.org/LulumiProject/lulumi-browser/status.svg)](https://david-dm.org/LulumiProject/lulumi-browser) [![devDependencies Status](https://david-dm.org/LulumiProject/lulumi-browser/dev-status.svg)](https://david-dm.org/LulumiProject/lulumi-browser?type=dev)
 
 > Lulumi-browser is a lightweight browser coded with Vue.js 2 and Electron.
 
