@@ -498,8 +498,8 @@
         if (nav) {
           nav.style.display = 'block';
           this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
-          const jsScript = "document.webkitExitFullscreen()"
-          this.getWebView().executeJavaScript(jsScript, true)
+          const jsScript = "document.webkitExitFullscreen()";
+          this.getWebView().executeJavaScript(jsScript, true);
         }
         this.$electron.remote.BrowserWindow.fromId(this.windowId).setFullScreen(false);
         if (is.macos) {
