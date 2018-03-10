@@ -39,38 +39,27 @@ let mainConfig = {
   module: {
     rules: [
       {
-        test: /\.(ts)$/,
+        test: /\.ts$/,
         enforce: 'pre',
         use: {
-          loader: 'tslint-loader',
-          options: {
-            typeCheck: true,
-            tsConfigFile: './src/tsconfig.json'
-          }
+          loader: 'happypack/loader?id=happy-tslint'
         },
         exclude: /node_modules/
       },
       {
         test: /\.ts$/,
         use: {
-          loader: 'ts-loader',
-          options: {
-            appendTsSuffixTo: [/\.vue$/],
-            onlyCompileBundledFiles: true
-          }
+          loader: 'happypack/loader?id=happy-ts'
         },
         exclude: /node_modules/
       },
       {
-        test: /\.(js)$/,
+        test: /\.js$/,
         enforce: 'pre',
-        exclude: /node_modules/,
         use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
+          loader: 'happypack/loader?id=happy-eslint'
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
@@ -98,7 +87,33 @@ let mainConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', ['babel-loader?cacheDirectory=true'])
+    createHappyPlugin('happy-babel', [{
+      loader: 'babel-loader',
+      options: {
+        cacheDirectory: true
+      }
+    }]),
+    createHappyPlugin('happy-eslint', [{
+      loader: 'eslint-loader',
+      options: {
+        formatter: require('eslint-friendly-formatter')
+      }
+    }]),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        happyPackMode: true,
+        appendTsSuffixTo: [/\.vue$/],
+        onlyCompileBundledFiles: true
+      }
+    }]),
+    createHappyPlugin('happy-tslint', [{
+      loader: 'tslint-loader',
+      options: {
+        typeCheck: true,
+        tsConfigFile: './src/tsconfig.json'
+      }
+    }]),
   ],
   resolve: {
     alias: {

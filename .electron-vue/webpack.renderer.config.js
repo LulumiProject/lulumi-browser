@@ -9,6 +9,7 @@ const settings = require('./config.js')
 const webpack = require('webpack')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
@@ -48,25 +49,17 @@ let rendererConfig = {
   module: {
     rules: [
       {
-        test: /\.(ts)$/,
+        test: /\.ts$/,
         enforce: 'pre',
         use: {
-          loader: 'tslint-loader',
-          options: {
-            typeCheck: true,
-            tsConfigFile: './src/tsconfig.json'
-          }
+          loader: 'happypack/loader?id=happy-tslint'
         },
         exclude: /node_modules/
       },
       {
         test: /\.ts$/,
         use: {
-          loader: 'ts-loader',
-          options: {
-            appendTsSuffixTo: [/\.vue$/],
-            onlyCompileBundledFiles: true
-          }
+          loader: 'happypack/loader?id=happy-ts'
         },
         exclude: /node_modules/
       },
@@ -74,10 +67,7 @@ let rendererConfig = {
         test: /\.js$/,
         enforce: 'pre',
         use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
+          loader: 'happypack/loader?id=happy-eslint'
         },
         exclude: /node_modules/
       },
@@ -137,7 +127,8 @@ let rendererConfig = {
                   loader: 'happypack/loader?id=happy-less'
                 }]
               }),
-              js: 'happypack/loader?id=happy-babel'
+              js: 'happypack/loader?id=happy-babel',
+              ts: 'happypack/loader?id=happy-ts'
             }
           },
         },
@@ -208,11 +199,47 @@ let rendererConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', ['babel-loader?cacheDirectory=true']),
-    createHappyPlugin('happy-css', ['css-loader']),
-    createHappyPlugin('happy-html', ['vue-html-loader']),
-    createHappyPlugin('happy-less', ['css-loader', 'less-loader']),
-    createHappyPlugin('happy-pug', ['pug-html-loader']),
+    createHappyPlugin('happy-babel', [{
+      loader: 'babel-loader',
+      options: {
+        cacheDirectory: true
+      }
+    }]),
+    createHappyPlugin('happy-css', [{
+      loader: 'css-loader'
+    }]),
+    createHappyPlugin('happy-eslint', [{
+      loader: 'eslint-loader',
+      options: {
+        formatter: require('eslint-friendly-formatter')
+      }
+    }]),
+    createHappyPlugin('happy-html',  [{
+      loader: 'vue-html-loader'
+    }]),
+    createHappyPlugin('happy-less', [{
+      loader: 'css-loader'
+    }, {
+      loader: 'less-loader'
+    }]),
+    createHappyPlugin('happy-pug', [{
+      loader: 'pug-html-loader'
+    }]),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        happyPackMode: true,
+        appendTsSuffixTo: [/\.vue$/],
+        onlyCompileBundledFiles: true
+      }
+    }]),
+    createHappyPlugin('happy-tslint', [{
+      loader: 'tslint-loader',
+      options: {
+        typeCheck: true,
+        tsConfigFile: './src/tsconfig.json'
+      }
+    }]),
     // https://github.com/amireh/happypack/pull/131
     new HappyPack({
       loaders: [{
@@ -223,6 +250,9 @@ let rendererConfig = {
           }
         }
       }]
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/tsconfig.json'
     })
   ],
   output: {
@@ -258,25 +288,17 @@ let aboutConfig = {
   module: {
     rules: [
       {
-        test: /\.(ts)$/,
+        test: /\.ts$/,
         enforce: 'pre',
         use: {
-          loader: 'tslint-loader',
-          options: {
-            typeCheck: true,
-            tsConfigFile: './src/tsconfig.json'
-          }
+          loader: 'happypack/loader?id=happy-tslint'
         },
         exclude: /node_modules/
       },
       {
         test: /\.ts$/,
         use: {
-          loader: 'ts-loader',
-          options: {
-            appendTsSuffixTo: [/\.vue$/],
-            onlyCompileBundledFiles: true
-          }
+          loader: 'happypack/loader?id=happy-ts'
         },
         exclude: /node_modules/
       },
@@ -284,10 +306,7 @@ let aboutConfig = {
         test: /\.js$/,
         enforce: 'pre',
         use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
+          loader: 'happypack/loader?id=happy-eslint'
         },
         exclude: /node_modules/
       },
@@ -347,7 +366,8 @@ let aboutConfig = {
                   loader: 'happypack/loader?id=happy-less'
                 }]
               }),
-              js: 'happypack/loader?id=happy-babel'
+              js: 'happypack/loader?id=happy-babel',
+              ts: 'happypack/loader?id=happy-ts'
             },
           }
         },
@@ -412,11 +432,47 @@ let aboutConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', ['babel-loader?cacheDirectory=true']),
-    createHappyPlugin('happy-css', ['css-loader']),
-    createHappyPlugin('happy-html', ['vue-html-loader']),
-    createHappyPlugin('happy-less', ['css-loader', 'less-loader']),
-    createHappyPlugin('happy-pug', ['pug-html-loader']),
+    createHappyPlugin('happy-babel', [{
+      loader: 'babel-loader',
+      options: {
+        cacheDirectory: true
+      }
+    }]),
+    createHappyPlugin('happy-css', [{
+      loader: 'css-loader'
+    }]),
+    createHappyPlugin('happy-eslint', [{
+      loader: 'eslint-loader',
+      options: {
+        formatter: require('eslint-friendly-formatter')
+      }
+    }]),
+    createHappyPlugin('happy-html',  [{
+      loader: 'vue-html-loader'
+    }]),
+    createHappyPlugin('happy-less', [{
+      loader: 'css-loader'
+    }, {
+      loader: 'less-loader'
+    }]),
+    createHappyPlugin('happy-pug', [{
+      loader: 'pug-html-loader'
+    }]),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        happyPackMode: true,
+        appendTsSuffixTo: [/\.vue$/],
+        onlyCompileBundledFiles: true
+      }
+    }]),
+    createHappyPlugin('happy-tslint', [{
+      loader: 'tslint-loader',
+      options: {
+        typeCheck: true,
+        tsConfigFile: './src/tsconfig.json'
+      }
+    }]),
     // https://github.com/amireh/happypack/pull/131
     new HappyPack({
       loaders: [{
@@ -427,6 +483,9 @@ let aboutConfig = {
           }
         }
       }]
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/tsconfig.json'
     })
   ],
   output: {
