@@ -9,6 +9,7 @@ const settings = require('./config.js')
 const webpack = require('webpack')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -50,17 +51,10 @@ let rendererConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'pre',
-        use: {
-          loader: 'happypack/loader?id=happy-tslint'
-        },
-        exclude: /node_modules/
-      },
-      {
-        test: /\.ts$/,
         use: {
           loader: 'happypack/loader?id=happy-ts'
         },
+        include: [ path.join(__dirname, '../src') ],
         exclude: /node_modules/
       },
       {
@@ -69,6 +63,7 @@ let rendererConfig = {
         use: {
           loader: 'happypack/loader?id=happy-eslint'
         },
+        include: [ path.join(__dirname, '../src/renderer'), path.join(__dirname, '../src/api') ],
         exclude: /node_modules/
       },
       {
@@ -78,7 +73,8 @@ let rendererConfig = {
           use: [{
             loader: 'happypack/loader?id=happy-less'
           }]
-        })
+        }),
+        include: [ path.join(__dirname, '../src/renderer/css') ]
       },
       {
         test: /\.css$/,
@@ -87,7 +83,13 @@ let rendererConfig = {
           use: [{
             loader: 'happypack/loader?id=happy-css'
           }]
-        })
+        }),
+        include: [
+          path.join(__dirname, '../src/renderer/css'),
+          path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
+          path.join(__dirname, '../node_modules/iview/dist/styles'),
+          path.join(__dirname, '../node_modules/modern-normalize')
+        ]
       },
       {
         test: /\.html$/,
@@ -100,7 +102,7 @@ let rendererConfig = {
         use: {
           loader: 'happypack/loader?id=happy-babel'
         },
-        include: [ path.resolve(__dirname, '../src/renderer'), path.resolve(__dirname, '../src/api') ],
+        include: [ path.join(__dirname, '../src/renderer'), path.join(__dirname, '../src/api') ],
         exclude: /node_modules/
       },
       {
@@ -133,9 +135,9 @@ let rendererConfig = {
           },
         },
         include: [
-          path.resolve(__dirname, '../src/renderer'),
-          path.resolve(__dirname, '../node_modules/iview/src/components/icon'),
-          path.resolve(__dirname, '../node_modules/vue-awesome/components')
+          path.join(__dirname, '../src/renderer'),
+          path.join(__dirname, '../node_modules/iview/src/components/icon'),
+          path.join(__dirname, '../node_modules/vue-awesome/components')
         ]
       },
       {
@@ -181,14 +183,14 @@ let rendererConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.ejs'),
+      template: path.join(__dirname, '../src/index.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
         removeComments: true
       },
       nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
+        ? path.join(__dirname, '../node_modules')
         : false
     }),
     new webpack.HotModuleReplacementPlugin(),
@@ -228,16 +230,10 @@ let rendererConfig = {
     createHappyPlugin('happy-ts', [{
       loader: 'ts-loader',
       options: {
-        happyPackMode: true,
         appendTsSuffixTo: [/\.vue$/],
-        onlyCompileBundledFiles: true
-      }
-    }]),
-    createHappyPlugin('happy-tslint', [{
-      loader: 'tslint-loader',
-      options: {
-        typeCheck: true,
-        tsConfigFile: './src/tsconfig.json'
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
       }
     }]),
     // https://github.com/amireh/happypack/pull/131
@@ -252,8 +248,12 @@ let rendererConfig = {
       }]
     }),
     new ForkTsCheckerWebpackPlugin({
-      tsconfig: './src/tsconfig.json'
-    })
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [Renderer]', excludeWarnings: false })
   ],
   output: {
     filename: '[name].js',
@@ -289,17 +289,10 @@ let aboutConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'pre',
-        use: {
-          loader: 'happypack/loader?id=happy-tslint'
-        },
-        exclude: /node_modules/
-      },
-      {
-        test: /\.ts$/,
         use: {
           loader: 'happypack/loader?id=happy-ts'
         },
+        include: [ path.join(__dirname, '../src') ],
         exclude: /node_modules/
       },
       {
@@ -308,6 +301,7 @@ let aboutConfig = {
         use: {
           loader: 'happypack/loader?id=happy-eslint'
         },
+        include: [ path.join(__dirname, '../src/guest/renderer') ],
         exclude: /node_modules/
       },
       {
@@ -317,7 +311,8 @@ let aboutConfig = {
           use: [{
             loader: 'happypack/loader?id=happy-less'
           }]
-        })
+        }),
+        include: [ path.join(__dirname, '../src/guest/renderer/css') ]
       },
       {
         test: /\.css$/,
@@ -326,7 +321,12 @@ let aboutConfig = {
           use: [{
             loader: 'happypack/loader?id=happy-css'
           }]
-        })
+        }),
+        include: [
+          path.join(__dirname, '../src/guest/renderer/css'),
+          path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
+          path.join(__dirname, '../node_modules/modern-normalize')
+        ]
       },
       {
         test: /\.html$/,
@@ -339,7 +339,7 @@ let aboutConfig = {
         use: {
           loader: 'happypack/loader?id=happy-babel'
         },
-        include: [ path.resolve(__dirname, '../src/guest/renderer') ],
+        include: [ path.join(__dirname, '../src/guest/renderer') ],
         exclude: /node_modules/
       },
       {
@@ -371,7 +371,7 @@ let aboutConfig = {
             },
           }
         },
-        include: [ path.resolve(__dirname, '../src/guest') ]
+        include: [ path.join(__dirname, '../src/guest') ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -416,7 +416,7 @@ let aboutConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'about.html',
-      template: path.resolve(__dirname, '../src/guest/index.ejs'),
+      template: path.join(__dirname, '../src/guest/index.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -461,16 +461,10 @@ let aboutConfig = {
     createHappyPlugin('happy-ts', [{
       loader: 'ts-loader',
       options: {
-        happyPackMode: true,
         appendTsSuffixTo: [/\.vue$/],
-        onlyCompileBundledFiles: true
-      }
-    }]),
-    createHappyPlugin('happy-tslint', [{
-      loader: 'tslint-loader',
-      options: {
-        typeCheck: true,
-        tsConfigFile: './src/tsconfig.json'
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
       }
     }]),
     // https://github.com/amireh/happypack/pull/131
@@ -485,8 +479,12 @@ let aboutConfig = {
       }]
     }),
     new ForkTsCheckerWebpackPlugin({
-      tsconfig: './src/tsconfig.json'
-    })
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [About]', excludeWarnings: false })
   ],
   output: {
     filename: '[name].js',

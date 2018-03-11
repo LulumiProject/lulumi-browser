@@ -5,9 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: {
     vendor: [
-      'babel-polyfill',
       'collect.js',
+      'css-element-queries',
       'fuse.js',
+      'nanoid',
+      'rxjs',
       'vue/dist/vue.esm.js',
       'vue-i18n',
       'vue-router',

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es5",
@@ -26,7 +25,8 @@
     ]
   },
   "include": [
-    "**/*"
+    "**/*.ts",
+    "**/*.vue"
   ],
   "exclude": [
     "../node_modules"

@@ -7,6 +7,8 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
+const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
 
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
@@ -40,17 +42,10 @@ let mainConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'pre',
-        use: {
-          loader: 'happypack/loader?id=happy-tslint'
-        },
-        exclude: /node_modules/
-      },
-      {
-        test: /\.ts$/,
         use: {
           loader: 'happypack/loader?id=happy-ts'
         },
+        include: [ path.join(__dirname, '../src') ],
         exclude: /node_modules/
       },
       {
@@ -59,6 +54,7 @@ let mainConfig = {
         use: {
           loader: 'happypack/loader?id=happy-eslint'
         },
+        include: [ path.join(__dirname, '../src/main') ],
         exclude: /node_modules/
       },
       {
@@ -66,6 +62,7 @@ let mainConfig = {
         use: {
           loader: 'happypack/loader?id=happy-babel'
         },
+        include: [ path.join(__dirname, '../src/main') ],
         exclude: /node_modules/
       }
     ]
@@ -102,18 +99,19 @@ let mainConfig = {
     createHappyPlugin('happy-ts', [{
       loader: 'ts-loader',
       options: {
-        happyPackMode: true,
         appendTsSuffixTo: [/\.vue$/],
-        onlyCompileBundledFiles: true
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
       }
     }]),
-    createHappyPlugin('happy-tslint', [{
-      loader: 'tslint-loader',
-      options: {
-        typeCheck: true,
-        tsConfigFile: './src/tsconfig.json'
-      }
-    }]),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Main Process', excludeWarnings: false })
   ],
   resolve: {
     alias: {

@@ -2,6 +2,9 @@
   "extends": [
     "tslint-config-airbnb"
   ],
+  "linterOptions": {
+    "exclude": "node_modules/**"
+  },
   "rules": {
     "class-name": true,
     "comment-format": [
