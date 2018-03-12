@@ -30,8 +30,13 @@
     "test": "yarn run unit && yarn run e2e",
     "postinstall": "yarn run lint:fix"
   },
-  "author": "Boik Su <boik@tdohacker.org>",
+  "author": {
+    "name": "Boik Su",
+    "email": "boik@tdohacker.org"
+  },
   "license": "Apache-2.0",
+  "homepage": "https://github.com/LulumiProject/lulumi-browser",
+  "repository": "https://github.com/LulumiProject/lulumi-browser",
   "dependencies": {
     "collect.js": "^4.0.11",
     "css-element-queries": "^1.0.2",
