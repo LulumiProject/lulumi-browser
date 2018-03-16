@@ -282,7 +282,7 @@ export default class Navbar extends Vue {
             = `
             <div class="security-hint">
               <span class="${hint}-origin">${currentUrl.protocol}</span>
-              ${currentUrl.href.substr(currentUrl.protocol.length)}
+              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
             </div>`;
           originalInput.style.display = 'none';
 
