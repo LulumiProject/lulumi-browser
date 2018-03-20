@@ -258,7 +258,7 @@ export default class Tabs extends Vue {
         position: relative;
         display: flex;
         align-items: center;
-        left: 10px;
+        left: 5px;
 
         img {
           width: 16px;
@@ -359,6 +359,10 @@ export default class Tabs extends Vue {
       &.chrome-tab-current {
         border: 0;
         z-index: 2;
+
+        .chrome-tab-favicon {
+          left: 10px;
+        }
 
         svg {
           height: 32px;
