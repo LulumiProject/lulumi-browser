@@ -70,7 +70,6 @@
         "singleline": "never"
       }
     ],
-    "no-boolean-literal-compare": true,
-    "strict-boolean-expressions": false
+    "no-boolean-literal-compare": true
   }
 }
