@@ -25,6 +25,7 @@ const state: Lulumi.Store.State = {
   lastOpenedTabs: [],
   certificates: {},
   windows: [],
+  extensionInfoDict: {},
 };
 
 // tslint:disable-next-line:max-line-length
@@ -623,6 +624,26 @@ const mutations = {
       Vue.set(state.windows[index], 'top', top);
       Vue.set(state.windows[index], 'focused', focused);
       Vue.set(state.windows[index], 'state', windowState);
+    }
+  },
+  // extensions
+  [types.ADD_EXTENSION](state: Lulumi.Store.State, payload) {
+    const extensionInfo: chrome.management.ExtensionInfo = payload.extensionInfo;
+    if (state.extensionInfoDict[extensionInfo.id] === undefined) {
+      Vue.set(state.extensionInfoDict, extensionInfo.id, extensionInfo);
+    }
+  },
+  [types.REMOVE_EXTENSION](state: Lulumi.Store.State, payload) {
+    const extensionId: string = payload.extensionId;
+    Vue.delete(state.extensionInfoDict, extensionId);
+  },
+  [types.UPDATE_EXTENSION](state: Lulumi.Store.State, payload) {
+    const enabled: boolean = payload.enabled;
+    const extensionId: string = payload.extensionId;
+    const extensionInfo = state.extensionInfoDict[extensionId];
+    if (extensionInfo !== undefined) {
+      extensionInfo.enabled = enabled;
+      Vue.set(state.extensionInfoDict, extensionId, extensionInfo);
     }
   },
 };

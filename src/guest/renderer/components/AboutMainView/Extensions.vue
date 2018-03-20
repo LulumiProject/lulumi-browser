@@ -27,18 +27,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, Col, Row } from 'element-ui';
 
-interface RenderProcessPreference {
-  name: string;
-  extensionId: string;
-  icons: string[];
-  srcDirectory: string;
-}
-interface RenderProcessPreferences {
-  [index: number]: RenderProcessPreference;
-  findIndex: (element: any) => number;
-}
-interface Window {
-  renderProcessPreferences: RenderProcessPreferences;
+interface Window extends Lulumi.API.GlobalObject {
   location: {
     reload: () => void;
   };

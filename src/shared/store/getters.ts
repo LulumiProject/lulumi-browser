@@ -54,4 +54,7 @@ export const getters = {
   windows(state: BrowserState) {
     return state.browser.windows;
   },
+  extensionInfoDict(state: BrowserState) {
+    return state.browser.extensionInfoDict;
+  },
 };

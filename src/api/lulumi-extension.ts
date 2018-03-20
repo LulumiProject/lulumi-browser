@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, nativeImage, webContents } from 'electron';
 import { Buffer } from 'buffer';
+import { Store } from 'vuex';
 import localshortcut from 'electron-localshortcut';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,6 +15,10 @@ import './extensions/listeners';
 
 const globalObjet = global as Lulumi.API.GlobalObject;
 let loaded = false;
+
+// ../shared/store/mainStore.ts
+const { default: mainStore } = require('../shared/store/mainStore');
+const store: Store<any> = mainStore.getStore();
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
@@ -179,36 +184,33 @@ const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
   }
 };
 
-const injectContentScripts = (manifest, entry) => {
-  if (!manifest.content_scripts) {
-    return entry;
+const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
+  if (manifest.content_scripts) {
+    const readArrayOfFiles = relativePath => ({
+      url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
+      code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
+    });
+
+    const contentScriptToEntry = script => ({
+      matches: script.matches,
+      js: script.js ? script.js.map(readArrayOfFiles) : [],
+      css: script.css ? script.css.map(readArrayOfFiles) : [],
+      runAt: script.run_at || 'document_idle',
+    });
+
+    try {
+      manifest.content_scripts = manifest.content_scripts.map(contentScriptToEntry);
+    } catch (readError) {
+      console.error('Failed to read content scripts', readError);
+    }
   }
-
-  const readArrayOfFiles = relativePath => ({
-    url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
-    code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
-  });
-
-  const contentScriptToEntry = script => ({
-    matches: script.matches,
-    js: script.js ? script.js.map(readArrayOfFiles) : [],
-    css: script.css ? script.css.map(readArrayOfFiles) : [],
-    runAt: script.run_at || 'document_idle',
-  });
-
-  try {
-    entry.contentScripts = manifest.content_scripts.map(contentScriptToEntry);
-  } catch (readError) {
-    console.error('Failed to read content scripts', readError);
-  }
-  return entry;
 };
 
 const removeRenderProcessPreferences = (manifest) => {
   globalObjet.renderProcessPreferences = globalObjet.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
 };
 
-const loadIcons = (manifest, entry) => {
+const loadIcons = (manifest: Lulumi.API.ManifestObject) => {
   /*
   const readArrayOfFiles = relativePath => ({
     url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
@@ -216,7 +218,7 @@ const loadIcons = (manifest, entry) => {
   });
   */
 
-  const iconsToEntry = (icons) => {
+  const iconsToEntry = (icons: Lulumi.API.ManifestIcons) => {
     const object = {};
     Object.keys(icons).forEach((key) => {
       object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL();
@@ -226,30 +228,46 @@ const loadIcons = (manifest, entry) => {
 
   try {
     if (manifest.icons) {
-      entry.icons = iconsToEntry(manifest.icons);
+      manifest.icons = iconsToEntry(manifest.icons);
     }
   } catch (readError) {
     console.error('Failed to load icons', readError);
   }
-  return entry;
 };
 
-const manifestToExtensionInfo = manifest => ({
-  startPage: manifest.startPage,
-  srcDirectory: manifest.srcDirectory,
+const manifestToExtensionInfo = (manifest: Lulumi.API.ManifestObject): chrome.management.ExtensionInfo => ({
+  description: manifest.description || '',
+  enabled: false,
+  hostPermissions: [],
+  id: manifest.extensionId,
+  installType: 'development',
+  isApp: false,
+  mayDisable: false,
   name: manifest.name,
-  extensionId: manifest.extensionId,
-  exposeExperimentalAPIs: true,
+  offlineEnabled: false,
+  optionsUrl: manifest.options_page || '',
+  permissions: [],
+  shortName: '',
+  type: 'extension',
+  version: manifest.version,
 });
 
 // load the extensions for the window
-const loadExtension = (manifest) => {
+const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
   startBackgroundPages(manifest);
+  injectContentScripts(manifest);
+  loadIcons(manifest);
 
-  let entry = manifestToExtensionInfo(manifest);
-  entry = injectContentScripts(manifest, entry);
-  entry = loadIcons(manifest, entry);
-  globalObjet.renderProcessPreferences.push(entry);
+  const extensionInfo = manifestToExtensionInfo(manifest);
+  store.dispatch('addExtension', {
+    extensionInfo,
+  });
+
+  globalObjet.renderProcessPreferences.push(manifest);
+  store.dispatch('updateExtension', {
+    enabled: true,
+    extensionid: extensionInfo.id,
+  });
 };
 
 const loadLulumiExtensions = (win, manifests) => {
@@ -348,6 +366,9 @@ app.once('ready', () => {
       removeRenderProcessPreferences(manifest);
       delete manifestMap[manifest.extensionId];
       delete manifestNameMap[manifest.name];
+      store.dispatch('removeExtension', {
+        extensionId,
+      });
       return manifest.name;
     }
     return '';

@@ -253,4 +253,20 @@ export const actions = {
       windowState,
     });
   },
+
+  addExtension({ commit }, { extensionInfo }) {
+    commit(types.ADD_EXTENSION, {
+      extensionInfo,
+    });
+  },
+  removeExtension({ commit }, { extensionId }) {
+    commit(types.REMOVE_EXTENSION, {
+      extensionId,
+    });
+  },
+  updateExtension({ commit }, { extensionInfo }) {
+    commit(types.UPDATE_EXTENSION, {
+      extensionInfo,
+    });
+  },
 };

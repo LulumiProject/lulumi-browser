@@ -26,8 +26,13 @@ declare namespace Lulumi {
     export interface BackgroundPages {
       [index: string]: BackgroundPageObject | undefined;
     }
+    export interface ManifestIcons {
+      [size: string]: string;
+    }
     export interface ManifestObject extends chrome.runtime.Manifest {
       extensionId: string;
+      icons: ManifestIcons;
+      srcDirectory: string;
     }
     export interface ManifestMap {
       [index: string]: ManifestObject | undefined;
@@ -41,7 +46,7 @@ declare namespace Lulumi {
     export interface GlobalObject extends NodeJS.Global {
       isOnline: boolean;
       __static: string;
-      renderProcessPreferences: any[];
+      renderProcessPreferences: ManifestObject[];
       backgroundPages: BackgroundPages;
       manifestMap: ManifestMap;
       manifestNameMap: ManifestNameMap;
@@ -130,6 +135,9 @@ declare namespace Lulumi {
       state: string;
       tabs?: TabObject[];
     }
+    export interface ExtensionInfoDict extends Object {
+      [id: string]: chrome.management.ExtensionInfo;
+    }
     export interface State {
       tabId: number;
       tabs: TabObject[];
@@ -148,6 +156,7 @@ declare namespace Lulumi {
       lastOpenedTabs: LastOpenedTabObject[];
       certificates: Certificates;
       windows: LulumiBrowserWindowProperty[];
+      extensionInfoDict: ExtensionInfoDict;
     }
     export interface TabsOrdering {
       tabObjects: Store.TabObject[];

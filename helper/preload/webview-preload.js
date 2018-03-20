@@ -99,8 +99,8 @@ const injectContentScript = (extensionId, script) => {
 const preferences = remote.getGlobal('renderProcessPreferences');
 if (preferences) {
   preferences.forEach((pref) => {
-    if (pref.contentScripts) {
-      pref.contentScripts.forEach(script => injectContentScript(pref.extensionId, script));
+    if (pref.content_scripts) {
+      pref.content_scripts.forEach(script => injectContentScript(pref.extensionId, script));
     }
   });
 }
