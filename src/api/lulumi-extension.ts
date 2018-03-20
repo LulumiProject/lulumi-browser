@@ -148,7 +148,7 @@ const removeBackgroundPages = (manifest) => {
   }
 };
 
-const loadCommands = (window: Electron.BrowserWindow, manifest) => {
+const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
   const commands = manifest.commands;
   if (commands) {
     Object.keys(commands).forEach((command) => {
@@ -244,8 +244,9 @@ const manifestToExtensionInfo = manifest => ({
 
 // load the extensions for the window
 const loadExtension = (manifest) => {
-  let entry = manifestToExtensionInfo(manifest);
   startBackgroundPages(manifest);
+
+  let entry = manifestToExtensionInfo(manifest);
   entry = injectContentScripts(manifest, entry);
   entry = loadIcons(manifest, entry);
   globalObjet.renderProcessPreferences.push(entry);
@@ -394,6 +395,6 @@ export default {
   manifestMap,
   manifestNameMap,
   backgroundPages,
-  loadCommands,
+  registerLocalCommands,
   loadExtensions,
 };

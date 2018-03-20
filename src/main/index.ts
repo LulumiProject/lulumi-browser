@@ -69,16 +69,16 @@ const winURL: string = process.env.NODE_ENV === 'development'
   : `file://${__dirname}/index.html`;
 
 // ./js/lib/session.ts
-const session = require('./js/lib/session').default;
+const { default: session } = require('./js/lib/session');
 
 // ../shared/store/mainStore.ts
-const mainStore = require('../shared/store/mainStore').default;
+const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
 
 // ../api/lulumi-extension.ts
-const lulumiExtension = require('../api/lulumi-extension').default;
+const { default: lulumiExtension } = require('../api/lulumi-extension');
 
 function appStateSave(soft: boolean = true): void {
   if (Object.keys(windows).length !== 0) {
@@ -612,7 +612,7 @@ ipcMain.on('request-extension-objects', (event: Electron.Event) => {
       'response-extension-objects',
       lulumiExtension.manifestMap);
     Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
-      lulumiExtension.loadCommands(window, lulumiExtension.manifestMap[manifest]);
+      lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
     });
   });
 });
