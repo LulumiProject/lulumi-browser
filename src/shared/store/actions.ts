@@ -264,9 +264,10 @@ export const actions = {
       extensionId,
     });
   },
-  updateExtension({ commit }, { extensionInfo }) {
+  updateExtension({ commit }, { enabled, extensionId }) {
     commit(types.UPDATE_EXTENSION, {
-      extensionInfo,
+      enabled,
+      extensionId,
     });
   },
 };
