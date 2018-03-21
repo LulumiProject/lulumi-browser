@@ -146,9 +146,9 @@
   dependencies:
     "@types/babel-types" "*"
 
-"@types/chrome@^0.0.60":
-  version "0.0.60"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.60.tgz#058eed1587b7aec3b83d4be905c8758ea145ba84"
+"@types/chrome@^0.0.61":
+  version "0.0.61"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.61.tgz#bfcfd15d0d81806b701ebd9c3933f2467d7aab1c"
   dependencies:
     "@types/filesystem" "*"
 
@@ -220,9 +220,9 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
-"@types/webpack@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.1.0.tgz#5af4d36ee464c85747c30629cb94f290a1195d7c"
+"@types/webpack@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.1.1.tgz#646c77457ff3b7b1a27be6cf57cf509c529786a3"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
@@ -3692,9 +3692,9 @@ electron-util@^0.7.0:
   dependencies:
     electron-is-dev "^0.3.0"
 
-electron@2.0.0-beta.4:
-  version "2.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.0-beta.4.tgz#900f1c4a0602c33d9477e86406e1e2e19907c9a9"
+electron@2.0.0-beta.5:
+  version "2.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.0-beta.5.tgz#a261bb2a5c10bffa9a989a4ec689e0a5851e14a5"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -8791,9 +8791,9 @@ pug-filters@^3.0.0:
     resolve "^1.1.6"
     uglify-js "^2.6.1"
 
-pug-filters@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/pug-filters/-/pug-filters-3.0.1.tgz#163ef73bfbb1f1544d032b2b40f45130eb52dccb"
+pug-filters@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/pug-filters/-/pug-filters-3.0.2.tgz#84ecad7bd074901827658c995354c9b245171402"
   dependencies:
     clean-css "^3.3.0"
     constantinople "^3.0.1"
@@ -8891,12 +8891,12 @@ pug@^2.0.0-rc.2:
     pug-runtime "^2.0.4"
     pug-strip-comments "^1.0.3"
 
-pug@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/pug/-/pug-2.0.1.tgz#27c151612b53d729abe8e8285aac6bc89345b5d0"
+pug@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/pug/-/pug-2.0.2.tgz#055342acc17ce00cd623c27215f9f1dbdf9134bd"
   dependencies:
     pug-code-gen "^2.0.1"
-    pug-filters "^3.0.1"
+    pug-filters "^3.0.2"
     pug-lexer "^4.0.0"
     pug-linker "^3.0.5"
     pug-load "^2.0.11"
@@ -11277,9 +11277,16 @@ vue-router@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
-vue-style-loader@^4.0.1, vue-style-loader@^4.0.2:
+vue-style-loader@^4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.0.2.tgz#e89aa4702a0c6b9630d8de70b1cbddb06b9ad254"
+  dependencies:
+    hash-sum "^1.0.2"
+    loader-utils "^1.0.2"
+
+vue-style-loader@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.1.0.tgz#7588bd778e2c9f8d87bfc3c5a4a039638da7a863"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
