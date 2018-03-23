@@ -553,8 +553,8 @@ if (process.env.TEST_ENV === 'e2e') {
    */
   if (process.env.NODE_ENV === 'production') {
     rendererConfig.mode = 'production'
-    rendererConfig.performance = { hints: false }
     aboutConfig.mode = 'production'
+    // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
     aboutConfig.performance = { hints: false }
     rendererConfig.devtool = false
     aboutConfig.devtool = false

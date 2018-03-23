@@ -152,7 +152,6 @@ if (process.env.TEST_ENV === 'e2e') {
    */
   if (process.env.NODE_ENV === 'production') {
     mainConfig.mode = 'production'
-    mainConfig.performance = { hints: false }
   }
 }
 
