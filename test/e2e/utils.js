@@ -44,21 +44,21 @@ function addCommands() {
   const client = app.client;
   const initialized = [];
 
-  const windowOrig = app.client.window;
-  Object.getPrototypeOf(app.client).window = function (handle) {
+  const windowOrig = client.window;
+  Object.getPrototypeOf(client).window = (handle) => {
     if (!initialized.includes(handle)) {
       initialized.push(handle);
-      return windowOrig.apply(this, [handle]).call(() => {
+      return windowOrig.apply(client, [handle]).call(() => {
         return app.api.initialize().then(() => true, () => true);
-      }).then(() => windowOrig.apply(this, [handle]));
+      }).then(() => windowOrig.apply(client, [handle]));
     } else {
-      return windowOrig.apply(this, [handle]);
+      return windowOrig.apply(client, [handle]);
     }
   };
 
   const windowHandlesOrig = client.windowHandles;
   Object.getPrototypeOf(client).windowHandles = () => {
-    return windowHandlesOrig.apply(this)
+    return windowHandlesOrig.apply(client)
       .then((response) => {
         const handles = response.value;
         return promiseMapSeries(handles, (handle) => {

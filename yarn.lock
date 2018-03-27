@@ -3624,9 +3624,9 @@ electron-osx-sign@^0.4.1:
     minimist "^1.2.0"
     plist "^2.1.0"
 
-electron-packager@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-11.1.0.tgz#90b5b41c952ccfc86f0bcb3a9c3fd30151978958"
+electron-packager@^11.2.0:
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-11.2.0.tgz#facc17d2b92c10da1bfa1d7c5f58f13774571839"
   dependencies:
     asar "^0.14.0"
     debug "^3.0.0"
@@ -3679,12 +3679,13 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.30:
   version "1.3.36"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.36.tgz#0eabf71a9ebea9013fb1cc35a390e068624f27e8"
 
-electron-unhandled@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/electron-unhandled/-/electron-unhandled-1.0.0.tgz#ecbc881c433cce053545072efab3647fcd40bfb0"
+electron-unhandled@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/electron-unhandled/-/electron-unhandled-1.1.0.tgz#ebb4e7cbfca20ba696f6bbe513e5929e1533ba46"
   dependencies:
     clean-stack "^1.3.0"
     ensure-error "^1.0.0"
+    lodash.debounce "^4.0.8"
 
 electron-util@^0.7.0:
   version "0.7.0"
@@ -5026,9 +5027,9 @@ handlebars@^4.0.1:
   optionalDependencies:
     uglify-js "^2.6"
 
-happypack@5.0.0-beta.1:
-  version "5.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/happypack/-/happypack-5.0.0-beta.1.tgz#ed648abb55afd3bc4496602d9bf08abf474deb44"
+happypack@5.0.0-beta.3:
+  version "5.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/happypack/-/happypack-5.0.0-beta.3.tgz#cb4ce4d72b7f396d84889d9dfb6c99fdefe97bb0"
   dependencies:
     async "1.5.0"
     json-stringify-safe "5.0.1"
@@ -6751,7 +6752,7 @@ lodash.clonedeepwith@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeepwith/-/lodash.clonedeepwith-4.5.0.tgz#6ee30573a03a1a60d670a62ef33c10cf1afdbdd4"
 
-lodash.debounce@^4.0.3:
+lodash.debounce@^4.0.3, lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
 
@@ -11243,9 +11244,9 @@ vue-i18n@^7.6.0:
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.6.0.tgz#8745807756f6ca5090fd85629e9cab99b1c6e442"
 
-vue-loader@^14.2.1:
-  version "14.2.1"
-  resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-14.2.1.tgz#3ace19f98187b1fa9e0709defa963a0a2396b6b3"
+vue-loader@^14.2.2:
+  version "14.2.2"
+  resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-14.2.2.tgz#c8cf3c2e29b6fb2ee595248a2aa6005038a125b3"
   dependencies:
     consolidate "^0.14.0"
     hash-sum "^1.0.2"
