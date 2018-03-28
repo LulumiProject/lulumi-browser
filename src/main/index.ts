@@ -128,6 +128,12 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       mainWindow.webContents.send('tab-click', index - 1);
     });
   }
+  localshortcut.register(mainWindow, 'CmdOrCtrl+Left', () => {
+    mainWindow.webContents.send('tab-switch', 'left');
+  });
+  localshortcut.register(mainWindow, 'CmdOrCtrl+Right', () => {
+    mainWindow.webContents.send('tab-switch', 'right');
+  });
   // register 'Escape' shortcut
   localshortcut.register(mainWindow, 'Escape', () => {
     mainWindow.webContents.send('escape-full-screen');

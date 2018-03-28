@@ -1599,7 +1599,7 @@ export default class BrowserMainView extends Vue {
         this.onTabClose(this.currentTabIndex);
       }
     });
-    ipc.on('tab-click', (event, tabIndexThatWeSee) => {
+    ipc.on('tab-click', (event: Electron.Event, tabIndexThatWeSee: number) => {
       const els = document.querySelectorAll('.chrome-tab-draggable') as NodeListOf<HTMLDivElement>;
       const el = (tabIndexThatWeSee === -1)
         ? els[els.length - 1]
@@ -1608,6 +1608,23 @@ export default class BrowserMainView extends Vue {
         el.click();
       }
     });
+    ipc.on(
+      'tab-switch',
+      (event: Electron.Event, direction: 'left' | 'right') => {
+        const els: HTMLDivElement[] = [].slice.call(
+          document.querySelectorAll('.chrome-tab-draggable'));
+        const el = document.querySelector('.chrome-tab-current');
+        if (el) {
+          const elIndex: number = els.findIndex(ele => ele.id === el.id);
+          if (elIndex !== -1) {
+            if (direction === 'left' && elIndex > 0) {
+              els[elIndex - 1].click();
+            } else if (direction === 'right' && elIndex < els.length - 1) {
+              els[elIndex + 1].click();
+            }
+          }
+        }
+      });
     ipc.on('escape-full-screen', () => {
       this.onLeaveHtmlFullScreen();
     });
