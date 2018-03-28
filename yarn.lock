@@ -1983,7 +1983,7 @@ bytes@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
 
-cacache@^10.0.1:
+cacache@^10.0.4:
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/cacache/-/cacache-10.0.4.tgz#6452367999eff9d4188aefd9a14e9d7c6a263460"
   dependencies:
@@ -3687,15 +3687,15 @@ electron-unhandled@^1.1.0:
     ensure-error "^1.0.0"
     lodash.debounce "^4.0.8"
 
-electron-util@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/electron-util/-/electron-util-0.7.0.tgz#6cc94ae4f4280725ac10e05b54ecfae6033be045"
+electron-util@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/electron-util/-/electron-util-0.8.0.tgz#37f90c7880f8ae86b9147ed35a3be8fea5a919bc"
   dependencies:
     electron-is-dev "^0.3.0"
 
-electron@2.0.0-beta.5:
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.0-beta.5.tgz#a261bb2a5c10bffa9a989a4ec689e0a5851e14a5"
+electron@2.0.0-beta.6:
+  version "2.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.0-beta.6.tgz#226000ef60fef76183bd3968a9f81759232f505b"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -6316,9 +6316,9 @@ karma-coverage@^1.1.1:
     minimatch "^3.0.0"
     source-map "^0.5.1"
 
-karma-electron@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/karma-electron/-/karma-electron-5.2.2.tgz#bdab1b2ce142fba7d12156d0add6061816b38258"
+karma-electron@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/karma-electron/-/karma-electron-5.3.0.tgz#ce5240014ca454383a30462c17874948ae1bd0fd"
   dependencies:
     commander "~2.9.0"
     convert-source-map "~1.2.0"
@@ -9801,9 +9801,9 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^4.4.8:
-  version "4.4.8"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.8.tgz#0479e0ccb8caa0d737ce9773c8d53d57d38f2d84"
+sinon@^4.4.9:
+  version "4.4.9"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.9.tgz#0792a2a5171eb0cf242edacb0eba3898b8b4297f"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.1.0"
@@ -10837,9 +10837,9 @@ typescript-formatter@^7.1.0:
     commandpost "^1.0.0"
     editorconfig "^0.15.0"
 
-typescript@^2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
+typescript@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.1.tgz#6160e4f8f195d5ba81d4876f9c0cc1fbc0820624"
 
 uglify-es@^3.3.4:
   version "3.3.9"
@@ -10877,13 +10877,13 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
-uglifyjs-webpack-plugin@^1.1.1:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-1.2.2.tgz#e7516d4367afdb715c3847841eb46f94c45ca2b9"
+uglifyjs-webpack-plugin@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-1.2.4.tgz#5eec941b2e9b8538be0a20fc6eda25b14c7c1043"
   dependencies:
-    cacache "^10.0.1"
+    cacache "^10.0.4"
     find-cache-dir "^1.0.0"
-    schema-utils "^0.4.2"
+    schema-utils "^0.4.5"
     serialize-javascript "^1.4.0"
     source-map "^0.6.1"
     uglify-es "^3.3.4"
@@ -11480,9 +11480,9 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.2.0.tgz#a4f80807651a0e611bb09609600dc266262efcc1"
+webpack@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.3.0.tgz#0b0c1e211311b3995dd25aed47ab46ea658be070"
   dependencies:
     acorn "^5.0.0"
     acorn-dynamic-import "^3.0.0"
@@ -11500,7 +11500,7 @@ webpack@^4.2.0:
     node-libs-browser "^2.0.0"
     schema-utils "^0.4.2"
     tapable "^1.0.0"
-    uglifyjs-webpack-plugin "^1.1.1"
+    uglifyjs-webpack-plugin "^1.2.4"
     watchpack "^1.5.0"
     webpack-sources "^1.0.1"
 

@@ -962,7 +962,7 @@ export default class BrowserMainView extends Vue {
     if (url.startsWith('about:')) {
       newUrl = urlResource.aboutUrls(url);
     } else if (urlUtil.isNotURL(url)) {
-      newUrl = `${this.$store.getters.currentSearchEngine.search}${url}`;
+      newUrl = this.$store.getters.currentSearchEngine.search.replace('{queryString}', url);
     } else {
       newUrl = url;
     }
@@ -1102,7 +1102,6 @@ export default class BrowserMainView extends Vue {
     if (currentWindow) {
       const { Menu, MenuItem } = this.$electron.remote;
       const menu = new Menu();
-      const el = event.target as HTMLInputElement;
       const clipboard = this.$electron.clipboard;
 
       menu.append(new MenuItem({
@@ -1113,7 +1112,11 @@ export default class BrowserMainView extends Vue {
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.copy') as string,
         accelerator: 'CmdOrCtrl+C',
-        role: 'copy',
+        click: () => {
+          if (event.target) {
+            clipboard.writeText((event.target as HTMLInputElement).value);
+          }
+        },
       }));
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.paste') as string,
@@ -1123,10 +1126,7 @@ export default class BrowserMainView extends Vue {
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.pasteAndGo') as string,
         click: () => {
-          let url = el.value.slice(0, el.selectionStart);
-          url += clipboard.readText();
-          url += el.value.slice(el.selectionEnd);
-          this.onEnterUrl(url);
+          this.onEnterUrl(clipboard.readText());
         },
       }));
 

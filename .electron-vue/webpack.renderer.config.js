@@ -15,8 +15,8 @@ const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
-const extractCSS = new ExtractTextPlugin('[name].[contenthash].css')
-const extractLESS = new ExtractTextPlugin('[name].[contenthash].less.css')
+const extractCSS = new ExtractTextPlugin('[name].css')
+const extractLESS = new ExtractTextPlugin('[name].less.css')
 
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
 function createHappyPlugin(id, loaders) {

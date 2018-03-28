@@ -13,17 +13,18 @@
       iview-icon(type="android-refresh", size="16")
   .input-group
     good-custom-autocomplete#url-input(ref="input",
-                                        @keyup.shift.up.native="selectPortion",
-                                        @keyup.shift.down.native="selectPortion",
-                                        @input="onChange",
-                                        @select="onSelect",
-                                        :trigger-on-focus="false",
-                                        :placeholder="$t('navbar.placeholder')",
-                                        :fetch-suggestions="querySearch",
-                                        v-focus="focused",
-                                        :value="value",
-                                        popper-class="my-autocomplete",
-                                        :debounce="0")
+                                       @contextmenu.native="$parent.onNavContextMenu",
+                                       @keyup.shift.up.native="selectPortion",
+                                       @keyup.shift.down.native="selectPortion",
+                                       @input="onChange",
+                                       @select="onSelect",
+                                       :trigger-on-focus="false",
+                                       :placeholder="$t('navbar.placeholder')",
+                                       :fetch-suggestions="querySearch",
+                                       v-focus="focused",
+                                       :value="value",
+                                       popper-class="my-autocomplete",
+                                       :debounce="0")
       el-button(slot="prepend")
         div.secure(v-if="secure")
           awesome-icon(name="lock")
@@ -377,11 +378,9 @@ export default class Navbar extends Vue {
     if (tabId === this.tab.id) {
       this.updateSecure(url);
       if (url === undefined || url.startsWith('lulumi-extension')) {
-        this.value = '';
         return;
       }
       if (this.focused) {
-        this.value = '';
         return;
       }
       let newUrl = decodeURIComponent(url);
