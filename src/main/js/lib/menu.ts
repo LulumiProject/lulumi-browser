@@ -84,7 +84,7 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.toggleFullscreen') as string,
-          accelerator: is.macos ? 'Ctrl+Command+F' : 'F11',
+          accelerator: is.macos ? 'Ctrl+Cmd+F' : 'F11',
           click: () => {
             const window = BrowserWindow.getFocusedWindow();
             if (is.macos) {
@@ -132,17 +132,17 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.viewSource') as string,
-          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
+          accelerator: is.macos ? 'Alt+Cmd+U' : 'Ctrl+U',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('view-source'),
         },
         {
           label: i18n.t('view.toggleDevTools') as string,
-          accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          accelerator: is.macos ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('toggle-dev-tools'),
         },
         {
           label: i18n.t('view.javascriptPanel') as string,
-          accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
+          accelerator: is.macos ? 'Alt+Cmd+J' : 'Ctrl+Shift+J',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('javascript-panel'),
         },
       ],
@@ -162,10 +162,16 @@ const getTemplate = () => {
         is.macos ? {
           type: 'separator',
         } : {},
-        is.macos ? {
-          label: i18n.t('window.front') as string,
-          role: 'front',
-        } : {},
+        {
+          label: i18n.t('window.selectNextTab') as string,
+          accelerator: is.macos ? 'Option+Cmd+Right' : 'Alt+Cmd+Right',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'next'),
+        },
+        {
+          label: i18n.t('window.selectPreviousTab') as string,
+          accelerator: is.macos ? 'Option+Cmd+Left' : 'Alt+Cmd+Left',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'previous'),
+        },
         is.macos ? {
           type: 'separator',
         } : {},
@@ -173,6 +179,13 @@ const getTemplate = () => {
           label: i18n.t('window.processManager') as string,
           click: () => openProcessManager(),
         },
+        is.macos ? {
+          type: 'separator',
+        } : {},
+        is.macos ? {
+          label: i18n.t('window.front') as string,
+          role: 'front',
+        } : {},
       ],
     },
   ];

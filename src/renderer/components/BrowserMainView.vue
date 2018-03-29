@@ -1609,18 +1609,26 @@ export default class BrowserMainView extends Vue {
       }
     });
     ipc.on(
-      'tab-switch',
-      (event: Electron.Event, direction: 'left' | 'right') => {
+      'tab-select',
+      (event: Electron.Event, direction: 'next' | 'previous') => {
         const els: HTMLDivElement[] = [].slice.call(
           document.querySelectorAll('.chrome-tab-draggable'));
         const el = document.querySelector('.chrome-tab-current');
         if (el) {
           const elIndex: number = els.findIndex(ele => ele.id === el.id);
           if (elIndex !== -1) {
-            if (direction === 'left' && elIndex > 0) {
-              els[elIndex - 1].click();
-            } else if (direction === 'right' && elIndex < els.length - 1) {
-              els[elIndex + 1].click();
+            if (direction === 'next') {
+              if (elIndex < els.length - 1) {
+                els[elIndex + 1].click();
+              } else {
+                els[0].click();
+              }
+            } else if (direction === 'previous') {
+              if (elIndex > 0) {
+                els[elIndex - 1].click();
+              } else {
+                els[els.length - 1].click();
+              }
             }
           }
         }

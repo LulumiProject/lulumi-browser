@@ -48,8 +48,10 @@ export const appMenu = {
     title: 'Window',
     minimize: 'Minimize',
     close: 'Close Window',
-    front: 'Bring All to Front',
+    selectNextTab: 'Select Next Tab',
+    selectPreviousTab: 'Select Previous Tab',
     processManager: 'Process Manager',
+    front: 'Bring All to Front',
   },
   help: {
     title: 'Help',

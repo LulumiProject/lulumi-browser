@@ -56,11 +56,8 @@ if (process.env.NODE_ENV === 'development') {
 let appStateSaveHandler: any = null;
 let setLanguage: boolean = false;
 
-const isDarwin: boolean = is.macos;
-const isWindows: boolean = is.windows;
-
-const autoHideMenuBarSetting: boolean = isDarwin;
-const swipeGesture: boolean = isDarwin
+const autoHideMenuBarSetting: boolean = is.macos;
+const swipeGesture: boolean = is.macos
   ? systemPreferences.isSwipeTrackingFromScrollEventsEnabled()
   : false;
 
@@ -104,7 +101,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   let mainWindow: Electron.BrowserWindow;
   const defaultOption: Object = {
     autoHideMenuBar: autoHideMenuBarSetting,
-    frame: !isWindows,
+    frame: !is.windows,
     fullscreenWindowTitle: true,
     minWidth: 320,
     minHeight: 500,
@@ -128,12 +125,6 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       mainWindow.webContents.send('tab-click', index - 1);
     });
   }
-  localshortcut.register(mainWindow, 'CmdOrCtrl+Left', () => {
-    mainWindow.webContents.send('tab-switch', 'left');
-  });
-  localshortcut.register(mainWindow, 'CmdOrCtrl+Right', () => {
-    mainWindow.webContents.send('tab-switch', 'right');
-  });
   // register 'Escape' shortcut
   localshortcut.register(mainWindow, 'Escape', () => {
     mainWindow.webContents.send('escape-full-screen');
@@ -248,7 +239,7 @@ app.on('ready', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (!isDarwin) {
+  if (!is.macos) {
     app.quit();
   }
 });

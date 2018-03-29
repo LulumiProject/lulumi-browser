@@ -48,8 +48,10 @@ export const appMenu = {
     title: '視窗',
     minimize: '最小化',
     close: '關閉視窗',
-    front: '全部移至最上層',
+    selectNextTab: '選取下一個分頁',
+    selectPreviousTab: '選取前一個分頁',
     processManager: '工作管理員',
+    front: '全部移至最上層',
   },
   help: {
     title: '說明',

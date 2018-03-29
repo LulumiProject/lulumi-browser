@@ -48,8 +48,10 @@ export const appMenu = {
     title: '窗口',
     minimize: '最小化',
     close: '关闭窗口',
-    front: '全部置于顶层',
+    selectNextTab: '选中下个标签页',
+    selectPreviousTab: '选中上个标签页',
     processManager: '任务管理器',
+    front: '全部置于顶层',
   },
   help: {
     title: '帮助',
