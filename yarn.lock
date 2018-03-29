@@ -146,9 +146,9 @@
   dependencies:
     "@types/babel-types" "*"
 
-"@types/chrome@^0.0.62":
-  version "0.0.62"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.62.tgz#2a00dfe7c70c210d90807d47d7aebf702808af53"
+"@types/chrome@^0.0.63":
+  version "0.0.63"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.63.tgz#b86fc8c859ec6ae0bf929b4504d7ac47d579006d"
   dependencies:
     "@types/filesystem" "*"
 
@@ -220,9 +220,9 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
-"@types/webpack@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.1.2.tgz#96b45333201dd1526b85fbe18f1972f828f7e996"
+"@types/webpack@^4.1.3":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.1.3.tgz#1cbb3fceb275590b63addf7cfb1534fda7e645a1"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
@@ -2495,9 +2495,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.0.12:
-  version "4.0.12"
-  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.12.tgz#124cae2517aaf2cb4d09d91397cc38cec5293e92"
+collect.js@^4.0.13:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.13.tgz#b50a7a664125d5e8fba8faa0917c1beab373e21f"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -3711,9 +3711,9 @@ element-resize-detector@^1.1.14:
   dependencies:
     batch-processor "^1.0.0"
 
-element-ui@^2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.2.2.tgz#40935d55e2eb007e6a5d2e766fc4bcc2266eb571"
+element-ui@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.3.2.tgz#c34ddc4474b2209b3bfbab1c633b10a4e70964cb"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -9801,9 +9801,9 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^4.4.9:
-  version "4.4.9"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.9.tgz#0792a2a5171eb0cf242edacb0eba3898b8b4297f"
+sinon@^4.4.10:
+  version "4.4.10"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.10.tgz#592ba39256cd5aecd35c883e1da2759b75d90e02"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.1.0"

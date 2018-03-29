@@ -38,7 +38,7 @@
   "homepage": "https://github.com/LulumiProject/lulumi-browser",
   "repository": "https://github.com/LulumiProject/lulumi-browser",
   "dependencies": {
-    "collect.js": "^4.0.12",
+    "collect.js": "^4.0.13",
     "css-element-queries": "^1.0.2",
     "electron-localshortcut": "^3.1.0",
     "electron-process-manager": "^0.5.1",
@@ -53,9 +53,9 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.62",
+    "@types/chrome": "^0.0.63",
     "@types/mocha": "^5.0.0",
-    "@types/webpack": "^4.1.2",
+    "@types/webpack": "^4.1.3",
     "@types/webpack-env": "^1.13.5",
     "@types/webpack-hot-middleware": "^2.16.3",
     "ava": "^0.25.0",
@@ -83,7 +83,7 @@
     "electron-rebuild": "^1.7.3",
     "electron-unhandled": "^1.1.0",
     "electron-util": "^0.8.0",
-    "element-ui": "^2.2.2",
+    "element-ui": "^2.3.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-friendly-formatter": "^4.0.0",
@@ -119,7 +119,7 @@
     "pug": "^2.0.3",
     "pug-html-loader": "^1.1.5",
     "require-dir": "^1.0.0",
-    "sinon": "^4.4.9",
+    "sinon": "^4.4.10",
     "sortablejs": "^1.7.0",
     "spectron": "^3.8.0",
     "style-loader": "^0.20.3",
