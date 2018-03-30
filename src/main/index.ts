@@ -125,6 +125,21 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       mainWindow.webContents.send('tab-click', index - 1);
     });
   }
+  if (!is.macos) {
+    /*
+    * On Windows and Linux, there're two shortcuts registered
+    * to jump to the next and previous open tab.
+    * However, it's not possible to add multiple accelerators in
+    * Electron currently; therefore, we need to register another one here.
+    * Ref: https://github.com/electron/electron/issues/5256
+    */
+    localshortcut.register(mainWindow, 'Ctrl+Tab', () => {
+      mainWindow.webContents.send('tab-select', 'next');
+    });
+    localshortcut.register(mainWindow, 'Ctrl+Shift+Tab', () => {
+      mainWindow.webContents.send('tab-select', 'previous');
+    });
+  }
   // register 'Escape' shortcut
   localshortcut.register(mainWindow, 'Escape', () => {
     mainWindow.webContents.send('escape-full-screen');
