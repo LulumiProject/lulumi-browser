@@ -306,6 +306,10 @@ export default class Tabs extends Vue {
         white-space: nowrap;
       }
 
+      span.focusing {
+        outline: 0;
+      }
+
       &.chrome-tab-nofavicon .chrome-tab-title {
         padding-left: 15px;
       }

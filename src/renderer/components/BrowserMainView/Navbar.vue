@@ -17,11 +17,12 @@
                                        @keyup.shift.up.native="selectPortion",
                                        @keyup.shift.down.native="selectPortion",
                                        @input="onChange",
+                                       @focus="onFocus",
+                                       @blur="onBlur",
                                        @select="onSelect",
                                        :trigger-on-focus="false",
                                        :placeholder="$t('navbar.placeholder')",
                                        :fetch-suggestions="querySearch",
-                                       v-focus="focused",
                                        :value="value",
                                        popper-class="my-autocomplete",
                                        :debounce="0")
@@ -67,7 +68,6 @@ import { Component, Watch, Vue } from 'vue-property-decorator';
 
 import * as path from 'path';
 import * as url from 'url';
-import { focus } from 'vue-focus';
 
 import AwesomeIcon from 'vue-awesome/components/Icon.vue';
 import 'vue-awesome/icons/angle-double-left';
@@ -166,7 +166,6 @@ Vue.component('suggestion-item', {
 
 @Component({
   directives: {
-    focus,
     sortable: {
       update(el) {
         Sortable.create(el, {
@@ -270,39 +269,7 @@ export default class Navbar extends Vue {
 
   @Watch('url')
   onUrl(newUrl: string): void {
-    this.showUrl(this.url, this.tab.id);
-    if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
-      const currentUrl = url.parse(newUrl, true);
-      const originalInput = document.querySelector('.el-input__inner') as HTMLInputElement;
-      const newElement = document.getElementById('security-indicator');
-      if (newElement !== null) {
-        if (currentUrl.href !== undefined &&
-        (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:')) {
-          const hint = this.secure ? 'secure' : 'insecure';
-          const newUrl
-            = `
-            <div class="security-hint">
-              <span class="${hint}-origin">${currentUrl.protocol}</span>
-              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
-            </div>`;
-          originalInput.style.display = 'none';
-
-          newElement.innerHTML = newUrl;
-          newElement.style.display = 'block';
-
-          newElement.removeEventListener('click', this.clickHandler, false);
-          originalInput.removeEventListener('blur', this.blurHandler, false);
-          newElement.addEventListener('click', this.clickHandler);
-          originalInput.addEventListener('blur', this.blurHandler);
-        } else {
-          newElement.style.display = 'none';
-          originalInput.style.display = 'block';
-
-          newElement.removeEventListener('click', this.clickHandler, false);
-          originalInput.removeEventListener('blur', this.blurHandler, false);
-        }
-      }
-    }
+    this.showUrl(newUrl, this.tab.id);
     (this.$refs.input as any).suggestions.length = 0;
   }
   @Watch('focused')
@@ -317,24 +284,61 @@ export default class Navbar extends Vue {
       150);
   }
 
+  updateOmnibox(newUrl: string): void {
+    if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
+      let tmp = '';
+      const currentUrl = url.parse(newUrl, true);
+      const originalInput = document.querySelector('.el-input__inner') as HTMLInputElement;
+      const newElement = document.getElementById('security-indicator');
+      if (newElement && currentUrl.href && currentUrl.protocol) {
+        if (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:') {
+          const hint = this.secure ? 'secure' : 'insecure';
+          tmp = `
+            <div class="security-hint">
+              <span class="${hint}-origin">${currentUrl.protocol}</span>
+              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
+            </div>
+          `;
+        } else {
+          tmp = `
+            <div class="security-hint">
+              <span>${currentUrl.protocol}</span>
+              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
+            </div>
+          `;
+        }
+        originalInput.style.display = 'none';
+        newElement.innerHTML = tmp;
+        newElement.style.display = 'block';
+
+        newElement.removeEventListener('click', this.clickHandler, false);
+        originalInput.removeEventListener('blur', this.blurHandler, false);
+        newElement.addEventListener('click', this.clickHandler);
+        originalInput.addEventListener('blur', this.blurHandler);
+      }
+    }
+  }
   updateSecure(url: string): void {
-    if (urlUtil.getScheme(url) === 'lulumi://') {
+    const scheme = urlUtil.getScheme(url);
+    if (scheme === 'lulumi://') {
       this.secure = true;
       return;
     }
-    const hostname = urlUtil.getHostname(url);
-    if (hostname) {
-      const key
-        = Object.keys(this.certificates).find((el) => {
-          const rule = new RegExp(`${el}$`);
-          return rule.test(hostname);
-        });
-      const certificateObject = (key === undefined)
-        ? undefined
-        : this.certificates[key];
-      if (certificateObject) {
-        this.secure = (certificateObject.verificationResult === 'net::OK');
-        return;
+    if (scheme === 'https://' || scheme === 'wss://') {
+      const hostname = urlUtil.getHostname(url);
+      if (hostname) {
+        const key
+          = Object.keys(this.certificates).find((el) => {
+            const rule = new RegExp(`${el}$`);
+            return rule.test(hostname);
+          });
+        const certificateObject = (key === undefined)
+          ? undefined
+          : this.certificates[key];
+        if (certificateObject) {
+          this.secure = (certificateObject.verificationResult === 'net::OK');
+          return;
+        }
       }
     }
     this.secure = false;
@@ -377,16 +381,14 @@ export default class Navbar extends Vue {
   showUrl(url: string, tabId: number): void {
     if (tabId === this.tab.id) {
       this.updateSecure(url);
-      if (url === undefined || url.startsWith('lulumi-extension')) {
-        return;
-      }
-      if (this.focused) {
+      if (this.focused || url.startsWith('lulumi-extension')) {
         return;
       }
       let newUrl = decodeURIComponent(url);
       newUrl = urlUtil.getUrlIfError(newUrl);
       newUrl = urlUtil.getUrlIfPDF(newUrl);
       this.value = urlUtil.getUrlIfAbout(newUrl).url;
+      this.updateOmnibox(this.value);
     }
   }
   onGoBackMouseDown(): void {
@@ -409,6 +411,12 @@ export default class Navbar extends Vue {
   }
   onChange(val: string): void {
     this.value = val;
+  }
+  onFocus(): void {
+    this.focused = true;
+  }
+  onBlur(): void {
+    this.focused = false;
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
     const item: Lulumi.Renderer.SuggestionItem = event.item;
@@ -760,21 +768,17 @@ export default class Navbar extends Vue {
       newElement.style.display = 'none';
       (originalInput.parentElement as any).append(newElement);
 
-      originalInput.addEventListener('click', () => {
-        this.focused = true;
-      });
-      originalInput.addEventListener('blur', () => {
-        this.focused = false;
-      });
       this.clickHandler = () => {
         newElement.style.display = 'none';
         (originalInput as HTMLInputElement).style.display = 'block';
-        (originalInput as HTMLInputElement).focus();
+        (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
       };
       this.blurHandler = () => {
         newElement.style.display = 'block';
         (originalInput as HTMLInputElement).style.display = 'none';
       };
+
+      this.showUrl(this.url, this.tab.id);
     }
 
     const ipc = this.$electron.ipcRenderer;

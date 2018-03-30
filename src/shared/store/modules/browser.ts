@@ -285,6 +285,7 @@ const mutations = {
     if (state.tabs[tabsIndex] && url) {
       if (state.tabs[tabsIndex].title !== 'error') {
         state.tabs[tabsIndex].url = url;
+        state.tabs[tabsIndex].error = false;
         if (url.match(regexp)) {
           if (url.match(regexp)![1] === undefined) {
             state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
@@ -292,7 +293,6 @@ const mutations = {
             state.tabs[tabsIndex].statusText = false;
             state.tabs[tabsIndex].canGoBack = payload.canGoBack;
             state.tabs[tabsIndex].canGoForward = payload.canGoForward;
-            state.tabs[tabsIndex].isLoading = false;
           }
           state.tabs[tabsIndex].favIconUrl = config.tabConfig.lulumiFavicon;
         } else {
@@ -349,7 +349,8 @@ const mutations = {
 
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
-    if (state.tabs[tabsIndex] && url !== null) {
+    if (state.tabs[tabsIndex] && url) {
+      state.tabs[tabsIndex].url = url;
       if (!url.match(regexp)) {
         if (!state.tabs[tabsIndex].favIconUrl) {
           state.tabs[tabsIndex].favIconUrl = config.tabConfig.defaultFavicon;
