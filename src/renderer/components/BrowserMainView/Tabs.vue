@@ -398,7 +398,7 @@ export default class Tabs extends Vue {
 
         .chrome-tab-favicon {
           top: 16px;
-          width: 25px;
+          width: 35px;
           height: 0px;
           justify-content: center;
         }
