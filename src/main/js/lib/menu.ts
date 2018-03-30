@@ -164,12 +164,12 @@ const getTemplate = () => {
         } : {},
         {
           label: i18n.t('window.selectNextTab') as string,
-          accelerator: is.macos ? 'Option+Cmd+Right' : 'Ctrl+PageUp',
+          accelerator: is.macos ? 'Option+Cmd+Right' : 'Ctrl+PageDown',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'next'),
         },
         {
           label: i18n.t('window.selectPreviousTab') as string,
-          accelerator: is.macos ? 'Option+Cmd+Left' : 'Ctrl+PageDown',
+          accelerator: is.macos ? 'Option+Cmd+Left' : 'Ctrl+PageUp',
           click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'previous'),
         },
         is.macos ? {

@@ -368,7 +368,7 @@ ipcMain.on('get-window-count', (event: Electron.Event) => {
   event.returnValue = Object.keys(windows).length;
 });
 
-// return the number of BrowserWindow
+// show the certificate
 ipcMain.on('show-certificate',
   (event: Electron.Event, certificate: Electron.Certificate, message: string) => {
     dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
