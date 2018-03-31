@@ -844,7 +844,10 @@ export default class BrowserMainView extends Vue {
       300);
   }
   onTabDuplicate(tabIndex: number): void {
-    this.onNewTab(this.windowId, this.getTab[tabIndex].url, true);
+    const tabObject: Lulumi.Store.TabObject = this.getTabObject(tabIndex);
+    if (tabObject) {
+      this.onNewTab(this.windowId, tabObject.url, true);
+    }
   }
   onTabClick(tabIndex: number): void {
     let usedTabIndex = tabIndex;
