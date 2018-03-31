@@ -1524,14 +1524,11 @@ export default class BrowserMainView extends Vue {
 
   beforeMount() {
     const ipc = this.$electron.ipcRenderer;
-    const webFrame = this.$electron.webFrame;
 
     ipc.once('window-close', () => {
       this.$store.dispatch('closeAllTab', this.windowId);
       ipc.send('window-close');
     });
-
-    webFrame.setVisualZoomLevelLimits(1, 1);
 
     if (process.env.NODE_ENV !== 'testing') {
       const windowProperty = ipc.sendSync('window-id');
@@ -1566,6 +1563,21 @@ export default class BrowserMainView extends Vue {
 
     const ipc = this.$electron.ipcRenderer;
 
+    ipc.on('reset-zoom', () => {
+      this.getWebView().getWebContents().setZoomLevel(0);
+    });
+    ipc.on('zoom-in', () => {
+      const webContents = this.getWebView().getWebContents();
+      webContents.getZoomLevel((zoomLevel) => {
+        webContents.setZoomLevel(zoomLevel + 0.5);
+      });
+    });
+    ipc.on('zoom-out', () => {
+      const webContents = this.getWebView().getWebContents();
+      webContents.getZoomLevel((zoomLevel) => {
+        webContents.setZoomLevel(zoomLevel - 0.5);
+      });
+    });
     ipc.on('go-back', () => {
       this.onClickBack();
     });

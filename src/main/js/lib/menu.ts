@@ -117,15 +117,18 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('view.resetZoom') as string,
-          role: 'resetzoom',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('reset-zoom'),
         },
         {
           label: i18n.t('view.zoomIn') as string,
-          role: 'zoomin',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('zoom-in'),
         },
         {
           label: i18n.t('view.zoomOut') as string,
-          role: 'zoomout',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => BrowserWindow.getFocusedWindow().webContents.send('zoom-out'),
         },
         {
           type: 'separator',
