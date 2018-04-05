@@ -2,7 +2,7 @@
 #browser-navbar
   .control-group
     a(@click="$parent.onClickHome", class="enabled")
-      iview-icon(type="ios-home", size="16")
+      iview-icon(type="home", size="16")
     a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="tab.canGoBack ? 'enabled' : 'disabled'")
       iview-icon(type="arrow-left-c", size="16")
     a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="tab.canGoForward ? 'enabled' : 'disabled'")
@@ -70,11 +70,6 @@ import * as path from 'path';
 import * as url from 'url';
 
 import AwesomeIcon from 'vue-awesome/components/Icon.vue';
-import 'vue-awesome/icons/angle-double-left';
-import 'vue-awesome/icons/angle-left';
-import 'vue-awesome/icons/angle-right';
-import 'vue-awesome/icons/refresh';
-import 'vue-awesome/icons/times';
 import 'vue-awesome/icons/lock';
 import 'vue-awesome/icons/unlock';
 

@@ -19,12 +19,11 @@ const config = {
     asar: {
       unpackDir: 'static',
     },
-    dir: path.join(__dirname, '../'),
-    icon: path.join(__dirname, '../build/icons/icon'),
+    dir: path.resolve(__dirname, '../'),
+    icon: path.resolve(__dirname, '../build/icons/icon'),
     ignore: /(^\/(src|test|build|extensions|userData|tslint|\.\w+|README|yarn))|\.gitkeep/,
-    out: path.join(__dirname, '../builds'),
+    out: path.resolve(__dirname, '../builds'),
     overwrite: true,
-    packageManager: false,
     platform: process.env.BUILD_TARGET || 'all',
   },
 };
