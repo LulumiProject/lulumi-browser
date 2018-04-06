@@ -981,7 +981,6 @@ export default class BrowserMainView extends Vue {
 
       menu.append(new MenuItem({
         label: this.$t('tabs.contextMenu.newTab') as string,
-        accelerator: 'CmdOrCtrl+T',
         click: () => this.onNewTab(this.windowId, 'about:newtab', false),
       }));
       menu.append(new MenuItem({
@@ -993,7 +992,6 @@ export default class BrowserMainView extends Vue {
       menu.append(new MenuItem({ type: 'separator' }));
       menu.append(new MenuItem({
         label: this.$t('tabs.contextMenu.closeTab') as string,
-        accelerator: 'CmdOrCtrl+W',
         click: () => {
           this.onTabClose(tabIndex);
         },
@@ -1109,12 +1107,10 @@ export default class BrowserMainView extends Vue {
 
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.cut') as string,
-        accelerator: 'CmdOrCtrl+X',
         role: 'cut',
       }));
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.copy') as string,
-        accelerator: 'CmdOrCtrl+C',
         click: () => {
           if (event.target) {
             clipboard.writeText((event.target as HTMLInputElement).value);
@@ -1123,7 +1119,6 @@ export default class BrowserMainView extends Vue {
       }));
       menu.append(new MenuItem({
         label: this.$t('navbar.contextMenu.paste') as string,
-        accelerator: 'CmdOrCtrl+V',
         role: 'paste',
       }));
       menu.append(new MenuItem({
@@ -1312,29 +1307,56 @@ export default class BrowserMainView extends Vue {
         }
       };
 
-      if (params.isEditable) {
-        if (editFlags.canUndo) {
+      if (params.selectionText) {
+        if (is.macos) {
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.undo') as string,
-            accelerator: 'CmdOrCtrl+Z',
-            role: 'undo',
+            label: this.$t(
+              'webview.contextMenu.lookUp', { selectionText: params.selectionText }) as string,
+            click: () => {
+              webview.showDefinitionForSelection();
+            },
           }));
+
+          menu.append(new MenuItem({ type: 'separator' }));
         }
 
-        if (editFlags.canRedo) {
+        if (editFlags.canCopy) {
           menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.redo') as string,
-            accelerator: 'CmdOrCtrl+Shift+Z',
-            role: 'redo',
+            label: this.$t('webview.contextMenu.copy') as string,
+            role: 'copy',
           }));
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.searchFor', {
+              selectionText: params.selectionText,
+              searchEngine: this.$store.getters.currentSearchEngine.name,
+            }) as string,
+            click: () => this.onNewTab(this.windowId, params.selectionText, false),
+          }));
+
+          menu.append(new MenuItem({ type: 'separator' }));
         }
+      }
+      if (params.isEditable) {
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.undo') as string,
+          click: () => {
+            webview.undo();
+          },
+          enabled: editFlags.canUndo,
+        }));
+        menu.append(new MenuItem({
+          label: this.$t('webview.contextMenu.redo') as string,
+          click: () => {
+            webview.redo();
+          },
+          enabled: editFlags.canRedo,
+        }));
 
         menu.append(new MenuItem({ type: 'separator' }));
 
         if (editFlags.canCut) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.cut') as string,
-            accelerator: 'CmdOrCtrl+X',
             role: 'cut',
           }));
         }
@@ -1342,7 +1364,6 @@ export default class BrowserMainView extends Vue {
         if (editFlags.canCopy) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.copy') as string,
-            accelerator: 'CmdOrCtrl+C',
             role: 'copy',
           }));
         }
@@ -1350,19 +1371,16 @@ export default class BrowserMainView extends Vue {
         if (editFlags.canPaste) {
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.paste') as string,
-            accelerator: 'CmdOrCtrl+V',
             role: 'paste',
           }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.pasteAndMatchStyle') as string,
-            accelerator: 'CmdOrCtrl+Shift+V',
             role: 'pasteandmatchstyle',
           }));
         }
 
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.selectAll') as string,
-          accelerator: 'CmdOrCtrl+A',
           role: 'selectall',
         }));
       } else if (params.linkURL) {
@@ -1443,33 +1461,6 @@ export default class BrowserMainView extends Vue {
             clipboard.writeText(params.srcURL);
           },
         }));
-      } else if (params.selectionText) {
-        if (is.macos) {
-          menu.append(new MenuItem({
-            label: this.$t(
-              'webview.contextMenu.lookUp', { selectionText: params.selectionText }) as string,
-            click: () => {
-              webview.showDefinitionForSelection();
-            },
-          }));
-
-          menu.append(new MenuItem({ type: 'separator' }));
-        }
-
-        if (editFlags.canCopy) {
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.copy') as string,
-            accelerator: 'CmdOrCtrl+C',
-            role: 'copy',
-          }));
-          menu.append(new MenuItem({
-            label: this.$t('webview.contextMenu.searchFor', {
-              selectionText: params.selectionText,
-              searchEngine: this.$store.getters.currentSearchEngine.name,
-            }) as string,
-            click: () => this.onNewTab(this.windowId, params.selectionText, false),
-          }));
-        }
       } else {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.back') as string,
@@ -1487,7 +1478,6 @@ export default class BrowserMainView extends Vue {
         }));
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.reload') as string,
-          accelerator: 'CmdOrCtrl+R',
           click: () => {
             this.onClickRefresh();
           },
@@ -1504,18 +1494,15 @@ export default class BrowserMainView extends Vue {
       if (sourceUrl !== null) {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.viewSource') as string,
-          accelerator: is.macos ? 'Alt+Command+U' : 'Ctrl+U',
           click: this.onClickViewSource,
         }));
       }
       menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.javascriptPanel') as string,
-        accelerator: is.macos ? 'Alt+Command+J' : 'Ctrl+Shift+J',
         click: this.onClickJavaScriptPanel,
       }));
       menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.inspectElement') as string,
-        accelerator: is.macos ? 'Alt+Command+I' : 'Ctrl+Shift+I',
         click: () => {
           webview.inspectElement(params.x, params.y);
         },

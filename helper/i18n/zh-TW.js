@@ -17,7 +17,7 @@ export const appMenu = {
   },
   edit: {
     title: '編輯',
-    undo: '還原輸入',
+    undo: '還原',
     redo: '重做',
     cut: '剪下',
     copy: '複製',
