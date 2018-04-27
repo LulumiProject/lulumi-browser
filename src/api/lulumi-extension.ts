@@ -14,7 +14,7 @@ import './extensions/listeners';
 /* tslint:disable:max-line-length */
 
 const globalObjet = global as Lulumi.API.GlobalObject;
-let loaded = false;
+let persistentLoaded = false;
 
 // ../shared/store/mainStore.ts
 const { default: mainStore } = require('../shared/store/mainStore');
@@ -389,10 +389,10 @@ app.once('ready', () => {
 // we can not use protocol or BrowserWindow until app is ready,
 // and hopefully, this function will be called after app is ready
 const loadExtensions = () => {
-  if (!loaded) {
+  if (!persistentLoaded) {
     // load persisted extensions
     loadedExtensionsPath = process.env.NODE_ENV === 'development'
-      ? path.join(config.devUserData, 'lulumi-extensions')
+      ? path.join(config.devUserData, 'extensions')
       : path.join(app.getPath('userData'), 'extensions');
     try {
       const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
@@ -408,7 +408,7 @@ const loadExtensions = () => {
     } catch (error) {
       // ignore error
     }
-    loaded = true;
+    persistentLoaded = true;
   }
 };
 
