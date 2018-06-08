@@ -69,9 +69,9 @@ import { Component, Watch, Vue } from 'vue-property-decorator';
 import * as path from 'path';
 import * as url from 'url';
 
-import AwesomeIcon from 'vue-awesome/components/Icon.vue';
-import 'vue-awesome/icons/lock';
-import 'vue-awesome/icons/unlock';
+import AwesomeIcon from 'vue-awesome/src/components/Icon.vue';
+import 'vue-awesome/src/icons/lock';
+import 'vue-awesome/src/icons/unlock';
 
 import * as Fuse from 'fuse.js';
 import Sortable from 'sortablejs';

@@ -9,9 +9,9 @@ div
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import AwesomeIcon from 'vue-awesome/components/Icon.vue';
-import 'vue-awesome/icons/arrow-left';
-import 'vue-awesome/icons/arrow-right';
+import AwesomeIcon from 'vue-awesome/src/components/Icon.vue';
+import 'vue-awesome/src/icons/arrow-left';
+import 'vue-awesome/src/icons/arrow-right';
 
 import BrowserMainView from '../BrowserMainView.vue';
 

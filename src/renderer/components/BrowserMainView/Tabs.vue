@@ -40,9 +40,9 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import * as path from 'path';
 
-import AwesomeIcon from 'vue-awesome/components/Icon.vue';
-import 'vue-awesome/icons/volume-up';
-import 'vue-awesome/icons/volume-off';
+import AwesomeIcon from 'vue-awesome/src/components/Icon.vue';
+import 'vue-awesome/src/icons/volume-up';
+import 'vue-awesome/src/icons/volume-off';
 
 import { fixPathForAsarUnpack, is } from 'electron-util';
 import Sortable from 'sortablejs';

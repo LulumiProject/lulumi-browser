@@ -137,7 +137,7 @@ let rendererConfig = {
         include: [
           path.join(__dirname, '../src/renderer'),
           path.join(__dirname, '../node_modules/iview/src/components/icon'),
-          path.join(__dirname, '../node_modules/vue-awesome/components')
+          path.join(__dirname, '../node_modules/vue-awesome/src/components')
         ]
       },
       {
