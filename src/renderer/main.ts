@@ -22,6 +22,8 @@ if (process.env.NODE_ENV === 'production') {
 // Customize Autocomplete component to match out needs
 const customAutocomplete = Vue.extend(Autocomplete);
 const goodCustomAutocomplete = customAutocomplete.extend({
+  // https://bit.ly/2KpCoRf
+  inheritAttrs: true,
   data() {
     return {
       activated: false,

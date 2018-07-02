@@ -130,8 +130,6 @@ export default class Tab extends Vue {
       'did-stop-loading': 'onDidStopLoading',
       'did-fail-load': 'onDidFailLoad',
       'did-finish-load': 'onDidFinishLoad',
-      'did-get-redirect-request': 'onDidGetRedirectRequest',
-      'did-get-response-details': 'onDidGetResponseDetails',
       'ipc-message': 'onIpcMessage',
       'console-message': 'onConsoleMessage',
       'update-target-url': 'onUpdateTargetUrl',

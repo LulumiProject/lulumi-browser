@@ -149,7 +149,10 @@ const removeBackgroundPages = (manifest) => {
     toBeRemovedwebContents.send(`lulumi-extension-${manifest.extensionId}-going-removed`);
   } else {
     // because the extension doesn't have any background page, we should just send an IPC message
-    BrowserWindow.getFocusedWindow().webContents.send('remove-non-bg-lulumi-extension', manifest.extensionId);
+    const browserWindow = BrowserWindow.getFocusedWindow();
+    if (browserWindow !== null) {
+      browserWindow.webContents.send('remove-non-bg-lulumi-extension', manifest.extensionId);
+    }
   }
 };
 
@@ -161,10 +164,15 @@ const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
       if (suggested_key) {
         localshortcut.register(window, suggested_key.default, () => {
           if (commands[command].suggested_key) {
+            const browserWindow = BrowserWindow.getFocusedWindow();
             if (command === '_execute_page_action') {
-              BrowserWindow.getFocusedWindow().webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+              if (browserWindow !== null) {
+                browserWindow.webContents.send('lulumi-commands-execute-page-action', manifest.extensionId);
+              }
             } else if (command === '_execute_browser_action') {
-              BrowserWindow.getFocusedWindow().webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+              if (browserWindow !== null) {
+                browserWindow.webContents.send('lulumi-commands-execute-browser-action', manifest.extensionId);
+              }
             } else {
               const extension = backgroundPages[manifest.extensionId];
               if (extension) {
@@ -346,6 +354,11 @@ app.on('will-quit', () => {
     // Ignore error
   }
 });
+
+/*
+ * Uncomment it when upgrading to electron v3.x.
+ * app.whenReady().then(() => {
+ */
 
 app.once('ready', () => {
   // the public API to add/remove extensions

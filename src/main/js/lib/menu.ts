@@ -49,7 +49,12 @@ const getTemplate = () => {
         {
           label: i18n.t('edit.find') as string,
           accelerator: 'CmdOrCtrl+F',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('start-find-in-page'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('start-find-in-page');
+            }
+          },
         },
         {
           label: i18n.t('edit.speech.title') as string,
@@ -72,12 +77,22 @@ const getTemplate = () => {
         {
           label: i18n.t('view.reload') as string,
           accelerator: 'CmdOrCtrl+R',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('reload'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('reload');
+            }
+          },
         },
         {
           label: i18n.t('view.forceReload') as string,
           accelerator: 'Shift+CmdOrCtrl+R',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('force-reload'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('force-reload');
+            }
+          },
         },
         {
           type: 'separator',
@@ -87,48 +102,65 @@ const getTemplate = () => {
           accelerator: is.macos ? 'Ctrl+Cmd+F' : 'F11',
           click: () => {
             const window = BrowserWindow.getFocusedWindow();
-            if (is.macos) {
-              const isSimpleFullScreen = window.isSimpleFullScreen();
-              /* if the value of `isFullScreen` is true, it means:
-               * 1. the fullscreen is triggered by HTML API, or
-               * 2. the window has been toggled by the control button
-               */
-              const isFullScreen = window.isFullScreen();
-              if (isFullScreen) {
-                window.webContents.send('leave-full-screen', true);
-              } else {
-                if (isSimpleFullScreen) {
+            if (window !== null) {
+              if (is.macos) {
+                const isSimpleFullScreen = window.isSimpleFullScreen();
+                /* if the value of `isFullScreen` is true, it means:
+                * 1. the fullscreen is triggered by HTML API, or
+                * 2. the window has been toggled by the control button
+                */
+                const isFullScreen = window.isFullScreen();
+                if (isFullScreen) {
                   window.webContents.send('leave-full-screen', true);
                 } else {
-                  window.webContents.send('enter-full-screen', true);
+                  if (isSimpleFullScreen) {
+                    window.webContents.send('leave-full-screen', true);
+                  } else {
+                    window.webContents.send('enter-full-screen', true);
+                  }
+                  window.setSimpleFullScreen(!window.isSimpleFullScreen());
                 }
-                window.setSimpleFullScreen(!window.isSimpleFullScreen());
-              }
-            } else {
-              const isFullScreen = window.isFullScreen();
-              if (isFullScreen) {
-                window.webContents.send('leave-full-screen', false);
               } else {
-                window.webContents.send('enter-full-screen', false);
+                const isFullScreen = window.isFullScreen();
+                if (isFullScreen) {
+                  window.webContents.send('leave-full-screen', false);
+                } else {
+                  window.webContents.send('enter-full-screen', false);
+                }
+                window.setFullScreen(!window.isFullScreen());
               }
-              window.setFullScreen(!window.isFullScreen());
             }
           },
         },
         {
           label: i18n.t('view.resetZoom') as string,
           accelerator: 'CmdOrCtrl+0',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('reset-zoom'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('reset-zoom');
+            }
+          },
         },
         {
           label: i18n.t('view.zoomIn') as string,
           accelerator: 'CmdOrCtrl+Plus',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('zoom-in'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('zoom-in');
+            }
+          },
         },
         {
           label: i18n.t('view.zoomOut') as string,
           accelerator: 'CmdOrCtrl+-',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('zoom-out'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('zoom-out');
+            }
+          },
         },
         {
           type: 'separator',
@@ -136,17 +168,32 @@ const getTemplate = () => {
         {
           label: i18n.t('view.viewSource') as string,
           accelerator: is.macos ? 'Alt+Cmd+U' : 'Ctrl+U',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('view-source'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('view-source');
+            }
+          },
         },
         {
           label: i18n.t('view.toggleDevTools') as string,
           accelerator: is.macos ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('toggle-dev-tools'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('toggle-dev-tools');
+            }
+          },
         },
         {
           label: i18n.t('view.javascriptPanel') as string,
           accelerator: is.macos ? 'Alt+Cmd+J' : 'Ctrl+Shift+J',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('javascript-panel'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('javascript-panel');
+            }
+          },
         },
       ],
     },
@@ -168,12 +215,22 @@ const getTemplate = () => {
         {
           label: i18n.t('window.selectNextTab') as string,
           accelerator: is.macos ? 'Option+Cmd+Right' : 'Ctrl+PageDown',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'next'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('tab-select', 'next');
+            }
+          },
         },
         {
           label: i18n.t('window.selectPreviousTab') as string,
           accelerator: is.macos ? 'Option+Cmd+Left' : 'Ctrl+PageUp',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-select', 'previous'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('tab-select', 'previous');
+            }
+          },
         },
         is.macos ? {
           type: 'separator',
@@ -201,7 +258,12 @@ const getTemplate = () => {
         {
           label: i18n.t('file.newTab') as string,
           accelerator: 'CmdOrCtrl+T',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('new-tab');
+            }
+          },
         },
         {
           label: i18n.t('file.newWindow') as string,
@@ -214,7 +276,12 @@ const getTemplate = () => {
         {
           label: i18n.t('file.closeTab') as string,
           accelerator: 'CmdOrCtrl+W',
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('tab-close'),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('tab-close');
+            }
+          },
         },
       ],
     });
@@ -223,10 +290,15 @@ const getTemplate = () => {
       submenu: [
         {
           label: i18n.t('app.about', { appName }) as string,
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
-            url: 'about:lulumi',
-            follow: true,
-          }),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('new-tab', {
+                url: 'about:lulumi',
+                follow: true,
+              });
+            }
+          },
         },
         {
           type: 'separator',
@@ -266,18 +338,33 @@ const getTemplate = () => {
       submenu: [
         {
           label: i18n.t('help.reportIssue') as string,
-          click: () => BrowserWindow.getFocusedWindow().webContents.send('new-tab', {
-            url: 'https://github.com/LulumiProject/lulumi-browser/issues',
-            follow: true,
-          }),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.send('new-tab', {
+                url: 'https://github.com/LulumiProject/lulumi-browser/issues',
+                follow: true,
+              });
+            }
+          },
         },
         {
           label: i18n.t('help.forceReload') as string,
-          click: () => BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache(),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.reloadIgnoringCache();
+            }
+          },
         },
         {
           label: i18n.t('help.toggleDevTools') as string,
-          click: () => BrowserWindow.getFocusedWindow().webContents.toggleDevTools(),
+          click: () => {
+            const browserWindow = BrowserWindow.getFocusedWindow();
+            if (browserWindow !== null) {
+              browserWindow.webContents.toggleDevTools();
+            }
+          },
         },
       ],
     });

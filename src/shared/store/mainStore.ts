@@ -347,7 +347,10 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
       }
       return Promise.resolve('');
     });
-    BrowserWindow.getFocusedWindow().webContents.send('about-to-quit');
+    const browserWindow = BrowserWindow.getFocusedWindow();
+    if (browserWindow !== null) {
+      browserWindow.webContents.send('about-to-quit');
+    }
   }
   return Promise.resolve(JSON.stringify(
     collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));

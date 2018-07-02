@@ -12,7 +12,7 @@ If you like this and would like to support it. Check out my [patreon page](https
 
 ``` bash
 # install dependencies
-$ yarn
+$ yarn install --ignore-engines
 
 # prebuild the vendor.dll.js, which is a must-have file that will be used across main.js, renderer.js, and about.js.
 $ yarn run build:dll

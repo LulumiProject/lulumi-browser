@@ -17,7 +17,13 @@ if (typeof process.env.NODE_ENV === 'string') {
 }
 
 // Install `electron-debug` with `devtron`
-require('electron-debug')({ showDevTools: true });
+require('electron-debug')({ devToolsMode: 'bottom', showDevTools: true });
+
+/*
+ * Uncomment it when upgrading to electron v3.x.
+ * // Install `vue-devtools`
+ * require('electron').app.whenReady().then(() => {
+ */
 
 // Install `vue-devtools`
 require('electron').app.on('ready', () => {
