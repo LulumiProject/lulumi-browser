@@ -223,9 +223,9 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
-"@types/webpack@^4.4.4":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.4.tgz#f001a0a43cf5b433d57a1a22366fe1939d648957"
+"@types/webpack@^4.4.5":
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.5.tgz#d45596fb67aeb724495ef5e7c78771bfc35f2955"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
@@ -368,13 +368,14 @@
     "@webassemblyjs/wast-parser" "1.5.12"
     long "^3.2.0"
 
-"@webpack-contrib/config-loader@^1.0.0":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@webpack-contrib/config-loader/-/config-loader-1.1.3.tgz#6cce904cabfd880203db600207fdbf64f4744fd7"
+"@webpack-contrib/config-loader@^1.2.0":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@webpack-contrib/config-loader/-/config-loader-1.2.1.tgz#5b3dd474e207437939d294d200c68b7b00008e04"
   dependencies:
     "@webpack-contrib/schema-utils" "^1.0.0-beta.0"
     chalk "^2.1.0"
     cosmiconfig "^5.0.2"
+    is-plain-obj "^1.1.0"
     loud-rejection "^1.6.0"
     merge-options "^1.0.1"
     minimist "^1.2.0"
@@ -2527,6 +2528,10 @@ colors@^1.1.0, colors@^1.1.2, colors@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
+colors@^1.2.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/colors/-/colors-1.3.0.tgz#5f20c9fef6945cb1134260aab33bfbdc8295e04e"
+
 combine-lists@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/combine-lists/-/combine-lists-1.0.1.tgz#458c07e09e0d900fc28b70a3fec2dacd1d2cb7f6"
@@ -3592,11 +3597,11 @@ electron-process-reporter@^1.2.1:
     memoizee "^0.4.11"
     rxjs "^5.5.6"
 
-electron-rebuild@^1.7.3:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.7.3.tgz#24ae06ad9dd61cb7e4d688961f49118c40a110eb"
+electron-rebuild@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.8.1.tgz#9f3d53eaecde9c0a9abad2c9d148868de87b0825"
   dependencies:
-    colors "^1.1.2"
+    colors "^1.2.0"
     debug "^2.6.3"
     detect-libc "^1.0.3"
     fs-extra "^3.0.1"
@@ -3629,9 +3634,9 @@ electron-util@^0.9.0:
   dependencies:
     electron-is-dev "^0.3.0"
 
-electron@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.3.tgz#8e591e820cae2ccdb0c3fd74c6d07834913fc133"
+electron@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.4.tgz#87b86b8d9c13748032868c1be97e2b7021a51808"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -3643,9 +3648,9 @@ element-resize-detector@^1.1.14:
   dependencies:
     batch-processor "^1.0.0"
 
-element-ui@^2.4.2:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.4.2.tgz#048e8ba325b613b454111c1d6c0b07e1e051a54a"
+element-ui@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.4.3.tgz#17a09ba6332b17a90002d86070697dcdb88fe0a5"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -9486,9 +9491,9 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.0.1.tgz#4247b97dd8fecbe1e19f8b816a5e7eed3993bcfe"
+sinon@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-6.1.0.tgz#9ee3d3900616333078464aa3969ba5688456fea3"
   dependencies:
     "@sinonjs/formatio" "^2.0.0"
     diff "^3.5.0"
@@ -10944,11 +10949,11 @@ webdriverio@^4.8.0:
     wdio-dot-reporter "~0.0.8"
     wgxpath "~1.0.0"
 
-webpack-command@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/webpack-command/-/webpack-command-0.3.1.tgz#e1917d48e3285da6c1d8e5c0a432cab031c3970f"
+webpack-command@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/webpack-command/-/webpack-command-0.4.0.tgz#31d30b3ba3ef8f339e2c84d89d18c06fa0550363"
   dependencies:
-    "@webpack-contrib/config-loader" "^1.0.0"
+    "@webpack-contrib/config-loader" "^1.2.0"
     "@webpack-contrib/schema-utils" "^1.0.0-beta.0"
     camelcase "^5.0.0"
     chalk "^2.3.2"
