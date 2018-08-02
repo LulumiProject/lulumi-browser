@@ -2,15 +2,15 @@
 #browser-navbar
   .control-group
     a(@click="$parent.onClickHome", class="enabled")
-      iview-icon(type="home", size="16")
+      iview-icon(type="md-home", size="16")
     a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="tab.canGoBack ? 'enabled' : 'disabled'")
-      iview-icon(type="arrow-left-c", size="16")
+      iview-icon(type="md-arrow-round-back", size="16")
     a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="tab.canGoForward ? 'enabled' : 'disabled'")
-      iview-icon(type="arrow-right-c", size="16")
+      iview-icon(type="md-arrow-round-forward", size="16")
     a(v-if="tab.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
-      iview-icon(type="close", size="16")
+      iview-icon(type="md-close", size="16")
     a(v-else, @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
-      iview-icon(type="android-refresh", size="16")
+      iview-icon(type="md-refresh", size="16")
   .input-group
     good-custom-autocomplete#url-input(ref="input",
                                        @contextmenu.native="$parent.onNavContextMenu",
@@ -60,7 +60,7 @@
                           allowpopups="")
   .common-group
     a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
-      iview-icon(type="android-more-vertical", size="22")
+      iview-icon(type="md-more", size="22")
 </template>
 
 <script lang="ts">
