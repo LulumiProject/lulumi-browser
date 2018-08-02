@@ -3,32 +3,29 @@
   "env": {
     "test": {
       "presets": [
-        ["env", {
+        ["@babel/preset-env", {
           "targets": { "node": "8.9.3" }
-        }],
-        "stage-0"
+        }]
       ],
       "plugins": ["istanbul"]
     },
     "main": {
       "presets": [
-        ["env", {
+        ["@babel/preset-env", {
           "targets": { "node": "8.9.3" }
-        }],
-        "stage-0"
+        }]
       ]
     },
     "renderer": {
       "presets": [
-        ["env", {
+        ["@babel/preset-env", {
           "modules": false
-        }],
-        "stage-0"
+        }]
       ]
     }
   },
   "plugins": [
-    "closure-elimination",
-    "transform-runtime"
+    "@babel/plugin-transform-runtime",
+    "closure-elimination"
   ]
 }
