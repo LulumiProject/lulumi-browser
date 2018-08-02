@@ -5,18 +5,22 @@ process.env.BABEL_ENV = 'renderer'
 const os = require('os')
 const path = require('path')
 const { dependencies } = require('../package.json')
-const settings = require('./config.js')
 const webpack = require('webpack')
 
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
-const extractCSS = new ExtractTextPlugin('[name].css')
-const extractLESS = new ExtractTextPlugin('[name].less.css')
+const extractCSS = new MiniCssExtractPlugin({
+  filename: '[name].css'
+})
+const extractLESS = new MiniCssExtractPlugin({
+  filename: '[name].less.css'
+})
 
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
 function createHappyPlugin(id, loaders) {
@@ -68,27 +72,29 @@ let rendererConfig = {
       },
       {
         test: /\.less$/,
-        use: extractLESS.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'happypack/loader?id=happy-less'
-          }]
-        }),
-        include: [ path.join(__dirname, '../src/renderer/css') ]
+        use: [
+          process.env.NODE_ENV !== 'production'
+            ? 'vue-style-loader'
+            : extractLESS.loader,
+          'css-loader',
+          'less-loader'
+        ],
+        include: [ path.join(__dirname, '../src/renderer') ]
       },
       {
         test: /\.css$/,
-        use: extractCSS.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'happypack/loader?id=happy-css'
-          }]
-        }),
+        use: [
+          process.env.NODE_ENV !== 'production'
+            ? 'vue-style-loader'
+            : extractCSS.loader,
+          'css-loader'
+        ],
         include: [
-          path.join(__dirname, '../src/renderer/css'),
+          path.join(__dirname, '../src/renderer'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
           path.join(__dirname, '../node_modules/iview/dist/styles'),
-          path.join(__dirname, '../node_modules/modern-normalize')
+          path.join(__dirname, '../node_modules/modern-normalize'),
+          path.join(__dirname, '../node_modules/vue-awesome/components')
         ]
       },
       {
@@ -114,25 +120,7 @@ let rendererConfig = {
       {
         test: /\.vue$/,
         use: {
-          loader: 'vue-loader',
-          options: {
-            loaders: {
-              css: extractCSS.extract({
-                fallback: 'vue-style-loader',
-                use: [{
-                  loader: 'happypack/loader?id=happy-css'
-                }]
-              }),
-              less: extractLESS.extract({
-                fallback: 'vue-style-loader',
-                use: [{
-                  loader: 'happypack/loader?id=happy-less'
-                }]
-              }),
-              js: 'happypack/loader?id=happy-babel',
-              ts: 'happypack/loader?id=happy-ts'
-            }
-          },
+          loader: 'vue-loader'
         },
         include: [
           path.join(__dirname, '../src/renderer'),
@@ -207,9 +195,6 @@ let rendererConfig = {
         cacheDirectory: true
       }
     }]),
-    createHappyPlugin('happy-css', [{
-      loader: 'css-loader'
-    }]),
     createHappyPlugin('happy-eslint', [{
       loader: 'eslint-loader',
       options: {
@@ -219,13 +204,8 @@ let rendererConfig = {
     createHappyPlugin('happy-html',  [{
       loader: 'vue-html-loader'
     }]),
-    createHappyPlugin('happy-less', [{
-      loader: 'css-loader'
-    }, {
-      loader: 'less-loader'
-    }]),
     createHappyPlugin('happy-pug', [{
-      loader: 'pug-html-loader'
+      loader: 'pug-plain-loader'
     }]),
     createHappyPlugin('happy-ts', [{
       loader: 'ts-loader',
@@ -242,7 +222,7 @@ let rendererConfig = {
         path: 'vue-loader',
         query: {
           loaders: {
-            pug: 'pug-html-loader'
+            pug: 'pug-plain-loader'
           }
         }
       }]
@@ -253,7 +233,8 @@ let rendererConfig = {
       tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
-    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [Renderer]', excludeWarnings: false })
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [Renderer]', excludeWarnings: false }),
+    new VueLoaderPlugin()
   ],
   output: {
     filename: '[name].js',
@@ -306,26 +287,28 @@ let aboutConfig = {
       },
       {
         test: /\.less$/,
-        use: extractLESS.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'happypack/loader?id=happy-less'
-          }]
-        }),
-        include: [ path.join(__dirname, '../src/guest/renderer/css') ]
+        use: [
+          process.env.NODE_ENV !== 'production'
+            ? 'vue-style-loader'
+            : extractLESS.loader,
+          'css-loader',
+          'less-loader'
+        ],
+        include: [ path.join(__dirname, '../src/guest/renderer') ]
       },
       {
         test: /\.css$/,
-        use: extractCSS.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'happypack/loader?id=happy-css'
-          }]
-        }),
+        use: [
+          process.env.NODE_ENV !== 'production'
+            ? 'vue-style-loader'
+            : extractCSS.loader,
+          'css-loader'
+        ],
         include: [
-          path.join(__dirname, '../src/guest/renderer/css'),
+          path.join(__dirname, '../src/guest/renderer'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
-          path.join(__dirname, '../node_modules/modern-normalize')
+          path.join(__dirname, '../node_modules/modern-normalize'),
+          path.join(__dirname, '../node_modules/vue-awesome/components')
         ]
       },
       {
@@ -351,25 +334,7 @@ let aboutConfig = {
       {
         test: /\.vue$/,
         use: {
-          loader: 'vue-loader',
-          options: {
-            loaders: {
-              css: extractCSS.extract({
-                fallback: 'vue-style-loader',
-                use: [{
-                  loader: 'happypack/loader?id=happy-css'
-                }]
-              }),
-              less: extractLESS.extract({
-                fallback: 'vue-style-loader',
-                use: [{
-                  loader: 'happypack/loader?id=happy-less'
-                }]
-              }),
-              js: 'happypack/loader?id=happy-babel',
-              ts: 'happypack/loader?id=happy-ts'
-            },
-          }
+          loader: 'vue-loader'
         },
         include: [ path.join(__dirname, '../src/guest') ]
       },
@@ -438,9 +403,6 @@ let aboutConfig = {
         cacheDirectory: true
       }
     }]),
-    createHappyPlugin('happy-css', [{
-      loader: 'css-loader'
-    }]),
     createHappyPlugin('happy-eslint', [{
       loader: 'eslint-loader',
       options: {
@@ -450,13 +412,8 @@ let aboutConfig = {
     createHappyPlugin('happy-html',  [{
       loader: 'vue-html-loader'
     }]),
-    createHappyPlugin('happy-less', [{
-      loader: 'css-loader'
-    }, {
-      loader: 'less-loader'
-    }]),
     createHappyPlugin('happy-pug', [{
-      loader: 'pug-html-loader'
+      loader: 'pug-plain-loader'
     }]),
     createHappyPlugin('happy-ts', [{
       loader: 'ts-loader',
@@ -473,7 +430,7 @@ let aboutConfig = {
         path: 'vue-loader',
         query: {
           loaders: {
-            pug: 'pug-html-loader'
+            pug: 'pug-plain-loader'
           }
         }
       }]
@@ -484,7 +441,8 @@ let aboutConfig = {
       tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
-    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [About]', excludeWarnings: false })
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [About]', excludeWarnings: false }),
+    new VueLoaderPlugin()
   ],
   output: {
     filename: '[name].js',

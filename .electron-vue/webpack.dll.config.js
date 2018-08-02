@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   entry: {
@@ -44,6 +45,7 @@ module.exports = {
     new webpack.DllPlugin({
       path: path.join(__dirname, '../static', '[name]-manifest.json'),
       name: '[name]_library'
-    })
+    }),
+    new VueLoaderPlugin()
   ]
 }
