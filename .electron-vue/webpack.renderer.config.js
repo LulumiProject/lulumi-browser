@@ -15,13 +15,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
-const extractCSS = new MiniCssExtractPlugin({
-  filename: '[name].css'
-})
-const extractLESS = new MiniCssExtractPlugin({
-  filename: '[name].less.css'
-})
-
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
 function createHappyPlugin(id, loaders) {
   return new HappyPack({
@@ -30,6 +23,24 @@ function createHappyPlugin(id, loaders) {
     threadPool: happyThreadPool,
     verbose: false
   })
+}
+
+function returnLess() {
+  return [
+    process.env.NODE_ENV !== 'production'
+      ? 'vue-style-loader'
+      : MiniCssExtractPlugin.loader,
+    'css-loader',
+    'less-loader'
+  ]
+}
+function returnCss() {
+  return [
+    process.env.NODE_ENV !== 'production'
+      ? 'vue-style-loader'
+      : MiniCssExtractPlugin.loader,
+    'css-loader'
+  ]
 }
 
 /**
@@ -72,23 +83,12 @@ let rendererConfig = {
       },
       {
         test: /\.less$/,
-        use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : extractLESS.loader,
-          'css-loader',
-          'less-loader'
-        ],
+        use: returnLess,
         include: [ path.join(__dirname, '../src/renderer') ]
       },
       {
         test: /\.css$/,
-        use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : extractCSS.loader,
-          'css-loader'
-        ],
+        use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
@@ -163,8 +163,9 @@ let rendererConfig = {
     __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
-    extractCSS,
-    extractLESS,
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
     new OptimizeCssAssetsPlugin({
       cssProcessorOptions: { discardComments: { removeAll: true } },
       canPrint: false
@@ -287,23 +288,12 @@ let aboutConfig = {
       },
       {
         test: /\.less$/,
-        use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : extractLESS.loader,
-          'css-loader',
-          'less-loader'
-        ],
+        use: returnLess,
         include: [ path.join(__dirname, '../src/guest/renderer') ]
       },
       {
         test: /\.css$/,
-        use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : extractCSS.loader,
-          'css-loader'
-        ],
+        use: returnCss,
         include: [
           path.join(__dirname, '../src/guest/renderer'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
@@ -373,8 +363,9 @@ let aboutConfig = {
     __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
-    extractCSS,
-    extractLESS,
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
     new OptimizeCssAssetsPlugin({
       cssProcessorOptions: { discardComments: { removeAll: true } },
       canPrint: false
