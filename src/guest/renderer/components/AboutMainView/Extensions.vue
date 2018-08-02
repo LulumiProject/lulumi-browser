@@ -28,6 +28,8 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Button, Col, Row } from 'element-ui';
 
 interface Window extends Lulumi.API.GlobalObject {
+  createFromPath?: typeof Electron.NativeImage.createFromPath;
+  join?: (...paths: string[]) => string;
   location: {
     reload: () => void;
   };
@@ -58,8 +60,10 @@ export default class Extensions extends Vue {
   }
   loadIcon(extensionId: string): string | undefined {
     const id: number = this.findId(extensionId);
-    if (window.renderProcessPreferences[id].icons) { // manifest.icons entry is optional
-      return Object.values(window.renderProcessPreferences[id].icons)[0];
+    if (window.join && window.createFromPath && window.renderProcessPreferences[id].icons) {
+      return window.createFromPath(window.join(
+        window.renderProcessPreferences[id].srcDirectory,
+        Object.values(window.renderProcessPreferences[id].icons)[0])).toDataURL();
     }
     return undefined;
   }

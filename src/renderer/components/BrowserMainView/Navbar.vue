@@ -39,12 +39,10 @@
     div.block(v-for="extension in extensions",
               :key="extension.extensionId")
       el-popover(:ref="`popover-${extension.extensionId}`",
-                  placement="bottom",
-                  trigger="click",
-                  :disabled="showPopupOrNot(extension)",
-                  :popper-options={
-                    gpuAcceleration: true,
-                })
+                 placement="bottom",
+                 trigger="click",
+                 :disabled="showPopupOrNot(extension)",
+                 :popper-options={ gpuAcceleration: true })
         el-badge.badge(:ref="`badge-${extension.extensionId}`",
                         :value="showBrowserActionBadgeText(extension.extensionId)",
                         :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)",

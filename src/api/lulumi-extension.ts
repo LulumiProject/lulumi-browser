@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeImage, webContents } from 'electron';
+import { app, BrowserWindow, ipcMain, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import { Store } from 'vuex';
 import localshortcut from 'electron-localshortcut';
@@ -218,31 +218,6 @@ const removeRenderProcessPreferences = (manifest) => {
   globalObjet.renderProcessPreferences = globalObjet.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
 };
 
-const loadIcons = (manifest: Lulumi.API.ManifestObject) => {
-  /*
-  const readArrayOfFiles = relativePath => ({
-    url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
-    code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
-  });
-  */
-
-  const iconsToEntry = (icons: Lulumi.API.ManifestIcons) => {
-    const object = {};
-    Object.keys(icons).forEach((key) => {
-      object[key] = nativeImage.createFromPath(path.join(manifest.srcDirectory, icons[key])).toDataURL();
-    });
-    return object;
-  };
-
-  try {
-    if (manifest.icons) {
-      manifest.icons = iconsToEntry(manifest.icons);
-    }
-  } catch (readError) {
-    console.error('Failed to load icons', readError);
-  }
-};
-
 const manifestToExtensionInfo = (manifest: Lulumi.API.ManifestObject): chrome.management.ExtensionInfo => ({
   description: manifest.description || '',
   enabled: false,
@@ -264,7 +239,6 @@ const manifestToExtensionInfo = (manifest: Lulumi.API.ManifestObject): chrome.ma
 const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
   startBackgroundPages(manifest);
   injectContentScripts(manifest);
-  loadIcons(manifest);
 
   const extensionInfo = manifestToExtensionInfo(manifest);
   store.dispatch('addExtension', {

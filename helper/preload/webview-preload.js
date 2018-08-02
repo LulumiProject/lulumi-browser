@@ -130,6 +130,8 @@ process.once('loaded', () => {
       global.backgroundPages = remote.getGlobal('backgroundPages');
       global.manifestMap = remote.getGlobal('manifestMap');
       global.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
+      global.createFromPath = remote.nativeImage.createFromPath;
+      global.join = require('path').join;
     }
     global.require = requireTmp;
     global.module = moduleTmp;
