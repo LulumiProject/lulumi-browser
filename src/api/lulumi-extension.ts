@@ -194,15 +194,11 @@ const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
 
 const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
   if (manifest.content_scripts) {
-    const readArrayOfFiles = relativePath => ({
-      url: `lulumi-extension://${manifest.extensionId}/${relativePath}`,
-      code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
-    });
-
     const contentScriptToEntry = script => ({
+      all_frames: script.all_frames,
       matches: script.matches,
-      js: script.js ? script.js.map(readArrayOfFiles) : [],
-      css: script.css ? script.css.map(readArrayOfFiles) : [],
+      js: script.js,
+      css: script.css,
       runAt: script.run_at || 'document_idle',
     });
 
