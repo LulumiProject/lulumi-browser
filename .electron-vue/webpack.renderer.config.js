@@ -183,14 +183,6 @@ let rendererConfig = {
         ? path.join(__dirname, '../node_modules')
         : false
     }),
-    new CspHtmlWebpackPlugin({
-      'default-src': "'none'",
-      'object-src': "'self'",
-      'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='", "'unsafe-eval'"],
-      'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
-      'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
-      'img-src': ["'self'", "https:", "http:", "data:"]
-    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
       minChunkSize: 10000
@@ -522,6 +514,17 @@ if (process.env.TEST_ENV === 'e2e') {
     rendererConfig.plugins.push(
       new webpack.LoaderOptionsPlugin({
         minimize: true
+      })
+    )
+    rendererConfig.plugins.push(
+      new CspHtmlWebpackPlugin({
+        'default-src': "'none'",
+        'object-src': "'self'",
+        'connect-src': ["'self'", "ws://localhost:9080", "http://localhost:9080"],
+        'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='", "'unsafe-eval'"],
+        'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+        'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
+        'img-src': ["'self'", "https:", "http:", "data:"]
       })
     )
     aboutConfig.plugins.push(
