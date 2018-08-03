@@ -1,4 +1,4 @@
-import { Menu, BrowserWindow, ipcMain } from 'electron';
+import { app, Menu, BrowserWindow, ipcMain } from 'electron';
 import { is } from 'electron-util';
 import i18n from '../../i18n';
 import * as fs from 'fs';
@@ -299,7 +299,7 @@ const getTemplate = () => {
   ];
 
   if (is.macos) {
-    const appName = require('electron').app.getName();
+    const appName = app.getName();
     template.unshift({
       label: i18n.t('file.title') as string,
       submenu: [
