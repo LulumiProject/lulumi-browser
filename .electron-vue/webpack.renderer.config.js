@@ -12,6 +12,7 @@ const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-web
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
@@ -181,6 +182,14 @@ let rendererConfig = {
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.join(__dirname, '../node_modules')
         : false
+    }),
+    new CspHtmlWebpackPlugin({
+      'default-src': "'none'",
+      'object-src': "'self'",
+      'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='", "'unsafe-eval'"],
+      'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+      'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
+      'img-src': ["'self'", "https:", "http:", "data:"]
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
