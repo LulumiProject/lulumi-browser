@@ -13,8 +13,8 @@ import './extensions/listeners';
 /* tslint:disable:no-console */
 /* tslint:disable:max-line-length */
 
-const globalObjet = global as Lulumi.API.GlobalObject;
-let persistentLoaded = false;
+const globalObject = global as Lulumi.API.GlobalObject;
+globalObject.persistentLoaded = false;
 
 // ../shared/store/mainStore.ts
 const { default: mainStore } = require('../shared/store/mainStore');
@@ -22,7 +22,7 @@ const store: Store<any> = mainStore.getStore();
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
-globalObjet.renderProcessPreferences = [];
+globalObject.renderProcessPreferences = [];
 // extensionId => manifest
 const manifestMap: Lulumi.API.ManifestMap = {};
 // name => manifest
@@ -215,7 +215,7 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
 };
 
 const removeRenderProcessPreferences = (manifest) => {
-  globalObjet.renderProcessPreferences = globalObjet.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
+  globalObject.renderProcessPreferences = globalObject.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
 };
 
 const manifestToExtensionInfo = (manifest: Lulumi.API.ManifestObject): chrome.management.ExtensionInfo => ({
@@ -245,7 +245,7 @@ const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
     extensionInfo,
   });
 
-  globalObjet.renderProcessPreferences.push(manifest);
+  globalObject.renderProcessPreferences.push(manifest);
   store.dispatch('updateExtension', {
     enabled: true,
     extensionid: extensionInfo.id,
@@ -376,7 +376,7 @@ app.once('ready', () => {
 // we can not use protocol or BrowserWindow until app is ready,
 // and hopefully, this function will be called after app is ready
 const loadExtensions = () => {
-  if (!persistentLoaded) {
+  if (!globalObject.persistentLoaded) {
     // load persisted extensions
     loadedExtensionsPath = process.env.NODE_ENV === 'development'
       ? path.join(config.devUserData, 'extensions')
@@ -395,7 +395,7 @@ const loadExtensions = () => {
     } catch (error) {
       // ignore error
     }
-    persistentLoaded = true;
+    globalObject.persistentLoaded = true;
   }
 };
 

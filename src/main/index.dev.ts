@@ -1,9 +1,11 @@
 /**
  * This file is used specifically and only for development. It installs
- * `electron-debug` & `vue-devtools`. There shouldn't be any need to
+ * `vue-devtools`. There shouldn't be any need to
  *  modify this file, but it can be used to extend your development
  *  environment.
  */
+
+const { app } = require('electron');
 
 /* tslint:disable:no-console */
 
@@ -16,8 +18,19 @@ if (typeof process.env.NODE_ENV === 'string') {
   process.env.NODE_ENV = 'development';
 }
 
-// Install `electron-debug` with `devtron`
-require('electron-debug')({ devToolsMode: 'bottom', showDevTools: true });
+app.on('browser-window-created', (event, window) => {
+  window.webContents.once('devtools-opened', () => {
+    // Workaround for https://github.com/electron/electron/issues/13095
+    setImmediate(() => {
+      window.focus();
+    });
+  });
+
+  /// Workaround for https://github.com/electron/electron/issues/12438
+  window.webContents.once('dom-ready', () => {
+    window.webContents.openDevTools({ mode: 'bottom' });
+  });
+});
 
 /*
  * Uncomment it when upgrading to electron v3.x.

@@ -24,14 +24,14 @@ import request from './js/lib/request';
 
 const { openProcessManager } = require('electron-process-manager');
 
-const globalObjet = global as Lulumi.API.GlobalObject;
+const globalObject = global as Lulumi.API.GlobalObject;
 
 /*
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  globalObjet.__static = path.resolve(__dirname, '../static');
+  globalObject.__static = path.resolve(__dirname, '../static');
 }
 
 /*
@@ -201,7 +201,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   return mainWindow;
 }
 
-// register createWindow method to BrowserWindow
+// register methods to BrowserWindow
 (BrowserWindow as any).createWindow = createWindow;
 
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
@@ -500,7 +500,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
       [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
-    globalObjet.guestData = data;
+    globalObject.guestData = data;
   }
 });
 
@@ -646,8 +646,8 @@ ipcMain.on('request-extension-objects', (event: Electron.Event) => {
   lulumiExtension.loadExtensions();
 
   // assign extension objects to global variables
-  globalObjet.backgroundPages = lulumiExtension.backgroundPages;
-  globalObjet.manifestMap = lulumiExtension.manifestMap;
+  globalObject.backgroundPages = lulumiExtension.backgroundPages;
+  globalObject.manifestMap = lulumiExtension.manifestMap;
 
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -670,18 +670,18 @@ ipcMain.on('fetch-search-suggestions',
   });
 
 // reload each BrowserView when we plug in our cable
-globalObjet.isOnline = true;
+globalObject.isOnline = true;
 ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
   if (status) {
-    if (!globalObjet.isOnline) {
+    if (!globalObject.isOnline) {
       Object.keys(windows).forEach((key) => {
         const id = parseInt(key, 10);
         const window = windows[id];
         window.webContents.send('reload');
       });
-      globalObjet.isOnline = true;
+      globalObject.isOnline = true;
     }
   } else {
-    globalObjet.isOnline = false;
+    globalObject.isOnline = false;
   }
 });

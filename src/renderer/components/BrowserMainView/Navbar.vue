@@ -798,11 +798,16 @@ export default class Navbar extends Vue {
     });
     ipc.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
       if (data.result === 'OK') {
+        ipc.send('force-reload-result', true);
         (this.$parent as BrowserMainView).extensionService.update();
         this.$forceUpdate();
       } else {
+        ipc.send('force-reload-result', false);
         alert(data.result);
       }
+    });
+    ipc.on('remove-lulumi-extension', (event, extensionId) => {
+      ipc.send('remove-lulumi-extension', extensionId);
     });
 
     (this.$parent as BrowserMainView).onRemovedEvent.addListener((tabId) => {

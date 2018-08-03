@@ -5,16 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Main Process",
+      "name": "Debug Main Process (attach)",
       "type": "node",
-      "request": "launch",
+      "request": "attach",
       "cwd": "${workspaceRoot}",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-      "windows": {
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-      },
-      "program": "${workspaceRoot}/dist/main.js",
-      "protocol": "inspector"
+      "smartStep": true,
+      "sourceMaps": true,
+      "protocol": "inspector",
+      "port": 9222,
+      "timeout": 20000
     }
   ]
 }

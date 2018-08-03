@@ -753,7 +753,7 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
             checked: menuItem.checked,
           };
           lulumi.tabs.get(tabId, tab => onclick(info, tab));
-          
+
           if (scriptType === 'event') {
             lulumi.tabs.get(tabId, tab => lulumi.contextMenus.onClicked.emit(info, tab));
           }
