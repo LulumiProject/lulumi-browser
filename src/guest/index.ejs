@@ -2,6 +2,9 @@
   <head>
     <meta charset="utf-8">
     <title>lulumi-browser</title>
+    <% if (htmlWebpackPlugin.options.nodeModules) { %>
+      <meta http-equiv="Content-Security-Policy" content="">
+    <% } %>
   </head>
   <body>
     <div id="app"></div>

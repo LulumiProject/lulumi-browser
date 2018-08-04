@@ -252,7 +252,7 @@ let rendererConfig = {
       'shared': path.join(__dirname, '../src/shared'),
       'i18n': path.join(__dirname, '../helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.runtime.esm.js'
     },
     extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
@@ -447,7 +447,7 @@ let aboutConfig = {
       'components': path.join(__dirname, '../src/guest/renderer/components'),
       'renderer': path.join(__dirname, '../src/guest/renderer'),
       'i18n': path.join(__dirname, '../helper/i18n'),
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.runtime.esm.js'
     },
     extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
   },
@@ -520,8 +520,8 @@ if (process.env.TEST_ENV === 'e2e') {
       new CspHtmlWebpackPlugin({
         'default-src': "'none'",
         'object-src': "'self'",
-        'connect-src': ["'self'", "ws://localhost:9080", "http://localhost:9080"],
-        'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='", "'unsafe-eval'"],
+        'connect-src': ["'self'"],
+        'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='"],
         'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
         'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
         'img-src': ["'self'", "https:", "http:", "data:"]
@@ -530,6 +530,17 @@ if (process.env.TEST_ENV === 'e2e') {
     aboutConfig.plugins.push(
       new webpack.LoaderOptionsPlugin({
         minimize: true
+      })
+    )
+    aboutConfig.plugins.push(
+      new CspHtmlWebpackPlugin({
+        'default-src': "'none'",
+        'object-src': "'none'",
+        'connect-src': ["'self'"],
+        'script-src': ["'self'"],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'font-src': ["'self'", "data:"],
+        'img-src': ["'self'", "https:", "http:", "data:"]
       })
     )
   }
