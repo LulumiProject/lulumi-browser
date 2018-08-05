@@ -489,9 +489,14 @@ export default class Navbar extends Vue {
   createFilter(queryString: string): (suggestion: any) => boolean {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
-  setBrowserActionIcon(extensionId: string, path: string): void {
-    this.$refs[`popover-${extensionId}`][0]
-    .referenceElm.querySelector('img').setAttribute('src', path);
+  setBrowserActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
+    if (iconInfo.type === 'path') {
+      this.$refs[`popover-${extensionId}`][0]
+      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    } else if (iconInfo.type === 'imageData') {
+      this.$refs[`popover-${extensionId}`][0]
+      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    }
   }
   setBrowserActionBadgeText(extensionId: string, details): void {
     if (this.badgeTextArray[extensionId] === undefined) {
@@ -548,9 +553,14 @@ export default class Navbar extends Vue {
     }
     return '';
   }
-  setPageActionIcon(extensionId: string, path: string): void {
-    this.$refs[`popover-${extensionId}`][0]
-    .referenceElm.querySelector('img').setAttribute('src', path);
+  setPageActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
+    if (iconInfo.type === 'path') {
+      this.$refs[`popover-${extensionId}`][0]
+      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    } else if (iconInfo.type === 'imageData') {
+      this.$refs[`popover-${extensionId}`][0]
+      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    }
   }
   loadIcon(extension: any): string | undefined {
     try {

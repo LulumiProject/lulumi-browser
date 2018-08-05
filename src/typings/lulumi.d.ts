@@ -26,6 +26,10 @@ declare namespace Lulumi {
     export interface BackgroundPages {
       [index: string]: BackgroundPageObject | undefined;
     }
+    export interface IconInfo {
+      type: 'path' | 'imageData';
+      url: string;
+    }
     export interface ManifestIcons {
       [size: string]: string;
     }

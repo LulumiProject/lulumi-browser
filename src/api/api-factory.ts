@@ -1,5 +1,7 @@
 import Event from './extensions/event';
 
+import imageUtil from '../renderer/js/lib/image-util';
+
 /* tslint:disable:max-line-length */
 
 function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number, tabIndex?: number): Lulumi.Store.TabObject {
@@ -45,13 +47,32 @@ export default (vueInstance: any) => {
 
   const browserAction = {
     setIcon: (extensionId: string, startPage: string, details: chrome.browserAction.TabIconDetails): void => {
-      if (details.path) {
-        // TODO: https://developer.chrome.com/extensions/browserAction#method-setIcon
-        let path: string | object = details.path;
-        if (typeof path === 'object') {
-          path = Object.values(path)[0];
+      if (details.imageData) {
+        let size = 16;
+        if (typeof details.imageData === 'object') {
+          if (details.imageData[16]) {
+            details.imageData = details.imageData[16];
+          } else if (details.imageData[32]) {
+            size = 32;
+            details.imageData = details.imageData[32];
+          }
         }
-        vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, `${startPage}/${path}`);
+        vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, {
+          type: 'path',
+          url: imageUtil.getBase64FromImageData((details.imageData as ImageData), size),
+        });
+      } else if (details.path) {
+        if (typeof details.path === 'object') {
+          if (details.path[16]) {
+            details.path = details.path[16];
+          } else if (details.path[32]) {
+            details.path = details.path[32];
+          }
+        }
+        vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, {
+          type: 'path',
+          url: `${startPage}/${details.path}`,
+        });
       }
     },
     setBadgeText: (extensionId: string, details: chrome.browserAction.BadgeTextDetails): void => {
@@ -75,8 +96,32 @@ export default (vueInstance: any) => {
 
   const pageAction = {
     setIcon: (extensionId: string, startPage: string, details: chrome.pageAction.IconDetails): void => {
-      if (details.path) {
-        vueInstance.$refs.navbar.setPageActionIcon(extensionId, `${startPage}/${details.path}`);
+      if (details.imageData) {
+        let size = 16;
+        if (typeof details.imageData === 'object') {
+          if (details.imageData[16]) {
+            details.imageData = details.imageData[16];
+          } else if (details.imageData[32]) {
+            size = 32;
+            details.imageData = details.imageData[32];
+          }
+        }
+        vueInstance.$refs.navbar.setPageActionIcon(extensionId, {
+          type: 'path',
+          url: imageUtil.getBase64FromImageData((details.imageData as ImageData), size),
+        });
+      } else if (details.path) {
+        if (typeof details.path === 'object') {
+          if (details.path[16]) {
+            details.path = details.path[16];
+          } else if (details.path[32]) {
+            details.path = details.path[32];
+          }
+        }
+        vueInstance.$refs.navbar.setPageActionIcon(extensionId, {
+          type: 'path',
+          url: `${startPage}/${details.path}`,
+        });
       }
     },
     onClicked: (webContentsId: number): Event => {
