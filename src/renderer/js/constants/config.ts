@@ -77,6 +77,7 @@ const tabConfig: Lulumi.Store.TabConfig = {
     hasMedia: false,
     isAudioMuted: false,
     pageActionMapping: {},
+    extensionsMetadata: {},
   },
   defaultFavicon: nativeImage
     .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'document.png')))

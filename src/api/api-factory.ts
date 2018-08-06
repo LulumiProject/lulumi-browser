@@ -29,7 +29,7 @@ function findAndUpdateOrCreate(vueInstance: any, active: boolean, tabId: number,
     return dummyTabObject;
   }
   if (active) {
-    vueInstance.onTabClick(tabObject.index);
+    vueInstance.onTabClick(getBuiltInTabIndex(vueInstance, tabObject.index));
   }
   return tabObject;
 }
@@ -84,6 +84,10 @@ export default (vueInstance: any) => {
     },
     setBadgeBackgroundColor: (extensionId: string, details: chrome.browserAction.BadgeBackgroundColorDetails): void => {
       if (details.color) {
+        if (typeof details.color === 'object') {
+          const color: [number, number, number, number] = details.color;
+          details.color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]/255})`;
+        }
         vueInstance.$refs.navbar.setBrowserActionBadgeBackgroundColor(extensionId, details);
       }
     },

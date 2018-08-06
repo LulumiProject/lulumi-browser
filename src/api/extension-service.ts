@@ -780,10 +780,6 @@ export default class ExtensionService {
     Object.keys(this.manifestMap).forEach((extension) => {
       const ext = this.manifestMap[extension];
       if (ext) {
-        Vue.set(
-          (this.instance.$refs.navbar as any).badgeTextArray,
-          ext.extensionId,
-          { text: undefined });
         if (backgroundPages[extension]) {
           const webContentsId = backgroundPages[extension].webContentsId;
           ext.webContentsId = webContentsId;

@@ -141,6 +141,16 @@ export const actions = {
       errorCode,
     });
   },
+  updateExtensionMetadata({ commit }, { tabId, extensionId, browserActionIcon, pageActionIcon, badgeText, badgeBackgroundColor }) {
+    commit(types.UPDATE_EXTENSION_METADATA, {
+      tabId,
+      extensionId,
+      browserActionIcon,
+      pageActionIcon,
+      badgeText,
+      badgeBackgroundColor,
+    });
+  },
 
   setCurrentSearchEngineProvider({ commit }, val) {
     commit(types.SET_CURRENT_SEARCH_ENGINE_PROVIDER, { val });

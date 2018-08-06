@@ -62,6 +62,15 @@ declare namespace Lulumi {
 
   export namespace Store {
     // store
+    export interface ExtensionMetadata {
+      browserActionIcon: string;
+      pageActionIcon: string;
+      badgeText: string;
+      badgeBackgroundColor: string;
+    }
+    export interface ExtensionsMetadata extends Object {
+      [index: string]: ExtensionMetadata;
+    }
     export interface TabObject {
       webContentsId: number; // Id of the corresponding webContents
       id: number; // 頁籤的標識符。(某些狀況可能會沒有 id)
@@ -89,6 +98,7 @@ declare namespace Lulumi {
       hasMedia: boolean;
       isAudioMuted: boolean;
       pageActionMapping: object;
+      extensionsMetadata: ExtensionsMetadata;
     }
     export interface TabConfig {
       dummyTabObject: TabObject;
@@ -142,7 +152,7 @@ declare namespace Lulumi {
       tabs?: TabObject[];
     }
     export interface ExtensionInfoDict extends Object {
-      [id: string]: chrome.management.ExtensionInfo;
+      [index: string]: chrome.management.ExtensionInfo;
     }
     export interface State {
       tabId: number;
@@ -223,19 +233,6 @@ declare namespace Lulumi {
       activeWebview: Electron.WebviewTag;
       start(): void;
       end(): void;
-    }
-  }
-
-  export namespace Navbar {
-    // Navbar.vue
-    export interface IconArray {
-      [index: string]: string[] | undefined;
-    }
-    export interface BadgeTextArray {
-      [index: string]: string[] | undefined;
-    }
-    export interface BadgeBackgroundColorArray {
-      [index: string]: string[] | undefined;
     }
   }
 }

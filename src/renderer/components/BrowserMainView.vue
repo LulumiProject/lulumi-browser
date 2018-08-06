@@ -879,12 +879,6 @@ export default class BrowserMainView extends Vue {
     const tabObject: Lulumi.Store.TabObject = this.getTabObject(usedTabIndex);
     if (tabObject) {
       const tabId: number = tabObject.id;
-      const navbar = (this.$refs.navbar as Navbar);
-      navbar.extensions.forEach((extension) => {
-        Vue.delete(navbar.iconArray, extension.extensionId);
-        Vue.delete(navbar.badgeTextArray, extension.extensionId);
-        Vue.delete(navbar.badgeBackgroundColorArray, extension.extensionId);
-      });
       this.onRemovedEvent.emit(tabObject);
       this.$store.dispatch('closeTab', {
         tabId,

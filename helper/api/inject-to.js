@@ -449,13 +449,12 @@ exports.injectTo = (guestInstanceId, thisExtensionId, scriptType, context, Local
       const count = ipcRenderer.sendSync('get-window-count');
       let counting = 0;
       const results = [];
-      ipcRenderer.on('lulumi-tabs-reload-result', (event, result) => {
+      ipcRenderer.on('lulumi-tabs-reload-result', () => {
         counting += 1;
-        results.push(result);
         if (counting === count) {
           ipcRenderer.removeAllListeners('lulumi-tabs-reload-result');
           if (callback) {
-            callback(collect(results).filter(result => (result.id !== -1)).first());
+            callback();
           }
         }
       });

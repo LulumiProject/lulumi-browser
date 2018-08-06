@@ -193,9 +193,6 @@ export default class Navbar extends Vue {
   extensions: Lulumi.API.ManifestObject[] = [];
   onbrowserActionClickedEvent: Event = new Event();
   onpageActionClickedEvent: Event = new Event();
-  iconArray: Lulumi.Navbar.IconArray = {};
-  badgeTextArray: Lulumi.Navbar.BadgeTextArray = {};
-  badgeBackgroundColorArray: Lulumi.Navbar.BadgeBackgroundColorArray = {};
 
   windowId: number;
 
@@ -491,107 +488,70 @@ export default class Navbar extends Vue {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
   setBrowserActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
-    if (this.iconArray[extensionId] === undefined) {
-      Vue.set(this.iconArray, extensionId, []);
-    }
-    const icon = this.iconArray[extensionId];
-    if (icon) {
-      if (iconInfo.tabId) {
-        Vue.set(icon,
-                `${require('lulumi').tabs.get(iconInfo.tabId).index}`,
-                iconInfo.url);
-      } else {
-        Vue.set(icon, '-1', iconInfo.url);
-      }
-    }
+    this.$nextTick(() => {
+      this.$store.dispatch('updateExtensionMetadata', {
+        extensionId,
+        tabId: (iconInfo.tabId) ? iconInfo.tabId : this.tab.id,
+        browserActionIcon: iconInfo.url,
+      });
+    });
   }
   showBrowserActionIcon(extensionId: string): string {
-    const icon = this.iconArray[extensionId];
-    if (icon) {
-      if (this.currentTabIndex !== undefined && icon[this.currentTabIndex]) {
-        return icon[this.currentTabIndex];
-      }
-      return icon[-1];
+    if (this.tab === this.dummyTabObject) {
+      return '#';
     }
-    return '#';
+    return this.tab.extensionsMetadata[extensionId].browserActionIcon;
   }
   setBrowserActionBadgeText(extensionId: string, details): void {
-    if (this.badgeTextArray[extensionId] === undefined) {
-      Vue.set(this.badgeTextArray, extensionId, []);
-    }
-    const badge = this.badgeTextArray[extensionId];
-    if (badge) {
-      if (details.tabId) {
-        Vue.set(badge,
-                `${require('lulumi').tabs.get(details.tabId).index}`,
-                details.text);
-      } else {
-        Vue.set(badge, '-1', details.text);
-      }
-    }
+    this.$nextTick(() => {
+      this.$store.dispatch('updateExtensionMetadata', {
+        extensionId,
+        tabId: (details.tabId) ? details.tabId : this.tab.id,
+        badgeText: String(details.text),
+      });
+    });
   }
-  showBrowserActionBadgeText(extensionId: string): string | number {
-    const badge = this.badgeTextArray[extensionId];
-    if (badge) {
-      if (this.currentTabIndex !== undefined && badge[this.currentTabIndex]) {
-        return badge[this.currentTabIndex];
-      }
-      return badge[-1];
+  showBrowserActionBadgeText(extensionId: string): string {
+    if (this.tab === this.dummyTabObject) {
+      return '';
     }
-    return '';
+    return this.tab.extensionsMetadata[extensionId].badgeText;
   }
   setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
-    if (this.badgeBackgroundColorArray[extensionId] === undefined) {
-      Vue.set(this.badgeBackgroundColorArray, extensionId, []);
-    }
-    const badge = this.badgeBackgroundColorArray[extensionId];
-    if (badge) {
-      if (details.tabId) {
-        Vue.set(badge,
-                `${require('lulumi').tabs.get(details.tabId).index}`,
-                details.color);
-      } else {
-        Vue.set(badge, '-1', details.color);
-      }
-    }
+    this.$nextTick(() => {
+      this.$store.dispatch('updateExtensionMetadata', {
+        extensionId,
+        tabId: (details.tabId) ? details.tabId : this.tab.id,
+        badgeBackgroundColor: details.color,
+      });
+    });
   }
   showBrowserActionBadgeBackgroundColor(extensionId: string): void {
-    const badge = this.badgeBackgroundColorArray[extensionId];
+    if (this.tab === this.dummyTabObject) {
+      return;
+    }
     if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
       const node = this.$refs[`badge-${extensionId}`][0].$el.childNodes[1];
-      if (badge && node) {
-        if (this.currentTabIndex !== undefined && badge[this.currentTabIndex]) {
-          node.style.backgroundColor
-            = badge[this.currentTabIndex];
-        }
-        node.style.backgroundColor = badge[-1];
+      const color = this.tab.extensionsMetadata[extensionId].badgeBackgroundColor;
+      if (node && color) {
+        node.style.backgroundColor = color;
       }
     }
   }
   setPageActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
-    if (this.iconArray[extensionId] === undefined) {
-      Vue.set(this.iconArray, extensionId, []);
-    }
-    const icon = this.iconArray[extensionId];
-    if (icon) {
-      if (iconInfo.tabId) {
-        Vue.set(icon,
-                `${require('lulumi').tabs.get(iconInfo.tabId).index}`,
-                iconInfo.url);
-      } else {
-        Vue.set(icon, '-1', iconInfo.url);
-      }
-    }
+    this.$nextTick(() => {
+      this.$store.dispatch('updateExtensionMetadata', {
+        extensionId,
+        tabId: (iconInfo.tabId) ? iconInfo.tabId : this.tab.id,
+        pageActionIcon: iconInfo.url,
+      });
+    });
   }
   showPageActionIcon(extensionId: string): string {
-    const icon = this.iconArray[extensionId];
-    if (icon) {
-      if (this.currentTabIndex !== undefined && icon[this.currentTabIndex]) {
-        return icon[this.currentTabIndex];
-      }
-      return icon[-1];
+    if (this.tab === this.dummyTabObject) {
+      return '#';
     }
-    return '#';
+    return this.tab.extensionsMetadata[extensionId].pageActionIcon;
   }
   loadIcon(extension: any): string | undefined {
     try {
@@ -857,26 +817,6 @@ export default class Navbar extends Vue {
     });
     ipc.on('remove-lulumi-extension', (event, extensionId) => {
       ipc.send('remove-lulumi-extension', extensionId);
-    });
-
-    (this.$parent as BrowserMainView).onRemovedEvent.addListener((tabId) => {
-      const tab = require('lulumi').tabs.get(tabId);
-      Object.keys(this.badgeTextArray).forEach((k) => {
-        const badge = this.badgeTextArray[k];
-        if (badge) {
-          if (badge[tab.index]) {
-            Vue.delete(badge, `${tab.index}`);
-          }
-        }
-      });
-      Object.keys(this.badgeBackgroundColorArray).forEach((k) => {
-        const badge = this.badgeBackgroundColorArray[k];
-        if (badge) {
-          if (badge[tab.index]) {
-            Vue.delete(badge, `${tab.index}`);
-          }
-        }
-      });
     });
   }
 }

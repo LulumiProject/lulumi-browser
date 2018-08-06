@@ -53,6 +53,7 @@ function createTabObject(state: Lulumi.Store.State, wid: number, openUrl: string
     hasMedia: false,
     isAudioMuted: false,
     pageActionMapping: {},
+    extensionsMetadata: {},
   };
 }
 
@@ -84,8 +85,18 @@ const mutations = {
     } else {
       state.tabs.push(createTabObject(state, windowId));
     }
-    const last = state.tabs.filter(tab => tab.windowId === windowId).length - 1;
+
     Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
+    Object.keys(state.extensionInfoDict).forEach((extensionId) => {
+      Vue.set(state.tabs[state.tabs.length - 1].extensionsMetadata, extensionId, {
+        browserActionIcon: '#',
+        pageActionIcon: '#',
+        badgeText: '',
+        badgeBackgroundColor: '',
+      });
+    });
+
+    const last = state.tabs.filter(tab => tab.windowId === windowId).length - 1;
     if (url) {
       if (follow) {
         Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
@@ -445,6 +456,28 @@ const mutations = {
     Vue.set(state.certificates[hostname]!, 'verificationResult', verificationResult);
     Vue.set(state.certificates[hostname]!, 'errorCode', errorCode);
   },
+  [types.UPDATE_EXTENSION_METADATA](state: Lulumi.Store.State, payload) {
+    const tabId: number = payload.tabId;
+    const extensionId: string = payload.extensionId;
+    const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
+
+    if (state.tabs[tabsIndex]) {
+      const orig = state.tabs[tabsIndex].extensionsMetadata[extensionId];
+      if (payload.browserActionIcon) {
+        orig.browserActionIcon = payload.browserActionIcon;
+      }
+      if (payload.pageActionIcon) {
+        orig.pageActionIcon = payload.pageActionIcon;
+      }
+      if (payload.badgeText) {
+        orig.badgeText = payload.badgeText;
+      }
+      if (payload.badgeBackgroundColor) {
+        orig.badgeBackgroundColor = payload.badgeBackgroundColor;
+      }
+      Vue.set(state.tabs[tabsIndex].extensionsMetadata, extensionId, orig);
+    }
+  },
   // preferences handlers
   [types.SET_CURRENT_SEARCH_ENGINE_PROVIDER](state: Lulumi.Store.State, { val }) {
     if (val.currentSearchEngine !== null) {
@@ -632,11 +665,22 @@ const mutations = {
     const extensionInfo: chrome.management.ExtensionInfo = payload.extensionInfo;
     if (state.extensionInfoDict[extensionInfo.id] === undefined) {
       Vue.set(state.extensionInfoDict, extensionInfo.id, extensionInfo);
+      state.tabs.forEach((tab, index) => {
+        Vue.set(state.tabs[index].extensionsMetadata, extensionInfo.id, {
+          browserActionIcon: '#',
+          pageActionIcon: '#',
+          badgeText: '',
+          badgeBackgroundColor: '',
+        });
+      });
     }
   },
   [types.REMOVE_EXTENSION](state: Lulumi.Store.State, payload) {
     const extensionId: string = payload.extensionId;
     Vue.delete(state.extensionInfoDict, extensionId);
+    state.tabs.forEach((tab, index) => {
+      Vue.delete(state.tabs[index].extensionsMetadata, extensionId);
+    });
   },
   [types.UPDATE_EXTENSION](state: Lulumi.Store.State, payload) {
     const enabled: boolean = payload.enabled;
