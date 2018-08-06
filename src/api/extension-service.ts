@@ -8,7 +8,7 @@ import apiFactory, { initializeExtensionApi } from './api-factory';
 
 export default class ExtensionService {
   newtabOverrides: string = '';
-  manifestMap: object = {};
+  manifestMap: Lulumi.API.ManifestMap = {};
   instance: Vue;
   constructor(vueInstance) {
     this.instance = vueInstance;
@@ -772,14 +772,14 @@ export default class ExtensionService {
   }
 
   registerAction() {
-    const manifest: object[] = [];
+    const manifest: Lulumi.API.ManifestObject[] = [];
     const remote = this.instance.$electron.remote;
     const backgroundPages = remote.getGlobal('backgroundPages');
 
     this.newtabOverrides = '';
     Object.keys(this.manifestMap).forEach((extension) => {
       const ext = this.manifestMap[extension];
-      if (ext !== null) {
+      if (ext) {
         Vue.set(
           (this.instance.$refs.navbar as any).badgeTextArray,
           ext.extensionId,
@@ -788,13 +788,14 @@ export default class ExtensionService {
           const webContentsId = backgroundPages[extension].webContentsId;
           ext.webContentsId = webContentsId;
         }
-        if (ext.hasOwnProperty('chrome_url_overrides')) {
-          Object.keys(ext.chrome_url_overrides).forEach((k) => {
+        const cuo = ext.chrome_url_overrides;
+        if (cuo) {
+          Object.keys(cuo).forEach((k) => {
             this[`${k}Overrides`] = `${url.format({
               protocol: 'lulumi-extension',
               slashes: true,
               hostname: ext.extensionId,
-              pathname: ext.chrome_url_overrides[k],
+              pathname: cuo[k],
             })}`;
           });
         }

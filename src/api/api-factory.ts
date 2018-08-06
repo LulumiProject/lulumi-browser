@@ -60,6 +60,7 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, {
           type: 'path',
           url: imageUtil.getBase64FromImageData((details.imageData as ImageData), size),
+          tabId: details.tabId,
         });
       } else if (details.path) {
         if (typeof details.path === 'object') {
@@ -72,6 +73,7 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setBrowserActionIcon(extensionId, {
           type: 'path',
           url: `${startPage}/${details.path}`,
+          tabId: details.tabId,
         });
       }
     },
@@ -109,6 +111,7 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setPageActionIcon(extensionId, {
           type: 'path',
           url: imageUtil.getBase64FromImageData((details.imageData as ImageData), size),
+          tabId: details.tabId,
         });
       } else if (details.path) {
         if (typeof details.path === 'object') {
@@ -121,6 +124,7 @@ export default (vueInstance: any) => {
         vueInstance.$refs.navbar.setPageActionIcon(extensionId, {
           type: 'path',
           url: `${startPage}/${details.path}`,
+          tabId: details.tabId,
         });
       }
     },

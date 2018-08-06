@@ -307,8 +307,8 @@ export default class BrowserMainView extends Vue {
   }
   onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, tabId: number): void {
     if (event.isMainFrame) {
-      const navbar = this.$refs.navbar;
-      (navbar as any).showUrl(event.url, tabId);
+      const navbar = (this.$refs.navbar as Navbar);
+      navbar.showUrl(event.url, tabId);
       this.$store.dispatch('loadCommit', {
         tabId,
         tabIndex,
@@ -876,9 +876,15 @@ export default class BrowserMainView extends Vue {
     if (usedTabIndex === -1) {
       usedTabIndex = this.tabs.length - 1;
     }
-    const tabObject: Lulumi.Store.TabObject = this.getTabObject(tabIndex);
+    const tabObject: Lulumi.Store.TabObject = this.getTabObject(usedTabIndex);
     if (tabObject) {
       const tabId: number = tabObject.id;
+      const navbar = (this.$refs.navbar as Navbar);
+      navbar.extensions.forEach((extension) => {
+        Vue.delete(navbar.iconArray, extension.extensionId);
+        Vue.delete(navbar.badgeTextArray, extension.extensionId);
+        Vue.delete(navbar.badgeBackgroundColorArray, extension.extensionId);
+      });
       this.onRemovedEvent.emit(tabObject);
       this.$store.dispatch('closeTab', {
         tabId,

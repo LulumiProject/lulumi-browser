@@ -190,9 +190,10 @@ export default class Navbar extends Vue {
   focused: boolean = false;
   value: string = '';
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = recommendTopSite;
-  extensions: any[] = [];
+  extensions: Lulumi.API.ManifestObject[] = [];
   onbrowserActionClickedEvent: Event = new Event();
   onpageActionClickedEvent: Event = new Event();
+  iconArray: Lulumi.Navbar.IconArray = {};
   badgeTextArray: Lulumi.Navbar.BadgeTextArray = {};
   badgeBackgroundColorArray: Lulumi.Navbar.BadgeBackgroundColorArray = {};
 
@@ -490,13 +491,29 @@ export default class Navbar extends Vue {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
   setBrowserActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
-    if (iconInfo.type === 'path') {
-      this.$refs[`popover-${extensionId}`][0]
-      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
-    } else if (iconInfo.type === 'imageData') {
-      this.$refs[`popover-${extensionId}`][0]
-      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    if (this.iconArray[extensionId] === undefined) {
+      Vue.set(this.iconArray, extensionId, []);
     }
+    const icon = this.iconArray[extensionId];
+    if (icon) {
+      if (iconInfo.tabId) {
+        Vue.set(icon,
+                `${require('lulumi').tabs.get(iconInfo.tabId).index}`,
+                iconInfo.url);
+      } else {
+        Vue.set(icon, '-1', iconInfo.url);
+      }
+    }
+  }
+  showBrowserActionIcon(extensionId: string): string {
+    const icon = this.iconArray[extensionId];
+    if (icon) {
+      if (this.currentTabIndex !== undefined && icon[this.currentTabIndex]) {
+        return icon[this.currentTabIndex];
+      }
+      return icon[-1];
+    }
+    return '#';
   }
   setBrowserActionBadgeText(extensionId: string, details): void {
     if (this.badgeTextArray[extensionId] === undefined) {
@@ -538,29 +555,43 @@ export default class Navbar extends Vue {
       }
     }
   }
-  showBrowserActionBadgeBackgroundColor(extensionId: string): string | number {
+  showBrowserActionBadgeBackgroundColor(extensionId: string): void {
     const badge = this.badgeBackgroundColorArray[extensionId];
     if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
-      if (badge) {
+      const node = this.$refs[`badge-${extensionId}`][0].$el.childNodes[1];
+      if (badge && node) {
         if (this.currentTabIndex !== undefined && badge[this.currentTabIndex]) {
-          this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor
+          node.style.backgroundColor
             = badge[this.currentTabIndex];
-          return badge[this.currentTabIndex];
         }
-        this.$refs[`badge-${extensionId}`][0].$el.childNodes[1].style.backgroundColor = badge[-1];
-        return badge[-1];
+        node.style.backgroundColor = badge[-1];
       }
     }
-    return '';
   }
   setPageActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
-    if (iconInfo.type === 'path') {
-      this.$refs[`popover-${extensionId}`][0]
-      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
-    } else if (iconInfo.type === 'imageData') {
-      this.$refs[`popover-${extensionId}`][0]
-      .referenceElm.querySelector('img').setAttribute('src', iconInfo.url);
+    if (this.iconArray[extensionId] === undefined) {
+      Vue.set(this.iconArray, extensionId, []);
     }
+    const icon = this.iconArray[extensionId];
+    if (icon) {
+      if (iconInfo.tabId) {
+        Vue.set(icon,
+                `${require('lulumi').tabs.get(iconInfo.tabId).index}`,
+                iconInfo.url);
+      } else {
+        Vue.set(icon, '-1', iconInfo.url);
+      }
+    }
+  }
+  showPageActionIcon(extensionId: string): string {
+    const icon = this.iconArray[extensionId];
+    if (icon) {
+      if (this.currentTabIndex !== undefined && icon[this.currentTabIndex]) {
+        return icon[this.currentTabIndex];
+      }
+      return icon[-1];
+    }
+    return '#';
   }
   loadIcon(extension: any): string | undefined {
     try {
@@ -569,9 +600,17 @@ export default class Navbar extends Vue {
       const manifestIcon = extension.icons;
       let icons = false;
       if (isPageAction) {
+        const icon = this.showPageActionIcon(extension.extensionId);
+        if (icon !== '#') {
+          return icon;
+        }
         icons = extension.page_action.default_icon;
       }
       if (isBrowserAction) {
+        const icon = this.showBrowserActionIcon(extension.extensionId);
+        if (icon !== '#') {
+          return icon;
+        }
         icons = extension.browser_action.default_icon;
       }
       if (manifestIcon) {

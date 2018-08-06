@@ -29,6 +29,7 @@ declare namespace Lulumi {
     export interface IconInfo {
       type: 'path' | 'imageData';
       url: string;
+      tabId: number | undefined;
     }
     export interface ManifestIcons {
       [size: string]: string;
@@ -227,6 +228,9 @@ declare namespace Lulumi {
 
   export namespace Navbar {
     // Navbar.vue
+    export interface IconArray {
+      [index: string]: string[] | undefined;
+    }
     export interface BadgeTextArray {
       [index: string]: string[] | undefined;
     }
