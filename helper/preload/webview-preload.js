@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-const { ipcRenderer, remote } = require('electron');
+const { ipcRenderer, remote, webFrame } = require('electron');
 const { runInThisContext } = require('vm');
 const { LocalStorage } = require('node-localstorage');
 
@@ -33,12 +33,13 @@ const runContentScript = (extensionId, url, code) => {
     var chrome = lulumi;
     ${code}
   });`;
-  const compiledWrapper = runInThisContext(wrapper, {
-    filename: url,
-    lineOffset: 1,
-    displayErrors: true,
-  });
-  return compiledWrapper.call(this, context.lulumi);
+  webFrame.executeJavaScriptInIsolatedWorld(1, [
+    {
+      code: wrapper,
+      url: url,
+    },
+  ]);
+  webFrame.setIsolatedWorldHumanReadableName(1, extensionId);
 };
 
 const runStylesheet = (url, code) => {
