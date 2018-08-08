@@ -27,6 +27,14 @@ Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to
         enabled: boolean,
       },
     },
+    extensionsMetadata: {
+      extensionId: {
+        browserActionIcon: string,
+        pageActionIcon: string,
+        badgeText: string,
+        badgeBackgroundColor: string,
+      },
+    },
   },
   currentTabIndexes: number[],
   currentSearchEngine: {

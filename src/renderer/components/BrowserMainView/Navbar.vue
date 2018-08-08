@@ -500,7 +500,10 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '#';
     }
-    return this.tab.extensionsMetadata[extensionId].browserActionIcon;
+    const extensionsMetadata = this.tab.extensionsMetadata;
+    return (Object.keys(extensionsMetadata).length)
+      ? extensionsMetadata[extensionId].browserActionIcon
+      : '#';
   }
   setBrowserActionBadgeText(extensionId: string, details): void {
     this.$nextTick(() => {
@@ -515,7 +518,10 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '';
     }
-    return this.tab.extensionsMetadata[extensionId].badgeText;
+    const extensionsMetadata = this.tab.extensionsMetadata;
+    return (Object.keys(extensionsMetadata).length)
+      ? this.tab.extensionsMetadata[extensionId].badgeText
+      : '';
   }
   setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
     this.$nextTick(() => {
@@ -532,7 +538,10 @@ export default class Navbar extends Vue {
     }
     if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
       const node = this.$refs[`badge-${extensionId}`][0].$el.childNodes[1];
-      const color = this.tab.extensionsMetadata[extensionId].badgeBackgroundColor;
+      const extensionsMetadata = this.tab.extensionsMetadata;
+      const color = (Object.keys(extensionsMetadata).length)
+        ? this.tab.extensionsMetadata[extensionId].badgeBackgroundColor
+        : '';
       if (node && color) {
         node.style.backgroundColor = color;
       }
@@ -551,7 +560,10 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '#';
     }
-    return this.tab.extensionsMetadata[extensionId].pageActionIcon;
+    const extensionsMetadata = this.tab.extensionsMetadata;
+    return (Object.keys(extensionsMetadata).length)
+      ? this.tab.extensionsMetadata[extensionId].pageActionIcon
+      : '#';
   }
   loadIcon(extension: any): string | undefined {
     try {
