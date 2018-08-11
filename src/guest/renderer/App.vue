@@ -45,14 +45,18 @@ export default class App extends Vue {
 </script>
 
 <style>
-body,
-html {
+
+html, body {
+  height: 100%;
+}
+
+body {
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: ".SFNSDisplay-Thin";
+  font-family: 'Source Code Pro', Courier, monospace;;
 }
 #page-wrapper {
   width: auto;

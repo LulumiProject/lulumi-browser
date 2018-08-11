@@ -501,7 +501,7 @@ export default class Navbar extends Vue {
       return '#';
     }
     const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length)
+    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
       ? extensionsMetadata[extensionId].browserActionIcon
       : '#';
   }
@@ -519,8 +519,8 @@ export default class Navbar extends Vue {
       return '';
     }
     const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length)
-      ? this.tab.extensionsMetadata[extensionId].badgeText
+    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
+      ? extensionsMetadata[extensionId].badgeText
       : '';
   }
   setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
@@ -539,8 +539,8 @@ export default class Navbar extends Vue {
     if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
       const node = this.$refs[`badge-${extensionId}`][0].$el.childNodes[1];
       const extensionsMetadata = this.tab.extensionsMetadata;
-      const color = (Object.keys(extensionsMetadata).length)
-        ? this.tab.extensionsMetadata[extensionId].badgeBackgroundColor
+      const color = (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
+        ? extensionsMetadata[extensionId].badgeBackgroundColor
         : '';
       if (node && color) {
         node.style.backgroundColor = color;
@@ -561,8 +561,8 @@ export default class Navbar extends Vue {
       return '#';
     }
     const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length)
-      ? this.tab.extensionsMetadata[extensionId].pageActionIcon
+    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
+      ? extensionsMetadata[extensionId].pageActionIcon
       : '#';
   }
   loadIcon(extension: any): string | undefined {
