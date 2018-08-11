@@ -38,7 +38,7 @@ const imageUtil = {
     canvas.width = size;
     canvas.height = size;
     const data
-     = new ImageData(new Uint8ClampedArray(imageData.data), size, size);
+      = new ImageData(new Uint8ClampedArray(imageData.data), size, size);
     canvas.getContext('2d')!.putImageData(data, 0, 0);
     return canvas.toDataURL('image/png');
   },

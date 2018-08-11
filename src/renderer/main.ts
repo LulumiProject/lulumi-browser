@@ -160,7 +160,7 @@ new Vue({
   router,
   store,
   components: { App },
-  render (h) {
+  render(h) {
     return h('App');
   },
   name: 'root',

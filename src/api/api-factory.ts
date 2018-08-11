@@ -86,7 +86,7 @@ export default (vueInstance: any) => {
       if (details.color) {
         if (typeof details.color === 'object') {
           const color: [number, number, number, number] = details.color;
-          details.color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]/255})`;
+          details.color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`;
         }
         vueInstance.$refs.navbar.setBrowserActionBadgeBackgroundColor(extensionId, details);
       }
