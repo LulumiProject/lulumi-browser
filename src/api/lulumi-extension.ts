@@ -125,6 +125,7 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
     isBackgroundPage: true,
     commandLineSwitches: ['--background-page'],
     preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
+    webSecurity: false,
   });
   backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
   contents.loadURL(url.format({
