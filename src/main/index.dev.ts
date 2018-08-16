@@ -44,7 +44,7 @@ require('electron').app.on('ready', () => {
   installExtension(VUEJS_DEVTOOLS)
     .then(() => { })
     .catch((err) => {
-      console.log('Unable to install `vue-devtools`: \n', err);
+      console.error(`(lulumi-browser) Unable to install \`vue-devtools\`: \n${err}`);
     });
 });
 

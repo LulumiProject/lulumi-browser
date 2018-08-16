@@ -22,6 +22,8 @@ import menu from './js/lib/menu';
 import promisify from './js/lib/promisify';
 import request from './js/lib/request';
 
+/* tslint:disable:no-console */
+
 const { openProcessManager } = require('electron-process-manager');
 
 const globalObject = global as Lulumi.API.GlobalObject;
@@ -230,8 +232,7 @@ app.on('ready', () => {
   try {
     data = readFileSync(storagePath, 'utf8');
   } catch (readError) {
-    // tslint:disable-next-line:no-console
-    console.error(`could not read data from ${storagePath}, ${readError}`);
+    console.error(`(lulumi-browser) Could not read data from ${storagePath}, ${readError}`);
   }
   try {
     data = JSON.parse(data);
@@ -261,8 +262,7 @@ app.on('ready', () => {
       createWindow();
     }
   } catch (parseError) {
-    // tslint:disable-next-line:no-console
-    console.error(`could not parse data from ${storagePath}, ${parseError}`);
+    console.error(`(lulumi-browser) Could not parse data from ${storagePath}, ${parseError}`);
     createWindow();
   }
 });
@@ -372,8 +372,7 @@ ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: an
       const windowPropertyTmp = path.resolve(app.getPath('temp'), windowPropertyFilename);
       rename(windowProperty.path, windowPropertyTmp, (renameError) => {
         if (renameError) {
-          // tslint:disable-next-line:no-console
-          console.error(renameError);
+          console.error(`(lulumi-browser) ${renameError}`);
         }
       });
     });
@@ -634,8 +633,7 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
     lang = readFileSync(langPath, 'utf8');
   } catch (langError) {
     lang = '"en-US"';
-    // tslint:disable-next-line:no-console
-    console.log(langError);
+    console.error(`(lulumi-browser) ${langError}`);
   }
   event.returnValue = JSON.parse(lang);
 });

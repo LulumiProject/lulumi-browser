@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain, session } from 'electron';
+import * as forge from 'node-forge';
 
 import mainStore from '../../../shared/store/mainStore';
 
@@ -231,12 +232,38 @@ const registerCertificateVerifyProc = () => {
   const sess = session.defaultSession as Electron.Session;
   const store = mainStore.getStore();
   sess.setCertificateVerifyProc((request, callback) => {
-    store.dispatch('updateCertificate', {
-      hostname: request.hostname,
-      certificate: request.certificate,
-      verificationResult: request.verificationResult,
-      errorCode: request.errorCode,
-    });
+    try {
+      const cert = forge.pki.certificateFromPem(request.certificate.data);
+      store.dispatch('updateCertificate', {
+        hostname: cert.subject.getField('CN').value,
+        certificate: request.certificate,
+        verificationResult: request.verificationResult,
+        errorCode: request.errorCode,
+      });
+      if (cert.getExtension('subjectAltName').altNames.length > 0) {
+        cert.getExtension('subjectAltName').altNames.forEach((altName) => {
+          store.dispatch('updateCertificate', {
+            hostname: altName.value,
+            certificate: request.certificate,
+            verificationResult: request.verificationResult,
+            errorCode: request.errorCode,
+          });
+        });
+      }
+    } catch (err) {
+      if (err.toString() === 'Error: Cannot read public key. OID is not RSA.') {
+        console.error('(lulumi-browser) `node-forge` doesn\'t support ECC for now, so we fallback to the old method.');
+        store.dispatch('updateCertificate', {
+          hostname: request.hostname,
+          certificate: request.certificate,
+          verificationResult: request.verificationResult,
+          errorCode: request.errorCode,
+        });
+      } else {
+        console.error(`(node-forge) ${err}`);
+      }
+    }
+
     if (request.verificationResult !== 'net::OK') {
       callback(-3);
     } else {
