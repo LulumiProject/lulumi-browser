@@ -19,7 +19,7 @@ const matchesPattern = (pattern) => {
     return true;
   }
 
-  const regexp = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
+  const regexp = new RegExp(`^${pattern.replace(/\./g, '\\.').replace(/\*/g, '.*')}$`);
   const url = `${location.protocol}//${location.host}${location.pathname}`;
   return url.match(regexp);
 };
