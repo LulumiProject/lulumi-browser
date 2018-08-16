@@ -56,7 +56,7 @@ body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Source Code Pro', Courier, monospace;;
+  font-family: Roboto, system-ui, PingFang TC, Heiti TC, sans-serif;
 }
 #page-wrapper {
   width: auto;
