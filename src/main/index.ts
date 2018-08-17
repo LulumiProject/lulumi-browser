@@ -203,7 +203,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   return mainWindow;
 }
 
-// register methods to BrowserWindow
+// register the method to BrowserWindow
 (BrowserWindow as any).createWindow = createWindow;
 
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
