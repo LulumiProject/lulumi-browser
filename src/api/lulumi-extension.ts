@@ -121,9 +121,9 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
   }
 
   const contents = (webContents as any).create({
-    partition: 'persist:__lulumi_extension',
-    isBackgroundPage: true,
     commandLineSwitches: ['--background-page'],
+    isBackgroundPage: true,
+    partition: 'persist:__lulumi_extension',
     preload: path.join(config.lulumiPreloadPath, 'extension-preload.js'),
     webSecurity: false,
   });

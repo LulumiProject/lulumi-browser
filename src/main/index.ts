@@ -162,7 +162,6 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   menu.init();
 
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
-    // webPreferences.contextIsolation = true;
     // webPreferences.nativeWindowOpen = true;
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
 
@@ -174,6 +173,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
         webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
+      webPreferences.contextIsolation = true;
       webPreferences.preload = path.join(config.lulumiPreloadPath, 'webview-preload.js');
     }
   });
