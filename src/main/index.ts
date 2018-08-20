@@ -173,7 +173,9 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
         webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
-      webPreferences.contextIsolation = true;
+      if (!params.src.startsWith('lulumi://')) {
+        webPreferences.contextIsolation = true;
+      }
       webPreferences.preload = path.join(config.lulumiPreloadPath, 'webview-preload.js');
     }
   });
