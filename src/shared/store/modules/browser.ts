@@ -137,6 +137,14 @@ const mutations = {
         state.tabId += 1;
         state.tabs.push(createTabObject(state, windowId));
         Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
+        Object.keys(state.extensionInfoDict).forEach((extensionId) => {
+          Vue.set(state.tabs[state.tabs.length - 1].extensionsMetadata, extensionId, {
+            browserActionIcon: '#',
+            pageActionIcon: '#',
+            badgeText: '',
+            badgeBackgroundColor: '',
+          });
+        });
         Vue.set(state.tabs[state.tabs.length - 1], 'highlighted', true);
         Vue.set(state.tabs[state.tabs.length - 1], 'active', true);
         Vue.set(state.currentTabIndexes, windowId, 0);
@@ -390,7 +398,7 @@ const mutations = {
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex] && isMainFrame) {
-      state.tabs[tabsIndex].title = 'error';
+      state.tabs[tabsIndex].title = state.tabs[tabsIndex].title || 'error';
       state.tabs[tabsIndex].error = true;
     }
   },
