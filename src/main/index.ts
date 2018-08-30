@@ -15,12 +15,12 @@ import collect from 'collect.js';
 import unhandled from 'electron-unhandled';
 import { is } from 'electron-util';
 
-import autoUpdater from './js/lib/auto-updater';
-import config from './js/constants/config';
+import autoUpdater from './lib/auto-updater';
+import constants from './constants';
 import localshortcut from 'electron-localshortcut';
-import menu from './js/lib/menu';
-import promisify from './js/lib/promisify';
-import request from './js/lib/request';
+import menu from './lib/menu';
+import promisify from './lib/promisify';
+import request from './lib/request';
 
 /* tslint:disable:no-console */
 
@@ -48,17 +48,17 @@ let shuttingDown: boolean = (process.env.NODE_ENV === 'testing' || process.env.T
 
 let storagePath: string;
 if (process.env.NODE_ENV === 'development') {
-  storagePath = path.join(config.devUserData, 'app-state');
+  storagePath = path.join(constants.devUserData, 'app-state');
 } else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  storagePath = path.join(config.testUserData, 'app-state');
+  storagePath = path.join(constants.testUserData, 'app-state');
 } else {
   storagePath = path.join(app.getPath('userData'), 'app-state');
 }
 let langPath: string;
 if (process.env.NODE_ENV === 'development') {
-  langPath = path.join(config.devUserData, 'lang');
+  langPath = path.join(constants.devUserData, 'lang');
 } else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  langPath = path.join(config.testUserData, 'lang');
+  langPath = path.join(constants.testUserData, 'lang');
 } else {
   langPath = path.join(app.getPath('userData'), 'lang');
 }
@@ -75,8 +75,8 @@ const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
 
-// ./js/lib/session.ts
-const { default: session } = require('./js/lib/session');
+// ./lib/session.ts
+const { default: session } = require('./lib/session');
 
 // ../shared/store/mainStore.ts
 const { default: mainStore } = require('../shared/store/mainStore');
@@ -84,8 +84,8 @@ mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
 
-// ../api/lulumi-extension.ts
-const { default: lulumiExtension } = require('../api/lulumi-extension');
+// ./api/lulumi-extension.ts
+const { default: lulumiExtension } = require('./api/lulumi-extension');
 
 function appStateSave(soft: boolean = true): void {
   if (Object.keys(windows).length !== 0) {
@@ -168,15 +168,15 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     const backgroundRegExp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {
       if (params.src.match(backgroundRegExp)) {
-        webPreferences.preload = path.join(config.lulumiPreloadPath, 'extension-preload.js');
+        webPreferences.preload = path.join(constants.lulumiPreloadPath, 'extension-preload.js');
       } else {
-        webPreferences.preload = path.join(config.lulumiPreloadPath, 'popup-preload.js');
+        webPreferences.preload = path.join(constants.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
       if (!params.src.startsWith('lulumi://')) {
         webPreferences.contextIsolation = true;
       }
-      webPreferences.preload = path.join(config.lulumiPreloadPath, 'webview-preload.js');
+      webPreferences.preload = path.join(constants.lulumiPreloadPath, 'webview-preload.js');
     }
   });
 
@@ -224,9 +224,9 @@ app.on('ready', () => {
     autoUpdater.listen(windows);
   }
   // session related operations
-  session.onWillDownload(windows, config.lulumiPDFJSPath);
+  session.onWillDownload(windows, constants.lulumiPDFJSPath);
   session.setPermissionRequestHandler(windows);
-  session.registerScheme(config.lulumiPagesCustomProtocol);
+  session.registerScheme(constants.lulumiPagesCustomProtocol);
   session.registerCertificateVerifyProc();
   session.registerWebRequestListeners();
   // load appState
@@ -435,7 +435,7 @@ ipcMain.on('open-item', (event, path) => {
 
 // load preference things into global when users accessing 'lulumi://' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const type: string = val.substr((config.lulumiPagesCustomProtocol).length).split('/')[0];
+  const type: string = val.substr((constants.lulumiPagesCustomProtocol).length).split('/')[0];
   const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
   if (type === 'about') {
     const versions = process.versions;
@@ -449,7 +449,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
         key: 'rev',
         value: process.env.NODE_ENV === 'development'
           ? require('git-rev-sync').long('.')
-          : config.lulumiRev,
+          : constants.lulumiRev,
       },
       {
         key: 'Electron',
@@ -482,7 +482,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       {
         key: 'userData',
         value: process.env.NODE_ENV === 'development'
-          ? config.devUserData
+          ? constants.devUserData
           : app.getPath('userData'),
       },
     ];
@@ -494,12 +494,12 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       ['Language', 'language'],
     ];
     data.about = [
-      [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
-      [`${config.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
-      [`${config.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
-      [`${config.lulumiPagesCustomProtocol}about/#/downloads`, 'downloads'],
-      [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
-      [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/about`, 'about'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/downloads`, 'downloads'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/history`, 'history'],
+      [`${constants.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
     globalObject.guestData = data;
   }

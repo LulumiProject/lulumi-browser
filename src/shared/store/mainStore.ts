@@ -8,8 +8,8 @@ import { getters } from './getters';
 import modules from './modules';
 
 import { writeFile } from 'fs';
-import promisify from '../../main/js/lib/promisify';
-import urlResource from '../../renderer/js/lib/url-resource';
+import promisify from '../../main/lib/promisify';
+import urlResource from '../../renderer/lib/url-resource';
 
 Vue.use(Vuex);
 

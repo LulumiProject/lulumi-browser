@@ -8,6 +8,7 @@ const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const WriteFileWebpackPlugin = require('write-file-webpack-plugin')
 const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const HappyPack = require('happypack')
@@ -53,11 +54,11 @@ function returnCss() {
  */
 let whiteListedModules = ['vue']
 
-let rendererConfig = {
-  name: 'renderer',
+let mainBrowserWindowConfig = {
+  name: 'main-browser-window',
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    renderer: path.join(__dirname, '../src/renderer/main.ts')
+    'main-browser-window': path.join(__dirname, '../src/renderer/mainBrowserWindow/main.ts')
   },
   externals: [
     /^electron-debug/,
@@ -70,7 +71,7 @@ let rendererConfig = {
         use: {
           loader: 'happypack/loader?id=happy-ts'
         },
-        include: [ path.join(__dirname, '../src') ],
+        include: [ path.join(__dirname, '../src/shared'), path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/mainBrowserWindow'), path.join(__dirname, '../src/renderer/api') ],
         exclude: /node_modules/
       },
       {
@@ -79,19 +80,19 @@ let rendererConfig = {
         use: {
           loader: 'happypack/loader?id=happy-eslint'
         },
-        include: [ path.join(__dirname, '../src/renderer'), path.join(__dirname, '../src/api') ],
+        include: [ path.join(__dirname, '../src/helper') ],
         exclude: /node_modules/
       },
       {
         test: /\.less$/,
         use: returnLess,
-        include: [ path.join(__dirname, '../src/renderer') ]
+        include: [ path.join(__dirname, '../src/renderer/mainBrowserWindow') ]
       },
       {
         test: /\.css$/,
         use: returnCss,
         include: [
-          path.join(__dirname, '../src/renderer'),
+          path.join(__dirname, '../src/renderer/mainBrowserWindow'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
           path.join(__dirname, '../node_modules/iview/dist/styles'),
           path.join(__dirname, '../node_modules/modern-normalize'),
@@ -109,7 +110,7 @@ let rendererConfig = {
         use: {
           loader: 'happypack/loader?id=happy-babel'
         },
-        include: [ path.join(__dirname, '../src/renderer'), path.join(__dirname, '../src/api') ],
+        include: [ path.join(__dirname, '../src/helper') ],
         exclude: /node_modules/
       },
       {
@@ -124,7 +125,7 @@ let rendererConfig = {
           loader: 'vue-loader'
         },
         include: [
-          path.join(__dirname, '../src/renderer'),
+          path.join(__dirname, '../src/renderer/mainBrowserWindow'),
           path.join(__dirname, '../node_modules/iview/src/components/icon'),
           path.join(__dirname, '../node_modules/vue-awesome/components')
         ]
@@ -173,7 +174,7 @@ let rendererConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../src/index.ejs'),
+      template: path.join(__dirname, '../src/renderer/mainBrowserWindow/index.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -235,7 +236,7 @@ let rendererConfig = {
       tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
-    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [Renderer]', excludeWarnings: false }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
     new VueLoaderPlugin()
   ],
   output: {
@@ -247,10 +248,10 @@ let rendererConfig = {
   resolve: {
     alias: {
       'src': path.join(__dirname, '../src'),
-      'components': path.join(__dirname, '../src/renderer/components'),
+      'components': path.join(__dirname, '../src/renderer/mainBrowserWindow/components'),
       'renderer': path.join(__dirname, '../src/renderer'),
       'shared': path.join(__dirname, '../src/shared'),
-      'i18n': path.join(__dirname, '../helper/i18n'),
+      'i18n': path.join(__dirname, '../src/helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.runtime.esm.js'
     },
@@ -259,11 +260,86 @@ let rendererConfig = {
   target: 'electron-renderer'
 }
 
-let aboutConfig = {
-  name: 'about',
+let preloadsConfig = {
+  name: 'preloads',
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    about: path.join(__dirname, '../src/guest/renderer/main.ts')
+    'webview-preload': path.join(__dirname, '../src/preloads/webview-preload.ts'),
+    'extension-preload': path.join(__dirname, '../src/preloads/extension-preload.ts'),
+    'popup-preload': path.join(__dirname, '../src/preloads/popup-preload.ts')
+  },
+  externals: [
+    /^electron-debug/,
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: {
+          loader: 'happypack/loader?id=happy-ts'
+        },
+        include: [ path.join(__dirname, '../src/preload'), path.join(__dirname, '../src/renderer/api') ],
+        exclude: /node_modules/
+      }
+    ]
+  },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    }),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        appendTsSuffixTo: [/\.vue$/],
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
+      }
+    }]),
+    new WriteFileWebpackPlugin({
+      test: /-preload\.js$/
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preloads]', excludeWarnings: false })
+  ],
+  output: {
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+    libraryTarget: 'commonjs2',
+    path: path.join(__dirname, '../dist')
+  },
+  resolve: {
+    alias: {
+      'src': path.join(__dirname, '../src'),
+      'renderer': path.join(__dirname, '../src/renderer'),
+      'extensions': path.join(__dirname, '../extensions'),
+      'vue$': 'vue/dist/vue.runtime.esm.js'
+    },
+    extensions: ['.ts']
+  },
+  target: 'electron-renderer'
+}
+
+let preferenceViewConfig = {
+  name: 'preference-view',
+  devtool: '#cheap-module-eval-source-map',
+  entry: {
+    'preference-view': path.join(__dirname, '../src/renderer/preferenceView/main.ts')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -275,28 +351,19 @@ let aboutConfig = {
         use: {
           loader: 'happypack/loader?id=happy-ts'
         },
-        include: [ path.join(__dirname, '../src') ],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
-        enforce: 'pre',
-        use: {
-          loader: 'happypack/loader?id=happy-eslint'
-        },
-        include: [ path.join(__dirname, '../src/guest/renderer') ],
+        include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/preferenceView') ],
         exclude: /node_modules/
       },
       {
         test: /\.less$/,
         use: returnLess,
-        include: [ path.join(__dirname, '../src/guest/renderer') ]
+        include: [ path.join(__dirname, '../src/renderer/preferenceView') ]
       },
       {
         test: /\.css$/,
         use: returnCss,
         include: [
-          path.join(__dirname, '../src/guest/renderer'),
+          path.join(__dirname, '../src/renderer/preferenceView'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
           path.join(__dirname, '../node_modules/modern-normalize'),
           path.join(__dirname, '../node_modules/vue-awesome/components')
@@ -309,14 +376,6 @@ let aboutConfig = {
         }]
       },
       {
-        test: /\.js$/,
-        use: {
-          loader: 'happypack/loader?id=happy-babel'
-        },
-        include: [ path.join(__dirname, '../src/guest/renderer') ],
-        exclude: /node_modules/
-      },
-      {
         test: /\.pug$/,
         use: [{
           loader: 'happypack/loader?id=happy-pug'
@@ -327,7 +386,7 @@ let aboutConfig = {
         use: {
           loader: 'vue-loader'
         },
-        include: [ path.join(__dirname, '../src/guest') ]
+        include: [ path.join(__dirname, '../src/renderer/preferenceView') ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -373,7 +432,7 @@ let aboutConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: 'about.html',
-      template: path.join(__dirname, '../src/guest/index.ejs'),
+      template: path.join(__dirname, '../src/renderer/preferenceView/index.ejs'),
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -389,18 +448,6 @@ let aboutConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', [{
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true
-      }
-    }]),
-    createHappyPlugin('happy-eslint', [{
-      loader: 'eslint-loader',
-      options: {
-        formatter: require('eslint-friendly-formatter')
-      }
-    }]),
     createHappyPlugin('happy-html',  [{
       loader: 'vue-html-loader'
     }]),
@@ -433,7 +480,7 @@ let aboutConfig = {
       tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
-    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [About]', excludeWarnings: false }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preferenceView]', excludeWarnings: false }),
     new VueLoaderPlugin()
   ],
   output: {
@@ -444,9 +491,9 @@ let aboutConfig = {
   },
   resolve: {
     alias: {
-      'components': path.join(__dirname, '../src/guest/renderer/components'),
-      'renderer': path.join(__dirname, '../src/guest/renderer'),
-      'i18n': path.join(__dirname, '../helper/i18n'),
+      'components': path.join(__dirname, '../src/renderer/preferenceView/components'),
+      'renderer': path.join(__dirname, '../src/renderer'),
+      'i18n': path.join(__dirname, '../src/helper/i18n'),
       'vue$': 'vue/dist/vue.runtime.esm.js'
     },
     extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
@@ -455,18 +502,25 @@ let aboutConfig = {
 }
 
 /**
- * Adjust rendererConfig and aboutConfig for development settings
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+ * for development settings
  */
 if (process.env.NODE_ENV !== 'production') {
-  rendererConfig.mode = 'development'
-  aboutConfig.mode = 'development'
+  mainBrowserWindowConfig.mode = 'development'
+  preloadsConfig.mode = 'development'
+  preferenceViewConfig.mode = 'development'
 
-  rendererConfig.plugins.push(
+  mainBrowserWindowConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
   )
-  aboutConfig.plugins.push(
+  preloadsConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+    })
+  )
+  preferenceViewConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
@@ -474,14 +528,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Adjust rendererConfig and aboutConfig for e2e testing settings
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+ * for e2e testing settings
  */
 if (process.env.TEST_ENV === 'e2e') {
-  rendererConfig.mode = 'production'
-  aboutConfig.mode = 'production'
+  mainBrowserWindowConfig.mode = 'production'
+  preloadsConfig.mode = 'production'
+  preferenceViewConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
-  aboutConfig.performance = { hints: false }
-  rendererConfig.plugins.push(
+  preferenceViewConfig.performance = { hints: false }
+  mainBrowserWindowConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
       'process.env.TEST_ENV': '"e2e"'
@@ -490,7 +546,16 @@ if (process.env.TEST_ENV === 'e2e') {
       minimize: true
     })
   )
-  aboutConfig.plugins.push(
+  preloadsConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"',
+      'process.env.TEST_ENV': '"e2e"'
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
+  preferenceViewConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
       'process.env.TEST_ENV': '"e2e"'
@@ -501,22 +566,36 @@ if (process.env.TEST_ENV === 'e2e') {
   )
 } else {
   /**
-   * Adjust rendererConfig and aboutConfig for production settings
+   * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+   * for production settings
    */
   if (process.env.NODE_ENV === 'production') {
-    rendererConfig.mode = 'production'
-    aboutConfig.mode = 'production'
+    mainBrowserWindowConfig.mode = 'production'
+    preloadsConfig.mode = 'production'
+    preferenceViewConfig.mode = 'production'
     // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
-    aboutConfig.performance = { hints: false }
-    rendererConfig.devtool = false
-    aboutConfig.devtool = false
+    preferenceViewConfig.performance = { hints: false }
+    mainBrowserWindowConfig.devtool = false
+    preloadsConfig.devtool = false
+    preferenceViewConfig.devtool = false
 
-    rendererConfig.plugins.push(
+    mainBrowserWindowConfig.plugins.push(
       new webpack.LoaderOptionsPlugin({
         minimize: true
       })
     )
-    rendererConfig.plugins.push(
+    preloadsConfig.plugins.push(
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
+    )
+    preferenceViewConfig.plugins.push(
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      })
+    )
+
+    mainBrowserWindowConfig.plugins.push(
       new CspHtmlWebpackPlugin({
         'default-src': "'none'",
         'object-src': "'self'",
@@ -527,12 +606,7 @@ if (process.env.TEST_ENV === 'e2e') {
         'img-src': ["'self'", "https:", "http:", "data:"]
       })
     )
-    aboutConfig.plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true
-      })
-    )
-    aboutConfig.plugins.push(
+    preferenceViewConfig.plugins.push(
       new CspHtmlWebpackPlugin({
         'default-src': "'none'",
         'object-src': "'none'",
@@ -547,6 +621,7 @@ if (process.env.TEST_ENV === 'e2e') {
 }
 
 module.exports = [
-  Object.assign({} , rendererConfig),
-  Object.assign({} , aboutConfig)
+  Object.assign({} , mainBrowserWindowConfig),
+  Object.assign({} , preloadsConfig),
+  Object.assign({} , preferenceViewConfig)
 ]

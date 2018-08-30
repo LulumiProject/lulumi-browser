@@ -42,7 +42,11 @@ function logStats (proc, data) {
 function startRenderer () {
   return new Promise((resolve, reject) => {
     Configs.forEach((config) => {
-      Object.keys(config.entry).forEach(key => config.entry[key] = [path.join(__dirname, `dev-client-${key}`)].concat(config.entry[key]));
+      if (config.name !== 'preloads') {
+        Object.keys(config.entry).forEach(key => {
+          config.entry[key] = [path.join(__dirname, `dev-client-${key}`)].concat(config.entry[key])
+        });
+      }
     })
 
     const multiCompiler = webpack(Configs)
@@ -51,12 +55,16 @@ function startRenderer () {
       heartbeat: 2500
     })
 
-    multiCompiler.compilers.map(c => c.hooks.compilation.tap('dev-runner', compilation => {
-      compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('dev-runner', (data, cb) => {
-        hotMiddleware.publish({ action: 'reload' })
-        cb()
-      })
-    }))
+    multiCompiler.compilers.map(c => {
+      if (c.name !== 'preloads') {
+        c.hooks.compilation.tap('dev-runner', compilation => {
+          compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('dev-runner', (data, cb) => {
+            hotMiddleware.publish({ action: 'reload' })
+            cb()
+          })
+        })
+      }
+    })
 
     multiCompiler.compilers.map(c => c.hooks.done.tap('dev-runner', stats => {
       logStats('Renderer', stats)

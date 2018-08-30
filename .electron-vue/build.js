@@ -34,13 +34,13 @@ function clean () {
  */
 function rev() {
   console.log('\x1b[34mWriting rev into app(s)...\n\x1b[0m')
-  const appConfig = require('path').resolve(__dirname ,'../src/main/js/constants/config.ts')
-  fs.readFile(appConfig, 'utf8', (err, data) => {
+  const constants = require('path').resolve(__dirname ,'../src/main/constants.ts')
+  fs.readFile(constants, 'utf8', (err, data) => {
     if (err) {
       console.error(err)
     } else {
       const result = data.replace(/lulumiRev: ['a-z0-9]*,/, `lulumiRev: '${require('git-rev-sync').long('.')}',`)
-      fs.writeFile(appConfig, result, 'utf8', (err) => {
+      fs.writeFile(constants, result, 'utf8', (err) => {
         if (err) {
           console.error(err)
         } else build()

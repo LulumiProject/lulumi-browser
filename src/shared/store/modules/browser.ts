@@ -1,9 +1,9 @@
 import Vue from 'vue';
 
 import * as types from '../mutation-types';
-import config from '../../../renderer/js/constants/config';
-import timeUtil from '../../../renderer/js/lib/time-util';
-import urlUtil from '../../../renderer/js/lib/url-util';
+import constants from '../../../renderer/mainBrowserWindow/constants';
+import timeUtil from '../../../renderer/lib/time-util';
+import urlUtil from '../../../renderer/lib/url-util';
 
 /* tslint:disable:object-shorthand-properties-first */
 
@@ -12,12 +12,12 @@ const state: Lulumi.Store.State = {
   tabs: [],
   tabsOrder: [],
   currentTabIndexes: [],
-  searchEngine: config.searchEngine,
-  currentSearchEngine: config.currentSearchEngine,
-  autoFetch: config.autoFetch,
-  homepage: config.homepage,
-  pdfViewer: config.pdfViewer,
-  tabConfig: config.tabConfig,
+  searchEngine: constants.searchEngine,
+  currentSearchEngine: constants.currentSearchEngine,
+  autoFetch: constants.autoFetch,
+  homepage: constants.homepage,
+  pdfViewer: constants.pdfViewer,
+  tabConfig: constants.tabConfig,
   lang: 'en',
   downloads: [],
   history: [],
@@ -80,7 +80,8 @@ const mutations = {
       newUrl = url;
       state.tabs.push(createTabObject(state, windowId, newUrl));
     } else if (url) {
-      newUrl = config.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(url));
+      newUrl
+        = constants.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(url));
       state.tabs.push(createTabObject(state, windowId, newUrl));
     } else {
       state.tabs.push(createTabObject(state, windowId));
@@ -313,7 +314,7 @@ const mutations = {
             state.tabs[tabsIndex].canGoBack = payload.canGoBack;
             state.tabs[tabsIndex].canGoForward = payload.canGoForward;
           }
-          state.tabs[tabsIndex].favIconUrl = config.tabConfig.lulumiFavicon;
+          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.lulumiFavicon;
         } else {
           if (state.tabs[tabsIndex].title === '') {
             state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
@@ -326,7 +327,7 @@ const mutations = {
               state.history.unshift({
                 title: state.tabs[tabsIndex].title,
                 url: state.tabs[tabsIndex].url,
-                favIconUrl: config.tabConfig.defaultFavicon,
+                favIconUrl: constants.tabConfig.defaultFavicon,
                 label: date.split(' ')[0],
                 time: date.split(' ')[1],
               });
@@ -336,7 +337,7 @@ const mutations = {
             state.history.unshift({
               title: state.tabs[tabsIndex].title,
               url: state.tabs[tabsIndex].url,
-              favIconUrl: config.tabConfig.defaultFavicon,
+              favIconUrl: constants.tabConfig.defaultFavicon,
               label: date.split(' ')[0],
               time: date.split(' ')[1],
             });
@@ -372,7 +373,7 @@ const mutations = {
       state.tabs[tabsIndex].url = url;
       if (!url.match(regexp)) {
         if (!state.tabs[tabsIndex].favIconUrl) {
-          state.tabs[tabsIndex].favIconUrl = config.tabConfig.defaultFavicon;
+          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.defaultFavicon;
         }
         // update favicon of the certain history
         if (state.tabs[tabsIndex].title !== 'error') {
@@ -600,7 +601,7 @@ const mutations = {
     state.tabId = newState.pid;
     state.tabs = newState.tabs;
     state.currentTabIndexes = newState.currentTabIndexes;
-    state.searchEngine = config.searchEngine;
+    state.searchEngine = constants.searchEngine;
     state.currentSearchEngine = newState.currentSearchEngine;
     state.autoFetch = newState.autoFetch;
     state.homepage = newState.homepage;
