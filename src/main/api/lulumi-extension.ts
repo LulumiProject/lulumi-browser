@@ -5,7 +5,7 @@ import localshortcut from 'electron-localshortcut';
 import * as fs from 'fs';
 import * as path from 'path';
 import generate from 'nanoid/generate';
-import * as url from 'url';
+import * as urllib from 'url';
 
 import config from '../constants';
 import './listeners';
@@ -81,7 +81,7 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
         srcDirectory,
         extensionId,
         messages,
-        startPage: url.format({
+        startPage: urllib.format({
           protocol: 'lulumi-extension',
           slashes: true,
           hostname: extensionId,
@@ -128,7 +128,7 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
     webSecurity: false,
   });
   backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
-  contents.loadURL(url.format({
+  contents.loadURL(urllib.format({
     protocol: 'lulumi-extension',
     slashes: true,
     hostname: manifest.extensionId,
@@ -195,11 +195,20 @@ const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
 
 const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
   if (manifest.content_scripts) {
+    const readArrayOfFiles = relativePath => ({
+      url: urllib.format({
+        protocol: 'lulumi-extension',
+        slashes: true,
+        hostname: manifest.extensionId,
+        pathname: relativePath,
+      }),
+      code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
+    });
     const contentScriptToEntry = script => ({
       all_frames: script.all_frames,
       matches: script.matches,
-      js: script.js,
-      css: script.css,
+      js: script.js ? script.js.map(readArrayOfFiles) : [],
+      css: script.css ? script.css.map(readArrayOfFiles) : [],
       runAt: script.run_at || 'document_idle',
     });
 
@@ -271,7 +280,7 @@ app.on('web-contents-created', (event, webContents) => {
 
 // the lulumi-extension can map a extension URL request to real file path
 const lulumiExtensionHandler = (request, callback) => {
-  const parsed = url.parse(request.url);
+  const parsed = urllib.parse(request.url);
   if (!parsed.hostname || !parsed.path) {
     return callback();
   }

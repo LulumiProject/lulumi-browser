@@ -16,6 +16,15 @@ declare namespace Lulumi {
     }
   }
 
+  export namespace Preload {
+    export interface IsolatedWorldMaps extends Object {
+      [index: string]: number | undefined;
+    }
+    export interface Context extends Object {
+      lulumi: any;
+    }
+  }
+
   export namespace API {
     // extension api
     export interface BackgroundPageObject {

@@ -121,7 +121,7 @@ let nextId = 0;
 
 ipcRenderer.setMaxListeners(0);
 // tslint:disable-next-line:variable-name
-export default function injectTo(guestInstanceId, thisExtensionId, scriptType, context, LocalStorage) {
+export default function injectTo(guestInstanceId, thisExtensionId, scriptType, context: Lulumi.Preload.Context, LocalStorage) {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
   let storagePath;

@@ -21,7 +21,7 @@ const globalObject = global as any;
 
 process.once('loaded', () => {
   const extensionId = globalObject.location.hostname;
-  const context: any = {};
+  const context: Lulumi.Preload.Context = { lulumi: {} };
   globalObject.scriptType = 'popup';
   injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
   globalObject.lulumi = context.lulumi;

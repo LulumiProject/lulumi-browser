@@ -1,5 +1,6 @@
 import { ipcRenderer, remote, webFrame } from 'electron';
 import { runInThisContext } from 'vm';
+import * as urllib from 'url';
 
 import requirePreload from './require-preload';
 import injectTo from '../renderer/api/inject-to';
@@ -31,23 +32,33 @@ const matchesPattern = (pattern) => {
 };
 
 const globalObject = global as any;
+const isolatedWorldMaps: Lulumi.Preload.IsolatedWorldMaps = {};
+const context: Lulumi.Preload.Context = { lulumi: {} };
 
 // Run the code with chrome and lulumi API integrated.
-const runContentScript = (extensionId, url, code) => {
-  const context: any = {};
+const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
+  const parsed = urllib.parse(url);
+  const extension = isolatedWorldMaps[extensionId];
   globalObject.scriptType = 'content-script';
-  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
-  const wrapper = `((lulumi) => {
-    var chrome = lulumi;
-    ${code}
-  });`;
-  webFrame.executeJavaScriptInIsolatedWorld(1, [
-    {
-      url,
-      code: wrapper,
-    },
-  ]);
-  webFrame.setIsolatedWorldHumanReadableName(1, extensionId);
+  if (extension === undefined) {
+    isolatedWorldMaps[extensionId] = isolatedWorldId;
+    injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
+    webFrame.setIsolatedWorldHumanReadableName(isolatedWorldId, name);
+    webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
+      code: 'window',
+    }], false, (window) => {
+      window.chrome = window.lulumi = context.lulumi;
+    });
+  }
+  webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
+    code,
+    url: urllib.format({
+      protocol: parsed.protocol,
+      slashes: true,
+      hostname: extensionId,
+      pathname: parsed.pathname,
+    }),
+  }]);
 };
 
 const runStylesheet = (url, code) => {
@@ -69,7 +80,7 @@ const runStylesheet = (url, code) => {
 
 // run injected scripts
 // https://developer.chrome.com/extensions/content_scripts
-const injectContentScript = (extensionId, script) => {
+const injectContentScript = (name, extensionId, script, isolatedWorldId) => {
   if (!script.matches.some(matchesPattern)) {
     return;
   }
@@ -79,7 +90,7 @@ const injectContentScript = (extensionId, script) => {
   process.setMaxListeners(0);
   if (script.js) {
     script.js.forEach((js) => {
-      const fire = runContentScript.bind(window, extensionId, js.url, js.code);
+      const fire = runContentScript.bind(window, name, extensionId, isolatedWorldId, js.url, js.code);
       if (script.runAt === 'document_start') {
         process.once(('document-start' as any), fire);
       } else if (script.runAt === 'document_end') {
@@ -107,9 +118,13 @@ const injectContentScript = (extensionId, script) => {
 // read the renderer process preferences to see if we need to inject scripts
 const preferences = remote.getGlobal('renderProcessPreferences');
 if (preferences) {
+  let nextIsolatedWorldId = 999;
   preferences.forEach((pref) => {
     if (pref.content_scripts) {
-      pref.content_scripts.forEach(script => injectContentScript(pref.extensionId, script));
+      nextIsolatedWorldId -= 1;
+      pref.content_scripts.forEach((script) => {
+        injectContentScript(pref.name, pref.extensionId, script, nextIsolatedWorldId);
+      });
     }
   });
 }
@@ -145,7 +160,12 @@ process.once('loaded', () => {
   } else {
     webFrame.executeJavaScript('window.eval = function () { };');
   }
-  ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
+  ipcRenderer.on('lulumi-tabs-send-message', (event: Electron.IpcMessageEvent, message) => {
     ipcRenderer.send('lulumi-runtime-emit-on-message', message);
+  });
+  ipcRenderer.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+    if (data.result === 'OK') {
+      delete isolatedWorldMaps[data.extensionId];
+    }
   });
 });
