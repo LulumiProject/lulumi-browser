@@ -30,11 +30,6 @@ const manifestNameMap: Lulumi.API.ManifestNameMap = {};
 
 const generateExtensionIdFromName = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
 
-const isWindowOrWebView = (webContents) => {
-  const type = webContents.getType();
-  return type === 'window' || type === 'webview';
-};
-
 // Create or get manifest object from |srcDirectory|.
 const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject | null =
   (srcDirectory: string): Lulumi.API.ManifestObject | null => {
@@ -257,26 +252,6 @@ const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
     extensionid: extensionInfo.id,
   });
 };
-
-const loadLulumiExtensions = (win, manifests) => {
-  if (!win.devToolsWebContents) {
-    return;
-  }
-
-  manifests.forEach(loadExtension);
-
-  // const extensionInfoArray = manifests.map(manifestToExtensionInfo);
-};
-
-app.on('web-contents-created', (event, webContents) => {
-  if (!isWindowOrWebView(webContents)) {
-    return;
-  }
-
-  webContents.on('dom-ready', () => {
-    loadLulumiExtensions(webContents, objectValues(manifestMap));
-  });
-});
 
 // the lulumi-extension can map a extension URL request to real file path
 const lulumiExtensionHandler = (request, callback) => {
