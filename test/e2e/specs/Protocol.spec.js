@@ -6,7 +6,7 @@ const urlInput = '#url-input';
 test.serial('has working about: handlers for redirecting requests to lulumi: protocol', async (t) => {
   const app = t.context.app;
   const result = await app.client
-  .waitForVisible(urlInput)
+    .waitForVisible(urlInput)
     .click(urlInput)
     .elementActive();
   const activeElement = result.value && result.value.ELEMENT;
