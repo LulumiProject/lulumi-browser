@@ -28,10 +28,8 @@ function startApp() {
   this.app = new Application({
     path: electron,
     args: ['dist/main.js'],
-    waitTimeout: 10000,
-    waitInterval: 100
+    waitTimeout: 10000
   });
-
   return this.app.start();
 };
 
@@ -266,9 +264,6 @@ export default {
   beforeEach(ava) {
     ava.beforeEach(async t => {
       await startApp.call(t.context);
-    });
-
-    ava.beforeEach(t => {
       addCommands.call(t.context);
     });
 

@@ -5,7 +5,6 @@ const merge = require('webpack-merge')
 const webpack = require('webpack')
 
 const baseConfigs = require('../../.electron-vue/webpack.renderer.config')
-const projectRoot = path.resolve(__dirname, '../../src/renderer')
 
 // Set BABEL_ENV to use proper preset config
 process.env.BABEL_ENV = 'test'
@@ -24,9 +23,8 @@ delete webpackConfig.entry
 delete webpackConfig.externals
 delete webpackConfig.output.libraryTarget
 
-// apply vue option to apply isparta-loader on js
-webpackConfig.module.rules
-  .find(rule => rule.use.loader === 'vue-loader').use.options.loaders.js = 'babel-loader'
+// apply a temporary fix according to https://github.com/webpack-contrib/karma-webpack/issues/322#issuecomment-417861781
+webpackConfig.output.filename = '[name]';
 
 module.exports = (config) => {
   config.set({

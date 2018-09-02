@@ -133,7 +133,7 @@ const moduleTmp = module;
 
 process.once('loaded', () => {
   if (process.env.TEST_ENV === 'e2e') {
-    globalObject.require = requirePreload;
+    globalObject.require = () => require('electron');
   }
   if (document.location.href.startsWith('lulumi://')) {
     // about:newtab handler

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-test('has everything set up', async (t) => {
+test.serial('has everything set up', async (t) => {
   const app = t.context.app;
   await app.client.waitForBrowserWindow();
 

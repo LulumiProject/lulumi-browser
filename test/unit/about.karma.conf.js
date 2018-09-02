@@ -5,12 +5,12 @@ const merge = require('webpack-merge')
 const webpack = require('webpack')
 
 const baseConfigs = require('../../.electron-vue/webpack.renderer.config')
-const projectRoot = path.resolve(__dirname, '../../src/renderer')
+const projectRoot = path.resolve(__dirname, '../../src/renderer/preferenceView')
 
 // Set BABEL_ENV to use proper preset config
 process.env.BABEL_ENV = 'test'
 
-let webpackConfig = merge(baseConfigs[1], {
+let webpackConfig = merge(baseConfigs[2], {
   devtool: '#inline-source-map',
   plugins: [
     new webpack.DefinePlugin({
@@ -24,12 +24,11 @@ delete webpackConfig.entry
 delete webpackConfig.externals
 delete webpackConfig.output.libraryTarget
 
-// apply vue option to apply isparta-loader on js
-webpackConfig.module.rules
-  .find(rule => rule.use.loader === 'vue-loader').use.options.loaders.js = 'babel-loader'
-
 // change to 'electron-renderer' in order to preload some lazy loading modules
 webpackConfig.target = 'electron-renderer';
+
+// apply a temporary fix according to https://github.com/webpack-contrib/karma-webpack/issues/322#issuecomment-417861781
+webpackConfig.output.filename = '[name]';
 
 module.exports = (config) => {
   config.set({

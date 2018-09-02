@@ -3,7 +3,7 @@ import Electron from 'vue-electron';
 import { Autocomplete } from 'element-ui';
 
 import BrowserMainView from 'components/BrowserMainView';
-import config from 'renderer/js/constants/config';
+import constants from 'renderer/constants';
 
 import router from 'renderer/router';
 import store from 'shared/store/rendererStore';
@@ -21,17 +21,24 @@ Vue.config.devtools = false;
 // Customize Autocomplete component to match out needs
 const customAutocomplete = Vue.extend(Autocomplete);
 const goodCustomAutocomplete = customAutocomplete.extend({
+  // https://bit.ly/2KpCoRf
+  inheritAttrs: true,
   data() {
     return {
+      activated: false,
+      isOnComposition: false,
+      suggestions: [],
+      loading: false,
+      highlightedIndex: -1,
       lastQueryString: '',
     };
   },
   computed: {
     suggestionVisible() {
-      const { suggestions } = this;
+      const suggestions = this.suggestions;
       const isValidData = Array.isArray(suggestions) && suggestions.length > 0;
       // Don't show suggestions if we have no input there
-      return (isValidData || this.loading) && this.isFocus && this.value;
+      return (isValidData || this.loading) && this.activated && this.value;
     },
   },
   methods: {
@@ -62,9 +69,10 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           if (el.selectionStart === queryString.length) {
             if (this.lastQueryString !== queryString) {
               const startPos = queryString.length;
-              const endPos = this.suggestions[0].value.length;
+              const endPos = this.suggestions[0].item.url.length;
               this.$nextTick().then(() => {
-                this.$refs.input.$refs.input.value = this.suggestions[0].value;
+                this.$refs.input.$refs.input.value
+                  = this.suggestions[0].item.url;
                 this.setInputSelection(el, startPos, endPos);
                 this.lastQueryString = queryString;
               });
@@ -73,7 +81,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
             }
           }
         } else {
-          // eslint-disable-next-line no-console
+          // tslint:disable-next-line no-console
           console.error('autocomplete suggestions must be an array');
         }
       });
@@ -82,28 +90,33 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       this.$emit('input', value);
       if (this.isOnComposition || (!this.triggerOnFocus && !value)) {
         this.lastQueryString = '';
-        this.suggestions.length = 0;
+        this.suggestions = [];
         return;
       }
-      this.getData(value);
+      this.debouncedGetData(value);
     },
     handleFocus(event) {
       event.target.select();
-      this.isFocus = true;
+      this.activated = true;
+      this.$emit('focus', event);
       if (this.triggerOnFocus) {
-        this.getData(this.value);
+        this.debouncedGetData(this.value);
       }
     },
     handleKeyEnter(event) {
       if (this.suggestionVisible
         && this.highlightedIndex >= 0
         && this.highlightedIndex < this.suggestions.length) {
+        event.preventDefault();
         this.select(this.suggestions[this.highlightedIndex]);
       } else {
         this.$parent.$parent.onEnterUrl(event.target.value);
-        this.select({
-          title: '',
-          value: event.target.value,
+        this.$emit('select', {
+          item: {
+            title: '',
+            value: event.target.value,
+            url: event.target.value,
+          },
         });
       }
     },
@@ -121,20 +134,21 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       const suggestion
         = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
       const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
+
       const highlightItem = suggestionList[newIndex];
-      const { clientHeight, scrollTop } = suggestion;
-      const { offsetTop, scrollHeight } = highlightItem;
-      if ((offsetTop + scrollHeight) > (scrollTop + clientHeight)) {
-        suggestion.scrollTop += scrollHeight;
+      const scrollTop = suggestion.scrollTop;
+      const offsetTop = highlightItem.offsetTop;
+
+      if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
+        suggestion.scrollTop += highlightItem.scrollHeight;
       }
       if (offsetTop < scrollTop) {
-        suggestion.scrollTop -= scrollHeight;
+        suggestion.scrollTop -= highlightItem.scrollHeight;
       }
       this.highlightedIndex = newIndex;
-      if (newIndex >= 0) {
-        this.$refs.input.$refs.input.value
-          = this.suggestions[this.highlightedIndex].value;
-      }
+      this.$el.querySelector('.el-input__inner')
+        .setAttribute('aria-activedescendant', `${this.id}-item-${this.highlightedIndex}`);
+      this.$emit('input', this.suggestions[this.highlightedIndex].item.url);
     },
   },
 });
@@ -167,19 +181,19 @@ describe('BrowserMainView.vue', () => {
 
     describe('computed.homepage()', () => {
       it('has correct default homepage', () => {
-        expect(vm.homepage).to.equal(config.homepage);
+        expect(vm.homepage).to.equal(constants.homepage);
       });
     });
 
     describe('computed.pdfViewer()', () => {
       it('has correct default pdfViewer', () => {
-        expect(vm.pdfViewer).to.equal(config.pdfViewer);
+        expect(vm.pdfViewer).to.equal(constants.pdfViewer);
       });
     });
 
     describe('methods.getWebView()', () => {
       it('has the corresponding webview element', async () => {
-        expect(vm.getWebView().getAttribute('src')).to.equal(config.tabConfig.dummyTabObject.url);
+        expect(vm.getWebView().getAttribute('src')).to.equal(constants.tabConfig.dummyTabObject.url);
       });
     });
 
@@ -214,7 +228,7 @@ describe('BrowserMainView.vue', () => {
     describe('methods.onClickHome()', () => {
       it('redirects to homepage', async () => {
         vm.onClickHome();
-        expect(vm.getWebView().getAttribute('src')).to.equal(config.homepage);
+        expect(vm.getWebView().getAttribute('src')).to.equal(constants.homepage);
       });
     });
 
@@ -291,10 +305,10 @@ describe('BrowserMainView.vue', () => {
     });
 
     it('has four controls in .control-group', () => {
-      expect(vm.$el.querySelector('.ivu-icon-ios-home')).to.exist;
-      expect(vm.$el.querySelector('.ivu-icon-arrow-left-c')).to.exist;
-      expect(vm.$el.querySelector('.ivu-icon-arrow-right-c')).to.exist;
-      expect(vm.$el.querySelector('.ivu-icon-android-refresh')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-md-home')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-md-arrow-round-back')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-md-arrow-round-forward')).to.exist;
+      expect(vm.$el.querySelector('.ivu-icon-md-refresh')).to.exist;
     });
   });
 

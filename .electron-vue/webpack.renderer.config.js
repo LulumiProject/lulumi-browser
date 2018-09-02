@@ -249,7 +249,7 @@ let mainBrowserWindowConfig = {
     alias: {
       'src': path.join(__dirname, '../src'),
       'components': path.join(__dirname, '../src/renderer/mainBrowserWindow/components'),
-      'renderer': path.join(__dirname, '../src/renderer'),
+      'renderer': path.join(__dirname, '../src/renderer/mainBrowserWindow'),
       'shared': path.join(__dirname, '../src/shared'),
       'i18n': path.join(__dirname, '../src/helper/i18n'),
       'extensions': path.join(__dirname, '../extensions'),
@@ -326,7 +326,6 @@ let preloadsConfig = {
   resolve: {
     alias: {
       'src': path.join(__dirname, '../src'),
-      'renderer': path.join(__dirname, '../src/renderer'),
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.runtime.esm.js'
     },
@@ -492,7 +491,7 @@ let preferenceViewConfig = {
   resolve: {
     alias: {
       'components': path.join(__dirname, '../src/renderer/preferenceView/components'),
-      'renderer': path.join(__dirname, '../src/renderer'),
+      'renderer': path.join(__dirname, '../src/renderer/preferenceView'),
       'i18n': path.join(__dirname, '../src/helper/i18n'),
       'vue$': 'vue/dist/vue.runtime.esm.js'
     },

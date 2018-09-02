@@ -2,8 +2,11 @@
 const testsContext = require.context('./specs/about', true, /\.spec$/)
 testsContext.keys().forEach(testsContext)
 
-// require all src files except main.js for coverage.
+// require all src files except some files for coverage.
 // you can also change this to match only the subset of files that
 // you want coverage for.
-const srcGuestContext = require.context('../../src/guest/renderer', true, /^\.\/(?!main|i18n(\.ts)?$)/)
-srcGuestContext.keys().forEach(srcGuestContext)
+const srcContext = require.context('../../src/renderer/preferenceView', true, /^\.\/(?!main|i18n|index(\.ts|\.ejs)?$)/)
+srcContext.keys().forEach(srcContext)
+
+// disable security warnings
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
