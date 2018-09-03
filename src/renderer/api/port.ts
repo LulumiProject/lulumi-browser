@@ -1,18 +1,34 @@
 import Event from './event';
 import { ipcRenderer, remote } from 'electron';
 
+const ports: Port[] = [];
+
 class MessageSender {
+  frameId: number;
   id: string;
+  tab: Lulumi.Store.TabObject;
   url: string;
 
   constructor(extensionId) {
+    // TODO: fix this
+    this.frameId = 0;
     this.id = extensionId;
     this.url = `lulumi-extension://${extensionId}`;
   }
+
+  setTab(tab) {
+    this.tab = tab;
+  }
+}
+
+function invalidateEvent(event: Event) {
+  event.listeners.length = 0;
 }
 
 class Port {
+  portId: number;
   disconnected: boolean;
+  otherEnd: boolean;
   extensionId: string;
   connectInfo: object;
   scriptType: string;
@@ -23,8 +39,10 @@ class Port {
   onMessage: Event;
   sender: MessageSender;
 
-  constructor(extensionId, connectInfo, scriptType, responseScriptType, webContentsId) {
+  constructor(portId, extensionId, connectInfo, scriptType, responseScriptType, webContentsId) {
+    this.portId = portId;
     this.disconnected = false;
+    this.otherEnd = false;
     this.extensionId = extensionId;
     this.connectInfo = connectInfo;
     this.scriptType = scriptType;
@@ -42,6 +60,11 @@ class Port {
     this.onDisconnect = new Event();
     this.onMessage = new Event();
     this.sender = new MessageSender(this.extensionId);
+    const port = ports[portId];
+    if (port) {
+      throw new Error(`Port '${portId}' already exists.`);
+    }
+    ports[portId] = this;
     process.nextTick(this._init.bind(this));
   }
 
@@ -50,6 +73,12 @@ class Port {
     ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}`, (event, message) => {
       // https://developer.chrome.com/extensions/runtime#property-Port-onMessage
       this.onMessage.emit(message, this);
+    });
+    ipcRenderer.once(`lulumi-runtime-port-${this.extensionId}-disconnect`, () => {
+      // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
+      this.onDisconnect.emit(this);
+      this.otherEnd = true;
+      this.disconnect();
     });
     if (this.responseScriptType) {
       remote.webContents.fromId(this.webContentsId)
@@ -95,8 +124,20 @@ class Port {
   _onDisconnect() {
     this.disconnected = true;
     ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}`);
+    if (!this.otherEnd) {
+      ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}-disconnect`);
+      remote.webContents.fromId(this.webContentsId)
+        .send(`lulumi-runtime-port-${this.extensionId}-disconnect`);
+    }
     // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
-    this.onDisconnect.emit(this);
+    this._Destroy();
+  }
+
+  // tslint:disable-next-line:function-name
+  _Destroy() {
+    invalidateEvent(this.onDisconnect);
+    invalidateEvent(this.onMessage);
+    delete ports[this.portId];
   }
 }
 

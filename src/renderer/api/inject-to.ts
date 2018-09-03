@@ -118,6 +118,7 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
 }
 
 let nextId = 0;
+let nextPortId = 0;
 
 ipcRenderer.setMaxListeners(0);
 // tslint:disable-next-line:variable-name
@@ -337,10 +338,12 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
       if (lulumi.runtime.port && responseScriptType && !lulumi.runtime.port.disconnected && scriptType !== 'event') {
         lulumi.runtime.port.updateResponseScriptType(responseScriptType);
       } else {
-        if (lulumi.runtime.port) {
-          lulumi.runtime.port.disconnect();
-        }
-        lulumi.runtime.port = new Port(extensionId, connectInfo, scriptType, responseScriptType, webContentsId);
+        nextPortId += 1;
+        lulumi.runtime.port
+          = new Port(nextPortId, extensionId, connectInfo, scriptType, responseScriptType, webContentsId);
+        lulumi.tabs.query({ webContentsId: lulumi.runtime.port.webContentsId }, (tabs) => {
+          lulumi.runtime.port.sender.setTab(tabs[0]);
+        });
         lulumi.runtime.onConnect.emit(lulumi.runtime.port);
       }
     },
@@ -356,7 +359,9 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
           newConnectInfo = extensionId;
           targetExtensionId = thisExtensionId;
         }
-        lulumi.runtime.port = new Port(targetExtensionId, newConnectInfo, scriptType, null, null);
+        nextPortId += 1;
+        lulumi.runtime.port
+          = new Port(nextPortId, targetExtensionId, newConnectInfo, scriptType, null, null);
       }
       return lulumi.runtime.port;
     },
