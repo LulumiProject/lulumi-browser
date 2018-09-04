@@ -65,7 +65,7 @@ class Port {
       throw new Error(`Port '${portId}' already exists.`);
     }
     ports[portId] = this;
-    process.nextTick(this._init.bind(this));
+    this._init();
   }
 
   // tslint:disable-next-line:function-name
