@@ -14,5 +14,5 @@ export default {
   lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
   lulumiPagesPath: `${path.resolve(lulumiHelperPath, 'pages')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: '12fa0da64e6b2a1b43b7384675b7ad0ba8e8e344',
+  lulumiRev: '7a655cb4ff17480de94010e338d2f66288d1e1fd',
 };
