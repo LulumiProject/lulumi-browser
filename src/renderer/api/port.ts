@@ -70,11 +70,11 @@ class Port {
 
   // tslint:disable-next-line:function-name
   _init() {
-    ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}`, (event, message) => {
+    ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}-${this.name}`, (event, message) => {
       // https://developer.chrome.com/extensions/runtime#property-Port-onMessage
       this.onMessage.emit(message, this);
     });
-    ipcRenderer.once(`lulumi-runtime-port-${this.extensionId}-disconnect`, () => {
+    ipcRenderer.once(`lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`, () => {
       // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
       this.onDisconnect.emit(this);
       this.otherEnd = true;
@@ -112,22 +112,21 @@ class Port {
   }
 
   postMessage(message) {
-    process.nextTick(() => {
-      remote.webContents.fromId(this.webContentsId).send(
-        `lulumi-runtime-port-${this.extensionId}`,
-        message,
-      );
-    });
+    remote.webContents.fromId(this.webContentsId).send(
+      `lulumi-runtime-port-${this.extensionId}-${this.name}`,
+      message,
+    );
   }
 
   // tslint:disable-next-line:function-name
   _onDisconnect() {
     this.disconnected = true;
-    ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}`);
+    ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}-${this.name}`);
     if (!this.otherEnd) {
-      ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}-disconnect`);
+      ipcRenderer.removeAllListeners(
+        `lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
       remote.webContents.fromId(this.webContentsId)
-        .send(`lulumi-runtime-port-${this.extensionId}-disconnect`);
+        .send(`lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
     }
     // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
     this._Destroy();

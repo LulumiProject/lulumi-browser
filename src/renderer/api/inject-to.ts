@@ -4,13 +4,17 @@ import { ipcRenderer, remote } from 'electron';
 import { specs } from 'lulumi';
 import * as path from 'path';
 import * as url from 'url';
+import generate from 'nanoid/generate';
 
 import IpcEvent from './ipc-event';
 import webRequestEvent from './web-request-event';
 import Event from './event';
 import Port from './port';
 
+/* tslint:disable:align */
 /* tslint:disable:max-line-length */
+
+const generateSuffix = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
 
 // Generate all possible signatures for a given API function.
 function getSignatures(parameterSignatureString) {
@@ -140,39 +144,30 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.env = {
     appName: (callback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-env-app-name-result', (event, result) => {
+      wrapper((results) => {
         if (callback) {
-          callback(result);
+          // we only need one window to tell us the result
+          callback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-env-app-name');
+      }, 'lulumi-env-app-name');
     },
     appVersion: (callback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-env-app-version-result', (event, result) => {
+      wrapper((results) => {
         if (callback) {
-          callback(result);
+          // we only need one window to tell us the result
+          callback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-env-app-version');
+      }, 'lulumi-env-app-version');
     },
   };
 
   lulumi.browserAction = {
     setIcon: (details, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-browser-action-set-icon-result', () => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-browser-action-set-icon-result');
-          if (callback) {
-            callback();
-          }
+      wrapper(() => {
+        if (callback) {
+          callback();
         }
-      });
-      ipcRenderer.send(
+      },
         'lulumi-browser-action-set-icon',
         thisExtensionId,
         lulumi.runtime.getManifest().startPage,
@@ -198,18 +193,11 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.pageAction = {
     setIcon: (details, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-page-action-set-icon-result', () => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-page-action-set-icon-result');
-          if (callback) {
-            callback();
-          }
+      wrapper(() => {
+        if (callback) {
+          callback();
         }
-      });
-      ipcRenderer.send(
+      },
         'lulumi-page-action-set-icon',
         thisExtensionId,
         lulumi.runtime.getManifest().startPage,
@@ -231,68 +219,32 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.alarms = {
     get: (name, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any[] = [];
-      ipcRenderer.on('lulumi-alarms-get-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-alarms-get-result');
-          if (callback) {
-            callback(collect(results).first());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).first());
         }
-      });
-      ipcRenderer.send('lulumi-alarms-get', name);
+      }, 'lulumi-alarms-get', name);
     },
     getAll: (callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results = collect({});
-      ipcRenderer.on('lulumi-alarms-get-all-result', (event, result) => {
-        counting += 1;
-        results.merge(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-alarms-get-all-result');
-          if (callback) {
-            callback(results.all());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(results.all());
         }
-      });
-      ipcRenderer.send('lulumi-alarms-get-all');
+      }, 'lulumi-alarms-get-all');
     },
     clear: (name, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-alarms-clear-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-alarms-clear-result');
-          if (callback) {
-            callback(collect(results).every(result => (result !== undefined)));
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).every(result => (result !== undefined)));
         }
-      });
-      ipcRenderer.send('lulumi-alarms-clear', name);
+      }, 'lulumi-alarms-clear', name);
     },
     clearAll: (callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-alarms-clear-all-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-alarms-clear-all-result');
-          if (callback) {
-            callback(collect(results).every(result => (result !== undefined)));
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).every(result => (result !== undefined)));
         }
-      });
-      ipcRenderer.send('lulumi-alarms-clear-all');
+      }, 'lulumi-alarms-clear-all');
     },
     create: (name, alarmInfo) => {
       ipcRenderer.send('lulumi-alarms-create', name, alarmInfo);
@@ -383,189 +335,103 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.tabs = {
     get: (tabId, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-get-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-get-result');
-          if (callback) {
-            callback(collect(results).first());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).first());
         }
-      });
-      ipcRenderer.send('lulumi-tabs-get', tabId);
+      }, 'lulumi-tabs-get', tabId);
     },
     getCurrent: (callback) => {
       if (guestInstanceId !== -1) {
-        const count = ipcRenderer.sendSync('get-window-count');
-        let counting = 0;
-        const results: any = [];
-        ipcRenderer.on('lulumi-tabs-get-current-result', (event, result) => {
-          counting += 1;
-          results.push(result);
-          if (counting === count) {
-            ipcRenderer.removeAllListeners('lulumi-tabs-get-current-result');
-            if (callback) {
-              callback(collect(results).filter(result => ((result as any).id !== -1)).first());
-            }
+        wrapper((results) => {
+          if (callback) {
+            callback(collect(results).filter(result => ((result as any).id !== -1)).first());
           }
-        });
-        ipcRenderer.send('lulumi-tabs-get-current', guestInstanceId);
+        }, 'lulumi-tabs-get-current', guestInstanceId);
       }
     },
     duplicate: (tabId, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-duplicate-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-duplicate-result');
-          if (callback) {
-            callback(collect(results).filter(result => ((result as any).id !== -1)).first());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).filter(result => ((result as any).id !== -1)).first());
         }
-      });
-      ipcRenderer.send('lulumi-tabs-duplicate', tabId);
+      }, 'lulumi-tabs-duplicate', tabId);
     },
     query: (queryInfo, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-query-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-query-result');
-          if (callback) {
-            const groups = collect(results).flatten(1).groupBy('windowId').all();
-            Object.keys(groups).forEach(key => (groups[key] = groups[key].toArray()));
-            // https://github.com/ecrmnn/collect.js#reduce
-            callback(
-              collect(Object.values(groups)).reduce(
-                (a, b) => collect(a!).sortBy('index').all().concat((collect(b).sortBy('index').all() as any)), []));
-          }
+      wrapper((results) => {
+        if (callback) {
+          const groups = collect(results).flatten(1).groupBy('windowId').all();
+          Object.keys(groups).forEach(key => (groups[key] = groups[key].toArray()));
+          // https://github.com/ecrmnn/collect.js#reduce
+          callback(
+            collect(Object.values(groups)).reduce(
+              (a, b) => collect(a!).sortBy('index').all().concat((collect(b).sortBy('index').all() as any)), []));
         }
-      });
-      ipcRenderer.send('lulumi-tabs-query', queryInfo);
+      }, 'lulumi-tabs-query', queryInfo);
     },
     update: (tabId, updateProperties, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-update-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-update-result');
-          if (callback) {
-            callback(collect(results).filter(result => ((result as any).id !== -1)).first());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).filter(result => ((result as any).id !== -1)).first());
         }
-      });
-      ipcRenderer.send('lulumi-tabs-update', tabId, updateProperties);
+      }, 'lulumi-tabs-update', tabId, updateProperties);
     },
     reload: (tabId, reloadProperties, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-tabs-reload-result', () => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-reload-result');
-          if (callback) {
-            callback();
-          }
+      wrapper(() => {
+        if (callback) {
+          callback();
         }
-      });
-      ipcRenderer.send('lulumi-tabs-reload', tabId, reloadProperties);
+      }, 'lulumi-tabs-reload', tabId, reloadProperties);
     },
     create: (createProperties, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-create-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-create-result');
-          if (callback) {
-            callback(collect(results).filter(result => ((result as any).id !== -1)).first());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).filter(result => ((result as any).id !== -1)).first());
         }
-      });
-      ipcRenderer.send('lulumi-tabs-create', createProperties);
+      }, 'lulumi-tabs-create', createProperties);
     },
     remove: (tabIds, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-tabs-remove-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-remove-result');
-          if (callback) {
-            callback(collect(results).flatten(1).sortBy('windowId').all());
-          }
+      wrapper((results) => {
+        if (callback) {
+          callback(collect(results).flatten(1).sortBy('windowId').all());
         }
-      });
-      ipcRenderer.send('lulumi-tabs-remove', tabIds);
+      }, tabIds);
     },
     detectLanguage: (tabId, callback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-tabs-detect-language-result', (event, result) => {
+      wrapper((results) => {
         if (callback) {
-          callback(result);
+          // we only need one window to tell us the result
+          callback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-tabs-detect-language', tabId);
+      }, 'lulumi-tabs-detect-language', tabId);
     },
     executeScript: (tabId, details: chrome.tabs.InjectDetails = {}, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-tabs-execute-script-result', () => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-execute-script-result');
-          if (callback) {
-            callback();
-          }
-        }
-      });
       if (details.file) {
         details.code = fs.readFileSync(path.join(manifest.srcDirectory, details.file), 'utf8');
       }
-      ipcRenderer.send('lulumi-tabs-execute-script', tabId, details);
+      wrapper(() => {
+        if (callback) {
+          callback();
+        }
+      }, 'lulumi-tabs-execute-script', tabId, details);
     },
     insertCSS: (tabId, details: chrome.tabs.InjectDetails = {}, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-tabs-insert-css-result', () => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-tabs-insert-css-result');
-          if (callback) {
-            callback();
-          }
-        }
-      });
       if (details.file) {
         details.code = fs.readFileSync(path.join(manifest.srcDirectory, details.file), 'utf8');
       }
-      ipcRenderer.send('lulumi-tabs-insert-css', tabId, details);
+      wrapper(() => {
+        if (callback) {
+          callback();
+        }
+      }, 'lulumi-tabs-insert-css', tabId, details);
     },
     sendMessage: (tabId, message, responseCallback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-tabs-send-message-result', (event, result) => {
+      wrapper((results) => {
         if (responseCallback) {
-          responseCallback(result);
+          // we only need one window to tell us the result
+          responseCallback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-tabs-send-message', tabId, message);
+      }, 'lulumi-tabs-send-message', tabId, message);
     },
     onActivated: new IpcEvent('tabs', 'on-activated'),
     onUpdated: new IpcEvent('tabs', 'on-updated'),
@@ -575,14 +441,20 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.windows = {
     get: (windowId, getInfo, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-windows-get-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-windows-get-result');
+      wrapper((results) => {
+        if (callback) {
+          const window: any = collect(results).filter(result => (result !== undefined)).first();
+          const windowTabs = window.tabs;
+          if (windowTabs) {
+            window.tabs = collect(windowTabs).sortBy('index').all();
+          }
+          callback(window);
+        }
+      }, 'lulumi-windows-get', windowId, getInfo);
+    },
+    getCurrent: (getInfo, callback) => {
+      if (guestInstanceId !== -1) {
+        wrapper((results) => {
           if (callback) {
             const window: any = collect(results).filter(result => (result !== undefined)).first();
             const windowTabs = window.tabs;
@@ -591,54 +463,21 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
             }
             callback(window);
           }
-        }
-      });
-      ipcRenderer.send('lulumi-windows-get', windowId, getInfo);
-    },
-    getCurrent: (getInfo, callback) => {
-      if (guestInstanceId !== -1) {
-        const count = ipcRenderer.sendSync('get-window-count');
-        let counting = 0;
-        const results: any = [];
-        ipcRenderer.on('lulumi-windows-get-current-result', (event, result) => {
-          counting += 1;
-          results.push(result);
-          if (counting === count) {
-            ipcRenderer.removeAllListeners('lulumi-windows-get-current-result');
-            if (callback) {
-              const window: any = collect(results).filter(result => (result !== undefined)).first();
-              const windowTabs = window.tabs;
-              if (windowTabs) {
-                window.tabs = collect(windowTabs).sortBy('index').all();
-              }
-              callback(window);
-            }
-          }
-        });
-        ipcRenderer.send('lulumi-windows-get-current', getInfo, guestInstanceId);
+        }, 'lulumi-windows-get-current', getInfo, guestInstanceId);
       }
     },
     getAll: (getInfo, callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      const results: any = [];
-      ipcRenderer.on('lulumi-windows-get-all-result', (event, result) => {
-        counting += 1;
-        results.push(result);
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-windows-get-all-result');
-          if (callback) {
-            results.forEach((window, index) => {
-              const windowTabs = window.tabs;
-              if (windowTabs) {
-                results[index].tabs = collect(windowTabs).sortBy('index').all();
-              }
-            });
-            callback(collect(results).sortBy('id').all());
-          }
+      wrapper((results) => {
+        if (callback) {
+          results.forEach((window, index) => {
+            const windowTabs = window.tabs;
+            if (windowTabs) {
+              results[index].tabs = collect(windowTabs).sortBy('index').all();
+            }
+          });
+          callback(collect(results).sortBy('id').all());
         }
-      });
-      ipcRenderer.send('lulumi-windows-get-all', getInfo);
+      }, 'lulumi-windows-get-all', getInfo);
     },
   };
 
@@ -847,52 +686,31 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
       } else {
         createProperties.id = id;
       }
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-context-menus-create-result', (event) => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-context-menus-create-result');
-          if (callback) {
-            callback();
-          }
-        }
-      });
       lulumi.contextMenus.handleMenuItems(createProperties, null);
-      ipcRenderer.send('lulumi-context-menus-create', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
+      wrapper(() => {
+        if (callback) {
+          callback();
+        }
+      }, 'lulumi-context-menus-create', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
       return id;
     },
     remove: (menuItemId, callback) => {
       const id = menuItemId;
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-context-menus-remove-result', (event) => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-context-menus-remove-result');
-          if (callback) {
-            callback();
-          }
-        }
-      });
       lulumi.contextMenus.handleMenuItems(null, menuItemId);
-      ipcRenderer.send('lulumi-context-menus-remove', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
+      wrapper(() => {
+        if (callback) {
+          callback();
+        }
+      }, 'lulumi-context-menus-remove', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
       return id;
     },
     removeAll: (callback) => {
-      const count = ipcRenderer.sendSync('get-window-count');
-      let counting = 0;
-      ipcRenderer.on('lulumi-context-menus-remove-all-result', (event) => {
-        counting += 1;
-        if (counting === count) {
-          ipcRenderer.removeAllListeners('lulumi-context-menus-remove-all-result');
-          if (callback) {
-            callback();
-          }
-        }
-      });
       lulumi.contextMenus.handleMenuItems(null, null);
-      ipcRenderer.send('lulumi-context-menus-remove-all', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
+      wrapper(() => {
+        if (callback) {
+          callback();
+        }
+      }, 'lulumi-context-menus-remove-all', lulumi.contextMenus.menuItems[lulumi.runtime.id]);
     },
     onClicked: (scriptType === 'event') ? new Event() : 'Event scripts only',
   };
@@ -931,22 +749,20 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
 
   lulumi.webNavigation = {
     getFrame: (details, callback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-web-navigation-get-frame-result', (event, result) => {
+      wrapper((results) => {
         if (callback) {
-          callback(result);
+          // we only need one window to tell us the result
+          callback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-web-navigation-get-frame', details);
+      }, 'lulumi-web-navigation-get-frame', details);
     },
     getAllFrames: (details, callback) => {
-      // we only need one window to tell us the result
-      ipcRenderer.once('lulumi-web-navigation-get-all-frames-result', (event, result) => {
+      wrapper((results) => {
         if (callback) {
-          callback(result);
+          // we only need one window to tell us the result
+          callback(results[0]);
         }
-      });
-      ipcRenderer.send('lulumi-web-navigation-get-all-frames', details);
+      }, 'lulumi-web-navigation-get-all-frames', details);
     },
     onBeforeNavigate: new IpcEvent('web-navigation', 'on-before-navigate'),
     onCommitted: new IpcEvent('web-navigation', 'on-committed'),
@@ -955,7 +771,26 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
     onCreatedNavigationTarget: new IpcEvent('web-navigation', 'on-created-navigation-target'),
   };
 
-  // wrapper
+  function wrapper(action: Function | null, ...args: any[]) {
+    const scope: string = args.shift();
+    const suffix = generateSuffix();
+    const count = ipcRenderer.sendSync('get-window-count');
+    let counting = 0;
+    const results: any = [];
+    ipcRenderer.on(`${scope}-result-${suffix}`, (event, result) => {
+      counting += 1;
+      results.push(result);
+      if (counting === count) {
+        ipcRenderer.removeAllListeners(`${scope}-result-${suffix}`);
+        if (action) {
+          action(results);
+        }
+      }
+    });
+    ipcRenderer.send(scope, ...args, suffix);
+  }
+
+  // normalize arguments and validate
   const blackList = ['beforeConnect', 'handleMenuItems', 'contextMenusIPC'];
   Object.keys(lulumi).forEach((key) => {
     Object.keys(lulumi[key]).forEach((member) => {

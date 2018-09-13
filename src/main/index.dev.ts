@@ -40,6 +40,7 @@ app.on('browser-window-created', (event, window) => {
 
 // Install `vue-devtools`
 require('electron').app.on('ready', () => {
+  require('devtron').install();
   const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
   installExtension(VUEJS_DEVTOOLS)
     .then(() => { })

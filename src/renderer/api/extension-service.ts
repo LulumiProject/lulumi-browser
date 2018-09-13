@@ -34,13 +34,15 @@ export default class ExtensionService {
     ipc.on('lulumi-env-app-name', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-env-app-name-result', require('lulumi').env.appName());
+        webContents.send(
+          `lulumi-env-app-name-result-${data.suffix}`, require('lulumi').env.appName());
       }
     });
     ipc.on('lulumi-env-app-version', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-env-app-version-result', require('lulumi').env.appVersion());
+        webContents.send(
+          `lulumi-env-app-version-result-${data.suffix}`, require('lulumi').env.appVersion());
       }
     });
 
@@ -48,7 +50,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-browser-action-set-icon-result',
+          `lulumi-browser-action-set-icon-result-${data.suffix}`,
           require('lulumi').browserAction.setIcon(data.extensionId, data.startPage, data.details));
       }
     });
@@ -109,7 +111,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-page-action-set-icon-result',
+          `lulumi-page-action-set-icon-result-${data.suffix}`,
           require('lulumi').pageAction.setIcon(data.extensionId, data.startPage, data.details));
       }
     });
@@ -210,25 +212,25 @@ export default class ExtensionService {
     ipc.on('lulumi-alarms-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-alarms-get-result', vue.getAlarm(data.name));
+        webContents.send(`lulumi-alarms-get-result-${data.suffix}`, vue.getAlarm(data.name));
       }
     });
     ipc.on('lulumi-alarms-get-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-alarms-get-all-result', vue.getAllAlarm());
+        webContents.send(`lulumi-alarms-get-all-result-${data.suffix}`, vue.getAllAlarm());
       }
     });
     ipc.on('lulumi-alarms-clear', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-alarms-clear-result', vue.clearAlarm(data.name));
+        webContents.send(`lulumi-alarms-clear-result-${data.suffix}`, vue.clearAlarm(data.name));
       }
     });
     ipc.on('lulumi-alarms-clear-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-alarms-clear-all-result', vue.clearAllAlarm());
+        webContents.send(`lulumi-alarms-clear-all-result-${data.suffix}`, vue.clearAllAlarm());
       }
     });
     ipc.on('lulumi-alarms-create', (event, data) => {
@@ -346,31 +348,36 @@ export default class ExtensionService {
     ipc.on('lulumi-tabs-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-tabs-get-result', require('lulumi').tabs.get(data.tabId));
+        webContents.send(
+          `lulumi-tabs-get-result-${data.suffix}`, require('lulumi').tabs.get(data.tabId));
       }
     });
     ipc.on('lulumi-tabs-get-current', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-tabs-get-current-result', require('lulumi').tabs.getCurrent(data.guestInstanceId));
+        webContents.send(
+          `lulumi-tabs-get-current-result-${data.suffix}`, require('lulumi').tabs.getCurrent(data.guestInstanceId));
       }
     });
     ipc.on('lulumi-tabs-duplicate', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').tabs.duplicate(data.tabId, data.webContentsId);
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send(
+          `lulumi-tabs-duplicate-result-${data.suffix}`, require('lulumi').tabs.duplicate(data.tabId));
       }
     });
     ipc.on('lulumi-tabs-query', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-tabs-query-result', require('lulumi').tabs.query(data.queryInfo));
+        webContents.send(
+          `lulumi-tabs-query-result-${data.suffix}`, require('lulumi').tabs.query(data.queryInfo));
       }
     });
     ipc.on('lulumi-tabs-update', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-update-result',
+          `lulumi-tabs-update-result-${data.suffix}`,
           require('lulumi').tabs.update(data.tabId, data.updateProperties));
       }
     });
@@ -378,39 +385,41 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-reload-result',
+          `lulumi-tabs-reload-result-${data.suffix}`,
           require('lulumi').tabs.reload(data.tabId, data.reloadProperties));
       }
     });
     ipc.on('lulumi-tabs-create', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').tabs.create(data.createProperties, data.webContentsId);
+        const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
+        webContents.send(
+          `lulumi-tabs-create-result-${data.suffix}`, require('lulumi').tabs.create(data.createProperties));
       }
     });
     ipc.on('lulumi-tabs-remove', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-remove-result',
+          `lulumi-tabs-remove-result-${data.suffix}`,
           require('lulumi').tabs.remove(data.tabIds));
       }
     });
     ipc.on('lulumi-tabs-detect-language', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').tabs.detectLanguage(data.tabId, data.webContentsId);
+        require('lulumi').tabs.detectLanguage(data.tabId, data.suffix, data.webContentsId);
       }
     });
     ipc.on('lulumi-tabs-detect-language-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-tabs-detect-language-result', data.value);
+        webContents.send(`lulumi-tabs-detect-language-result-${data.suffix}`, data.value);
       }
     });
     ipc.on('lulumi-tabs-execute-script', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-execute-script-result',
+          `lulumi-tabs-execute-script-result-${data.suffix}`,
           require('lulumi').tabs.executeScript(data.tabId, data.details));
       }
     });
@@ -418,7 +427,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-insert-css-result',
+          `lulumi-tabs-insert-css-result-${data.suffix}`,
           require('lulumi').tabs.insertCSS(data.tabId, data.details));
       }
     });
@@ -426,7 +435,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-tabs-send-message-result',
+          `lulumi-tabs-send-message-result-${data.suffix}`,
           require('lulumi').tabs.sendMessage(data.tabId, data.message));
       }
     });
@@ -526,19 +535,22 @@ export default class ExtensionService {
     ipc.on('lulumi-windows-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-windows-get-result', require('lulumi').windows.get(data.windowId, data.getInfo));
+        webContents.send(
+          `lulumi-windows-get-result-${data.suffix}`, require('lulumi').windows.get(data.windowId, data.getInfo));
       }
     });
     ipc.on('lulumi-windows-get-current', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-windows-get-current-result', require('lulumi').windows.getCurrent(data.getInfo, data.guestInstanceId));
+        webContents.send(
+          `lulumi-windows-get-current-result-${data.suffix}`, require('lulumi').windows.getCurrent(data.getInfo, data.guestInstanceId));
       }
     });
     ipc.on('lulumi-windows-get-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-windows-get-all-result', require('lulumi').windows.getAll(data.getInfo));
+        webContents.send(
+          `lulumi-windows-get-all-result-${data.suffix}`, require('lulumi').windows.getAll(data.getInfo));
       }
     });
 
@@ -570,7 +582,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-context-menus-create-result',
+          `lulumi-context-menus-create-result-${data.suffix}`,
           require('lulumi').contextMenus.create(data.menuItems, data.webContentsId));
       }
     });
@@ -578,7 +590,7 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-context-menus-remove-result',
+          `lulumi-context-menus-remove-result-${data.suffix}`,
           require('lulumi').contextMenus.remove(data.menuItems, data.webContentsId));
       }
     });
@@ -586,31 +598,31 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          'lulumi-context-menus-remove-all-result',
+          `lulumi-context-menus-remove-all-result-${data.suffix}`,
           require('lulumi').contextMenus.removeAll(data.menuItems, data.webContentsId));
       }
     });
 
     ipc.on('lulumi-web-navigation-get-frame', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').webNavigation.getFrame(data.details, data.webContentsId);
+        require('lulumi').webNavigation.getFrame(data.details, data.suffix, data.webContentsId);
       }
     });
     ipc.on('lulumi-web-navigation-get-frame-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-web-navigation-get-frame-result', data.details);
+        webContents.send(`lulumi-web-navigation-get-frame-result-${data.suffix}`, data.details);
       }
     });
     ipc.on('lulumi-web-navigation-get-all-frames', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        require('lulumi').webNavigation.getAllFrames(data.details, data.webContentsId);
+        require('lulumi').webNavigation.getAllFrames(data.details, data.suffix, data.webContentsId);
       }
     });
     ipc.on('lulumi-web-navigation-get-all-frames-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send('lulumi-web-navigation-get-all-frames-result', data.details);
+        webContents.send(`lulumi-web-navigation-get-all-frames-result-${data.suffix}`, data.details);
       }
     });
     ipc.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, data) => {

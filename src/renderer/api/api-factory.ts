@@ -195,15 +195,14 @@ export default (vueInstance: any) => {
       }
       return findAndUpdateOrCreate(vueInstance, false, -1);
     },
-    duplicate: (tabId: number, webContentsId: number): void => {
+    duplicate: (tabId: number): Lulumi.Store.TabObject => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
-      const webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       if (tab.windowId === vueInstance.windowId) {
         vueInstance.onTabDuplicate(tab.index);
-        setTimeout(() => webContents.send('lulumi-tabs-duplicate-result', tabs.get(vueInstance.$store.getters.id), 100));
-        return;
+        // TODO: timing issue
+        return tabs.get(vueInstance.$store.getters.id);
       }
-      webContents.send('lulumi-tabs-duplicate-result', findAndUpdateOrCreate(vueInstance, false, -1));
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     query: (queryInfo: Lulumi.API.CustomTabsQueryInfo): Lulumi.Store.TabObject[] => {
       if (Object.keys(queryInfo).length === 0 || queryInfo.url === '<all_urls>') {
@@ -245,19 +244,18 @@ export default (vueInstance: any) => {
         }
       }
     },
-    create: (createProperties: chrome.tabs.CreateProperties = {}, webContentsId: number): void => {
-      const webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
+    create: (createProperties: chrome.tabs.CreateProperties = {}): Lulumi.Store.TabObject => {
       if (createProperties.windowId === undefined) {
         createProperties.windowId = vueInstance.$electron.remote.BrowserWindow.getFocusedWindow().id;
       }
       if (createProperties.windowId && createProperties.windowId === vueInstance.windowId) {
         if (createProperties.url) {
           vueInstance.onNewTab(createProperties.windowId, createProperties.url, createProperties.active);
-          setTimeout(() => webContents.send('lulumi-tabs-create-result', tabs.get(vueInstance.$store.getters.id), 100));
-          return;
+          // TODO: timing issue
+          return tabs.get(vueInstance.$store.getters.id);
         }
       }
-      webContents.send('lulumi-tabs-create-result', findAndUpdateOrCreate(vueInstance, false, -1));
+      return findAndUpdateOrCreate(vueInstance, false, -1);
     },
     remove: (tabIds: number[] | number): void => {
       const targetTabIds = Array.isArray(tabIds) ? tabIds : [tabIds];
@@ -268,11 +266,11 @@ export default (vueInstance: any) => {
         }
       });
     },
-    detectLanguage: (tabId: number, webContentsId: number): void => {
+    detectLanguage: (tabId: number, suffix: string, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
         vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
-          ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${webContentsId});
+          ipcRenderer.send('lulumi-tabs-detect-language-result', navigator.language, ${suffix}, ${webContentsId});
         `);
       }
     },
@@ -374,7 +372,7 @@ export default (vueInstance: any) => {
   };
 
   const webNavigation = {
-    getFrame: (details: chrome.webNavigation.GetFrameDetails, webContentsId: number): void => {
+    getFrame: (details: chrome.webNavigation.GetFrameDetails, suffix: string, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
         const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
@@ -419,13 +417,13 @@ export default (vueInstance: any) => {
                   url: document.location.href,
                 };
               }
-              ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${webContentsId});
+              ipcRenderer.send('lulumi-web-navigation-get-frame-result', frame, ${suffix}, ${webContentsId});
             }
           `);
         }
       }
     },
-    getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, webContentsId: number): void => {
+    getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, suffix: string, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
         const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
@@ -460,7 +458,7 @@ export default (vueInstance: any) => {
             parentFrameId: -1,
             url: document.location.href,
           });
-          ipcRenderer.send('lulumi-web-navigation-get-all-frames-result', framesArray, ${webContentsId});
+          ipcRenderer.send('lulumi-web-navigation-get-all-frames-result', framesArray, ${suffix}, ${webContentsId});
         `);
       }
     },

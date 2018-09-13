@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Electron from 'vue-electron';
-import unhandled from 'electron-unhandled';
 import { Autocomplete } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'iview/dist/styles/iview.css';
@@ -12,7 +11,6 @@ import store from '../../shared/store/rendererStore';
 import i18n from './i18n';
 
 Vue.use(Electron);
-unhandled();
 
 if (process.env.NODE_ENV === 'production') {
   Vue.config.productionTip = false;

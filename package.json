@@ -81,7 +81,6 @@
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^12.1.1",
     "electron-rebuild": "^1.8.2",
-    "electron-unhandled": "^1.1.0",
     "electron-util": "^0.9.1",
     "element-ui": "^2.4.6",
     "eslint": "^5.5.0",

@@ -12,7 +12,6 @@ import {
   systemPreferences,
 } from 'electron';
 import collect from 'collect.js';
-import unhandled from 'electron-unhandled';
 import { is } from 'electron-util';
 
 import autoUpdater from './lib/auto-updater';
@@ -217,7 +216,6 @@ protocol.registerStandardSchemes(['lulumi', 'lulumi-extension'], { secure: true 
  */
 
 app.on('ready', () => {
-  unhandled();
   // autoUpdater
   if (process.env.NODE_ENV !== 'development') {
     autoUpdater.init();

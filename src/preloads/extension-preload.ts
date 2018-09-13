@@ -64,3 +64,7 @@ process.once('loaded', () => {
     globalObject.lulumi.commands.onCommand.emit(command);
   });
 });
+
+process.once('exit', () => {
+  globalObject.lulumi.runtime.port.disconnect();
+});

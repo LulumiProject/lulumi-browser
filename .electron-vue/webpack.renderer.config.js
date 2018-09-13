@@ -329,7 +329,7 @@ let preloadsConfig = {
       'extensions': path.join(__dirname, '../extensions'),
       'vue$': 'vue/dist/vue.runtime.esm.js'
     },
-    extensions: ['.ts']
+    extensions: ['.ts', '.js']
   },
   target: 'electron-renderer'
 }

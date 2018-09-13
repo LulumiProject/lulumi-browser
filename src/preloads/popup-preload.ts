@@ -38,3 +38,7 @@ process.once('loaded', () => {
       webContentsId);
   });
 });
+
+process.once('exit', () => {
+  globalObject.lulumi.runtime.port.disconnect();
+});
