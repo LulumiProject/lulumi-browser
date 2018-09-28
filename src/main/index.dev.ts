@@ -32,14 +32,8 @@ app.on('browser-window-created', (event, window) => {
   });
 });
 
-/*
- * Uncomment it when upgrading to electron v3.x.
- * // Install `vue-devtools`
- * require('electron').app.whenReady().then(() => {
- */
-
 // Install `vue-devtools`
-require('electron').app.on('ready', () => {
+require('electron').app.whenReady().then(() => {
   require('devtron').install();
   const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
   installExtension(VUEJS_DEVTOOLS)

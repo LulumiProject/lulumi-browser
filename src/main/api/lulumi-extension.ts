@@ -310,12 +310,7 @@ app.on('will-quit', () => {
   }
 });
 
-/*
- * Uncomment it when upgrading to electron v3.x.
- * app.whenReady().then(() => {
- */
-
-app.once('ready', () => {
+app.whenReady().then(() => {
   // the public API to add/remove extensions
   ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);

@@ -35,13 +35,10 @@ if (process.env.NODE_ENV !== 'development') {
   globalObject.__static = path.resolve(__dirname, '../static');
 }
 
-/*
- * Uncomment it when upgrading to electron v3.x.
- * const gotTheLock = app.requestSingleInstanceLock();
- * if (!gotTheLock) {
- *   app.quit();
- * }
- */
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+}
 
 let shuttingDown: boolean = (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e');
 
@@ -210,12 +207,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
 protocol.registerStandardSchemes(['lulumi', 'lulumi-extension'], { secure: true });
 
-/*
- * Uncomment it when upgrading to electron v3.x.
- * app.whenReady().then(() => {
- */
-
-app.on('ready', () => {
+app.whenReady().then(() => {
   // autoUpdater
   if (process.env.NODE_ENV !== 'development') {
     autoUpdater.init();
@@ -310,23 +302,20 @@ app.on('before-quit', (event: Electron.Event) => {
   appStateSave(false);
 });
 
-/*
- * Uncomment it when upgrading to electron v3.x.
- * // https://github.com/electron/electron/pull/12782
- * app.on('second-instance', () => {
- *   // Someone tried to run a second instance, we should focus our window.
- *   if (Object.keys(windows).length !== 0) {
- *     const id = parseInt(Object.keys(windows)[0], 10);
- *     const window = windows[id];
- *     if (window) {
- *       if (window.isMinimized()) {
- *         window.restore();
- *       }
- *       window.focus();
- *     }
- *   }
- * });
- */
+// https://github.com/electron/electron/pull/12782
+app.on('second-instance', () => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (Object.keys(windows).length !== 0) {
+    const id = parseInt(Object.keys(windows)[0], 10);
+    const window = windows[id];
+    if (window) {
+      if (window.isMinimized()) {
+        window.restore();
+      }
+      window.focus();
+    }
+  }
+});
 
 // load windowProperties
 ipcMain.on('get-window-properties', (event: Electron.Event) => {
