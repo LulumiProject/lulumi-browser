@@ -37,7 +37,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
-  app.quit();
+  app.exit();
 }
 
 let shuttingDown: boolean = (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e');

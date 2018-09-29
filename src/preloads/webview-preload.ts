@@ -132,14 +132,15 @@ if (preferences) {
 const moduleTmp = module;
 
 process.once('loaded', () => {
-  if (process.env.TEST_ENV === 'e2e') {
-    globalObject.require = () => require('electron');
-  }
-  if (document.location.href.startsWith('lulumi://')) {
+  if (document.location && document.location.href.startsWith('lulumi://')) {
     // about:newtab handler
     if (document.location.href === 'lulumi://about/#/newtab') {
       setTimeout(() => {
-        ipcRenderer.once('newtab', (event, newtab) => (document.location.href = newtab));
+        ipcRenderer.once('newtab', (event, newtab: string) => {
+          if (document.location) {
+            document.location.href = newtab;
+          }
+        });
         ipcRenderer.sendToHost('newtab');
       });
 
@@ -155,7 +156,11 @@ process.once('loaded', () => {
       globalObject.join = require('path').join;
     }
     globalObject.ipcRenderer = ipcRenderer;
-    globalObject.require = requirePreload;
+    if (process.env.TEST_ENV === 'e2e') {
+      globalObject.electronRequire = requirePreload.electronRequire;
+    } else {
+      globalObject.require = requirePreload.require;
+    }
     globalObject.module = moduleTmp;
   } else {
     webFrame.executeJavaScript('window.eval = function () { };');

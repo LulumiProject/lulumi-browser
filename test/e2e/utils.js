@@ -28,6 +28,7 @@ function startApp() {
   this.app = new Application({
     path: electron,
     args: ['dist/main.js'],
+    requireName: 'electronRequire',
     waitTimeout: 10000
   });
   return this.app.start();
