@@ -156,14 +156,13 @@ process.once('loaded', () => {
       globalObject.join = require('path').join;
     }
     globalObject.ipcRenderer = ipcRenderer;
-    if (process.env.TEST_ENV === 'e2e') {
-      globalObject.electronRequire = requirePreload.electronRequire;
-    } else {
-      globalObject.require = requirePreload.require;
-    }
+    globalObject.require = requirePreload.require;
     globalObject.module = moduleTmp;
   } else {
     webFrame.executeJavaScript('window.eval = function () { };');
+  }
+  if (process.env.TEST_ENV === 'e2e') {
+    globalObject.require = requirePreload.electronRequire;
   }
   ipcRenderer.on('lulumi-tabs-send-message', (event: Electron.IpcMessageEvent, message) => {
     ipcRenderer.send('lulumi-runtime-emit-on-message', message);

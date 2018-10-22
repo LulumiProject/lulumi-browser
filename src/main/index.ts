@@ -169,7 +169,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
         webPreferences.preload = path.join(constants.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
-      if (!params.src.startsWith('lulumi://')) {
+      if (process.env.TEST_ENV !== 'e2e' && !params.src.startsWith('lulumi://')) {
         webPreferences.contextIsolation = true;
       }
       webPreferences.preload = path.join(constants.lulumiPreloadPath, 'webview-preload.js');
@@ -260,7 +260,7 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (!is.macos) {
+  if (!is.macos || process.env.TEST_ENV === 'e2e') {
     app.quit();
   }
 });

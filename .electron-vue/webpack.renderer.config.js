@@ -182,7 +182,9 @@ let mainBrowserWindowConfig = {
       },
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.join(__dirname, '../node_modules')
-        : false
+        : false,
+      production: process.env.NODE_ENV === 'production',
+      e2e: process.env.TEST_ENV === 'e2e'
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
@@ -437,7 +439,9 @@ let preferenceViewConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
-      nodeModules: false
+      nodeModules: false,
+      production: process.env.NODE_ENV === 'production',
+      e2e: process.env.TEST_ENV === 'e2e'
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({

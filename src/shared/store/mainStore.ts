@@ -172,12 +172,16 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
         // store the property of this window into a temp
         handleWindowProperty(store, window, 'update');
-        saveWindowState(window.id).then((state) => {
-          if (state) {
-            promisify(writeFile, `${storagePath}-window-${Date.now()}`, state);
-          }
+        if (process.env.TEST_ENV !== 'e2e') {
+          saveWindowState(window.id).then((state) => {
+            if (state) {
+              promisify(writeFile, `${storagePath}-window-${Date.now()}`, state);
+            }
+            window.webContents.send('window-close');
+          });
+        } else {
           window.webContents.send('window-close');
-        });
+        }
 
         event.preventDefault();
       }

@@ -1,0 +1,37 @@
+"use strict";
+
+module.exports = function(api) {
+  const env = api.env();
+
+  let testEnv = false;
+
+  const envOpts = {
+    targets: {
+      node: "10.2.0",
+    }
+  };
+
+  switch (env) {
+    // Configs used during bundling builds.
+    case "test":
+      testEnv = true;
+      break;
+    case "main":
+      break;
+    case "renderer":
+      envOpts.modules = false;
+      break;
+  }
+
+  const config = {
+    comments: false,
+    presets: [["@babel/preset-env", envOpts]],
+    plugins: []
+  };
+
+  if (testEnv) {
+    config.plugins.push("istanbul");
+  }
+
+  return config;
+};
