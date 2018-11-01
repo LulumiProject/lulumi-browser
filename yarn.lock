@@ -695,9 +695,9 @@
     reflect-metadata "^0.1.12"
     tslib "^1.8.1"
 
-"@sinonjs/commons@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/@sinonjs/commons/-/commons-1.0.2.tgz#3e0ac737781627b8844257fadc3d803997d0526e"
+"@sinonjs/commons@^1.2.0":
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/@sinonjs/commons/-/commons-1.3.0.tgz#50a2754016b6f30a994ceda6d9a0a8c36adda849"
   dependencies:
     type-detect "4.0.8"
 
@@ -2743,15 +2743,15 @@ css-element-queries@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/css-element-queries/-/css-element-queries-1.0.5.tgz#4f032f017693a2d410872db46a4caa932c62c71a"
 
-css-loader@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/css-loader/-/css-loader-1.0.0.tgz#9f46aaa5ca41dbe31860e3b62b8e23c42916bf56"
+css-loader@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/css-loader/-/css-loader-1.0.1.tgz#6885bb5233b35ec47b006057da01cc640b6b79fe"
   dependencies:
     babel-code-frame "^6.26.0"
     css-selector-tokenizer "^0.7.0"
     icss-utils "^2.1.0"
     loader-utils "^1.0.2"
-    lodash.camelcase "^4.3.0"
+    lodash "^4.17.11"
     postcss "^6.0.23"
     postcss-modules-extract-imports "^1.2.0"
     postcss-modules-local-by-default "^1.2.0"
@@ -3468,9 +3468,9 @@ electron-util@^0.10.1:
   dependencies:
     electron-is-dev "^1.0.0"
 
-electron@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.npmjs.org/electron/-/electron-3.0.6.tgz#2d7b4ed521e90c69d83ffe5696db173b0e7b2473"
+electron@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.npmjs.org/electron/-/electron-3.0.7.tgz#e70c735467b4903c66e0c21278263c8ca571f9eb"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^4.1.0"
@@ -5487,9 +5487,9 @@ istanbul@^0.4.0:
     which "^1.1.1"
     wordwrap "^1.0.0"
 
-iview@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.npmjs.org/iview/-/iview-3.1.3.tgz#c99ca1d5dad48fb4df17d75b95554d16bd05ab77"
+iview@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.npmjs.org/iview/-/iview-3.1.4.tgz#982bde89302d73c01d32146ef10597bed59d2893"
   dependencies:
     async-validator "^1.8.2"
     deepmerge "^2.1.0"
@@ -5959,10 +5959,6 @@ lodash._isiterateecall@^3.0.0:
 lodash.assign@^4.2.0:
   version "4.2.0"
   resolved "https://registry.npmjs.org/lodash.assign/-/lodash.assign-4.2.0.tgz#0d99f3ccd7a6d261d19bdaeb9245005d285808e7"
-
-lodash.camelcase@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
 
 lodash.clone@^4.5.0:
   version "4.5.0"
@@ -6571,9 +6567,9 @@ nan@^2.9.2:
   version "2.11.1"
   resolved "https://registry.npmjs.org/nan/-/nan-2.11.1.tgz#90e22bccb8ca57ea4cd37cc83d3819b52eea6766"
 
-nanoid@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.npmjs.org/nanoid/-/nanoid-1.3.1.tgz#4538e1a02822b131da198d8eb17c9e3b3ac5167f"
+nanoid@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.npmjs.org/nanoid/-/nanoid-1.3.3.tgz#23d4130cb3dcb455c742cbf281163d52f0cd51b0"
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -8619,11 +8615,11 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.npmjs.org/sinon/-/sinon-7.1.0.tgz#819b63002ee09a90a3b50a0da4e0bdecb2e3f345"
+sinon@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.npmjs.org/sinon/-/sinon-7.1.1.tgz#1202f317aa14d93cb9b69ff50b6bd49c0e05ffc9"
   dependencies:
-    "@sinonjs/commons" "^1.0.2"
+    "@sinonjs/commons" "^1.2.0"
     "@sinonjs/formatio" "^3.0.0"
     "@sinonjs/samsam" "^2.1.2"
     diff "^3.5.0"
@@ -9387,9 +9383,9 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
-ts-loader@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.npmjs.org/ts-loader/-/ts-loader-5.2.2.tgz#a707849b08ca754cc46f5c7053e79fe1c84caf0e"
+ts-loader@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.npmjs.org/ts-loader/-/ts-loader-5.3.0.tgz#4bac24e57bc5189391ab14987d9898ce53ef5cf7"
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^4.0.0"
@@ -9512,9 +9508,9 @@ typescript-formatter@^7.2.2:
     commandpost "^1.0.0"
     editorconfig "^0.15.0"
 
-typescript@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
+typescript@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.1.5.tgz#93d8b6864375325a91177372cb370ae0ae3a0703"
 
 uglify-es@^3.3.4:
   version "3.3.9"
@@ -9842,9 +9838,9 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@^8.2.1:
-  version "8.2.1"
-  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.2.1.tgz#7e21fed5f18dec6025992522500e9bd62cbe6668"
+vue-i18n@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.3.0.tgz#8e0b69f036c0e818c2c48368a313680175e30f7e"
 
 vue-loader@^15.4.2:
   version "15.4.2"
