@@ -65,25 +65,6 @@
   dependencies:
     "@babel/highlight" "^7.0.0"
 
-"@babel/core@^7.1.2":
-  version "7.1.2"
-  resolved "https://registry.npmjs.org/@babel/core/-/core-7.1.2.tgz#f8d2a9ceb6832887329a7b60f9d035791400ba4e"
-  dependencies:
-    "@babel/code-frame" "^7.0.0"
-    "@babel/generator" "^7.1.2"
-    "@babel/helpers" "^7.1.2"
-    "@babel/parser" "^7.1.2"
-    "@babel/template" "^7.1.2"
-    "@babel/traverse" "^7.1.0"
-    "@babel/types" "^7.1.2"
-    convert-source-map "^1.1.0"
-    debug "^3.1.0"
-    json5 "^0.5.0"
-    lodash "^4.17.10"
-    resolve "^1.3.2"
-    semver "^5.4.1"
-    source-map "^0.5.0"
-
 "@babel/core@^7.1.5":
   version "7.1.5"
   resolved "https://registry.npmjs.org/@babel/core/-/core-7.1.5.tgz#abb32d7aa247a91756469e788998db6a72b93090"
@@ -113,7 +94,7 @@
     source-map "^0.5.0"
     trim-right "^1.0.1"
 
-"@babel/generator@^7.0.0", "@babel/generator@^7.1.2", "@babel/generator@^7.1.3":
+"@babel/generator@^7.0.0", "@babel/generator@^7.1.3":
   version "7.1.3"
   resolved "https://registry.npmjs.org/@babel/generator/-/generator-7.1.3.tgz#2103ec9c42d9bdad9190a6ad5ff2d456fd7b8673"
   dependencies:
@@ -288,14 +269,6 @@
     "@babel/template" "^7.1.0"
     "@babel/traverse" "^7.1.0"
     "@babel/types" "^7.0.0"
-
-"@babel/helpers@^7.1.2":
-  version "7.1.2"
-  resolved "https://registry.npmjs.org/@babel/helpers/-/helpers-7.1.2.tgz#ab752e8c35ef7d39987df4e8586c63b8846234b5"
-  dependencies:
-    "@babel/template" "^7.1.2"
-    "@babel/traverse" "^7.1.0"
-    "@babel/types" "^7.1.2"
 
 "@babel/helpers@^7.1.5":
   version "7.1.5"
@@ -1411,15 +1384,15 @@ author-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/author-regex/-/author-regex-1.0.0.tgz#d08885be6b9bbf9439fe087c76287245f0a81450"
 
-ava@1.0.0-rc.1:
-  version "1.0.0-rc.1"
-  resolved "https://registry.npmjs.org/ava/-/ava-1.0.0-rc.1.tgz#4c1b585defcf18b90ba0c3f3716c4899ebf1c049"
+ava@1.0.0-rc.2:
+  version "1.0.0-rc.2"
+  resolved "https://registry.npmjs.org/ava/-/ava-1.0.0-rc.2.tgz#a2f63211d2ad1924fa4671ff3b29212b1da656af"
   dependencies:
     "@ava/babel-preset-stage-4" "^2.0.0"
     "@ava/babel-preset-transform-test-files" "^4.0.0"
     "@ava/write-file-atomic" "^2.2.0"
-    "@babel/core" "^7.1.2"
-    "@babel/generator" "^7.1.3"
+    "@babel/core" "^7.1.5"
+    "@babel/generator" "^7.1.5"
     "@babel/plugin-syntax-async-generators" "^7.0.0"
     "@babel/plugin-syntax-object-rest-spread" "^7.0.0"
     "@babel/plugin-syntax-optional-catch-binding" "^7.0.0"
@@ -1430,12 +1403,12 @@ ava@1.0.0-rc.1:
     array-union "^1.0.1"
     array-uniq "^2.0.0"
     arrify "^1.0.0"
-    bluebird "^3.5.2"
+    bluebird "^3.5.3"
     chalk "^2.4.1"
     chokidar "^2.0.4"
     chunkd "^1.0.0"
     ci-parallel-vars "^1.0.0"
-    clean-stack "^1.1.1"
+    clean-stack "^2.0.0"
     clean-yaml-object "^0.1.0"
     cli-cursor "^2.1.0"
     cli-truncate "^1.1.0"
@@ -1770,9 +1743,13 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-bluebird@^3.1.1, bluebird@^3.3.0, bluebird@^3.5.0, bluebird@^3.5.1, bluebird@^3.5.2:
+bluebird@^3.1.1, bluebird@^3.3.0, bluebird@^3.5.0, bluebird@^3.5.1:
   version "3.5.2"
   resolved "https://registry.npmjs.org/bluebird/-/bluebird-3.5.2.tgz#1be0908e054a751754549c270489c1505d4ab15a"
+
+bluebird@^3.5.3:
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/bluebird/-/bluebird-3.5.3.tgz#7d01c6f9616c9a51ab0f8c549a79dfe6ec33efa7"
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
@@ -2287,9 +2264,9 @@ clean-css@4.2.x, clean-css@^4.1.11:
   dependencies:
     source-map "~0.6.0"
 
-clean-stack@^1.1.1:
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/clean-stack/-/clean-stack-1.3.0.tgz#9e821501ae979986c46b1d66d2d432db2fd4ae31"
+clean-stack@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/clean-stack/-/clean-stack-2.0.0.tgz#301bfa9e8dd2d3d984c0e542f7aa67b996f63e0a"
 
 clean-yaml-object@^0.1.0:
   version "0.1.0"
@@ -3541,9 +3518,9 @@ electron-util@^0.10.2:
     electron-is-dev "^1.0.0"
     new-github-issue-url "^0.1.2"
 
-electron@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.npmjs.org/electron/-/electron-3.0.8.tgz#7905806ebaead4c693531e11cda6568c32efa7bb"
+electron@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.npmjs.org/electron/-/electron-3.0.9.tgz#79bd25dfd5496918a00d579e702fb83082f1a036"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^4.1.0"
@@ -3822,11 +3799,11 @@ eslint-module-utils@^2.2.0:
     debug "^2.6.8"
     pkg-dir "^1.0.0"
 
-eslint-plugin-html@^4.0.6:
-  version "4.0.6"
-  resolved "https://registry.npmjs.org/eslint-plugin-html/-/eslint-plugin-html-4.0.6.tgz#724bb9272efb4df007dfee8dfb269ed83577e5b4"
+eslint-plugin-html@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-html/-/eslint-plugin-html-5.0.0.tgz#396e30a60dedee0122fe08f11d13c5ab22f20d32"
   dependencies:
-    htmlparser2 "^3.8.2"
+    htmlparser2 "^3.10.0"
 
 eslint-plugin-import@^2.14.0:
   version "2.14.0"
@@ -3869,9 +3846,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^5.8.0:
-  version "5.8.0"
-  resolved "https://registry.npmjs.org/eslint/-/eslint-5.8.0.tgz#91fbf24f6e0471e8fdf681a4d9dd1b2c9f28309b"
+eslint@^5.9.0:
+  version "5.9.0"
+  resolved "https://registry.npmjs.org/eslint/-/eslint-5.9.0.tgz#b234b6d15ef84b5849c6de2af43195a2d59d408e"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     ajv "^6.5.3"
@@ -4923,7 +4900,7 @@ html-webpack-plugin@^3.2.0:
     toposort "^1.0.0"
     util.promisify "1.0.0"
 
-htmlparser2@^3.8.2, htmlparser2@^3.9.1:
+htmlparser2@^3.10.0, htmlparser2@^3.9.1:
   version "3.10.0"
   resolved "https://registry.npmjs.org/htmlparser2/-/htmlparser2-3.10.0.tgz#5f5e422dcf6119c0d983ed36260ce9ded0bee464"
   dependencies:
