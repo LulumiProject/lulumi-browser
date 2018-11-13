@@ -22,6 +22,7 @@ import BrowserMainView from '../BrowserMainView.vue';
 })
 export default class SwipeArrow extends Vue {
   mounted() {
+    // TODO: fix this, ref: https://github.com/electron/electron/issues/14258#issuecomment-416794070
     window.addEventListener(
       'wheel',
       (event) => {
