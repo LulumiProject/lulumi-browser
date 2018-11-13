@@ -102,7 +102,7 @@ function appStateSave(soft: boolean = true): void {
   }
 }
 
-// tslint:disable-next-line:max-line-length
+/* tslint:disable-next-line:max-line-length */
 function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
   const defaultOption: Object = {

@@ -143,6 +143,7 @@
     "webpack-dev-server": "^3.1.10",
     "webpack-hot-middleware": "^2.24.3",
     "webpack-merge": "^4.1.4",
+    "workerize": "^0.1.7",
     "write-file-webpack-plugin": "^4.4.1"
   },
   "engines": {

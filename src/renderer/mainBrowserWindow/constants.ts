@@ -33,7 +33,7 @@ const searchEngine = [
     name: 'Yahoo! JAPAN',
     search: 'http://search.yahoo.co.jp/search?ei=UTF-8&fr=crmas&p={queryString}',
     autocomplete:
-      // tslint:disable-next-line max-line-length
+      /* tslint:disable-next-line:max-line-length */
       'http://search.yahooapis.jp/AssistSearchService/V2/webassistSearch?appid=oQsoxcyxg66enp0TYoirkKoryq6rF8bK76mW0KYxZ0v0WPLtn.Lix6wy8F_LwGWHUII-&output=iejson&p={queryString}',
   },
   {

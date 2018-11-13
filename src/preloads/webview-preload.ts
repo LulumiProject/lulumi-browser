@@ -158,8 +158,6 @@ process.once('loaded', () => {
     globalObject.ipcRenderer = ipcRenderer;
     globalObject.require = requirePreload.require;
     globalObject.module = moduleTmp;
-  } else {
-    webFrame.executeJavaScript('window.eval = function () { };');
   }
   if (process.env.TEST_ENV === 'e2e') {
     globalObject.require = requirePreload.electronRequire;

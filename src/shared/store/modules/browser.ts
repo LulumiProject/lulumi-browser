@@ -28,7 +28,7 @@ const state: Lulumi.Store.State = {
   extensionInfoDict: {},
 };
 
-// tslint:disable-next-line:max-line-length
+/* tslint:disable-next-line:max-line-length */
 function createTabObject(state: Lulumi.Store.State, wid: number, openUrl: string | null = null): Lulumi.Store.TabObject {
   return {
     webContentsId: -1,
@@ -321,8 +321,23 @@ const mutations = {
           }
           // history
           if (state.history.length !== 0) {
-            if (state.history[state.history.length - 1].url
-              !== state.tabs[tabsIndex].url) {
+            /* tslint:disable-next-line:max-line-length */
+            if (state.tabs[tabsIndex].url.indexOf('/helper/pages/error/index.html') === -1) {
+              if (state.history[state.history.length - 1].url
+                !== state.tabs[tabsIndex].url) {
+                const date = timeUtil.getLocaleCurrentTime();
+                state.history.unshift({
+                  title: state.tabs[tabsIndex].title,
+                  url: state.tabs[tabsIndex].url,
+                  favIconUrl: constants.tabConfig.defaultFavicon,
+                  label: date.split(' ')[0],
+                  time: date.split(' ')[1],
+                });
+              }
+            }
+          } else {
+            /* tslint:disable-next-line:max-line-length */
+            if (state.tabs[tabsIndex].url.indexOf('/helper/pages/error/index.html') === -1) {
               const date = timeUtil.getLocaleCurrentTime();
               state.history.unshift({
                 title: state.tabs[tabsIndex].title,
@@ -332,15 +347,6 @@ const mutations = {
                 time: date.split(' ')[1],
               });
             }
-          } else {
-            const date = timeUtil.getLocaleCurrentTime();
-            state.history.unshift({
-              title: state.tabs[tabsIndex].title,
-              url: state.tabs[tabsIndex].url,
-              favIconUrl: constants.tabConfig.defaultFavicon,
-              label: date.split(' ')[0],
-              time: date.split(' ')[1],
-            });
           }
         }
       }

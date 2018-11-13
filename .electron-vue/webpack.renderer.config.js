@@ -605,10 +605,11 @@ if (process.env.TEST_ENV === 'e2e') {
         'default-src': "'none'",
         'object-src': "'self'",
         'connect-src': ["'self'"],
-        'script-src': ["'self'", "'sha256-FpY4/j63W31nSIwd1kfSbeyxSB9PKOPZ75NLii2nHJc='"],
+        'script-src': ["'self'"],
         'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
         'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
-        'img-src': ["'self'", "https:", "http:", "data:"]
+        'img-src': ["'self'", "https:", "http:", "data:"],
+        'worker-src': ["blob:"]
       })
     )
     preferenceViewConfig.plugins.push(

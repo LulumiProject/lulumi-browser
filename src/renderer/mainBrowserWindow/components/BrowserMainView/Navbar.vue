@@ -64,6 +64,7 @@
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
 
+import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -71,7 +72,7 @@ import AwesomeIcon from 'vue-awesome/components/Icon.vue';
 import 'vue-awesome/icons/lock';
 import 'vue-awesome/icons/unlock';
 
-import * as Fuse from 'fuse.js';
+import Workerize from 'workerize';
 import Sortable from 'sortablejs';
 
 import { Badge, Button, Popover } from 'element-ui';
@@ -232,7 +233,7 @@ export default class Navbar extends Vue {
   get currentSearchEngine(): Lulumi.Store.SearchEngineObject {
     return this.$store.getters.currentSearchEngine;
   }
-  get fuse(): Fuse<Lulumi.Renderer.SuggestionItem> {
+  get suggestionItemsByHistory(): any {
     const suggestionItems: Lulumi.Renderer.SuggestionItem[] = [];
     const regex = new RegExp('(^\w+:|^)\/\/');
     this.$store.getters.history.forEach((history) => {
@@ -244,24 +245,14 @@ export default class Navbar extends Vue {
         icon: 'document',
       });
     });
-    const fuse = new Fuse(suggestionItems, {
-      shouldSort: true,
-      threshold: 0.4,
-      includeMatches: true,
-      keys: [{
-        name: 'value',
-        weight: 0.7,
-      }, {
-        name: 'title',
-        weight: 0.3,
-      }],
-    });
-    return fuse;
+    return suggestionItems;
   }
 
   @Watch('url')
   onUrl(newUrl: string): void {
     this.showUrl(newUrl, this.tab.id);
+    (document.querySelector('.my-autocomplete') as HTMLDivElement)
+      .style.display = 'none';
     (this.$refs.input as any).suggestions.length = 0;
   }
   @Watch('focused')
@@ -270,12 +261,16 @@ export default class Navbar extends Vue {
       () => {
         if (!isFocus) {
           (document.querySelector('.my-autocomplete') as HTMLDivElement)
-          .style.display = 'none';
+            .style.display = 'none';
+          (this.$refs.input as any).suggestions.length = 0;
         }
       },
       150);
   }
 
+  chunk(r: any[], j: number): any[][] {
+    return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
+  }
   updateOmnibox(newUrl: string): void {
     if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
       let tmp = '';
@@ -422,7 +417,7 @@ export default class Navbar extends Vue {
       (this.$parent as BrowserMainView).onEnterUrl(item.url);
     }
   }
-  querySearch(queryString: string, cb: Function): void {
+  async querySearch(queryString: string, cb: Function): Promise<void> {
     const ipc = this.$electron.ipcRenderer;
     const currentSearchEngine: string = this.currentSearchEngine.name;
     const navbarSearch = this.$t('navbar.search');
@@ -448,10 +443,32 @@ export default class Navbar extends Vue {
         },
       });
     }
-    // fuse results
-    const entries: Lulumi.Renderer.SuggestionObject[]
-      = this.fuse.search(queryString.toLowerCase()) as any;
-    entries.map(entry => suggestions.push(entry));
+
+    const worker = Workerize(`
+      // Ref: https://github.com/webpack/webpack/issues/1554#issuecomment-336462319
+      ${fs.readFileSync(__non_webpack_require__.resolve('fuse.js'), 'utf8')}
+      export function search(suggestionItems, niddle) {
+        const fuse = new Fuse(suggestionItems, {
+          shouldSort: true,
+          threshold: 0.4,
+          includeMatches: true,
+          keys: [{
+            name: 'value',
+            weight: 0.7,
+          }, {
+            name: 'title',
+            weight: 0.3,
+          }],
+        });
+        return fuse.search(niddle);
+      }
+    `);
+
+    // calling out fuse results using web workers
+    const entries: Lulumi.Renderer.SuggestionObject[][]
+      = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
+        .map(suggestionItem => worker.search(suggestionItem, queryString.toLowerCase()))) as any;
+    entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
 
     if (this.autoFetch && this.currentSearchEngine.autocomplete !== '') {
       const timestamp: number = Date.now();
