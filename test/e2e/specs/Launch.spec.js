@@ -5,16 +5,10 @@ const controlGroup = '.control-group';
 
 test.serial('has everything set up', async (t) => {
   const app = t.context.app;
-  await app.client
-  .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
-  .waitForBrowserWindow()
-  .waitForVisible(urlInput)
-  .waitForExist(controlGroup)
-  .tabByIndex(0)
-  .loadUrl('lulumi://about/#/lulumi')
-  .waitForBrowserWindow();;
+  const win = await app.client
+    .waitUntilWindowLoaded()
+    .browserWindow;
 
-  const win = app.browserWindow;
   expect(await app.client.getWindowCount()).to.equal(1);
   expect(await win.isMinimized()).to.equal(false);
   expect(await win.isDevToolsOpened()).to.equal(false);

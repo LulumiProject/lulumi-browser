@@ -3,25 +3,19 @@ import test from 'ava';
 const urlInput = '#url-input';
 const controlGroup = '.control-group';
 
-test.serial('enables refresh', async (t) => {
+test.serial('has the functional control group', async (t) => {
   const app = t.context.app;
 
-  expect(await app.client
-    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
-    .waitForBrowserWindow()
-    .waitForVisible(urlInput)
-    .waitForExist(controlGroup)
-    .waitForExist('#browser-navbar__refresh.enabled')).to.equal(true);
-});
-
-test.serial('enables back button', async (t) => {
-  const app = t.context.app;
   await app.client
     .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
-    .waitForExist(controlGroup)
-    .tabByIndex(0)
+    .waitForExist(controlGroup);
+
+  expect(await app.client.waitForExist('#browser-navbar__refresh.enabled')).to.equal(true);
+
+  await app.client
+    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
     .loadUrl('lulumi://about/#/lulumi')
     .waitForBrowserWindow();
 
@@ -29,18 +23,8 @@ test.serial('enables back button', async (t) => {
     .waitForExist('#browser-navbar__goBack.enabled')).to.equal(true);
   expect(await app.client
     .waitForExist('#browser-navbar__goForward.disabled')).to.equal(true);
-});
 
-test.serial('enables forward button', async (t) => {
-  const app = t.context.app;
   await app.client
-    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
-    .waitForBrowserWindow()
-    .waitForVisible(urlInput)
-    .waitForExist(controlGroup)
-    .tabByIndex(0)
-    .loadUrl('lulumi://about/#/lulumi')
-    .waitForBrowserWindow()
     .waitForExist('#browser-navbar__goBack.enabled')
     .click('#browser-navbar__goBack.enabled');
 
