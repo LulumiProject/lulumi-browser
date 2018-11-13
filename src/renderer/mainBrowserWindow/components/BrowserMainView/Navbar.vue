@@ -234,8 +234,9 @@ export default class Navbar extends Vue {
   }
   get fuse(): Fuse<Lulumi.Renderer.SuggestionItem> {
     const suggestionItems: Lulumi.Renderer.SuggestionItem[] = [];
+    const regex = new RegExp('(^\w+:|^)\/\/');
     this.$store.getters.history.forEach((history) => {
-      const part: string = history.url.replace(/(^\w+:|^)\/\//, '');
+      const part: string = history.url.replace(regex, '');
       suggestionItems.push({
         title: history.title,
         value: part,
@@ -448,7 +449,9 @@ export default class Navbar extends Vue {
       });
     }
     // fuse results
-    this.fuse.search(queryString.toLowerCase()).map(item => suggestions.push({ item }));
+    const entries: Lulumi.Renderer.SuggestionObject[]
+      = this.fuse.search(queryString.toLowerCase()) as any;
+    entries.map(entry => suggestions.push(entry));
 
     if (this.autoFetch && this.currentSearchEngine.autocomplete !== '') {
       const timestamp: number = Date.now();
