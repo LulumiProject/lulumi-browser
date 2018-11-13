@@ -109,7 +109,7 @@ let mainConfig = {
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
       tslint: path.join(__dirname, '../tslint.json'),
-      tslintAutoFix: true,
+      tslintAutoFix: false,
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Main Process', excludeWarnings: false })

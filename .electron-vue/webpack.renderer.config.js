@@ -236,7 +236,7 @@ let mainBrowserWindowConfig = {
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
       tslint: path.join(__dirname, '../tslint.json'),
-      tslintAutoFix: true,
+      tslintAutoFix: false,
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
@@ -316,7 +316,7 @@ let preloadsConfig = {
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
       tslint: path.join(__dirname, '../tslint.json'),
-      tslintAutoFix: true,
+      tslintAutoFix: false,
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preloads]', excludeWarnings: false })
