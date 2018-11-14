@@ -265,7 +265,7 @@ export default class Navbar extends Vue {
           (this.$refs.input as any).suggestions.length = 0;
         }
       },
-      150);
+      200);
   }
 
   chunk(r: any[], j: number): any[][] {
