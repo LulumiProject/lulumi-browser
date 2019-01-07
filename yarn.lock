@@ -4566,10 +4566,10 @@ forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.npmjs.org/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
 
-fork-ts-checker-notifier-webpack-plugin@0.6.2:
-  version "0.6.2"
-  resolved "https://registry.npmjs.org/fork-ts-checker-notifier-webpack-plugin/-/fork-ts-checker-notifier-webpack-plugin-0.6.2.tgz#aa47d7c44acb70abf105247703dc4610996040a0"
-  integrity sha512-xWxEz3x/P9s9rowZghIYkb+gqf2D88/sjH2G3qJcvaYx4lvZgfmb14xPC4xe0UK2j5TQ9XTCMzHtchqaHXe5sw==
+fork-ts-checker-notifier-webpack-plugin@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.npmjs.org/fork-ts-checker-notifier-webpack-plugin/-/fork-ts-checker-notifier-webpack-plugin-0.7.0.tgz#735260be5917bc95cc275e997427a04e62df7267"
+  integrity sha512-PhtW7I/pf6TYvs9LOljy3TVe+SXeabcqny+HrWSsetHDVbsHG6BkDMuo+MwYlTyYm6+1pzJ4S4eyP9U76D8FJA==
   dependencies:
     node-notifier "^5.1.2"
 

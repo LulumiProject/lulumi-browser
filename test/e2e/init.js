@@ -6,7 +6,7 @@ test.beforeEach(async (t) => {
   utils.addCommands.call(t.context);
 });
 
-test.afterEach.always(async (t) => {
+test.afterEach.always('cleanup', async (t) => {
   await utils.stopApp.call(t.context);
 });
 
