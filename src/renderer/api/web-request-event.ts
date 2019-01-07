@@ -32,9 +32,11 @@ class Event {
   addListener(callback, filter = {}) {
     const digest = callback.toString().hashCode();
     this.listeners.push(digest);
-    ipcRenderer.on(`lulumi-${this.scope}-${this.event}-intercepted-${digest}`, (event, details) => {
-      ipcRenderer.send(`lulumi-${this.scope}-${this.event}-response-${digest}`, callback(details));
-    });
+    ipcRenderer.on(
+      `lulumi-${this.scope}-${this.event}-intercepted-${digest}`, (event, requestId, details) => {
+        ipcRenderer.send(
+          `lulumi-${this.scope}-${this.event}-response-${digest}-${requestId}`, callback(details));
+      });
     ipcRenderer.send(
       `lulumi-${this.scope}-add-listener-${this.event}`,
       this.name,

@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain, session } from 'electron';
 import * as forge from 'node-forge';
+import generate from 'nanoid/generate';
 
 import mainStore from '../../shared/store/mainStore';
 
@@ -10,125 +11,120 @@ import mainStore from '../../shared/store/mainStore';
 
 ipcMain.setMaxListeners(0);
 
-const whiteList = ['http://localhost:9080/'];
+const generateRequestId = () => generate('1234567890', 32);
 
 const register = (eventName: any, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
   if ((eventName === 'onBeforeRequest') || (eventName === 'onBeforeSendHeaders')) {
     sess.webRequest[eventName](filter, (details, callback) => {
-      if (whiteList.some(entry => (details.url.startsWith(entry)))) {
-        callback({ cancel: false });
+      const requestId = generateRequestId();
+      if (details.resourceType === 'mainFrame') {
+        details.type = 'main_frame';
+      } else if (details.resourceType === 'subFrame') {
+        details.type = 'sub_frame';
+      } else if (details.resourceType === 'cspReport') {
+        details.type = 'csp_report';
       } else {
-        if (details.resourceType === 'mainFrame') {
-          details.type = 'main_frame';
-        } else if (details.resourceType === 'subFrame') {
-          details.type = 'sub_frame';
-        } else if (details.resourceType === 'cspReport') {
-          details.type = 'csp_report';
-        } else {
-          details.type = details.resourceType;
-        }
-        if (details.requestHeaders) {
-          const requestHeaders: object[] = [];
-          Object.keys(details.requestHeaders).forEach((k) => {
-            requestHeaders.push({ name: k, value: details.requestHeaders[k] });
-          });
-          details.requestHeaders = requestHeaders;
-        }
-        ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, request) => {
-          if (request) {
-            if (request.cancel) {
-              callback({ cancel: true });
-            } else if (request.requestHeaders) {
-              const requestHeaders: object = {};
-              request.requestHeaders.forEach((requestHeader) => {
-                requestHeaders[requestHeader.name] = requestHeader.value;
-              });
-              callback({ requestHeaders, cancel: false });
-            } else if (request.redirectURL) {
-              callback({ redirectURL: request.redirectURL, cancel: false });
-            }
-          } else {
-            callback({ cancel: false });
-          }
-        });
-        const window = BrowserWindow.getAllWindows()[0];
-        window.webContents.send('lulumi-web-request-intercepted', {
-          eventLispCaseName,
-          digest,
-          details,
-          webContentsId: id,
-        });
+        details.type = details.resourceType;
       }
+      if (details.requestHeaders) {
+        const requestHeaders: object[] = [];
+        Object.keys(details.requestHeaders).forEach((k) => {
+          requestHeaders.push({ name: k, value: details.requestHeaders[k] });
+        });
+        details.requestHeaders = requestHeaders;
+      }
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}-${requestId}`, (event: Electron.Event, request) => {
+        if (request) {
+          if (request.cancel) {
+            callback({ cancel: true });
+          } else if (request.requestHeaders) {
+            const requestHeaders: object = {};
+            request.requestHeaders.forEach((requestHeader) => {
+              requestHeaders[requestHeader.name] = requestHeader.value;
+            });
+            callback({ requestHeaders, cancel: false });
+          } else if (request.redirectUrl) {
+            callback({ redirectUrl: request.redirectUrl, cancel: false });
+          }
+        } else {
+          callback({ cancel: false });
+        }
+      });
+      const window = BrowserWindow.getAllWindows()[0];
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        requestId,
+        details,
+        webContentsId: id,
+      });
     });
   } else if (eventName === 'onHeadersReceived') {
     sess.webRequest[eventName](filter, (details, callback) => {
-      if (whiteList.some(entry => (details.url.startsWith(entry)))) {
-        callback({ cancel: false });
-      } else {
-        details.type = details.resourceType;
-        if (details.responseHeaders) {
-          const responseHeaders: object[] = [];
-          Object.keys(details.responseHeaders).forEach((k) => {
-            responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
-          });
-          details.responseHeaders = responseHeaders;
-        }
-
-        ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}`, (event: Electron.Event, response) => {
-          if (response) {
-            if (response.cancel) {
-              callback({ cancel: true });
-            } else if (response.responseHeaders) {
-              const responseHeaders: object = {};
-              response.responseHeaders.forEach((responseHeader) => {
-                responseHeaders[responseHeader.name] = responseHeader.value;
-              });
-              if (response.statusLine) {
-                callback({ responseHeaders, statusLine: response.statusLine, cancel: false });
-              } else {
-                callback({ responseHeaders, statusLine: details.statusLine, cancel: false });
-              }
-            }
-          } else {
-            callback({ cancel: false });
-          }
+      const requestId = generateRequestId();
+      details.type = details.resourceType;
+      if (details.responseHeaders) {
+        const responseHeaders: object[] = [];
+        Object.keys(details.responseHeaders).forEach((k) => {
+          responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
         });
-        const window = BrowserWindow.getAllWindows()[0];
-        window.webContents.send('lulumi-web-request-intercepted', {
-          eventLispCaseName,
-          digest,
-          details,
-          webContentsId: id,
-        });
+        details.responseHeaders = responseHeaders;
       }
+
+      ipcMain.once(`lulumi-web-request-${eventLispCaseName}-response-${digest}-${requestId}`, (event: Electron.Event, response) => {
+        if (response) {
+          if (response.cancel) {
+            callback({ cancel: true });
+          } else if (response.responseHeaders) {
+            const responseHeaders: object = {};
+            response.responseHeaders.forEach((responseHeader) => {
+              responseHeaders[responseHeader.name] = responseHeader.value;
+            });
+            if (response.statusLine) {
+              callback({ responseHeaders, statusLine: response.statusLine, cancel: false });
+            } else {
+              callback({ responseHeaders, statusLine: details.statusLine, cancel: false });
+            }
+          }
+        } else {
+          callback({ cancel: false });
+        }
+      });
+      const window = BrowserWindow.getAllWindows()[0];
+      window.webContents.send('lulumi-web-request-intercepted', {
+        eventLispCaseName,
+        digest,
+        requestId,
+        details,
+        webContentsId: id,
+      });
     });
   } else {
     sess.webRequest[eventName](filter, (details) => {
-      if (!whiteList.some(entry => (details.url.startsWith(entry)))) {
-        details.type = details.resourceType;
-        if (details.requestHeaders) {
-          const requestHeaders: object[] = [];
-          Object.keys(details.requestHeaders).forEach((k) => {
-            requestHeaders.push({ name: k, value: details.requestHeaders[k] });
-          });
-          details.requestHeaders = requestHeaders;
-        }
-        if (details.responseHeaders) {
-          const responseHeaders: object[] = [];
-          Object.keys(details.responseHeaders).forEach((k) => {
-            responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
-          });
-          details.responseHeaders = responseHeaders;
-        }
-
-        const window = BrowserWindow.getAllWindows()[0];
-        window.webContents.send('lulumi-web-request-intercepted', {
-          eventLispCaseName,
-          digest,
-          details,
-          webContentsId: id,
+      details.type = details.resourceType;
+      if (details.requestHeaders) {
+        const requestHeaders: object[] = [];
+        Object.keys(details.requestHeaders).forEach((k) => {
+          requestHeaders.push({ name: k, value: details.requestHeaders[k] });
         });
+        details.requestHeaders = requestHeaders;
       }
+      if (details.responseHeaders) {
+        const responseHeaders: object[] = [];
+        Object.keys(details.responseHeaders).forEach((k) => {
+          responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
+        });
+        details.responseHeaders = responseHeaders;
+      }
+
+      const window = BrowserWindow.getAllWindows()[0];
+      window.webContents.send('lulumi-web-request-intercepted', {
+        requestId: 0,
+        eventLispCaseName,
+        digest,
+        details,
+        webContentsId: id,
+      });
     });
   }
 };
@@ -138,7 +134,7 @@ const unregister = (eventName: string, sess: Electron.Session): void => {
 };
 
 const registerWebRequestListeners = (): void => {
-  const sess = session.defaultSession as Electron.Session;
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
   ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event: Electron.Event, extensionName: string, eventLispCaseName: string, digest: string, filter): void => {
     register('onBeforeRequest', sess, eventLispCaseName, event.sender.id, digest, filter);
   });
@@ -190,7 +186,7 @@ const registerWebRequestListeners = (): void => {
 };
 
 const registerScheme = (scheme: string): void => {
-  const sess = session.defaultSession as Electron.Session;
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
   if (process.env.NODE_ENV === 'development') {
     sess.protocol.registerHttpProtocol('lulumi', async (request, callback) => {
       const url: string = request.url.substr(scheme.length);
@@ -237,7 +233,7 @@ const registerScheme = (scheme: string): void => {
 };
 
 const registerCertificateVerifyProc = () => {
-  const sess = session.defaultSession as Electron.Session;
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
   const store = mainStore.getStore();
   sess.setCertificateVerifyProc((request, callback) => {
     try {
@@ -281,7 +277,7 @@ const registerCertificateVerifyProc = () => {
 };
 
 const onWillDownload = (windows, path: string): void => {
-  const sess = session.defaultSession as Electron.Session;
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
   sess.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
     if (item.getMimeType() === 'application/pdf'
@@ -370,7 +366,7 @@ const onWillDownload = (windows, path: string): void => {
 };
 
 const setPermissionRequestHandler = (windows): void => {
-  const sess = session.defaultSession as Electron.Session;
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
   sess.setPermissionRequestHandler((webContents, permission, callback) => {
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);

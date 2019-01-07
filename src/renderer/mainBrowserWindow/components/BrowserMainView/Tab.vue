@@ -3,7 +3,8 @@ div
   transition(name="notification")
     #notification(v-show="showNotification && isActive")
       notification(:windowWebContentsId="windowWebContentsId")
-  webview(plugins,
+  webview(partition="persist:webview",
+          plugins,
           :element-loading-text="$t('tab.loading')",
           ref="webview",
           :class="isActive ? 'active' : 'hidden'")
