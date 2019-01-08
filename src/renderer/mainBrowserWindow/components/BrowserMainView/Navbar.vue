@@ -39,8 +39,9 @@
     div.block(v-for="extension in extensions",
               :key="extension.extensionId")
       el-popover(:ref="`popover-${extension.extensionId}`",
-                 placement="bottom",
+                 placement="bottom-end",
                  trigger="click",
+                 :visible-arrow="false",
                  :disabled="showPopupOrNot(extension)",
                  :popper-options={ gpuAcceleration: true })
         el-badge.badge(:ref="`badge-${extension.extensionId}`",
@@ -676,7 +677,7 @@ export default class Navbar extends Vue {
       const isBrowserAction = extension.browser_action;
       if (isPageAction || isBrowserAction) {
         const webview: Electron.WebviewTag = this.$refs[`webview-${extension.extensionId}`][0];
-        webview.addEventListener('context-menu', (event: any) => {
+        const contextMenuEvent = (event: any) => {
           const { Menu, MenuItem } = this.$electron.remote;
           const menu = new Menu();
 
@@ -690,20 +691,20 @@ export default class Navbar extends Vue {
           }));
 
           menu.popup({ window: currentWindow });
-        });
-        webview.addEventListener('ipc-message', (event: Electron.IpcMessageEvent) => {
+        };
+        const ipcMessageEvent = (event: Electron.IpcMessageEvent) => {
           if (event.channel === 'resize') {
             const size = event.args[0];
             webview.style.height = `${size.height}px`;
             webview.style.width = `${size.width}px`;
             webview.style.overflow = 'hidden';
           }
-        });
-        webview.addEventListener('dom-ready', () => {
+        };
+        const domReadyEvent = () => {
           webview.executeJavaScript(`
             function triggerResize() {
-              const height = document.body.clientHeight;
-              const width = document.body.clientWidth;
+              const height = document.body.scrollHeight;
+              const width = document.body.scrollWidth;
               ipcRenderer.sendToHost('resize', {
                 height,
                 width,
@@ -712,7 +713,13 @@ export default class Navbar extends Vue {
             triggerResize();
             new ResizeSensor(document.body, triggerResize);
           `);
-        });
+        };
+        webview.removeEventListener('context-menu', contextMenuEvent);
+        webview.addEventListener('context-menu', contextMenuEvent);
+        webview.removeEventListener('ipc-message', ipcMessageEvent);
+        webview.addEventListener('ipc-message', ipcMessageEvent);
+        webview.removeEventListener('dom-ready', domReadyEvent);
+        webview.addEventListener('dom-ready', domReadyEvent);
         if (isPageAction) {
           const target: HTMLElement = (event.target as HTMLElement);
           const img: HTMLImageElement = target.tagName === 'SUP'
@@ -928,22 +935,23 @@ export default class Navbar extends Vue {
     }
 
     .badge {
+      border-radius: 3px;
+
       .extension {
         width: 16px;
         padding: 5px;
-        border-radius: 3px;
-
-        &:hover {
-          background-color: rgb(210, 210, 210);
-        }
-
-        &:active {
-          background-color: rgb(200, 200, 200);
-        }
 
         &.disabled {
           opacity: 0.3;
         }
+      }
+
+      &:hover {
+        background-color: rgb(210, 210, 210);
+      }
+
+      &:active {
+        background-color: rgb(200, 200, 200);
       }
     }
   }
