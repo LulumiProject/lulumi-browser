@@ -200,7 +200,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 };
 
 const windowStateSave = (): void => {
-  Object.values(windows).forEach((window) => {
+  Object.values(windows).filter(window => (window as any) !== -1).forEach((window) => {
     handleWindowProperty(store, window, 'update');
   });
 };
