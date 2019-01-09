@@ -925,13 +925,17 @@ export default class Navbar extends Vue {
 
   .extensions-group {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     width: auto;
 
     * {
       user-select: none;
       -webkit-user-select: none;
+    }
+
+    .block {
+      padding: 0 3px;
     }
 
     .badge {
