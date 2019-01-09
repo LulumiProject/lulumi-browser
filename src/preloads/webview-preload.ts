@@ -145,20 +145,22 @@ process.once('loaded', () => {
     } else if (document.location.href.startsWith('lulumi://')) {
       ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
-      globalObject.about = remote.getGlobal('guestData');
-      globalObject.backgroundPages = remote.getGlobal('backgroundPages');
-      globalObject.manifestMap = remote.getGlobal('manifestMap');
-      globalObject.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
-      globalObject.createFromPath = remote.nativeImage.createFromPath;
-      globalObject.join = require('path').join;
+      webFrame.executeJavaScript('window', ((window) => {
+        window.about = remote.getGlobal('guestData');
+        window.backgroundPages = remote.getGlobal('backgroundPages');
+        window.manifestMap = remote.getGlobal('manifestMap');
+        window.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
+        window.createFromPath = remote.nativeImage.createFromPath;
+        window.join = require('path').join;
 
-      globalObject.ipcRenderer = ipcRenderer;
-      globalObject.require = requirePreload.require;
-      globalObject.module = moduleTmp;
+        window.ipcRenderer = ipcRenderer;
+        window.require = requirePreload.require;
+        window.module = moduleTmp;
+      }) as any);
     }
-  }
-  if (process.env.TEST_ENV === 'e2e') {
-    globalObject.require = requirePreload.electronRequire;
+    if (process.env.TEST_ENV === 'e2e') {
+      globalObject.require = requirePreload.electronRequire;
+    }
   }
   ipcRenderer.on('lulumi-tabs-send-message', (event: Electron.IpcMessageEvent, message) => {
     ipcRenderer.send('lulumi-runtime-emit-on-message', message);

@@ -169,7 +169,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
         webPreferences.preload = path.join(constants.lulumiPreloadPath, 'popup-preload.js');
       }
     } else {
-      if (process.env.TEST_ENV !== 'e2e' && !params.src.startsWith('lulumi://')) {
+      if (process.env.TEST_ENV !== 'e2e') {
         webPreferences.contextIsolation = true;
       }
       webPreferences.preload = path.join(constants.lulumiPreloadPath, 'webview-preload.js');
