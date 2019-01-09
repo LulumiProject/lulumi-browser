@@ -132,9 +132,8 @@ if (preferences) {
 const moduleTmp = module;
 
 process.once('loaded', () => {
-  if (document.location && document.location.href.startsWith('lulumi://')) {
-    // about:newtab handler
-    if (document.location.href === 'lulumi://about/#/newtab') {
+  if (document.location) {
+    if (document.location.href === 'about:newtab') {
       setTimeout(() => {
         ipcRenderer.once('newtab', (event, newtab: string) => {
           if (document.location) {
@@ -143,9 +142,7 @@ process.once('loaded', () => {
         });
         ipcRenderer.sendToHost('newtab');
       });
-
-      global.console.warn = function () { };
-    } else {
+    } else if (document.location.href.startsWith('lulumi://')) {
       ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
       globalObject.about = remote.getGlobal('guestData');
@@ -154,10 +151,11 @@ process.once('loaded', () => {
       globalObject.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
       globalObject.createFromPath = remote.nativeImage.createFromPath;
       globalObject.join = require('path').join;
+
+      globalObject.ipcRenderer = ipcRenderer;
+      globalObject.require = requirePreload.require;
+      globalObject.module = moduleTmp;
     }
-    globalObject.ipcRenderer = ipcRenderer;
-    globalObject.require = requirePreload.require;
-    globalObject.module = moduleTmp;
   }
   if (process.env.TEST_ENV === 'e2e') {
     globalObject.require = requirePreload.electronRequire;

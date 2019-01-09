@@ -9,8 +9,6 @@ const urlResource = {
     switch (url) {
       case 'about:about':
         return getLulumiExtUrl('about/#/');
-      case 'about:blank':
-        return url;
       case 'about:downloads':
         return getLulumiExtUrl('about/#/downloads');
       case 'about:extensions':
@@ -19,10 +17,12 @@ const urlResource = {
         return getLulumiExtUrl('about/#/history');
       case 'about:lulumi':
         return getLulumiExtUrl('about/#/lulumi');
-      case 'about:newtab':
-        return getLulumiExtUrl('about/#/newtab');
       case 'about:preferences':
         return getLulumiExtUrl('about/#/preferences');
+      case 'about:blank':
+        return 'about:blank';
+      case 'about:newtab':
+        return getLulumiExtUrl('about/#/newtab');
       case 'about:gpu':
         return 'chrome://gpu';
       default:

@@ -449,7 +449,7 @@ export default class BrowserMainView extends Vue {
       } else {
         (event.target as Electron.WebviewTag).send(
           'newtab',
-          this.$store.getters.tabConfig.dummyTabObject.url);
+          urlResource.aboutUrls('about:newtab'));
       }
     }
   }
