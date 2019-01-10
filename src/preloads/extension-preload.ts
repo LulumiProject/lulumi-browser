@@ -6,8 +6,6 @@ import injectTo from '../renderer/api/inject-to';
 /* tslint:disable:max-line-length */
 /* tslint:disable:function-name */
 
-const { LocalStorage } = require('node-localstorage');
-
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
 if (guestInstanceIndex !== -1) {
@@ -22,7 +20,7 @@ process.once('loaded', () => {
   const extensionId = globalObject.location.hostname;
   const context: any = {};
   globalObject.scriptType = 'event';
-  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
+  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
   globalObject.lulumi = context.lulumi;
   globalObject.chrome = globalObject.lulumi;
 

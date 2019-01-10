@@ -1,6 +1,6 @@
 import { ipcRenderer, remote, webFrame } from 'electron';
-import { runInThisContext } from 'vm';
 import * as urllib from 'url';
+import { runInThisContext } from 'vm';
 
 import requirePreload from './require-preload';
 import injectTo from '../renderer/api/inject-to';
@@ -8,8 +8,6 @@ import injectTo from '../renderer/api/inject-to';
 /* tslint:disable:align */
 /* tslint:disable:max-line-length */
 /* tslint:disable:function-name */
-
-const { LocalStorage } = require('node-localstorage');
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
@@ -42,7 +40,7 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
   globalObject.scriptType = 'content-script';
   if (extension === undefined) {
     isolatedWorldMaps[extensionId] = isolatedWorldId;
-    injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
+    injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
     webFrame.setIsolatedWorldHumanReadableName(isolatedWorldId, name);
     webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
       code: 'window',

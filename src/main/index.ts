@@ -42,22 +42,14 @@ if (!gotTheLock) {
 
 let shuttingDown: boolean = (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e');
 
-let storagePath: string;
 if (process.env.NODE_ENV === 'development') {
-  storagePath = path.join(constants.devUserData, 'app-state');
+  app.setPath('userData', constants.devUserData);
 } else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  storagePath = path.join(constants.testUserData, 'app-state');
-} else {
-  storagePath = path.join(app.getPath('userData'), 'app-state');
+  app.setPath('userData', constants.testUserData);
 }
-let langPath: string;
-if (process.env.NODE_ENV === 'development') {
-  langPath = path.join(constants.devUserData, 'lang');
-} else if (process.env.NODE_ENV === 'testing' || process.env.TEST_ENV === 'e2e') {
-  langPath = path.join(constants.testUserData, 'lang');
-} else {
-  langPath = path.join(app.getPath('userData'), 'lang');
-}
+
+const storagePath: string = path.join(app.getPath('userData'), 'app-state');
+const langPath: string = path.join(app.getPath('userData'), 'lang');
 
 let appStateSaveHandler: any = null;
 let setLanguage: boolean = false;
@@ -468,9 +460,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       },
       {
         key: 'userData',
-        value: process.env.NODE_ENV === 'development'
-          ? constants.devUserData
-          : app.getPath('userData'),
+        value: app.getPath('userData'),
       },
     ];
     data.preferences = [

@@ -6,7 +6,6 @@ import injectTo from '../renderer/api/inject-to';
 /* tslint:disable:max-line-length */
 /* tslint:disable:function-name */
 
-const { LocalStorage } = require('node-localstorage');
 const resizeSensor = require('css-element-queries/src/ResizeSensor.js');
 
 let guestInstanceId = -1;
@@ -23,7 +22,7 @@ process.once('loaded', () => {
   const extensionId = globalObject.location.hostname;
   const context: Lulumi.Preload.Context = { lulumi: {} };
   globalObject.scriptType = 'popup';
-  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context, LocalStorage);
+  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
   globalObject.lulumi = context.lulumi;
   globalObject.chrome = globalObject.lulumi;
 

@@ -5,6 +5,7 @@ import { specs } from 'lulumi';
 import * as path from 'path';
 import * as url from 'url';
 import generate from 'nanoid/generate';
+import { Store, get, set, del, keys } from 'idb-keyval';
 
 import IpcEvent from './ipc-event';
 import webRequestEvent from './web-request-event';
@@ -124,23 +125,15 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
 let nextId = 0;
 let nextPortId = 0;
 
+const localStorage = new Store('local-store', 'local-storage');
+
 ipcRenderer.setMaxListeners(0);
 // tslint:disable-next-line:variable-name
-export default function injectTo(guestInstanceId, thisExtensionId, scriptType, context: Lulumi.Preload.Context, LocalStorage) {
+export default function injectTo(guestInstanceId, thisExtensionId, scriptType, context: Lulumi.Preload.Context) {
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
-  let storagePath;
-  let localStorage;
 
   const manifest = remote.getGlobal('manifestMap')[thisExtensionId];
-
-  if (LocalStorage) {
-    storagePath = process.env.NODE_ENV === 'development'
-      ? path.join(path.resolve('./userData'), 'local-storage')
-      : path.join(remote.app.getPath('userData'), 'local-storage');
-
-    localStorage = new LocalStorage(storagePath);
-  }
 
   lulumi.env = {
     appName: (callback) => {
@@ -484,42 +477,62 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
   lulumi.storage = {
     set: (items, callback) => {
       Object.keys(items).forEach((key) => {
-        const oldValue = JSON.parse(localStorage.getItem(key));
-        const newValue = items[key];
-        localStorage.setItem(key, JSON.stringify(newValue));
-
-        lulumi.storage.onChanged.emit([{ oldValue, newValue }], 'local');
+        get(key, localStorage).then((val: any) => {
+          let oldValue = null;
+          if (val !== undefined) {
+            oldValue = JSON.parse(val);
+          }
+          const newValue = items[key];
+          set(key, JSON.stringify(newValue), localStorage);
+          lulumi.storage.onChanged.emit([{
+            oldValue,
+            newValue,
+          }], 'local');
+        });
       });
 
       if (callback) {
         callback();
       }
     },
-    get: (keys, callback) => {
+    get: (_keys, callback) => {
       const ret = {};
       let ks;
-      if (keys !== null) {
-        if (keys.constructor === Object) {
+      if (_keys !== null) {
+        if (_keys.constructor === Object) {
           ks = [];
-          Object.keys(keys).forEach((key) => {
+          Object.keys(_keys).forEach((key) => {
             ks.push(key);
-            ret[key] = keys[key];
+            ret[key] = _keys[key];
           });
-        } else if (keys.constructor === String) {
-          ks = [keys];
-        } else if (keys.constructor === Array) {
-          ks = keys;
+        } else if (_keys.constructor === String) {
+          ks = [_keys];
+        } else if (_keys.constructor === Array) {
+          ks = _keys;
         }
         ks.forEach((key) => {
-          const tmp = JSON.parse(localStorage.getItem(key));
-          ret[key] = (tmp !== null) ? tmp : ret[key];
+          get(key, localStorage).then((val: any) => {
+            let tmp = null;
+            if (val !== undefined) {
+              tmp = JSON.parse(val);
+            }
+            ret[key] = (tmp !== null) ? tmp : ret[key];
+          });
         });
       } else {
-        localStorage._keys.forEach((key) => {
-          ret[key] = JSON.parse(localStorage.getItem(key));
-          if (ret[key] === null) {
-            ret[key] = undefined;
-          }
+        keys(localStorage).then((_keys) => {
+          _keys.forEach((key) => {
+            get(key, localStorage).then((val: any) => {
+              let tmp = null;
+              if (val !== undefined) {
+                tmp = JSON.parse(val);
+              }
+              ret[(key as any)] = tmp;
+              if (ret[(key as any)] === null) {
+                ret[(key as any)] = undefined;
+              }
+            });
+          });
         });
       }
 
@@ -527,18 +540,18 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
         callback(ret);
       }
     },
-    remove: (keys, callback) => {
-      if (keys !== null) {
+    remove: (_keys, callback) => {
+      if (_keys !== null) {
         let ks;
-        if (keys.constructor === String) {
-          ks = [keys];
-        } else if (keys.constructor === Array) {
-          ks = keys;
+        if (_keys.constructor === String) {
+          ks = [_keys];
+        } else if (_keys.constructor === Array) {
+          ks = _keys;
         } else {
           return;
         }
         ks.forEach((key) => {
-          localStorage.removeItem(key);
+          del(key, localStorage);
         });
 
         if (callback) {
