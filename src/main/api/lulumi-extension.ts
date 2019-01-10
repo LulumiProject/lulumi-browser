@@ -255,8 +255,8 @@ const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
 
 // the lulumi-extension can map a extension URL request to real file path
 const lulumiExtensionHandler = (request, callback) => {
-  const parsed = urllib.parse(request.url);
-  if (!parsed.hostname || !parsed.path) {
+  const parsed = urllib.parse(decodeURIComponent(request.url));
+  if (!parsed.hostname || !parsed.pathname) {
     return callback();
   }
 
@@ -266,14 +266,14 @@ const lulumiExtensionHandler = (request, callback) => {
   }
 
   const page = backgroundPages[parsed.hostname];
-  if (page && parsed.path === `/${page.name}`) {
+  if (page && parsed.pathname === `/${page.name}`) {
     return callback({
       mimeType: 'text/html',
       data: page.html,
     });
   }
 
-  fs.readFile(path.join(manifest.srcDirectory, parsed.path), (err, content) => {
+  fs.readFile(path.join(manifest.srcDirectory, parsed.pathname), (err, content) => {
     if (err) {
       return callback(-6); // FILE_NOT_FOUND
     }

@@ -21,6 +21,8 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
         details.type = 'main_frame';
       } else if (details.resourceType === 'subFrame') {
         details.type = 'sub_frame';
+      } else if (details.resourceType === 'xhr') {
+        details.type = 'xmlhttprequest';
       } else if (details.resourceType === 'cspReport') {
         details.type = 'csp_report';
       } else {
@@ -62,7 +64,17 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
   } else if (eventName === 'onHeadersReceived') {
     sess.webRequest[eventName](filter, (details, callback) => {
       const requestId = generateRequestId();
-      details.type = details.resourceType;
+      if (details.resourceType === 'mainFrame') {
+        details.type = 'main_frame';
+      } else if (details.resourceType === 'subFrame') {
+        details.type = 'sub_frame';
+      } else if (details.resourceType === 'xhr') {
+        details.type = 'xmlhttprequest';
+      } else if (details.resourceType === 'cspReport') {
+        details.type = 'csp_report';
+      } else {
+        details.type = details.resourceType;
+      }
       if (details.responseHeaders) {
         const responseHeaders: object[] = [];
         Object.keys(details.responseHeaders).forEach((k) => {
@@ -101,7 +113,17 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
     });
   } else {
     sess.webRequest[eventName](filter, (details) => {
-      details.type = details.resourceType;
+      if (details.resourceType === 'mainFrame') {
+        details.type = 'main_frame';
+      } else if (details.resourceType === 'subFrame') {
+        details.type = 'sub_frame';
+      } else if (details.resourceType === 'xhr') {
+        details.type = 'xmlhttprequest';
+      } else if (details.resourceType === 'cspReport') {
+        details.type = 'csp_report';
+      } else {
+        details.type = details.resourceType;
+      }
       if (details.requestHeaders) {
         const requestHeaders: object[] = [];
         Object.keys(details.requestHeaders).forEach((k) => {
