@@ -23,4 +23,5 @@ new Vue({
   render(h) {
     return h('App');
   },
+  name: 'root',
 }).$mount('#app');

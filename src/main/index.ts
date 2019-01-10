@@ -601,7 +601,7 @@ ipcMain.on('set-history', (event: Electron.Event, val) => {
 });
 
 // listen to new-lulumi-window event
-ipcMain.on('new-lulumi-window', (event, data) => {
+ipcMain.on('new-lulumi-window', (event: Electron.Event, data) => {
   if (data.url) {
     event.returnValue = createWindow({
       width: 800,

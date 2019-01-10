@@ -447,9 +447,7 @@ export default class BrowserMainView extends Vue {
       if (this.extensionService.newtabOverrides !== '') {
         (event.target as Electron.WebviewTag).send('newtab', this.extensionService.newtabOverrides);
       } else {
-        (event.target as Electron.WebviewTag).send(
-          'newtab',
-          urlResource.aboutUrls('about:newtab'));
+        (event.target as Electron.WebviewTag).send('newtab', '');
       }
     }
   }

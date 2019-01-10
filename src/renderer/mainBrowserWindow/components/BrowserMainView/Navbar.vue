@@ -274,6 +274,15 @@ export default class Navbar extends Vue {
   }
   updateOmnibox(newUrl: string): void {
     if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
+      if (newUrl === 'about:newtab') {
+        this.secure = true;
+        this.value = '';
+        const newElement = document.getElementById('security-indicator');
+        if (newElement) {
+          newElement.click();
+        }
+        return;
+      }
       let tmp = '';
       const currentUrl = url.parse(newUrl, true);
       const originalInput = document.querySelector('.el-input__inner') as HTMLInputElement;
@@ -856,8 +865,11 @@ export default class Navbar extends Vue {
         alert(data.result);
       }
     });
-    ipc.on('remove-lulumi-extension', (event, extensionId) => {
+    ipc.on('remove-lulumi-extension', (event: Electron.IpcMessageEvent, extensionId) => {
       ipc.send('remove-lulumi-extension', extensionId);
+    });
+    ipc.on('omnibox-ready', (): void => {
+      alert(1);
     });
   }
 }

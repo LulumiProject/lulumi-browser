@@ -134,14 +134,7 @@ const moduleTmp = module;
 process.once('loaded', () => {
   if (document.location) {
     if (document.location.href === 'about:newtab') {
-      setTimeout(() => {
-        ipcRenderer.once('newtab', (event, newtab: string) => {
-          if (document.location) {
-            document.location.href = newtab;
-          }
-        });
-        ipcRenderer.sendToHost('newtab');
-      });
+      document.location.href = 'lulumi://about/#/newtab';
     } else if (document.location.href.startsWith('lulumi://')) {
       ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
 
