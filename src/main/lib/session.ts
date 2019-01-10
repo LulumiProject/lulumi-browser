@@ -46,7 +46,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
             });
             callback({ requestHeaders, cancel: false });
           } else if (request.redirectUrl) {
-            callback({ redirectUrl: request.redirectUrl, cancel: false });
+            callback({ redirectURL: request.redirectUrl, cancel: false });
           }
         } else {
           callback({ cancel: false });

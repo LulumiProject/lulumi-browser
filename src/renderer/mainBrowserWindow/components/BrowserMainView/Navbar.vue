@@ -478,7 +478,9 @@ export default class Navbar extends Vue {
     const entries: Lulumi.Renderer.SuggestionObject[][]
       = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
         .map(suggestionItem => worker.search(suggestionItem, queryString.toLowerCase()))) as any;
-    entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
+    if (entries.length !== 0) {
+      entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
+    }
 
     if (this.autoFetch && this.currentSearchEngine.autocomplete !== '') {
       const timestamp: number = Date.now();
