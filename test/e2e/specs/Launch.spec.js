@@ -1,8 +1,5 @@
 import test from 'ava';
 
-const urlInput = '#url-input';
-const controlGroup = '.control-group';
-
 test.serial('has everything set up', async (t) => {
   const app = t.context.app;
   const win = await app.client

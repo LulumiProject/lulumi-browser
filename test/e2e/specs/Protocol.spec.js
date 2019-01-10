@@ -11,11 +11,12 @@ test.serial('has working about: handlers for redirecting requests to lulumi: pro
     .elementActive();
 
   await app.client
-    .elementIdValue(el.value.ELEMENT, 'about:lulumi')
+    .elementIdValue(el.value.ELEMENT, 'about:newtab')
     .elementIdValue(el.value.ELEMENT, keys.ENTER);
 
   expect(await app.client
     .tabByIndex(0)
     .waitForVisible('#app')
-    .getUrl()).to.equal('lulumi://about/#/lulumi');
+    .elementActive()
+    .getUrl()).to.equal('lulumi://about/#/newtab');
 });

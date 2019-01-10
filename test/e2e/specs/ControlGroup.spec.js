@@ -12,11 +12,11 @@ test.serial('has the functional control group', async (t) => {
     .elementActive();
 
   await app.client
-    .elementIdValue(el.value.ELEMENT, 'https://github.com/LulumiProject/lulumi-browser')
+    .elementIdValue(el.value.ELEMENT, 'https://example.com/')
     .elementIdValue(el.value.ELEMENT, keys.ENTER);
 
   await app.client
-    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
+    .waitForUrl('https://example.com/')
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
     .waitForExist(controlGroup);
@@ -24,7 +24,7 @@ test.serial('has the functional control group', async (t) => {
   expect(await app.client.waitForExist('#browser-navbar__refresh.enabled')).to.equal(true);
 
   await app.client
-    .waitForUrl('https://github.com/LulumiProject/lulumi-browser')
+    .waitForUrl('https://example.com/')
     .loadUrl('lulumi://about/#/lulumi')
     .waitForBrowserWindow();
 

@@ -273,7 +273,7 @@ export default class Navbar extends Vue {
     return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
   }
   updateOmnibox(newUrl: string): void {
-    if ((process.env.NODE_ENV !== 'testing') && !this.focused) {
+    if (!this.focused) {
       if (newUrl === 'about:newtab') {
         this.secure = true;
         this.value = '';
@@ -806,32 +806,30 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
-    if (process.env.NODE_ENV !== 'testing') {
-      // .el-input-group__prepend event(s)
-      const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
-      prepend.addEventListener('click', this.showCertificate);
+    // .el-input-group__prepend event(s)
+    const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
+    prepend.addEventListener('click', this.showCertificate);
 
-      // .el-input__inner event(s)
-      const originalInput = document.getElementsByClassName('el-input__inner')[0];
-      const newElement = document.createElement('div');
-      newElement.id = 'security-indicator';
-      (newElement as any).classList = 'el-input__inner';
-      newElement.innerHTML = '';
+    // .el-input__inner event(s)
+    const originalInput = document.getElementsByClassName('el-input__inner')[0];
+    const newElement = document.createElement('div');
+    newElement.id = 'security-indicator';
+    (newElement as any).classList = 'el-input__inner';
+    newElement.innerHTML = '';
+    newElement.style.display = 'none';
+    (originalInput.parentElement as any).append(newElement);
+
+    this.clickHandler = () => {
       newElement.style.display = 'none';
-      (originalInput.parentElement as any).append(newElement);
+      (originalInput as HTMLInputElement).style.display = 'block';
+      (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
+    };
+    this.blurHandler = () => {
+      newElement.style.display = 'block';
+      (originalInput as HTMLInputElement).style.display = 'none';
+    };
 
-      this.clickHandler = () => {
-        newElement.style.display = 'none';
-        (originalInput as HTMLInputElement).style.display = 'block';
-        (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
-      };
-      this.blurHandler = () => {
-        newElement.style.display = 'block';
-        (originalInput as HTMLInputElement).style.display = 'none';
-      };
-
-      this.showUrl(this.url, this.tab.id);
-    }
+    this.showUrl(this.url, this.tab.id);
 
     const ipc = this.$electron.ipcRenderer;
 
