@@ -71,27 +71,32 @@ const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
+let windowCount: number = 0;
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
 
 function appStateSave(soft: boolean = true): void {
-  if (Object.keys(windows).length !== 0) {
-    mainStore.saveAppState(soft)
-      .then((state) => {
-        if (state) {
-          promisify(writeFile, storagePath, state).then(() => {
-            if (appStateSaveHandler === null) {
-              shuttingDown = true;
-              app.quit();
-            }
-          });
-        }
-      });
-  } else {
-    shuttingDown = true;
-    app.quit();
+  if (!soft) {
+    windowCount = Object.keys(windows).length;
+    Object.keys(windows).forEach((key) => {
+      const id = parseInt(key, 10);
+      const window = windows[id];
+      window.close();
+      window.removeAllListeners('close');
+    });
   }
+  mainStore.saveAppState(soft)
+    .then((state) => {
+      if (state) {
+        promisify(writeFile, storagePath, JSON.stringify(state)).then(() => {
+          if (appStateSaveHandler === null) {
+            shuttingDown = true;
+            app.quit();
+          }
+        });
+      }
+    });
 }
 
 /* tslint:disable-next-line:max-line-length */
@@ -211,7 +216,7 @@ app.whenReady().then(() => {
   session.registerScheme(constants.lulumiPagesCustomProtocol);
   session.registerCertificateVerifyProc();
   session.registerWebRequestListeners();
-  // load appState
+  // load lulumi-state
   let data: string = '""';
   try {
     data = readFileSync(storagePath, 'utf8');
@@ -221,27 +226,32 @@ app.whenReady().then(() => {
   try {
     data = JSON.parse(data);
     if (data) {
-      let tmpWindow: Electron.BrowserWindow;
-      (data as any).windows.forEach((window) => {
-        tmpWindow = createWindow({
-          width: window.width,
-          height: window.height,
-          x: window.left,
-          y: window.top,
+      if ((data as any).windows.length > 0) {
+        let tmpWindow: Electron.BrowserWindow;
+        (data as any).windows.forEach((window) => {
+          tmpWindow = createWindow({
+            width: window.width,
+            height: window.height,
+            x: window.left,
+            y: window.top,
+          });
+          if (window.focused) {
+            tmpWindow.focus();
+          }
+          if (window.windowState === 'minimized') {
+            tmpWindow.minimize();
+          } else if (window.windowState === 'maximized') {
+            tmpWindow.maximize();
+          } else if (window.windowState === 'fullscreen') {
+            tmpWindow.setFullScreen(true);
+          }
         });
-        if (window.focused) {
-          tmpWindow.focus();
-        }
-        if (window.windowState === 'minimized') {
-          tmpWindow.minimize();
-        } else if (window.windowState === 'maximized') {
-          tmpWindow.maximize();
-        } else if (window.windowState === 'fullscreen') {
-          tmpWindow.setFullScreen(true);
-        }
-      });
-      (data as any).windows = [];
-      store.dispatch('setAppState', data);
+        (data as any).windows = [];
+        store.dispatch('setAppState', data);
+      } else {
+        store.dispatch('setAppState', data);
+        createWindow();
+      }
     } else {
       createWindow();
     }
@@ -252,7 +262,7 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (!is.macos || process.env.TEST_ENV === 'e2e') {
+  if (!is.macos) {
     app.quit();
   }
 });
@@ -268,25 +278,13 @@ app.on('before-quit', (event: Electron.Event) => {
     if (setLanguage) {
       event.preventDefault();
       shuttingDown = false;
-      let bumpWindowIdsBy = 0;
-      Object.values(windows).forEach((window) => {
-        window.removeAllListeners('close');
-        delete windows[window.id];
-        (windows[window.id] as any) = -1;
-        window.close();
-        bumpWindowIdsBy += 1;
-      });
-      mainStore.bumpWindowIds(bumpWindowIdsBy);
-      return;
+      mainStore.bumpWindowIds(windowCount);
+      windowCount = 0;
     }
-    Object.values(windows).forEach((window) => {
-      window.removeAllListeners('close');
-      delete windows[window.id];
-    });
     return;
   }
   event.preventDefault();
-  mainStore.windowStateSave();
+  mainStore.updateWindowStates();
   if (appStateSaveHandler !== null) {
     clearInterval(appStateSaveHandler);
     appStateSaveHandler = null;
@@ -315,7 +313,7 @@ ipcMain.on('get-window-properties', (event: Electron.Event) => {
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
   const windowProperties
-    = collection.filter(v => (v.match(/app-state-window-\d+/) !== null));
+    = collection.filter(v => (v.match(/lulumi-state-window-\d+/) !== null));
   if (windowProperties.isNotEmpty()) {
     const windowPropertyFilenames = windowProperties.sort((a, b) => {
       return ((b.split('-') as any).pop() - (a.split('-') as any).pop());

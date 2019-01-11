@@ -2,7 +2,7 @@ export const INCREMENT_TAB_ID = 'INCREMENT_TAB_ID';
 
 export const CREATE_TAB = 'CREATE_TAB';
 export const CLOSE_TAB = 'CLOSE_TAB';
-export const CLOSE_ALL_TAB = 'CLOSE_ALL_TAB';
+export const CLOSE_ALL_TABS = 'CLOSE_ALL_TABS';
 export const CLICK_TAB = 'CLICK_TAB';
 
 export const DID_START_LOADING = 'DID_START_LOADING';

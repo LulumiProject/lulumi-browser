@@ -22,8 +22,11 @@ export const actions = {
       tabIndex,
     });
   },
-  closeAllTab({ commit }, windowId) {
-    commit(types.CLOSE_ALL_TAB, { windowId });
+  closeAllTabs({ commit }, { windowId, amount }) {
+    commit(types.CLOSE_ALL_TABS, {
+      windowId,
+      amount,
+    });
   },
   clickTab({ commit }, { windowId, tabId, tabIndex }) {
     commit(types.CLICK_TAB, {

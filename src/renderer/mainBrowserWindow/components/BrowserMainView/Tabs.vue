@@ -115,7 +115,12 @@ export default class Tabs extends Vue {
       = this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       this.$nextTick(() => {
-        const pattern: string = event.target.firstElementChild.getAttribute('xlink:href');
+        let pattern: string = '';
+        if (event.target.tagName === 'svg') {
+          pattern = event.target.firstElementChild.getAttribute('xlink:href');
+        } else if (event.target.tagName === 'use') {
+          pattern = event.target.getAttribute('xlink:href');
+        }
         const state: string = pattern.split('#').reverse()[0].split('-')[0];
         if (state === 'minimize') {
           currentWindow.minimize();

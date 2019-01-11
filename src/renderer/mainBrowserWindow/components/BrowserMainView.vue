@@ -1513,9 +1513,12 @@ export default class BrowserMainView extends Vue {
   beforeMount() {
     const ipc = this.$electron.ipcRenderer;
 
-    ipc.once('window-close', () => {
-      this.$store.dispatch('closeAllTab', this.windowId);
-      ipc.send('window-close');
+    ipc.once('close-all-tabs', (event: Electron.Event, amount: number) => {
+      this.$store.dispatch('closeAllTabs', {
+        amount,
+        windowId: this.windowId,
+      });
+      ipc.send('tabs-closed');
     });
 
     if (process.env.NODE_ENV !== 'testing') {
@@ -1547,7 +1550,10 @@ export default class BrowserMainView extends Vue {
       document.body.classList.add('darwin');
     }
     // removed unneeded tabs
-    this.$store.dispatch('closeAllTab', 0);
+    this.$store.dispatch('closeAllTabs', {
+      windowId: 0,
+      amount: -1,
+    });
 
     const ipc = this.$electron.ipcRenderer;
 

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import Vuex from 'vuex';
 import { BrowserWindow, ipcMain } from 'electron';
 import { is } from 'electron-util';
 
@@ -45,7 +45,7 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
-function handleWindowProperty(store: Store<any>, window: Electron.BrowserWindow, action: string) {
+function handleWindowProperty(window: Electron.BrowserWindow, action: string) {
   const bounds: Electron.Rectangle = window.getBounds();
   let windowState: string = 'normal';
   if (window.isFullScreen()) {
@@ -84,28 +84,28 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     window.setMaxListeners(0);
 
     window.on('blur', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('focus', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('maximize', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('unmaximize', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('minimize', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('restore', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('resize', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
     window.on('move', () => {
-      handleWindowProperty(store, window, 'update');
+      handleWindowProperty(window, 'update');
     });
 
     if (isWindows) {
@@ -149,7 +149,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       if (close) {
         close = false;
       } else {
-        ipcMain.once(('window-close' as any), () => {
+        ipcMain.once('tabs-closed', () => {
           store.dispatch('closeWindow', window.id);
           delete windows[window.id];
           window.webContents.removeAllListeners('blur');
@@ -170,24 +170,25 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
           window.close();
         });
 
-        // store the property of this window into a temp
-        handleWindowProperty(store, window, 'update');
+        // store the properties of this window
+        handleWindowProperty(window, 'update');
+
         if (process.env.TEST_ENV !== 'e2e') {
           saveWindowState(window.id).then((state) => {
-            if (state) {
-              promisify(writeFile, `${storagePath}-window-${Date.now()}`, state);
+            if (state && state.amount > 1) {
+              promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));
             }
-            window.webContents.send('window-close');
+            window.webContents.send('close-all-tabs', state.amount);
           });
         } else {
-          window.webContents.send('window-close');
+          window.webContents.send('close-all-tabs', -1);
         }
 
         event.preventDefault();
       }
     });
 
-    handleWindowProperty(store, window, 'create');
+    handleWindowProperty(window, 'create');
 
     windows[window.id] = window;
     event.returnValue = store.state;
@@ -199,9 +200,9 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
   });
 };
 
-const windowStateSave = (): void => {
-  Object.values(windows).filter(window => (window as any) !== -1).forEach((window) => {
-    handleWindowProperty(store, window, 'update');
+const updateWindowStates = (): void => {
+  Object.values(windows).forEach((window) => {
+    handleWindowProperty(window, 'update');
   });
 };
 
@@ -337,6 +338,7 @@ function collect(newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrent
     lang: store.getters.lang,
     downloads: downloads.filter(download => download.state !== 'progressing'),
     history: store.getters.history,
+    lastOpenedTabs: store.getters.lastOpenedTabs.slice(0, 8),
     windows: newWindows,
   };
 }
@@ -350,14 +352,14 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
   const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
   if (soft) {
-    return Promise.resolve(JSON.stringify(
-      collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
+    return Promise.resolve(
+      collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads));
   }
   if (pendingDownloads.length !== 0) {
     ipcMain.once('okay-to-quit', (event, okay) => {
       if (okay) {
-        return Promise.resolve(JSON.stringify(
-          collect(newStart, newTabs, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
+        return Promise.resolve(
+          collect(newStart, newTabs, newCurrentTabIndexes, newWindows, this.$store.getters.downloads));
       }
       return Promise.resolve('');
     });
@@ -366,39 +368,36 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
       browserWindow.webContents.send('about-to-quit');
     }
   }
-  return Promise.resolve(JSON.stringify(
-    collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
+  return Promise.resolve(
+    collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads));
 }
 
 function bumpWindowIds(bumpWindowIdsBy: number) {
   saveAppState(true, bumpWindowIdsBy).then((state) => {
-    if (state) {
-      const data = JSON.parse(state);
-      if (data) {
-        let tmpWindow: Electron.BrowserWindow;
-        (data as any).windows.forEach((window) => {
-          tmpWindow = (BrowserWindow as any).createWindow({
-            width: window.width,
-            height: window.height,
-            x: window.left,
-            y: window.top,
-          });
-          if (window.focused) {
-            tmpWindow.focus();
-          }
-          if (window.windowState === 'minimized') {
-            tmpWindow.minimize();
-          } else if (window.windowState === 'maximized') {
-            tmpWindow.maximize();
-          } else if (window.windowState === 'fullscreen') {
-            tmpWindow.setFullScreen(true);
-          }
+    if (state && state.windows.length > 0) {
+      let tmpWindow: Electron.BrowserWindow;
+      state.windows.forEach((window) => {
+        tmpWindow = (BrowserWindow as any).createWindow({
+          width: window.width,
+          height: window.height,
+          x: window.left,
+          y: window.top,
         });
-        (data as any).windows = [];
-        store.dispatch('setAppState', data);
-      } else {
-        (BrowserWindow as any).createWindow();
-      }
+        if (window.focused) {
+          tmpWindow.focus();
+        }
+        if (window.windowState === 'minimized') {
+          tmpWindow.minimize();
+        } else if (window.windowState === 'maximized') {
+          tmpWindow.maximize();
+        } else if (window.windowState === 'fullscreen') {
+          tmpWindow.setFullScreen(true);
+        }
+      });
+      state.windows = [];
+      store.dispatch('setAppState', state);
+    } else {
+      (BrowserWindow as any).createWindow();
     }
   });
 }
@@ -407,18 +406,18 @@ function saveWindowState(windowId: number): Promise<any> {
   const { tabObjects: newTabs, currentTabIndexes: newCurrentTabIndexes }
     = tabsOrdering(0, 0, windowId);
   const newWindows = windowsOrdering(0, windowId);
-  return Promise.resolve(JSON.stringify({
+  return Promise.resolve({
     amount: newTabs.length,
     tabs: newTabs,
     currentTabIndex: newCurrentTabIndexes[1],
     window: newWindows[0],
-  }));
+  });
 }
 
 export default {
   getStore: () => store,
   register,
-  windowStateSave,
+  updateWindowStates,
   saveAppState,
   bumpWindowIds,
   getWindows: () => windows,

@@ -217,12 +217,27 @@ const mutations = {
       }
     }
   },
-  [types.CLOSE_ALL_TAB](state: Lulumi.Store.State, { windowId }) {
-    state.tabs.map((tab, index) => {
-      if (tab.windowId === windowId) {
-        Vue.delete(state.tabs, index);
+  [types.CLOSE_ALL_TABS](state: Lulumi.Store.State, payload) {
+    const windowId: number = payload.windowId;
+    const amount: number = payload.amount;
+
+    if (amount === 1) {
+      const index = state.tabs.findIndex(tab => (tab.windowId === windowId));
+      if (state.tabs[index].title !== 'error') {
+        state.lastOpenedTabs.unshift({
+          title: state.tabs[index].title,
+          url: state.tabs[index].url,
+          favIconUrl: state.tabs[index].favIconUrl,
+        });
       }
-    });
+      Vue.delete(state.tabs, index);
+    } else {
+      state.tabs.forEach((tab, index) => {
+        if (tab.windowId === windowId) {
+          Vue.delete(state.tabs, index);
+        }
+      });
+    }
   },
   [types.CLICK_TAB](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;
@@ -617,6 +632,7 @@ const mutations = {
     state.lang = newState.lang;
     state.downloads = newState.downloads;
     state.history = newState.history;
+    state.lastOpenedTabs = newState.lastOpenedTabs;
     state.windows = newState.windows;
   },
   // window state
