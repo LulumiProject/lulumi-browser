@@ -12,16 +12,7 @@ import * as enUS from '../../helper/i18n/en-US';
 import * as zhCN from '../../helper/i18n/zh-CN';
 import * as zhTW from '../../helper/i18n/zh-TW';
 
-import config from '../constants';
-
-let langPath: string;
-if (process.env.NODE_ENV === 'development') {
-  langPath = path.join(config.devUserData, 'lang');
-} else if (process.env.NODE_ENV === 'testing') {
-  langPath = path.join(config.testUserData, 'lang');
-} else {
-  langPath = path.join(app.getPath('userData'), 'lang');
-}
+const langPath: string = path.join(app.getPath('userData'), 'lululmi-lang');
 
 let lang: string;
 try {

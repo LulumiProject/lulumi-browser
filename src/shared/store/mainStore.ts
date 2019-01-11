@@ -233,7 +233,7 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
     const oldTabs: Lulumi.Store.TabObject[]
       = store.getters.tabs.filter(tab => tab.windowId === id);
     const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
-    oldTabs.forEach((tab, index) => {
+    oldTabs.forEach((_, index) => {
       tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
     });
     tmpTabs.forEach((tab) => {
@@ -245,6 +245,11 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       if (tab.url.startsWith('lulumi-extension:')) {
         tab.url = urlResource.aboutUrls('about:newtab');
       }
+      Object.keys(tab.extensionsMetadata).forEach((key) => {
+        if (store.getters.extensionInfoDict[key] === undefined) {
+          delete tab.extensionsMetadata[key];
+        }
+      });
     });
     newTabs = tmpTabs;
     newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
@@ -258,7 +263,7 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       const oldTabs: Lulumi.Store.TabObject[]
         = store.getters.tabs.filter(tab => tab.windowId === id);
       const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
-      oldTabs.forEach((tab, index) => {
+      oldTabs.forEach((_, index) => {
         tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
       });
       tmpTabs.forEach((tab) => {
@@ -270,6 +275,11 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
         if (tab.url.startsWith('lulumi-extension:')) {
           tab.url = urlResource.aboutUrls('about:newtab');
         }
+        Object.keys(tab.extensionsMetadata).forEach((key) => {
+          if (store.getters.extensionInfoDict[key] === undefined) {
+            delete tab.extensionsMetadata[key];
+          }
+        });
       });
       newTabs = newTabs.concat(tmpTabs);
       newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
@@ -314,19 +324,19 @@ function windowsOrdering(bumpWindowIdsBy: number, oneWindow: number = -1): Lulum
   return newWindows;
 }
 
-function collect(getters, newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrentTabIndexes: number[], newWindows: Lulumi.Store.LulumiBrowserWindowProperty[], downloads) {
+function collect(newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrentTabIndexes: number[], newWindows: Lulumi.Store.LulumiBrowserWindowProperty[], downloads) {
   return {
     pid: newStart + newTabs.length,
     tabs: newTabs,
     currentTabIndexes: newCurrentTabIndexes,
-    currentSearchEngine: getters.currentSearchEngine,
-    autoFetch: getters.autoFetch,
-    homepage: getters.homepage,
-    pdfViewer: getters.pdfViewer,
-    tabConfig: getters.tabConfig,
-    lang: getters.lang,
+    currentSearchEngine: store.getters.currentSearchEngine,
+    autoFetch: store.getters.autoFetch,
+    homepage: store.getters.homepage,
+    pdfViewer: store.getters.pdfViewer,
+    tabConfig: store.getters.tabConfig,
+    lang: store.getters.lang,
     downloads: downloads.filter(download => download.state !== 'progressing'),
-    history: getters.history,
+    history: store.getters.history,
     windows: newWindows,
   };
 }
@@ -341,13 +351,13 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
 
   if (soft) {
     return Promise.resolve(JSON.stringify(
-      collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
+      collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
   }
   if (pendingDownloads.length !== 0) {
     ipcMain.once('okay-to-quit', (event, okay) => {
       if (okay) {
         return Promise.resolve(JSON.stringify(
-          collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
+          collect(newStart, newTabs, newCurrentTabIndexes, newWindows, this.$store.getters.downloads)));
       }
       return Promise.resolve('');
     });
@@ -357,7 +367,7 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
     }
   }
   return Promise.resolve(JSON.stringify(
-    collect(store.getters, newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
+    collect(newStart, newTabs, newCurrentTabIndexes, newWindows, downloads)));
 }
 
 function bumpWindowIds(bumpWindowIdsBy: number) {

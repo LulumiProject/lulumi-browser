@@ -521,6 +521,13 @@ export default class Navbar extends Vue {
   createFilter(queryString: string): (suggestion: any) => boolean {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
+  extensionsMetadata(extensionId: string): Lulumi.Store.ExtensionMetadata | null {
+    const extensionsMetadata = this.tab.extensionsMetadata;
+    if (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId]) {
+      return extensionsMetadata[extensionId];
+    }
+    return null;
+  }
   setBrowserActionIcon(extensionId: string, iconInfo: Lulumi.API.IconInfo): void {
     this.$nextTick(() => {
       this.$store.dispatch('updateExtensionMetadata', {
@@ -534,9 +541,9 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '#';
     }
-    const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
-      ? extensionsMetadata[extensionId].browserActionIcon
+    const extensionMetadata = this.extensionsMetadata(extensionId);
+    return (extensionMetadata !== null)
+      ? extensionMetadata.browserActionIcon
       : '#';
   }
   setBrowserActionBadgeText(extensionId: string, details): void {
@@ -552,9 +559,9 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '';
     }
-    const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
-      ? extensionsMetadata[extensionId].badgeText
+    const extensionMetadata = this.extensionsMetadata(extensionId);
+    return (extensionMetadata !== null)
+      ? extensionMetadata.badgeText
       : '';
   }
   setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
@@ -572,9 +579,9 @@ export default class Navbar extends Vue {
     }
     if (this.$refs[`badge-${extensionId}`] && this.$refs[`badge-${extensionId}`][0]) {
       const node = this.$refs[`badge-${extensionId}`][0].$el.childNodes[1];
-      const extensionsMetadata = this.tab.extensionsMetadata;
-      const color = (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
-        ? extensionsMetadata[extensionId].badgeBackgroundColor
+      const extensionMetadata = this.extensionsMetadata(extensionId);
+      const color = (extensionMetadata !== null)
+        ? extensionMetadata.badgeBackgroundColor
         : '';
       if (node && color) {
         node.style.backgroundColor = color;
@@ -594,9 +601,9 @@ export default class Navbar extends Vue {
     if (this.tab === this.dummyTabObject) {
       return '#';
     }
-    const extensionsMetadata = this.tab.extensionsMetadata;
-    return (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId])
-      ? extensionsMetadata[extensionId].pageActionIcon
+    const extensionMetadata = this.extensionsMetadata(extensionId);
+    return (extensionMetadata !== null)
+      ? extensionMetadata.pageActionIcon
       : '#';
   }
   loadIcon(extension: any): string | undefined {

@@ -4,8 +4,6 @@ import i18n from './i18n';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import config from '../constants';
-
 const { openProcessManager } = require('electron-process-manager');
 
 function reloadBrowserWindow(browserWindow: Electron.BrowserWindow): void {
@@ -17,9 +15,7 @@ function reloadBrowserWindow(browserWindow: Electron.BrowserWindow): void {
   if (count === 0) {
     browserWindow.webContents.reloadIgnoringCache();
   } else {
-    const loadedExtensionsPath = process.env.NODE_ENV === 'development'
-      ? path.join(config.devUserData, 'extensions')
-      : path.join(app.getPath('userData'), 'extensions');
+    const loadedExtensionsPath = path.join(app.getPath('userData'), 'lulumi-extensions');
     const loadedExtensions
       = objectValues(globalObject.manifestMap).map(manifest => manifest.srcDirectory);
     if (loadedExtensions.length > 0) {

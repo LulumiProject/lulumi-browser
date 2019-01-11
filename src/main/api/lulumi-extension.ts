@@ -290,7 +290,7 @@ app.on(('session-created' as any), (sess: Electron.Session) => {
 });
 
 // the persistent path of "Lulumi Extensions" preference file
-let loadedExtensionsPath: string = '';
+const loadedExtensionsPath: string = path.join(app.getPath('userData'), 'lulumi-extensions');
 
 app.on('will-quit', () => {
   try {
@@ -353,10 +353,6 @@ app.whenReady().then(() => {
 // and hopefully, this function will be called after app is ready
 const loadExtensions = () => {
   if (!globalObject.persistentLoaded) {
-    // load persisted extensions
-    loadedExtensionsPath = process.env.NODE_ENV === 'development'
-      ? path.join(config.devUserData, 'extensions')
-      : path.join(app.getPath('userData'), 'extensions');
     try {
       const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
       if (Array.isArray(loadedExtensions)) {

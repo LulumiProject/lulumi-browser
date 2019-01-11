@@ -48,8 +48,8 @@ if (process.env.NODE_ENV === 'development') {
   app.setPath('userData', constants.testUserData);
 }
 
-const storagePath: string = path.join(app.getPath('userData'), 'app-state');
-const langPath: string = path.join(app.getPath('userData'), 'lang');
+const storagePath: string = path.join(app.getPath('userData'), 'lulumi-state');
+const langPath: string = path.join(app.getPath('userData'), 'lulumi-lang');
 
 let appStateSaveHandler: any = null;
 let setLanguage: boolean = false;

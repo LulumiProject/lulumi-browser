@@ -394,6 +394,7 @@ const mutations = {
       state.tabs[tabsIndex].canGoForward = payload.canGoForward;
       state.tabs[tabsIndex].statusText = false;
       state.tabs[tabsIndex].isLoading = false;
+      state.tabs[tabsIndex].status = 'complete';
     }
   },
   [types.DID_FAIL_LOAD](state: Lulumi.Store.State, payload) {
@@ -680,7 +681,7 @@ const mutations = {
     const extensionInfo: chrome.management.ExtensionInfo = payload.extensionInfo;
     if (state.extensionInfoDict[extensionInfo.id] === undefined) {
       Vue.set(state.extensionInfoDict, extensionInfo.id, extensionInfo);
-      state.tabs.forEach((tab, index) => {
+      state.tabs.forEach((_, index) => {
         Vue.set(state.tabs[index].extensionsMetadata, extensionInfo.id, {
           browserActionIcon: '#',
           pageActionIcon: '#',
@@ -693,7 +694,7 @@ const mutations = {
   [types.REMOVE_EXTENSION](state: Lulumi.Store.State, payload) {
     const extensionId: string = payload.extensionId;
     Vue.delete(state.extensionInfoDict, extensionId);
-    state.tabs.forEach((tab, index) => {
+    state.tabs.forEach((_, index) => {
       Vue.delete(state.tabs[index].extensionsMetadata, extensionId);
     });
   },
