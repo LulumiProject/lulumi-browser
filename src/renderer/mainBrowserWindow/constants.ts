@@ -62,7 +62,7 @@ const tabConfig: Lulumi.Store.TabConfig = {
     highlighted: false,
     active: false,
     pinned: false,
-    url: 'https://github.com/LulumiProject/lulumi-browser',
+    url: 'about:newtab',
     title: null,
     favIconUrl: null,
     status: null,
