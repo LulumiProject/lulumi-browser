@@ -22,8 +22,6 @@ const isWindows: boolean = is.windows;
 
 const windows: Electron.BrowserWindow[] = [];
 
-let close: boolean = false;
-
 const broadcastMutations = (store) => {
   store.subscribe((mutation) => {
     Object.keys(windows).forEach((key) => {
@@ -80,7 +78,15 @@ function handleWindowProperty(window: Electron.BrowserWindow, action: string) {
 
 const register = (storagePath: string, swipeGesture: boolean): void => {
   ipcMain.on('vuex-connect', (event: Electron.Event) => {
-    const window = BrowserWindow.fromWebContents(event.sender);
+    let close: boolean = false;
+    const window: BrowserWindow = BrowserWindow.fromWebContents(event.sender);
+
+    // we've registered this window, so we just return
+    if (windows[window.id] !== undefined) {
+      event.returnValue = store.state;
+      return;
+    }
+
     window.setMaxListeners(0);
 
     window.on('blur', () => {
@@ -343,7 +349,7 @@ function collect(newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrent
   };
 }
 
-function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promise<any> {
+function saveLulumiState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promise<any> {
   const newStart = Math.ceil(Math.random() * 10000);
   const { tabObjects: newTabs, currentTabIndexes: newCurrentTabIndexes }
     = tabsOrdering(newStart, bumpWindowIdsBy);
@@ -373,7 +379,7 @@ function saveAppState(soft: boolean = true, bumpWindowIdsBy: number = 0): Promis
 }
 
 function bumpWindowIds(bumpWindowIdsBy: number) {
-  saveAppState(true, bumpWindowIdsBy).then((state) => {
+  saveLulumiState(true, bumpWindowIdsBy).then((state) => {
     if (state && state.windows.length > 0) {
       let tmpWindow: Electron.BrowserWindow;
       state.windows.forEach((window) => {
@@ -395,7 +401,7 @@ function bumpWindowIds(bumpWindowIdsBy: number) {
         }
       });
       state.windows = [];
-      store.dispatch('setAppState', state);
+      store.dispatch('setLulumiState', state);
     } else {
       (BrowserWindow as any).createWindow();
     }
@@ -418,7 +424,7 @@ export default {
   getStore: () => store,
   register,
   updateWindowStates,
-  saveAppState,
+  saveLulumiState,
   bumpWindowIds,
   getWindows: () => windows,
 };

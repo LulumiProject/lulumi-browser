@@ -65,7 +65,6 @@ declare namespace Lulumi {
       manifestMap: ManifestMap;
       manifestNameMap: ManifestNameMap;
       guestData: Scheme.LulumiObject;
-      persistentLoaded: boolean;
     }
   }
 

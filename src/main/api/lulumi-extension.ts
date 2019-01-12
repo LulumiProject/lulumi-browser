@@ -14,7 +14,6 @@ import './listeners';
 /* tslint:disable:max-line-length */
 
 const globalObject = global as Lulumi.API.GlobalObject;
-globalObject.persistentLoaded = false;
 
 // ../../shared/store/mainStore.ts
 const { default: mainStore } = require('../../shared/store/mainStore');
@@ -55,6 +54,7 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
     if (!manifestNameMap[manifest.name]) {
       const extensionId = generateExtensionIdFromName();
       manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
+      globalObject.manifestMap = manifestMap;
 
       let messages = {};
       if (manifest.default_locale) {
@@ -123,6 +123,7 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
     webSecurity: false,
   });
   backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
+  globalObject.backgroundPages = backgroundPages;
   contents.loadURL(urllib.format({
     protocol: 'lulumi-extension',
     slashes: true,
@@ -311,6 +312,9 @@ app.on('will-quit', () => {
 });
 
 app.whenReady().then(() => {
+  // load persisted extensions
+  loadExtensions();
+
   // the public API to add/remove extensions
   ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);
@@ -352,22 +356,19 @@ app.whenReady().then(() => {
 // we can not use protocol or BrowserWindow until app is ready,
 // and hopefully, this function will be called after app is ready
 const loadExtensions = () => {
-  if (!globalObject.persistentLoaded) {
-    try {
-      const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
-      if (Array.isArray(loadedExtensions)) {
-        for (const srcDirectory of loadedExtensions) {
-          // start background pages and set content scripts
-          const manifest = getManifestFromPath(srcDirectory);
-          if (manifest !== null) {
-            loadExtension(manifest);
-          }
+  try {
+    const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
+    if (Array.isArray(loadedExtensions)) {
+      for (const srcDirectory of loadedExtensions) {
+        // start background pages and set content scripts
+        const manifest = getManifestFromPath(srcDirectory);
+        if (manifest !== null) {
+          loadExtension(manifest);
         }
       }
-    } catch (error) {
-      // ignore error
     }
-    globalObject.persistentLoaded = true;
+  } catch (error) {
+    // ignore error
   }
 };
 
@@ -376,5 +377,4 @@ export default {
   manifestNameMap,
   backgroundPages,
   registerLocalCommands,
-  loadExtensions,
 };

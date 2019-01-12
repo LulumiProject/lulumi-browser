@@ -237,8 +237,8 @@ export const actions = {
     });
   },
 
-  setAppState({ commit }, newState) {
-    commit(types.SET_APP_STATE, { newState });
+  setLulumiState({ commit }, newState) {
+    commit(types.SET_LULUMI_STATE, { newState });
   },
 
   createWindow({ commit }, { windowId, width, height, left, top, windowState, type }) {

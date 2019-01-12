@@ -2,7 +2,7 @@
 
 Lulumi browser takes advantage of using [vuex](https://github.com/vuejs/vuex) to store lots of information. If you are not familiar with it, I suggest taking a look at its [guide](https://vuex.vuejs.org/).
 
-# appState
+# State
 
 ```javascript
 {

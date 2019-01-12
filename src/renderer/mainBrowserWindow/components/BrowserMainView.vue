@@ -1510,6 +1510,9 @@ export default class BrowserMainView extends Vue {
     }
   }
 
+  created() {
+    this.extensionService = new ExtensionService(this);
+  }
   beforeMount() {
     const ipc = this.$electron.ipcRenderer;
 
@@ -1542,8 +1545,6 @@ export default class BrowserMainView extends Vue {
         this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser', true);
       }
     }
-
-    this.extensionService = new ExtensionService(this);
   }
   mounted() {
     if (is.macos) {

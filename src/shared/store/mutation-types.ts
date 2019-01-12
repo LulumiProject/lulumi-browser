@@ -39,7 +39,7 @@ export const SET_PERMISSIONS = 'SET_PERMISSIONS';
 
 export const UPDATE_MAPPINGS = 'UPDATE_MAPPINGS';
 
-export const SET_APP_STATE = 'SET_APP_STATE';
+export const SET_LULUMI_STATE = 'SET_LULUMI_STATE';
 
 export const CREATE_WINDOW = 'CREATE_WINDOW';
 export const CLOSE_WINDOW = 'CLOSE_WINDOW';

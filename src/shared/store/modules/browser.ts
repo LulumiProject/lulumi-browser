@@ -88,14 +88,6 @@ const mutations = {
     }
 
     Vue.set(state.tabs[state.tabs.length - 1], 'id', state.tabId);
-    Object.keys(state.extensionInfoDict).forEach((extensionId) => {
-      Vue.set(state.tabs[state.tabs.length - 1].extensionsMetadata, extensionId, {
-        browserActionIcon: '#',
-        pageActionIcon: '#',
-        badgeText: '',
-        badgeBackgroundColor: '',
-      });
-    });
 
     const last = state.tabs.filter(tab => tab.windowId === windowId).length - 1;
     if (url) {
@@ -270,6 +262,16 @@ const mutations = {
       state.tabs[tabsIndex].isLoading = true;
       state.tabs[tabsIndex].status = 'loading';
       state.tabs[tabsIndex].error = false;
+
+      // extensionsMetadata initilized
+      Object.keys(state.extensionInfoDict).forEach((extensionId) => {
+        Vue.set(state.tabs[tabsIndex].extensionsMetadata, extensionId, {
+          browserActionIcon: '#',
+          pageActionIcon: '#',
+          badgeText: '',
+          badgeBackgroundColor: '',
+        });
+      });
     }
   },
   [types.LOAD_COMMIT](state: Lulumi.Store.State, payload) {
@@ -618,8 +620,8 @@ const mutations = {
 
     Vue.set(state.permissions[hostname], permission, accept);
   },
-  // app state
-  [types.SET_APP_STATE](state: Lulumi.Store.State, { newState }) {
+  // set state
+  [types.SET_LULUMI_STATE](state: Lulumi.Store.State, { newState }) {
     state.tabId = newState.pid;
     state.tabs = newState.tabs;
     state.currentTabIndexes = newState.currentTabIndexes;

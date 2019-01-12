@@ -1,51 +1,8 @@
-import { app, Menu, BrowserWindow, ipcMain } from 'electron';
+import { app, Menu, BrowserWindow } from 'electron';
 import { is } from 'electron-util';
 import i18n from './i18n';
-import * as fs from 'fs';
-import * as path from 'path';
 
 const { openProcessManager } = require('electron-process-manager');
-
-function reloadBrowserWindow(browserWindow: Electron.BrowserWindow): void {
-  const globalObject = global as Lulumi.API.GlobalObject;
-  const count = Object.keys(globalObject.backgroundPages).length;
-  let counting = 0;
-
-  const objectValues = object => Object.keys(object).map(key => object[key]);
-  if (count === 0) {
-    browserWindow.webContents.reloadIgnoringCache();
-  } else {
-    const loadedExtensionsPath = path.join(app.getPath('userData'), 'lulumi-extensions');
-    const loadedExtensions
-      = objectValues(globalObject.manifestMap).map(manifest => manifest.srcDirectory);
-    if (loadedExtensions.length > 0) {
-      try {
-        fs.mkdirSync(path.dirname(loadedExtensionsPath));
-      } catch (error) {
-        // Ignore error
-      }
-      fs.writeFileSync(loadedExtensionsPath, JSON.stringify(loadedExtensions));
-      globalObject.persistentLoaded = false;
-      ipcMain.on('force-reload-result', (event, success): void => {
-        if (success) {
-          counting += 1;
-          if (counting === count) {
-            ipcMain.removeAllListeners('force-reload-result');
-            browserWindow.webContents.reloadIgnoringCache();
-          }
-        } else {
-          ipcMain.removeAllListeners('force-reload-result');
-          browserWindow.webContents.reloadIgnoringCache();
-        }
-      });
-      Object.keys(globalObject.backgroundPages).forEach((extensionId) => {
-        browserWindow.webContents.send('remove-lulumi-extension', extensionId);
-      });
-    } else {
-      fs.unlinkSync(loadedExtensionsPath);
-    }
-  }
-}
 
 const getTemplate = () => {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -397,7 +354,7 @@ const getTemplate = () => {
           click: () => {
             const browserWindow = BrowserWindow.getFocusedWindow();
             if (browserWindow !== null) {
-              reloadBrowserWindow(browserWindow);
+              browserWindow.webContents.reloadIgnoringCache();
             }
           },
         },

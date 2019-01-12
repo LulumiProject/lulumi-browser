@@ -51,7 +51,7 @@ if (process.env.NODE_ENV === 'development') {
 const storagePath: string = path.join(app.getPath('userData'), 'lulumi-state');
 const langPath: string = path.join(app.getPath('userData'), 'lulumi-lang');
 
-let appStateSaveHandler: any = null;
+let lulumiStateSaveHandler: any = null;
 let setLanguage: boolean = false;
 
 const autoHideMenuBarSetting: boolean = is.macos;
@@ -76,7 +76,7 @@ let windowCount: number = 0;
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
 
-function appStateSave(soft: boolean = true): void {
+function lulumiStateSave(soft: boolean = true): void {
   if (!soft) {
     windowCount = Object.keys(windows).length;
     Object.keys(windows).forEach((key) => {
@@ -86,11 +86,11 @@ function appStateSave(soft: boolean = true): void {
       window.removeAllListeners('close');
     });
   }
-  mainStore.saveAppState(soft)
+  mainStore.saveLulumiState(soft)
     .then((state) => {
       if (state) {
         promisify(writeFile, storagePath, JSON.stringify(state)).then(() => {
-          if (appStateSaveHandler === null) {
+          if (lulumiStateSaveHandler === null) {
             shuttingDown = true;
             app.quit();
           }
@@ -184,7 +184,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   if (process.env.NODE_ENV !== 'testing' || process.env.TEST_ENV !== 'e2e') {
     // save app-state every 5 mins
-    appStateSaveHandler = setInterval(appStateSave, 1000 * 60 * 5);
+    lulumiStateSaveHandler = setInterval(lulumiStateSave, 1000 * 60 * 5);
   }
   if (callback) {
     (mainWindow as any).callback = callback;
@@ -216,6 +216,7 @@ app.whenReady().then(() => {
   session.registerScheme(constants.lulumiPagesCustomProtocol);
   session.registerCertificateVerifyProc();
   session.registerWebRequestListeners();
+
   // load lulumi-state
   let data: string = '""';
   try {
@@ -247,9 +248,9 @@ app.whenReady().then(() => {
           }
         });
         (data as any).windows = [];
-        store.dispatch('setAppState', data);
+        store.dispatch('setLulumiState', data);
       } else {
-        store.dispatch('setAppState', data);
+        store.dispatch('setLulumiState', data);
         createWindow();
       }
     } else {
@@ -285,11 +286,11 @@ app.on('before-quit', (event: Electron.Event) => {
   }
   event.preventDefault();
   mainStore.updateWindowStates();
-  if (appStateSaveHandler !== null) {
-    clearInterval(appStateSaveHandler);
-    appStateSaveHandler = null;
+  if (lulumiStateSaveHandler !== null) {
+    clearInterval(lulumiStateSaveHandler);
+    lulumiStateSaveHandler = null;
   }
-  appStateSave(false);
+  lulumiStateSave(false);
 });
 
 // https://github.com/electron/electron/pull/12782
@@ -617,23 +618,14 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
 
 // load extension objects for each BrowserWindow instance
 ipcMain.on('request-extension-objects', (event: Electron.Event) => {
-  // load persisted extensions
-  lulumiExtension.loadExtensions();
-
-  // assign extension objects to global variables
-  globalObject.backgroundPages = lulumiExtension.backgroundPages;
-  globalObject.manifestMap = lulumiExtension.manifestMap;
-
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    window.webContents.send(
-      'response-extension-objects',
-      lulumiExtension.manifestMap);
     Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
       lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
     });
   });
+  event.sender.send('response-extension-objects', lulumiExtension.manifestMap);
 });
 
 ipcMain.on('fetch-search-suggestions',
