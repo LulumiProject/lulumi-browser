@@ -312,9 +312,6 @@ app.on('will-quit', () => {
 });
 
 app.whenReady().then(() => {
-  // load persisted extensions
-  loadExtensions();
-
   // the public API to add/remove extensions
   ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension = (srcDirectory: string): string => {
     const manifest = getManifestFromPath(srcDirectory);
@@ -377,4 +374,5 @@ export default {
   manifestNameMap,
   backgroundPages,
   registerLocalCommands,
+  loadExtensions,
 };

@@ -87,7 +87,10 @@ export default class Tab extends Vue {
 
   navigateTo(url) {
     if (this.$refs.webview) {
-      (this.$refs.webview as Electron.WebviewTag).setAttribute('src', urlUtil.getUrlFromInput(url));
+      this.$nextTick(() => {
+        (this.$refs.webview as Electron.WebviewTag)
+          .setAttribute('src', urlUtil.getUrlFromInput(url));
+      });
     }
   }
   webviewHandler(self, fnName) {

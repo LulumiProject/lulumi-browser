@@ -217,6 +217,9 @@ app.whenReady().then(() => {
   session.registerCertificateVerifyProc();
   session.registerWebRequestListeners();
 
+  // load persisted extensions
+  lulumiExtension.loadExtensions();
+
   // load lulumi-state
   let data: string = '""';
   try {
@@ -617,7 +620,7 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
 });
 
 // load extension objects for each BrowserWindow instance
-ipcMain.on('request-extension-objects', (event: Electron.Event) => {
+ipcMain.on('register-local-commands', (event: Electron.Event) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
@@ -625,7 +628,7 @@ ipcMain.on('request-extension-objects', (event: Electron.Event) => {
       lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
     });
   });
-  event.sender.send('response-extension-objects', lulumiExtension.manifestMap);
+  event.returnValue = true;
 });
 
 ipcMain.on('fetch-search-suggestions',

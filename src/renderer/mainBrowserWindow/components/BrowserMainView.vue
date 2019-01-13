@@ -19,7 +19,7 @@ div
 </template>
 
 <script lang="ts">
-import { Component, Watch, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 import * as urlPackage from 'url';
 
@@ -60,7 +60,6 @@ export default class BrowserMainView extends Vue {
   startTime: number = 0;
   showDownloadBar: boolean = false;
   extensionService: ExtensionService;
-  ready: boolean = false;
   contextMenus: object = {};
   onCommandEvent: Event = new Event();
   onUpdatedEvent: Event = new Event();
@@ -104,13 +103,6 @@ export default class BrowserMainView extends Vue {
   }
   get certificates(): Lulumi.Store.Certificates {
     return this.$store.getters.certificates;
-  }
-
-  @Watch('ready')
-  onReady(ready: boolean): void {
-    if (ready) {
-      this.$electron.ipcRenderer.send('request-app-state');
-    }
   }
 
   getWebView(tabIndex?: number): Electron.WebviewTag {
@@ -1510,9 +1502,6 @@ export default class BrowserMainView extends Vue {
     }
   }
 
-  created() {
-    this.extensionService = new ExtensionService(this);
-  }
   beforeMount() {
     const ipc = this.$electron.ipcRenderer;
 
@@ -1542,19 +1531,16 @@ export default class BrowserMainView extends Vue {
       this.windowId = 0;
 
       if (this.tabs.length === 0) {
-        this.onNewTab(this.windowId, 'https://github.com/LulumiProject/lulumi-browser', true);
+        this.onNewTab(this.windowId, 'about:newtab', true);
       }
     }
+
+    this.extensionService = new ExtensionService(this);
   }
   mounted() {
     if (is.macos) {
       document.body.classList.add('darwin');
     }
-    // removed unneeded tabs
-    this.$store.dispatch('closeAllTabs', {
-      windowId: 0,
-      amount: -1,
-    });
 
     const ipc = this.$electron.ipcRenderer;
 
