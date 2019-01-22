@@ -270,10 +270,11 @@ const urlUtil = {
    * @return {string}
    */
   getUrlIfError(url: string): string {
-    const errorPage = '/pages/error/index.html';
+    const errorPage = '/error/index.html';
     if (url) {
       if (url.includes(errorPage)) {
-        return url.replace(/^file:.+\/pages\/error\/index.html\?.*url=(\w+:\/\/.+)/, '$1');
+        return decodeURIComponent(url).replace(
+          /^file:.+\/error\/index.html\?.*url=(\w+:\/\/.+)/, '$1');
       }
       return url;
     }

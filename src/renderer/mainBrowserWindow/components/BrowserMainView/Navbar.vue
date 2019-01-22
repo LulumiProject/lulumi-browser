@@ -325,7 +325,7 @@ export default class Navbar extends Vue {
       const hostname = urlUtil.getHostname(url);
       if (hostname) {
         const key
-          = Object.keys(this.certificates).filter(key => key.indexOf(hostname) !== -1)
+          = Object.keys(this.certificates).filter(key => key.includes(hostname))
           .find((el) => {
             const rule
               = new RegExp(`^(www\\.)?${el.replace(/\./g, '\\.').replace(/\*/g, '.*')}$`);

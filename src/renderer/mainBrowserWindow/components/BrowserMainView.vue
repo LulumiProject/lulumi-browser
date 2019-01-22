@@ -21,6 +21,7 @@ div
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
+import * as path from 'path';
 import * as urlPackage from 'url';
 
 import Tabs from './BrowserMainView/Tabs.vue';
@@ -413,10 +414,10 @@ export default class BrowserMainView extends Vue {
       windowId: this.windowId,
     });
     const appPath = process.env.NODE_ENV === 'development'
-      ? process.cwd()
-      : this.$electron.remote.app.getAppPath();
+      ? path.join(process.cwd(), 'src/helper/pages')
+      : path.join(this.$electron.remote.app.getAppPath(), 'dist');
     let errorCode = event.errorCode;
-    let errorPage = `file://${appPath}/helper/pages/error/index.html`;
+    let errorPage = `file://${appPath}/error/index.html`;
 
     if (errorCode === -501) {
       const hostname = urlUtil.getHostname(event.validatedURL);
@@ -904,24 +905,27 @@ export default class BrowserMainView extends Vue {
   }
   onClickRefresh(): void {
     const webview = this.getWebView();
-    if (webview.getURL() === this.tab.url) {
+    const url = urlUtil.getUrlIfError(this.tab.url);
+    if (webview.getURL() === url) {
       webview.reload();
     } else {
-      webview.loadURL(this.tab.url);
+      webview.loadURL(url);
     }
   }
   onClickForceRefresh(): void {
     const webview = this.getWebView();
-    if (webview.getURL() === this.tab.url) {
+    const url = urlUtil.getUrlIfError(this.tab.url);
+    if (webview.getURL() === url) {
       webview.reloadIgnoringCache();
     } else {
-      webview.loadURL(this.tab.url);
+      webview.loadURL(url);
     }
   }
   onClickViewSource(): void {
     const webview = this.getWebView();
-    if (webview.getURL() === this.tab.url) {
-      const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
+    const url = urlUtil.getUrlIfError(this.tab.url);
+    if (webview.getURL() === url) {
+      const sourceUrl = urlUtil.getViewSourceUrlFromUrl(url);
       if (sourceUrl !== null) {
         this.onNewTab(this.windowId, sourceUrl, true);
       }
@@ -929,10 +933,9 @@ export default class BrowserMainView extends Vue {
   }
   onClickToggleDevTools(): void {
     const webview = this.getWebView();
-    if (webview.getURL() === this.tab.url) {
+    const url = urlUtil.getUrlIfError(this.tab.url);
+    if (webview.getURL() === url) {
       webview.getWebContents().openDevTools({ mode: 'bottom' });
-    } else {
-      webview.loadURL(this.tab.url);
     }
   }
   onClickJavaScriptPanel(): void {
@@ -1403,7 +1406,6 @@ export default class BrowserMainView extends Vue {
           label: this.$t('webview.contextMenu.saveImageAs') as string,
           click: () => {
             const fs = require('fs');
-            const path = require('path');
             const electron = this.$electron;
             urlUtil.getFilenameFromUrl(params.srcURL).then(
               (filename) => {
@@ -1480,12 +1482,15 @@ export default class BrowserMainView extends Vue {
       // lulumi.contextMenus
       registerExtensionContextMenus(menu);
 
-      const sourceUrl = urlUtil.getViewSourceUrlFromUrl(this.getTabObject().url);
-      if (sourceUrl !== null) {
-        menu.append(new MenuItem({
-          label: this.$t('webview.contextMenu.viewSource') as string,
-          click: this.onClickViewSource,
-        }));
+      const url = urlUtil.getUrlIfError(tab.url);
+      if (webview.getURL() === url) {
+        const sourceUrl = urlUtil.getViewSourceUrlFromUrl(url);
+        if (sourceUrl !== null) {
+          menu.append(new MenuItem({
+            label: this.$t('webview.contextMenu.viewSource') as string,
+            click: this.onClickViewSource,
+          }));
+        }
       }
       menu.append(new MenuItem({
         label: this.$t('webview.contextMenu.javascriptPanel') as string,

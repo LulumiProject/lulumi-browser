@@ -10,7 +10,7 @@ import injectTo from '../renderer/api/inject-to';
 /* tslint:disable:function-name */
 
 let guestInstanceId = -1;
-const guestInstanceIndex = process.argv.findIndex(e => e.indexOf('--guest-instance-id=') !== -1);
+const guestInstanceIndex = process.argv.findIndex(e => e.includes('--guest-instance-id='));
 if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(

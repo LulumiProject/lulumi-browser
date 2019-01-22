@@ -216,7 +216,7 @@ const tabsMapping = (tabs: Lulumi.Store.TabObject[], tabsOrder: number[]): numbe
   const newOrder: number[] = [];
   for (let index = 0; index < tabs.length; index += 1) {
     if (tabsOrder) {
-      newOrder[index] = tabsOrder.indexOf(index) === -1
+      newOrder[index] = !tabsOrder.includes(index)
         ? index
         : tabsOrder.indexOf(index);
     } else {
@@ -259,7 +259,7 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       });
     });
     newTabs = tmpTabs;
-    newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
+    newCurrentTabIndexes[windowId] = !tabsOrder.includes(currentTabIndex)
       ? currentTabIndex
       : tabsOrder.indexOf(currentTabIndex);
   } else {
@@ -289,7 +289,7 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
         });
       });
       newTabs = newTabs.concat(tmpTabs);
-      newCurrentTabIndexes[windowId] = tabsOrder.indexOf(currentTabIndex) === -1
+      newCurrentTabIndexes[windowId] = !tabsOrder.includes(currentTabIndex)
         ? currentTabIndex
         : tabsOrder.indexOf(currentTabIndex);
       windowId += 1;

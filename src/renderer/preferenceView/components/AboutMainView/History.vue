@@ -103,9 +103,9 @@ export default class History extends Vue {
       return true;
     }
     if (data.children) {
-      return data.label.toLowerCase().indexOf(value.toLowerCase()) !== -1;
+      return data.label.toLowerCase().includes(value.toLowerCase());
     }
-    return data.title.toLowerCase().indexOf(value.toLowerCase()) !== -1;
+    return data.title.toLowerCase().includes(value.toLowerCase());
   }
   transformArr(history: HistoryItem[]): HistoryItem[] {
     const newArr: HistoryItem[] = [];

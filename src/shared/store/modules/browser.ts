@@ -147,7 +147,7 @@ const mutations = {
           const newOrder: number[] = [];
           for (let index = 0; index < tabs.length; index += 1) {
             if (tabsOrder) {
-              newOrder[index] = tabsOrder.indexOf(index) === -1
+              newOrder[index] = !tabsOrder.includes(index)
                 ? index
                 : tabsOrder.indexOf(index);
             } else {
@@ -339,7 +339,8 @@ const mutations = {
           // history
           if (state.history.length !== 0) {
             /* tslint:disable-next-line:max-line-length */
-            if (state.tabs[tabsIndex].url.indexOf('/helper/pages/error/index.html') === -1) {
+            if (state.tabs[tabsIndex].url.startsWith('file://')
+              && !state.tabs[tabsIndex].url.includes('/error/index.html')) {
               if (state.history[state.history.length - 1].url
                 !== state.tabs[tabsIndex].url) {
                 const date = timeUtil.getLocaleCurrentTime();
@@ -354,7 +355,8 @@ const mutations = {
             }
           } else {
             /* tslint:disable-next-line:max-line-length */
-            if (state.tabs[tabsIndex].url.indexOf('/helper/pages/error/index.html') === -1) {
+            if (state.tabs[tabsIndex].url.startsWith('file://')
+              && !state.tabs[tabsIndex].url.includes('/error/index.html')) {
               const date = timeUtil.getLocaleCurrentTime();
               state.history.unshift({
                 title: state.tabs[tabsIndex].title,

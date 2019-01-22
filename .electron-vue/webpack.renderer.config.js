@@ -16,6 +16,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
 function createHappyPlugin(id, loaders) {
@@ -240,7 +241,12 @@ let mainBrowserWindowConfig = {
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new CopyWebpackPlugin([{
+      from: 'src/helper/pages/',
+      to: path.join(__dirname, '../dist'),
+      toType: 'dir'
+    }])
   ],
   output: {
     filename: '[name].js',

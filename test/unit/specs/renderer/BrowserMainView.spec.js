@@ -221,7 +221,7 @@ describe('BrowserMainView.vue', () => {
           },
         };
         vm.onDidFailLoad(event, 0);
-        expect(vm.getWebView().getAttribute('src')).to.contain('/pages/error/index.html');
+        expect(vm.getWebView().getAttribute('src')).to.contain('/error/index.html');
       });
     });
 

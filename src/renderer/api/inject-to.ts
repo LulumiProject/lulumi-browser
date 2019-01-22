@@ -90,7 +90,7 @@ function resolveSignature(namespace, name, args) {
         } else {
           types = signature.split(' ')[0].split('||');
         }
-        if (types.indexOf(typeof newArgs[index]) === -1) {
+        if (!types.includes(typeof newArgs[index])) {
           solved = false;
         }
       });
@@ -98,7 +98,7 @@ function resolveSignature(namespace, name, args) {
     }
     return false;
   });
-  return results.indexOf(true) !== -1;
+  return results.includes(true);
 }
 
 // Returns a string representing a call to an API function.

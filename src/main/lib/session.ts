@@ -304,8 +304,8 @@ const onWillDownload = (windows, path: string): void => {
     const itemURL = item.getURL();
     if (item.getMimeType() === 'application/pdf'
       && itemURL.indexOf('blob:') !== 0
-      && itemURL.indexOf('#pdfjs.action=download') === -1
-      && itemURL.indexOf('skip=true') === -1) {
+      && !itemURL.includes('#pdfjs.action=download')
+      && !itemURL.includes('skip=true')) {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
