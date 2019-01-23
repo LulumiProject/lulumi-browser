@@ -57,10 +57,18 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
       globalObject.manifestMap = manifestMap;
 
       let messages = {};
-      if (manifest.default_locale) {
+      let lang = '';
+      try {
+        lang = fs.readFileSync(path.join(app.getPath('userData'), 'lulumi-lang'), 'utf8');
+      } catch (langError) {
+        lang = `"${manifest.default_locale}"`;
+        console.error(`(lulumi-browser) ${langError}`);
+      }
+      if (lang) {
+        lang = JSON.parse(lang);
         try {
           messages = JSON.parse(fs.readFileSync(
-            path.join(srcDirectory, '_locales', manifest.default_locale, 'messages.json'), 'utf8'));
+            path.join(srcDirectory, '_locales', lang.replace('-', '_'), 'messages.json'), 'utf8'));
         } catch (readError) {
           console.warn(`${manifest.name}: Reading messages.json failed.`);
           console.warn(readError.stack || readError);
@@ -68,7 +76,7 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
       }
       messages = Object.assign({
         '@@extension_id': { message: extensionId },
-        '@@ui_locale': { message: manifest.default_locale || 'en' },
+        '@@ui_locale': { message: lang || 'en' },
         // tslint:disable-next-line:align
       }, messages);
 
