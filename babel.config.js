@@ -7,7 +7,7 @@ module.exports = function(api) {
 
   const envOpts = {
     targets: {
-      node: "10.2.0",
+      node: "10.13.0",
     }
   };
 

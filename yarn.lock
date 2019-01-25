@@ -893,9 +893,10 @@
   dependencies:
     "@types/babel-types" "*"
 
-"@types/chrome@^0.0.77":
-  version "0.0.77"
-  resolved "https://registry.npmjs.org/@types/chrome/-/chrome-0.0.77.tgz#afab7a45da9ebf67d5d50c0ee0a347582128d47e"
+"@types/chrome@^0.0.78":
+  version "0.0.78"
+  resolved "https://registry.npmjs.org/@types/chrome/-/chrome-0.0.78.tgz#aed4b6299476d17494aab99821107e4eb880ed7e"
+  integrity sha512-0ibUi2LxeH96KIGRr/QZ6TlUm6DCBXztUn2pWK8vWMgasS2vkADoO5OROG0Fqz7YkKLa/DAVzQF5h/4acxaCgg==
   dependencies:
     "@types/filesystem" "*"
 
@@ -961,10 +962,10 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
-"@types/webpack@^4.4.23":
-  version "4.4.23"
-  resolved "https://registry.npmjs.org/@types/webpack/-/webpack-4.4.23.tgz#059d6f4598cfd65ddee0e2db38317ef989696712"
-  integrity sha512-WswyG+2mRg0ul/ytPpCSWo+kOlVVPW/fKCBEVwqmPVC/2ffWEwhsCEQgnFbWDf8EWId2qGcpL623EjLfNTRk9A==
+"@types/webpack@^4.4.24":
+  version "4.4.24"
+  resolved "https://registry.npmjs.org/@types/webpack/-/webpack-4.4.24.tgz#75bc301176066f566ec54151b6101c2b45abb8b2"
+  integrity sha512-yg99CjvB7xZ/iuHrsZ7dkGKoq/FRDzqLzAxKh2EmTem6FWjzrty4FqCqBYuX5z+MFwSaaQGDAX4Q9HQkLjGLnQ==
   dependencies:
     "@types/anymatch" "*"
     "@types/node" "*"
@@ -3735,10 +3736,10 @@ electron-util@^0.10.2:
     electron-is-dev "^1.0.0"
     new-github-issue-url "^0.1.2"
 
-electron@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.npmjs.org/electron/-/electron-3.1.1.tgz#983492f0eb25740d1ba1da47712b16139ebc6d17"
-  integrity sha512-ZamfKY9xp8P6/prtBbhOoOsdCaqyArr7GOmgJuBgWY95ZW5nJVP5aA5lLTh8IeVSW1/IM1KyKYPTrTS/RGercQ==
+electron@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.npmjs.org/electron/-/electron-3.1.2.tgz#e410b976c56fc2f783c3b0fb6d757e02eaeab902"
+  integrity sha512-B/mXRCN8jGBBx8dvtIgLyW+nE8i9y7K9G6wijU+cLoneqF5al9BgZA1l5xgZEiUrwTtt0cgXIWNwhStt7EDoQQ==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^4.1.0"
@@ -3750,9 +3751,10 @@ element-resize-detector@^1.2.0:
   dependencies:
     batch-processor "1.0.0"
 
-element-ui@^2.4.11:
+element-ui@2.4.11:
   version "2.4.11"
   resolved "https://registry.npmjs.org/element-ui/-/element-ui-2.4.11.tgz#db6a2d37001b8fe5fff9f176fb58bb3908cfa9c9"
+  integrity sha512-RtgK0t840NAFTajGMWvylzZRSX1EkZ7V4YgAoBxhv4TtkeMscLuk/IdYOzPdlQq6IN0byx1YVBxCX+u4yYkGvw==
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -5991,9 +5993,10 @@ karma-webpack@4.0.0-rc.5:
     source-map "^0.5.6"
     webpack-dev-middleware "^3.2.0"
 
-karma@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.npmjs.org/karma/-/karma-3.1.4.tgz#3890ca9722b10d1d14b726e1335931455788499e"
+karma@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/karma/-/karma-4.0.0.tgz#f28e38a2b66243fde3f98e12a8dcaa2c6ff8ca9c"
+  integrity sha512-EFoFs3F6G0BcUGPNOn/YloGOb3h09hzTguyXlg6loHlKY76qbJikkcyPk43m2kfRF65TUGda/mig29QQtyhm1g==
   dependencies:
     bluebird "^3.3.0"
     body-parser "^1.16.1"
@@ -10274,10 +10277,10 @@ vue-i18n@^8.7.0:
   version "8.7.0"
   resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.7.0.tgz#846269ad9d9c40c77479a540398d4024356fa4e1"
 
-vue-loader@^15.5.1:
-  version "15.5.1"
-  resolved "https://registry.npmjs.org/vue-loader/-/vue-loader-15.5.1.tgz#e005d5fc2481a55a19910f0dcf434206d68acc2a"
-  integrity sha512-gsTA9xRzu9jGBzkcrAB8my14RkHMzdr5rY/mCFmxgY2tOVsd2Z1MaYCDXHu5nX6PyHAsVK2/hXmarPln/2MiIw==
+vue-loader@^15.6.0:
+  version "15.6.0"
+  resolved "https://registry.npmjs.org/vue-loader/-/vue-loader-15.6.0.tgz#c78916dc4f994b1559056d4a1cb92fa0b00e42bf"
+  integrity sha512-V1Hzv04jVj9bwQuq1ha+109+7xYRRZIAQ+lK5oIGsE1IH5z5wXhzGgcTtZwIfSqBOuij6Z8exfrrHV812v1eFA==
   dependencies:
     "@vue/component-compiler-utils" "^2.4.0"
     hash-sum "^1.0.2"
