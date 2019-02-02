@@ -23,7 +23,7 @@ const objectValues = object => Object.keys(object).map(key => object[key]);
 
 globalObject.renderProcessPreferences = [];
 // extensionId => manifest
-const manifestMap: Lulumi.API.ManifestMap = {};
+globalObject.manifestMap = {};
 // name => manifest
 const manifestNameMap: Lulumi.API.ManifestNameMap = {};
 
@@ -53,8 +53,7 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
 
     if (!manifestNameMap[manifest.name]) {
       const extensionId = generateExtensionIdFromName();
-      manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
-      globalObject.manifestMap = manifestMap;
+      globalObject.manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
 
       let messages = {};
       let lang = '';
@@ -269,7 +268,7 @@ const lulumiExtensionHandler = (request, callback) => {
     return callback();
   }
 
-  const manifest = manifestMap[parsed.hostname];
+  const manifest = globalObject.manifestMap[parsed.hostname];
   if (!manifest) {
     return callback();
   }
@@ -303,7 +302,7 @@ const loadedExtensionsPath: string = path.join(app.getPath('userData'), 'lulumi-
 
 app.on('will-quit', () => {
   try {
-    const loadedExtensions = objectValues(manifestMap).map(manifest => manifest.srcDirectory);
+    const loadedExtensions = objectValues(globalObject.manifestMap).map(manifest => manifest.srcDirectory);
     if (loadedExtensions.length > 0) {
       try {
         fs.mkdirSync(path.dirname(loadedExtensionsPath));
@@ -332,11 +331,11 @@ app.whenReady().then(() => {
   };
 
   ((BrowserWindow as any) as Lulumi.BrowserWindow).removeLulumiExtension = (extensionId: string): string => {
-    const manifest = manifestMap[extensionId];
+    const manifest = globalObject.manifestMap[extensionId];
     if (manifest) {
       removeBackgroundPages(manifest);
       removeRenderProcessPreferences(manifest);
-      delete manifestMap[manifest.extensionId];
+      delete globalObject.manifestMap[manifest.extensionId];
       delete manifestNameMap[manifest.name];
       store.dispatch('removeExtension', {
         extensionId,
@@ -378,7 +377,6 @@ const loadExtensions = () => {
 };
 
 export default {
-  manifestMap,
   manifestNameMap,
   backgroundPages,
   registerLocalCommands,

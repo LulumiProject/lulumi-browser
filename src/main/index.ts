@@ -624,8 +624,8 @@ ipcMain.on('register-local-commands', (event: Electron.Event) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
-      lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
+    Object.keys(globalObject.manifestMap).forEach((manifest) => {
+      lulumiExtension.registerLocalCommands(window, globalObject.manifestMap[manifest]);
     });
   });
   event.returnValue = true;
