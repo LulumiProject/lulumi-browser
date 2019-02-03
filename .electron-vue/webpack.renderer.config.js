@@ -181,12 +181,30 @@ let mainBrowserWindowConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
+      cspPlugin: {
+        enabled: process.env.NODE_ENV === 'production',
+        policy: {
+          'base-uri': "'self'",
+          'default-src': "'none'",
+          'object-src': "'self'",
+          'connect-src': ["'self'"],
+          'script-src': ["'self'"],
+          'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+          'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
+          'img-src': ["'self'", "https:", "http:", "data:"],
+          'worker-src': ["blob:"]
+        },
+        nonceEnabled: {
+          'style-src': false,
+        },
+      },
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.join(__dirname, '../node_modules')
         : false,
       production: process.env.NODE_ENV === 'production',
       e2e: process.env.TEST_ENV === 'e2e'
     }),
+    new CspHtmlWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
       minChunkSize: 10000
@@ -447,10 +465,26 @@ let preferenceViewConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
+      cspPlugin: {
+        enabled: process.env.NODE_ENV === 'production',
+        policy: {
+          'default-src': "'none'",
+          'object-src': "'none'",
+          'connect-src': ["'self'"],
+          'script-src': ["'self'"],
+          'style-src': ["'self'", "'unsafe-inline'"],
+          'font-src': ["'self'", "data:"],
+          'img-src': ["'self'", "https:", "http:", "data:"]
+        },
+        nonceEnabled: {
+          'style-src': false,
+        },
+      },
       nodeModules: false,
       production: process.env.NODE_ENV === 'production',
       e2e: process.env.TEST_ENV === 'e2e'
     }),
+    new CspHtmlWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.MinChunkSizePlugin({
       minChunkSize: 10000
@@ -603,30 +637,6 @@ if (process.env.TEST_ENV === 'e2e') {
     preferenceViewConfig.plugins.push(
       new webpack.LoaderOptionsPlugin({
         minimize: true
-      })
-    )
-
-    mainBrowserWindowConfig.plugins.push(
-      new CspHtmlWebpackPlugin({
-        'default-src': "'none'",
-        'object-src': "'self'",
-        'connect-src': ["'self'"],
-        'script-src': ["'self'"],
-        'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
-        'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
-        'img-src': ["'self'", "https:", "http:", "data:"],
-        'worker-src': ["blob:"]
-      })
-    )
-    preferenceViewConfig.plugins.push(
-      new CspHtmlWebpackPlugin({
-        'default-src': "'none'",
-        'object-src': "'none'",
-        'connect-src': ["'self'"],
-        'script-src': ["'self'"],
-        'style-src': ["'self'", "'unsafe-inline'"],
-        'font-src': ["'self'", "data:"],
-        'img-src': ["'self'", "https:", "http:", "data:"]
       })
     )
   }
