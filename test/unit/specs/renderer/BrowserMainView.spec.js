@@ -163,8 +163,6 @@ describe('BrowserMainView.vue', () => {
       router,
       store,
     }).$mount();
-    vm.onNewTab(undefined, 'https://github.com/LulumiProject/lulumi-browser', true);
-    vm.onTabClose(0);
     await vm.$nextTick();
   });
 
@@ -193,7 +191,7 @@ describe('BrowserMainView.vue', () => {
 
     describe('methods.getWebView()', () => {
       it('has the corresponding webview element', async () => {
-        expect(vm.getWebView().getAttribute('src')).to.equal(constants.tabConfig.dummyTabObject.url);
+        expect(vm.getWebView().getAttribute('src')).to.equal('lulumi://about/#/newtab');
       });
     });
 
@@ -207,7 +205,7 @@ describe('BrowserMainView.vue', () => {
     describe('methods.getTabObject()', () => {
       it('can call navigateTo method from certain tab instance to let the webview navigate to somewhere', () => {
         vm.getTab().navigateTo('https://github.com/LulumiProject/lulumi-browser');
-        expect(vm.getTabObject().url).to.equal('https://github.com/LulumiProject/lulumi-browser');
+        expect(vm.getWebView().getAttribute('src')).to.equal('https://github.com/LulumiProject/lulumi-browser');
       });
     });
 

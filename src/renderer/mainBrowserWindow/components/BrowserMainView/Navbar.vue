@@ -252,8 +252,10 @@ export default class Navbar extends Vue {
   @Watch('url')
   onUrl(newUrl: string): void {
     this.showUrl(newUrl, this.tab.id);
-    (document.querySelector('.my-autocomplete') as HTMLDivElement)
-      .style.display = 'none';
+    if (process.env.NODE_ENV !== 'testing') {
+      (document.querySelector('.my-autocomplete') as HTMLDivElement)
+        .style.display = 'none';
+    }
     (this.$refs.input as any).suggestions.length = 0;
   }
   @Watch('focused')
@@ -815,28 +817,30 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
-    // .el-input-group__prepend event(s)
-    const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
-    prepend.addEventListener('click', this.showCertificate);
+    if (process.env.NODE_ENV !== 'testing') {
+      // .el-input-group__prepend event(s)
+      const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
+      prepend.addEventListener('click', this.showCertificate);
 
-    // .el-input__inner event(s)
-    const originalInput = document.getElementsByClassName('el-input__inner')[0];
-    const newElement = document.createElement('div');
-    newElement.id = 'security-indicator';
-    (newElement as any).classList = 'el-input__inner';
-    newElement.innerHTML = '';
-    newElement.style.display = 'none';
-    (originalInput.parentElement as any).append(newElement);
-
-    this.clickHandler = () => {
+      // .el-input__inner event(s)
+      const originalInput = document.getElementsByClassName('el-input__inner')[0];
+      const newElement = document.createElement('div');
+      newElement.id = 'security-indicator';
+      (newElement as any).classList = 'el-input__inner';
+      newElement.innerHTML = '';
       newElement.style.display = 'none';
-      (originalInput as HTMLInputElement).style.display = 'block';
-      (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
-    };
-    this.blurHandler = () => {
-      newElement.style.display = 'block';
-      (originalInput as HTMLInputElement).style.display = 'none';
-    };
+      (originalInput.parentElement as any).append(newElement);
+
+      this.clickHandler = () => {
+        newElement.style.display = 'none';
+        (originalInput as HTMLInputElement).style.display = 'block';
+        (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
+      };
+      this.blurHandler = () => {
+        newElement.style.display = 'block';
+        (originalInput as HTMLInputElement).style.display = 'none';
+      };
+    }
 
     this.showUrl(this.url, this.tab.id);
 

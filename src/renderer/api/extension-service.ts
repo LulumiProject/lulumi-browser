@@ -13,13 +13,13 @@ export default class ExtensionService {
   constructor(vueInstance) {
     this.instance = vueInstance;
     this.manifestMap = this.instance.$electron.remote.getGlobal('manifestMap');
-    const done = this.instance.$electron.ipcRenderer.sendSync('register-local-commands');
-    if (done) {
+    this.instance.$electron.ipcRenderer.once('registered-local-commands', () => {
       initializeExtensionApi(apiFactory(this.instance)).then(() => {
         this.register();
         this.registerAction();
       });
-    }
+    });
+    this.instance.$electron.ipcRenderer.send('register-local-commands');
   }
 
   register() {
@@ -772,10 +772,13 @@ export default class ExtensionService {
 
   update(): void {
     this.manifestMap = this.instance.$electron.remote.getGlobal('manifestMap');
-    const done = this.instance.$electron.ipcRenderer.sendSync('register-local-commands');
-    if (done) {
-      this.registerAction();
-    }
+    this.instance.$electron.ipcRenderer.once('registered-local-commands', () => {
+      initializeExtensionApi(apiFactory(this.instance)).then(() => {
+        this.register();
+        this.registerAction();
+      });
+    });
+    this.instance.$electron.ipcRenderer.send('register-local-commands');
   }
 
   registerAction() {

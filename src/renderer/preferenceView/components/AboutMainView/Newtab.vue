@@ -11,12 +11,14 @@ declare const ipcRenderer: Electron.IpcRenderer;
 @Component
 export default class Newtab extends Vue {
   beforeMount() {
-    ipcRenderer.once('newtab', (event, newtab: string) => {
-      if (document.location && newtab !== '') {
-        document.location.href = newtab;
-      }
-    });
-    ipcRenderer.sendToHost('newtab');
+    if (process.env.NODE_ENV !== 'testing') {
+      ipcRenderer.once('newtab', (event, newtab: string) => {
+        if (document.location && newtab !== '') {
+          document.location.href = newtab;
+        }
+      });
+      ipcRenderer.sendToHost('newtab');
+    }
   }
 }
 </script>
