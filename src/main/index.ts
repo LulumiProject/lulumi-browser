@@ -175,16 +175,19 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   mainWindow.on('close', () => (mainWindow.removeAllListeners('will-attach-webview')));
 
-  mainWindow.on('closed', () => {
-    if (setLanguage) {
-      setLanguage = false;
-    }
-    (mainWindow as any) = null;
-  });
+  mainWindow.on('closed', () => ((mainWindow as any) = null));
 
   if (process.env.NODE_ENV !== 'testing' || process.env.TEST_ENV !== 'e2e') {
-    // save app-state every 5 mins
-    lulumiStateSaveHandler = setInterval(lulumiStateSave, 1000 * 60 * 5);
+    // the first window
+    if (lulumiStateSaveHandler === null) {
+      // save app-state every 5 mins
+      lulumiStateSaveHandler = setInterval(lulumiStateSave, 1000 * 60 * 5);
+
+      // reset the setLanguage variable
+      if (setLanguage) {
+        setLanguage = false;
+      }
+    }
   }
   if (callback) {
     (mainWindow as any).callback = callback;
