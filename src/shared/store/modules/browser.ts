@@ -122,6 +122,7 @@ const mutations = {
           title: state.tabs[tabsIndex].title,
           url: state.tabs[tabsIndex].url,
           favIconUrl: state.tabs[tabsIndex].favIconUrl,
+          mtime: timeUtil.getMillisecondsTime(),
         });
       }
 
@@ -220,6 +221,7 @@ const mutations = {
           title: state.tabs[index].title,
           url: state.tabs[index].url,
           favIconUrl: state.tabs[index].favIconUrl,
+          mtime: timeUtil.getMillisecondsTime(),
         });
       }
       Vue.delete(state.tabs, index);
@@ -337,35 +339,28 @@ const mutations = {
             state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
           }
           // history
-          if (state.history.length !== 0) {
-            /* tslint:disable-next-line:max-line-length */
-            if (state.tabs[tabsIndex].url.startsWith('file://')
-              && !state.tabs[tabsIndex].url.includes('/error/index.html')) {
-              if (state.history[state.history.length - 1].url
-                !== state.tabs[tabsIndex].url) {
-                const date = timeUtil.getLocaleCurrentTime();
-                state.history.unshift({
-                  title: state.tabs[tabsIndex].title,
-                  url: state.tabs[tabsIndex].url,
-                  favIconUrl: constants.tabConfig.defaultFavicon,
-                  label: date.split(' ')[0],
-                  time: date.split(' ')[1],
-                });
-              }
-            }
-          } else {
-            /* tslint:disable-next-line:max-line-length */
-            if (state.tabs[tabsIndex].url.startsWith('file://')
-              && !state.tabs[tabsIndex].url.includes('/error/index.html')) {
-              const date = timeUtil.getLocaleCurrentTime();
-              state.history.unshift({
+          if (!(state.tabs[tabsIndex].url.startsWith('file://')
+            && state.tabs[tabsIndex].url.includes('/error/index.html'))) {
+            const dates = timeUtil.getLocaleCurrentTime().split(' ');
+            const mtime = timeUtil.getMillisecondsTime();
+            const index = state.history.findIndex(entry => entry.url === state.tabs[tabsIndex].url);
+            let entry: Lulumi.Store.TabHistory | null = null;
+            if (index !== -1) {
+              entry = state.history.splice(index, 1)[0];
+              entry.label = dates[0];
+              entry.time = dates[1];
+              entry.mtime = mtime;
+            } else {
+              entry = {
+                mtime,
                 title: state.tabs[tabsIndex].title,
                 url: state.tabs[tabsIndex].url,
                 favIconUrl: constants.tabConfig.defaultFavicon,
-                label: date.split(' ')[0],
-                time: date.split(' ')[1],
-              });
+                label: dates[0],
+                time: dates[1],
+              };
             }
+            state.history.unshift(entry);
           }
         }
       }

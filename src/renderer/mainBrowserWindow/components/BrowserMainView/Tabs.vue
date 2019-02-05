@@ -217,11 +217,6 @@ export default class Tabs extends Vue {
       &:not(:last-child) {
         flex: 1;
       }
-      &:last-child {
-        width: 45px;
-        opacity: .7;
-        z-index: 0;
-      }
       &.ghost {
         opacity: .5;
       }
@@ -396,6 +391,11 @@ export default class Tabs extends Vue {
       }
 
       &.chrome-tab-add-btn {
+        width: 45px;
+        margin-right: 20px;
+        opacity: .7;
+        z-index: 0;
+
         svg, .chrome-tab-bg {
           visibility: hidden;
           border: 0;

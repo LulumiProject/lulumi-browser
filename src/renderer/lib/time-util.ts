@@ -9,6 +9,13 @@ const timeUtil = {
     return date.toLocaleString();
   },
 
+  /**
+   * Gets the time value in milliseconds.
+   * @returns {Number} The current time milliseconds.
+   */
+  getMillisecondsTime(): number {
+    return new Date().getTime();
+  },
 };
 
 export default timeUtil;

@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import generate from 'nanoid/generate';
 import * as urllib from 'url';
+import * as mimeTypes from 'mime-types';
 
 import config from '../constants';
 import './listeners';
@@ -23,7 +24,7 @@ const objectValues = object => Object.keys(object).map(key => object[key]);
 
 globalObject.renderProcessPreferences = [];
 // extensionId => manifest
-globalObject.manifestMap = {};
+const manifestMap: Lulumi.API.ManifestMap = {};
 // name => manifest
 const manifestNameMap: Lulumi.API.ManifestNameMap = {};
 
@@ -53,7 +54,7 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
 
     if (!manifestNameMap[manifest.name]) {
       const extensionId = generateExtensionIdFromName();
-      globalObject.manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
+      manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
 
       let messages = {};
       let lang = '';
@@ -268,7 +269,7 @@ const lulumiExtensionHandler = (request, callback) => {
     return callback();
   }
 
-  const manifest = globalObject.manifestMap[parsed.hostname];
+  const manifest = manifestMap[parsed.hostname];
   if (!manifest) {
     return callback();
   }
@@ -281,11 +282,14 @@ const lulumiExtensionHandler = (request, callback) => {
     });
   }
 
-  fs.readFile(path.join(manifest.srcDirectory, parsed.pathname), (err, content) => {
+  fs.readFile(path.join(manifest.srcDirectory, parsed.pathname), (err, data) => {
     if (err) {
       return callback(-6); // FILE_NOT_FOUND
     }
-    return callback(content);
+    return callback({
+      data,
+      mimeType: mimeTypes.lookup(path.basename(parsed.pathname!)),
+    });
   });
 };
 
@@ -302,7 +306,7 @@ const loadedExtensionsPath: string = path.join(app.getPath('userData'), 'lulumi-
 
 app.on('will-quit', () => {
   try {
-    const loadedExtensions = objectValues(globalObject.manifestMap).map(manifest => manifest.srcDirectory);
+    const loadedExtensions = objectValues(manifestMap).map(manifest => manifest.srcDirectory);
     if (loadedExtensions.length > 0) {
       try {
         fs.mkdirSync(path.dirname(loadedExtensionsPath));
@@ -331,11 +335,11 @@ app.whenReady().then(() => {
   };
 
   ((BrowserWindow as any) as Lulumi.BrowserWindow).removeLulumiExtension = (extensionId: string): string => {
-    const manifest = globalObject.manifestMap[extensionId];
+    const manifest = manifestMap[extensionId];
     if (manifest) {
       removeBackgroundPages(manifest);
       removeRenderProcessPreferences(manifest);
-      delete globalObject.manifestMap[manifest.extensionId];
+      delete manifestMap[manifest.extensionId];
       delete manifestNameMap[manifest.name];
       store.dispatch('removeExtension', {
         extensionId,
@@ -377,6 +381,7 @@ const loadExtensions = () => {
 };
 
 export default {
+  manifestMap,
   manifestNameMap,
   backgroundPages,
   registerLocalCommands,

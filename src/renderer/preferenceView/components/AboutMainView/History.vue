@@ -126,6 +126,16 @@ export default class History extends Vue {
     }
     return newArr;
   }
+  getHostname(input: string, excludePort: boolean = false): string | null {
+    try {
+      if (excludePort) {
+        return new window.URL(input).hostname;
+      }
+      return new window.URL(input).host;
+    } catch (e) {
+      return null;
+    }
+  }
   customRender(h: CreateElement, node: any): VNode {
     const history: HistoryItem = node.data;
     if (history.children) {
@@ -138,9 +148,11 @@ export default class History extends Vue {
       },
       [
         h('span', { attrs: { class: 'history-list__item-time' } }, history.time),
-        h('img', { attrs: { src: history.favIconUrl, width: '20px' } }),
+        h('img', { attrs: { src: history.favIconUrl, width: '18px' } }),
         h('span', { attrs: { class: 'history-list__item-name' } }, history.title),
-        h('a', { attrs: { href: history.url, class: 'history-list__item-link' } }, history.url),
+        h('a',
+          { attrs: { href: history.url, class: 'history-list__item-link' } },
+          this.getHostname(history.url)),
       ],
     );
   }
@@ -175,7 +187,7 @@ export default class History extends Vue {
 .history-list__item {
   display: inline-flex;
   align-items: center;
-  width: 100vw;
+  width: 90vw;
 
   .history-list__item-time {
     width: 100px;
@@ -183,7 +195,7 @@ export default class History extends Vue {
     padding-right: 30px;
   }
   .history-list__item-name {
-    width: 400px;
+    width: 70%;
     color: #48576a;
     padding: 0 4px;
     transition: color .3s;
@@ -192,9 +204,7 @@ export default class History extends Vue {
     text-overflow: ellipsis;
   }
   a.history-list__item-link {
-    flex: 5;
     background-size: 0;
-    padding-right: 100px;
     text-overflow: ellipsis;
     overflow: hidden;
 

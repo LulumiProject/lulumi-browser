@@ -25,6 +25,7 @@ import request from './lib/request';
 
 const { openProcessManager } = require('electron-process-manager');
 
+const startTime = new Date().getTime();
 const globalObject = global as Lulumi.API.GlobalObject;
 
 /*
@@ -150,6 +151,10 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   // special case: go to the last tab
   localshortcut.register(mainWindow, 'CmdOrCtrl+9', () => {
     mainWindow.webContents.send('tab-click', -1);
+  });
+  // register the shortcut for opening the tab closed recently
+  localshortcut.register(mainWindow, 'CmdOrCtrl+Shift+T', () => {
+    mainWindow.webContents.send('restore-recently-closed-tab');
   });
 
   menu.init();
@@ -316,24 +321,25 @@ app.on('second-instance', () => {
 
 // load windowProperties
 ipcMain.on('get-window-properties', (event: Electron.Event) => {
-  const windows: any[] = [];
+  const windowProperties: any[] = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
-  const windowProperties
+  let windowPropertyFilenames
     = collection.filter(v => (v.match(/lulumi-state-window-\d+/) !== null));
-  if (windowProperties.isNotEmpty()) {
-    const windowPropertyFilenames = windowProperties.sort((a, b) => {
+  if (windowPropertyFilenames.isNotEmpty()) {
+    windowPropertyFilenames = windowPropertyFilenames.sort((a, b) => {
       return ((b.split('-') as any).pop() - (a.split('-') as any).pop());
-    }).all();
-    windowPropertyFilenames.forEach((windowPropertyFilename) => {
+    });
+    windowPropertyFilenames.all().forEach((windowPropertyFilename) => {
       const windowPropertyFile = path.join(baseDir, windowPropertyFilename);
       const windowProperty
         = JSON.parse(readFileSync(windowPropertyFile, 'utf8'));
       windowProperty.path = windowPropertyFile;
-      windows.push(windowProperty);
+      windowProperty.mtime = startTime;
+      windowProperties.push(windowProperty);
     });
   }
-  event.returnValue = windows;
+  event.returnValue = windowProperties;
 });
 // restore windowProperties
 ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: any) => {
@@ -624,6 +630,7 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
 
 // load extension objects for each BrowserWindow instance
 ipcMain.on('register-local-commands', (event: Electron.Event) => {
+  globalObject.manifestMap = lulumiExtension.manifestMap;
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
@@ -631,7 +638,7 @@ ipcMain.on('register-local-commands', (event: Electron.Event) => {
       lulumiExtension.registerLocalCommands(window, globalObject.manifestMap[manifest]);
     });
   });
-  event.sender.send('registered-local-commands');
+  event.sender.send('registered-local-commands', globalObject.manifestMap);
 });
 
 ipcMain.on('fetch-search-suggestions',

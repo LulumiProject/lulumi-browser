@@ -12,8 +12,8 @@ export default class ExtensionService {
   instance: Vue;
   constructor(vueInstance) {
     this.instance = vueInstance;
-    this.manifestMap = this.instance.$electron.remote.getGlobal('manifestMap');
-    this.instance.$electron.ipcRenderer.once('registered-local-commands', () => {
+    this.instance.$electron.ipcRenderer.once('registered-local-commands', (event, manifestMap) => {
+      this.manifestMap = manifestMap;
       initializeExtensionApi(apiFactory(this.instance)).then(() => {
         this.register();
         this.registerAction();
@@ -116,7 +116,6 @@ export default class ExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
-        vue.$nextTick(() => vue.$refs.navbar.$forceUpdate());
       }
     });
     ipc.on('lulumi-page-action-hide', (event, data) => {
@@ -126,7 +125,6 @@ export default class ExtensionService {
           extensionId: data.extensionId,
           enabled: data.enabled,
         });
-        vue.$nextTick(() => vue.$refs.navbar.$forceUpdate());
       }
     });
     ipc.on('lulumi-page-action-add-listener-on-clicked', (event, data) => {
@@ -771,9 +769,9 @@ export default class ExtensionService {
   }
 
   update(): void {
-    this.manifestMap = this.instance.$electron.remote.getGlobal('manifestMap');
-    this.instance.$electron.ipcRenderer.once('registered-local-commands', () => {
+    this.instance.$electron.ipcRenderer.once('registered-local-commands', (event, manifestMap) => {
       initializeExtensionApi(apiFactory(this.instance)).then(() => {
+        this.manifestMap = manifestMap;
         this.register();
         this.registerAction();
       });

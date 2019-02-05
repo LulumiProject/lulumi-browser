@@ -105,6 +105,39 @@ export default class BrowserMainView extends Vue {
   get certificates(): Lulumi.Store.Certificates {
     return this.$store.getters.certificates;
   }
+  get historyMenuItem(): Electron.MenuItemConstructorOptions[] {
+    const recentlyClosed: any[] = [];
+    this.lastOpenedTabs().forEach((lastOpenedTab) => {
+      recentlyClosed.push(
+        {
+          label: lastOpenedTab.title,
+          click: () => this.onNewTab(this.windowId, lastOpenedTab.url, true),
+          mtime: lastOpenedTab.mtime,
+        },
+      );
+    });
+
+    const windowProperties: any = this.$electron.ipcRenderer.sendSync('get-window-properties');
+    windowProperties.forEach((windowProperty) => {
+      recentlyClosed.push(
+        {
+          label: this.$t(
+            'navbar.common.options.history.tabs',{ amount: windowProperty.amount }) as string,
+          click: () => this.$electron.ipcRenderer
+            .send('restore-window-property', windowProperty),
+          mtime: windowProperty.mtime,
+        },
+      );
+    });
+
+    recentlyClosed.sort((a, b) => (b.mtime - a.mtime))
+      .map(m => delete m.mtime);
+    if (recentlyClosed[0] !== undefined) {
+      recentlyClosed[0].accelerator = 'CmdOrCtrl+Shift+T';
+    }
+
+    return recentlyClosed;
+  }
 
   getWebView(tabIndex?: number): Electron.WebviewTag {
     let index: number | undefined = tabIndex;
@@ -152,58 +185,29 @@ export default class BrowserMainView extends Vue {
     return out;
   }
   lastOpenedTabs(): Lulumi.Store.LastOpenedTabObject[] {
-    const tabs: Lulumi.Store.LastOpenedTabObject[] = this.$store.getters.lastOpenedTabs.slice(0, 8);
-    const lastOpenedTabs: Lulumi.Store.LastOpenedTabObject[] = [];
-    tabs.forEach((tab) => {
-      switch (tab.title) {
+    const lastOpenedTabs: Lulumi.Store.LastOpenedTabObject[]
+      = this.$store.getters.lastOpenedTabs.slice(0, 8);
+    // clone every tab so that we won't modify the vuex object directly
+    lastOpenedTabs.map((tab, index) => (lastOpenedTabs[index] = Object.assign({}, tab)));
+    lastOpenedTabs.forEach((lastOpenedTab) => {
+      switch (lastOpenedTab.title) {
         case 'about:about':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.aboutPage.title'),
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.aboutPage.title');
           break;
         case 'about:lulumi':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.lulumiPage.title'),
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.lulumiPage.title');
           break;
         case 'about:preferences':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.preferencesPage.title'),
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.title');
           break;
         case 'about:downloads':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.downloadsPage.title'),
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.downloadsPage.title');
           break;
         case 'about:history':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.historyPage.title'),
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.historyPage.title');
           break;
         case 'about:extensions':
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: this.$t('lulumi.extensionsPage.title'),
-            url: tab.url,
-          });
-          break;
-        default:
-          lastOpenedTabs.push({
-            favIconUrl: tab.favIconUrl,
-            title: tab.title,
-            url: tab.url,
-          });
+          lastOpenedTab.title = this.$t('lulumi.extensionsPage.title');
           break;
       }
     });
@@ -1154,31 +1158,7 @@ export default class BrowserMainView extends Vue {
           }));
           menu.append(new MenuItem({ type: 'separator' }));
         }
-
-        const lastOpenedTabs: Electron.MenuItemConstructorOptions[] = [];
-        this.lastOpenedTabs().forEach((tab) => {
-          lastOpenedTabs.push(
-            {
-              label: tab.title,
-              click: () => this.onNewTab(this.windowId, tab.url, true),
-            },
-          );
-        });
-
-        const windowHistories: Electron.MenuItemConstructorOptions[] = [];
-        const data: any = this.$electron.ipcRenderer.sendSync('get-window-properties');
-        data.forEach((windowProperty) => {
-          windowHistories.push(
-            {
-              label: this.$t(
-                'navbar.common.options.history.tabs',{ amount: windowProperty.amount }) as string,
-              click: () => this.$electron.ipcRenderer
-                .send('restore-window-property', windowProperty),
-            },
-          );
-        });
-
-        menu.append(new MenuItem({
+        menu.append(new this.$electron.remote.MenuItem({
           label: this.$t('navbar.common.options.history.title') as string,
           submenu: ([
             {
@@ -1190,8 +1170,7 @@ export default class BrowserMainView extends Vue {
               label: this.$t('navbar.common.options.history.recentlyClosed') as string,
               enabled: false,
             },
-          ] as Electron.MenuItemConstructorOptions[])
-            .concat(windowHistories.concat(lastOpenedTabs)),
+          ] as Electron.MenuItemConstructorOptions[]).concat(this.historyMenuItem),
         }));
         menu.append(new MenuItem({
           label: this.$t('navbar.common.options.downloads') as string,
@@ -1590,6 +1569,12 @@ export default class BrowserMainView extends Vue {
         this.onNewTab(this.windowId, payload.url, payload.follow);
       } else {
         this.onNewTab(this.windowId, 'about:newtab', false);
+      }
+    });
+    ipc.on('restore-recently-closed-tab', () => {
+      if (this.historyMenuItem.length > 0) {
+        // trigger manually without filling with expected arguments
+        (this.historyMenuItem[0] as any).click();
       }
     });
     ipc.on('tab-close', () => {

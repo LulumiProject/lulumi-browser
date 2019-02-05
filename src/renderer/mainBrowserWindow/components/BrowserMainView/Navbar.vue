@@ -862,14 +862,12 @@ export default class Navbar extends Vue {
     ipc.on('add-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
       if (data.result === 'OK') {
         (this.$parent as BrowserMainView).extensionService.update();
-        this.$forceUpdate();
         ipc.send('lulumi-extension-added', data.name);
       }
     });
     ipc.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
       if (data.result === 'OK') {
         (this.$parent as BrowserMainView).extensionService.update();
-        this.$forceUpdate();
       } else {
         alert(data.result);
       }
