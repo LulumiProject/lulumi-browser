@@ -18,7 +18,8 @@ declare const window: Window;
 @Component({ name: 'lulumi-browser' })
 export default class App extends Vue {
   mounted() {
-    if (process.env.NODE_ENV !== 'testing') {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       if (window.about) {
         this.$store.dispatch('updateAbout', window.about);
       } else {

@@ -125,9 +125,14 @@ let mainConfig = {
 }
 
 /**
- * Adjust mainConfig for development settings
+ * Adjust mainConfig for production settings
  */
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'production') {
+  mainConfig.mode = 'production'
+} else {
+  /**
+   * Adjust mainConfig for development settings
+   */
   mainConfig.mode = 'development'
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
@@ -137,23 +142,15 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Adjust mainConfig for e2e testing settings
+ * Adjust mainConfig for e2e settings
  */
 if (process.env.TEST_ENV === 'e2e') {
-  mainConfig.mode = 'production'
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"',
+      'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
     })
   )
-} else {
-  /**
-   * Adjust mainConfig for production settings
-   */
-  if (process.env.NODE_ENV === 'production') {
-    mainConfig.mode = 'production'
-  }
 }
 
 module.exports = mainConfig

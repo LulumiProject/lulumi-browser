@@ -179,7 +179,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         // store the properties of this window
         handleWindowProperty(window, 'update');
 
-        if (process.env.TEST_ENV !== 'e2e') {
+        if (process.env.NODE_ENV !== 'test') {
           saveWindowState(window.id).then((state) => {
             if (state && state.amount > 1) {
               promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));

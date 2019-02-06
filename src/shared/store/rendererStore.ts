@@ -8,7 +8,8 @@ import modules from './modules';
 
 Vue.use(Vuex);
 
-if (process.env.NODE_ENV !== 'testing') {
+if (!(process.env.NODE_ENV === 'test'
+  && process.env.TEST_ENV === 'unit')) {
   const state = ipcRenderer.sendSync('vuex-connect');
 
   Object.keys(modules).forEach((module) => {
@@ -26,7 +27,8 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
-if (process.env.NODE_ENV !== 'testing') {
+if (!(process.env.NODE_ENV === 'test'
+  && process.env.TEST_ENV === 'unit')) {
   interface CustomStore {
     dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
   }

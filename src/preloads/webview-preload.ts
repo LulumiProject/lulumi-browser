@@ -149,8 +149,11 @@ process.once('loaded', () => {
         window.module = moduleTmp;
       }) as any);
     }
-    if (process.env.TEST_ENV === 'e2e') {
-      globalObject.require = requirePreload.electronRequire;
+    if (process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'e2e') {
+      webFrame.executeJavaScript('window', ((window) => {
+        window.require = requirePreload.electronRequire;
+      }) as any);
     }
   }
   ipcRenderer.on('lulumi-tabs-send-message', (event: Electron.IpcMessageEvent, message) => {

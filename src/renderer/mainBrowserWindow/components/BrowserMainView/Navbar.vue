@@ -252,7 +252,8 @@ export default class Navbar extends Vue {
   @Watch('url')
   onUrl(newUrl: string): void {
     this.showUrl(newUrl, this.tab.id);
-    if (process.env.NODE_ENV !== 'testing') {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       (document.querySelector('.my-autocomplete') as HTMLDivElement)
         .style.display = 'none';
     }
@@ -817,7 +818,8 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
-    if (process.env.NODE_ENV !== 'testing') {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       // .el-input-group__prepend event(s)
       const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
       prepend.addEventListener('click', this.showCertificate);

@@ -16,9 +16,8 @@ module.exports = function(api) {
     case "test":
       testEnv = true;
       break;
-    case "main":
-      break;
-    case "renderer":
+    case "development":
+    case "production":
       envOpts.modules = false;
       break;
   }

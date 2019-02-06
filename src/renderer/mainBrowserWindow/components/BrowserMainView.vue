@@ -285,7 +285,8 @@ export default class BrowserMainView extends Vue {
       webContentsId: webview.getWebContents().id,
       windowId: this.windowId,
     });
-    if ((process.env.NODE_ENV !== 'testing')) {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       this.onUpdatedEvent.emit(
         tabId,
         {
@@ -325,7 +326,8 @@ export default class BrowserMainView extends Vue {
       title: webview.getTitle(),
       windowId: this.windowId,
     });
-    if ((process.env.NODE_ENV !== 'testing')) {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       this.onUpdatedEvent.emit(
         tabId,
         {
@@ -390,7 +392,8 @@ export default class BrowserMainView extends Vue {
       url: event.favicons[0],
       windowId: this.windowId,
     });
-    if ((process.env.NODE_ENV !== 'testing')) {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       this.onUpdatedEvent.emit(
         tabId,
         {
@@ -481,7 +484,8 @@ export default class BrowserMainView extends Vue {
       tabId: tabObject.id,
       windowId: this.windowId,
     });
-    if ((process.env.NODE_ENV !== 'testing')) {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       this.onUpdatedEvent.emit(
         tabObject.id,
         {
@@ -832,7 +836,8 @@ export default class BrowserMainView extends Vue {
           windowId: this.windowId,
           tabsOrder: (this.$refs.tabs as Tabs).sortable.toArray(),
         });
-        if ((process.env.NODE_ENV !== 'testing')) {
+        if (!(process.env.NODE_ENV === 'test'
+        && process.env.TEST_ENV === 'unit')) {
           this.onCreatedEvent.emit(this.getTabObject(this.currentTabIndex));
         }
       },
@@ -1497,7 +1502,8 @@ export default class BrowserMainView extends Vue {
       ipc.send('tabs-closed');
     });
 
-    if (process.env.NODE_ENV !== 'testing') {
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
       const windowProperty = ipc.sendSync('window-id');
       this.windowId = windowProperty.windowId;
       this.windowWebContentsId = windowProperty.windowWebContentsId;

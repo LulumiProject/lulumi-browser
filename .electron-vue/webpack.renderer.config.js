@@ -200,9 +200,7 @@ let mainBrowserWindowConfig = {
       },
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.join(__dirname, '../node_modules')
-        : false,
-      production: process.env.NODE_ENV === 'production',
-      e2e: process.env.TEST_ENV === 'e2e'
+        : false
     }),
     new CspHtmlWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
@@ -480,9 +478,7 @@ let preferenceViewConfig = {
           'style-src': false,
         },
       },
-      nodeModules: false,
-      production: process.env.NODE_ENV === 'production',
-      e2e: process.env.TEST_ENV === 'e2e'
+      nodeModules: false
     }),
     new CspHtmlWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
@@ -548,9 +544,38 @@ let preferenceViewConfig = {
 
 /**
  * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
- * for development settings
+ * for production settings
  */
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'production') {
+  mainBrowserWindowConfig.mode = 'production'
+  preloadsConfig.mode = 'production'
+  preferenceViewConfig.mode = 'production'
+  // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
+  preferenceViewConfig.performance = { hints: false }
+  mainBrowserWindowConfig.devtool = false
+  preloadsConfig.devtool = false
+  preferenceViewConfig.devtool = false
+
+  mainBrowserWindowConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
+  preloadsConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
+  preferenceViewConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
+} else {
+  /**
+   * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+   * for development settings
+   */
   mainBrowserWindowConfig.mode = 'development'
   preloadsConfig.mode = 'development'
   preferenceViewConfig.mode = 'development'
@@ -573,73 +598,28 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
- * for e2e testing settings
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig
+ * and preloadsConfig for e2e settings
  */
 if (process.env.TEST_ENV === 'e2e') {
-  mainBrowserWindowConfig.mode = 'production'
-  preloadsConfig.mode = 'production'
-  preferenceViewConfig.mode = 'production'
-  // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
-  preferenceViewConfig.performance = { hints: false }
   mainBrowserWindowConfig.plugins.push(
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"',
+      'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
     })
   )
   preloadsConfig.plugins.push(
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"',
+      'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
     })
   )
   preferenceViewConfig.plugins.push(
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"',
+      'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
     })
   )
-} else {
-  /**
-   * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
-   * for production settings
-   */
-  if (process.env.NODE_ENV === 'production') {
-    mainBrowserWindowConfig.mode = 'production'
-    preloadsConfig.mode = 'production'
-    preferenceViewConfig.mode = 'production'
-    // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
-    preferenceViewConfig.performance = { hints: false }
-    mainBrowserWindowConfig.devtool = false
-    preloadsConfig.devtool = false
-    preferenceViewConfig.devtool = false
-
-    mainBrowserWindowConfig.plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true
-      })
-    )
-    preloadsConfig.plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true
-      })
-    )
-    preferenceViewConfig.plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true
-      })
-    )
-  }
 }
 
 module.exports = [

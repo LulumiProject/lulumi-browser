@@ -87,7 +87,8 @@ export default class Tab extends Vue {
 
   navigateTo(url) {
     if (this.$refs.webview) {
-      if (process.env.NODE_ENV !== 'testing') {
+      if (!(process.env.NODE_ENV === 'test'
+        && process.env.TEST_ENV === 'unit')) {
         this.$nextTick(() => {
           (this.$refs.webview as Electron.WebviewTag)
             .setAttribute('src', urlUtil.getUrlFromInput(url));

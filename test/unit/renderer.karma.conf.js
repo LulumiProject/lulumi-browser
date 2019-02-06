@@ -13,7 +13,8 @@ let webpackConfig = merge(baseConfigs[0], {
   devtool: '#inline-source-map',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"testing"'
+      'process.env.NODE_ENV': '"test"',
+      'process.env.TEST_ENV': '"unit"'
     })
   ]
 })
