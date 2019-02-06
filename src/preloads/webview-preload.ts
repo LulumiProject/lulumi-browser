@@ -114,7 +114,7 @@ const injectContentScript = (name, extensionId, script, isolatedWorldId) => {
 };
 
 // read the renderer process preferences to see if we need to inject scripts
-const preferences = remote.getGlobal('renderProcessPreferences');
+const preferences = ipcRenderer.sendSync('get-render-process-preferences');
 if (preferences) {
   let nextIsolatedWorldId = 999;
   preferences.forEach((pref) => {
@@ -134,13 +134,11 @@ process.once('loaded', () => {
     if (document.location.href === 'about:newtab') {
       document.location.href = 'lulumi://about/#/newtab';
     } else if (document.location.href.startsWith('lulumi://')) {
-      ipcRenderer.send('lulumi-scheme-loaded', document.location.href);
-
       webFrame.executeJavaScript('window', ((window) => {
-        window.about = remote.getGlobal('guestData');
-        window.backgroundPages = remote.getGlobal('backgroundPages');
-        window.manifestMap = remote.getGlobal('manifestMap');
-        window.renderProcessPreferences = remote.getGlobal('renderProcessPreferences');
+        window.about = ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href);
+        window.backgroundPages = ipcRenderer.sendSync('get-background-pages');
+        window.manifestMap = ipcRenderer.sendSync('get-manifest-map');
+        window.renderProcessPreferences = ipcRenderer.sendSync('get-render-process-preferences');
         window.createFromPath = remote.nativeImage.createFromPath;
         window.join = require('path').join;
 

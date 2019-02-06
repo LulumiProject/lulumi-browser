@@ -781,8 +781,8 @@ export default class ExtensionService {
 
   registerAction() {
     const manifest: Lulumi.API.ManifestObject[] = [];
-    const remote = this.instance.$electron.remote;
-    const backgroundPages = remote.getGlobal('backgroundPages');
+    const backgroundPages
+      = this.instance.$electron.ipcRenderer.sendSync('get-background-pages');
 
     this.newtabOverrides = '';
     Object.keys(this.manifestMap).forEach((extension) => {

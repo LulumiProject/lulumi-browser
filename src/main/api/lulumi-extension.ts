@@ -14,19 +14,19 @@ import './listeners';
 /* tslint:disable:no-console */
 /* tslint:disable:max-line-length */
 
-const globalObject = global as Lulumi.API.GlobalObject;
-
 // ../../shared/store/mainStore.ts
 const { default: mainStore } = require('../../shared/store/mainStore');
 const store: Store<any> = mainStore.getStore();
 
 const objectValues = object => Object.keys(object).map(key => object[key]);
 
-globalObject.renderProcessPreferences = [];
 // extensionId => manifest
 const manifestMap: Lulumi.API.ManifestMap = {};
 // name => manifest
 const manifestNameMap: Lulumi.API.ManifestNameMap = {};
+// manage the background pages
+const backgroundPages: Lulumi.API.BackgroundPages = {};
+let renderProcessPreferences: Lulumi.API.ManifestObject[] = [];
 
 const generateExtensionIdFromName = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
 
@@ -102,9 +102,6 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
     return null;
   };
 
-// manage the background pages
-const backgroundPages: Lulumi.API.BackgroundPages = {};
-
 const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
   if (backgroundPages[manifest.extensionId] || !manifest.background) {
     return;
@@ -131,7 +128,6 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
     webSecurity: false,
   });
   backgroundPages[manifest.extensionId] = { html, name, webContentsId: contents.id };
-  globalObject.backgroundPages = backgroundPages;
   contents.loadURL(urllib.format({
     protocol: 'lulumi-extension',
     slashes: true,
@@ -225,7 +221,7 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
 };
 
 const removeRenderProcessPreferences = (manifest) => {
-  globalObject.renderProcessPreferences = globalObject.renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
+  renderProcessPreferences = renderProcessPreferences.filter(el => el.extensionId !== manifest.extensionId);
 };
 
 const manifestToExtensionInfo = (manifest: Lulumi.API.ManifestObject): chrome.management.ExtensionInfo => ({
@@ -255,7 +251,7 @@ const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
     extensionInfo,
   });
 
-  globalObject.renderProcessPreferences.push(manifest);
+  renderProcessPreferences.push(manifest);
   store.dispatch('updateExtension', {
     enabled: true,
     extensionid: extensionInfo.id,
@@ -384,6 +380,7 @@ export default {
   manifestMap,
   manifestNameMap,
   backgroundPages,
+  renderProcessPreferences,
   registerLocalCommands,
   loadExtensions,
 };

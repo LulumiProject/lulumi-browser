@@ -488,8 +488,8 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       [`${constants.lulumiPagesCustomProtocol}about/#/history`, 'history'],
       [`${constants.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
     ];
-    globalObject.guestData = data;
   }
+  event.returnValue = data;
 });
 
 // about:* pages are eager to getting preference datas
@@ -629,15 +629,34 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
 
 // load extension objects for each BrowserWindow instance
 ipcMain.on('register-local-commands', (event: Electron.Event) => {
-  globalObject.manifestMap = lulumiExtension.manifestMap;
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    Object.keys(globalObject.manifestMap).forEach((manifest) => {
-      lulumiExtension.registerLocalCommands(window, globalObject.manifestMap[manifest]);
+    Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
+      lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
     });
   });
-  event.sender.send('registered-local-commands', globalObject.manifestMap);
+  event.sender.send('registered-local-commands', lulumiExtension.manifestMap);
+});
+
+// get manifestMap
+ipcMain.on('get-manifest-map', (event) => {
+  event.returnValue = lulumiExtension.manifestMap;
+});
+
+// get manifestNameMap
+ipcMain.on('get-manifest-name-map', (event) => {
+  event.returnValue = lulumiExtension.manifestNameMap;
+});
+
+// get backgroundPages
+ipcMain.on('get-background-pages', (event) => {
+  event.returnValue = lulumiExtension.backgroundPages;
+});
+
+// get renderProcessPreferences
+ipcMain.on('get-render-process-preferences', (event) => {
+  event.returnValue = lulumiExtension.renderProcessPreferences;
 });
 
 ipcMain.on('fetch-search-suggestions',

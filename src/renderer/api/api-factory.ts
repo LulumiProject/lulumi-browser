@@ -153,7 +153,8 @@ export default (vueInstance: any) => {
         // it's a popup.html or a background script
         webContents = vueInstance.$electron.remote.webContents.fromId(webContentsId);
       }
-      const backgroundPages: Lulumi.API.BackgroundPages = vueInstance.$electron.remote.getGlobal('backgroundPages');
+      const backgroundPages: Lulumi.API.BackgroundPages
+        = vueInstance.$electron.ipcRenderer.sendSync('get-background-pages');
       const extension = backgroundPages[extensionId];
       if (extension) {
         vueInstance.$electron.remote.webContents.fromId(extension.webContentsId)

@@ -1,6 +1,6 @@
 import collect from 'collect.js';
 import * as fs from 'fs';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import { specs } from 'lulumi';
 import * as path from 'path';
 import * as url from 'url';
@@ -133,7 +133,7 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
   context.lulumi = context.lulumi || {};
   const lulumi = context.lulumi;
 
-  const manifest = remote.getGlobal('manifestMap')[thisExtensionId];
+  const manifest = ipcRenderer.sendSync('get-manifest-map')[thisExtensionId];
 
   lulumi.env = {
     appName: (callback) => {

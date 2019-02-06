@@ -84,7 +84,7 @@ class Port {
       remote.webContents.fromId(this.webContentsId)
         .send('lulumi-runtime-before-connect', this.extensionId, this.connectInfo, this.scriptType);
     } else {
-      const extension = remote.getGlobal('backgroundPages')[this.extensionId];
+      const extension = ipcRenderer.sendSync('get-background-pages')[this.extensionId];
       remote.webContents.fromId(extension.webContentsId).send(
         'lulumi-runtime-before-connect',
         this.extensionId,
