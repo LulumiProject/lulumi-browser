@@ -1498,8 +1498,7 @@ export default class BrowserMainView extends Vue {
       this.$store.dispatch('closeAllTabs', {
         amount,
         windowId: this.windowId,
-      });
-      ipc.send('tabs-closed');
+      }).then(() => ipc.send('tabs-closed'));
     });
 
     if (!(process.env.NODE_ENV === 'test'
