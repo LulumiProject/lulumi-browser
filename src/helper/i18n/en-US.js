@@ -77,7 +77,7 @@ export const guest = {
     },
     preferencesPage: {
       searchEngineProviderPage: {
-        title: 'Search Engine Provider Page',
+        title: 'Preferences / Search Engine Provider Page',
         current: 'Current',
         searchEngine: 'Search Engine',
         name: 'Name',
@@ -85,19 +85,19 @@ export const guest = {
         autoFetch: 'Autocomplete query string (autosuggestion)',
       },
       homePage: {
-        title: 'Homepage',
+        title: 'Preferences / Homepage',
         homepage: 'homepage',
       },
       pdfViewerPage: {
-        title: 'PDFViewer',
+        title: 'Preferences / PDFViewer',
       },
       tabConfigPage: {
-        title: 'Tab',
+        title: 'Preferences / Tab',
         url: 'Opening Url',
         favicon: 'Default Favicon',
       },
       LanguagePage: {
-        title: 'Language',
+        title: 'Preferences / Language',
       },
     },
     historyPage: {
@@ -250,7 +250,21 @@ export default {
       title: 'About Lulumi',
     },
     preferencesPage: {
-      title: 'Preferences',
+      searchEngineProviderPage: {
+        title: 'Preferences / Search Engine Provider Page',
+      },
+      homePage: {
+        title: 'Preferences / Homepage',
+      },
+      pdfViewerPage: {
+        title: 'Preferences / PDFViewer',
+      },
+      tabConfigPage: {
+        title: 'Preferences / Tab',
+      },
+      LanguagePage: {
+        title: 'Preferences / Language',
+      },
     },
     historyPage: {
       title: 'History',

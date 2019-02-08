@@ -214,27 +214,24 @@ const mutations = {
     const windowId: number = payload.windowId;
     const amount: number = payload.amount;
 
-    return new Promise((resolve) => {
-      if (amount === 1) {
-        const index = state.tabs.findIndex(tab => (tab.windowId === windowId));
-        if (state.tabs[index].title !== 'error') {
-          state.lastOpenedTabs.unshift({
-            title: state.tabs[index].title,
-            url: state.tabs[index].url,
-            favIconUrl: state.tabs[index].favIconUrl,
-            mtime: timeUtil.getMillisecondsTime(),
-          });
-        }
-        Vue.delete(state.tabs, index);
-      } else {
-        state.tabs.forEach((tab, index) => {
-          if (tab.windowId === windowId) {
-            Vue.delete(state.tabs, index);
-          }
+    if (amount === 1) {
+      const index = state.tabs.findIndex(tab => (tab.windowId === windowId));
+      if (state.tabs[index].title !== 'error') {
+        state.lastOpenedTabs.unshift({
+          title: state.tabs[index].title,
+          url: state.tabs[index].url,
+          favIconUrl: state.tabs[index].favIconUrl,
+          mtime: timeUtil.getMillisecondsTime(),
         });
       }
-      resolve(true);
-    });
+      Vue.delete(state.tabs, index);
+    } else {
+      state.tabs.forEach((tab, index) => {
+        if (tab.windowId === windowId) {
+          Vue.delete(state.tabs, index);
+        }
+      });
+    }
   },
   [types.CLICK_TAB](state: Lulumi.Store.State, payload) {
     const windowId: number = payload.windowId;

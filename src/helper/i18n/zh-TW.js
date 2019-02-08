@@ -77,7 +77,7 @@ export const guest = {
     },
     preferencesPage: {
       searchEngineProviderPage: {
-        title: '搜尋引擎提供者',
+        title: '設置／搜尋引擎提供者',
         current: '現在',
         searchEngine: '搜尋引擎',
         name: '提供者',
@@ -85,19 +85,19 @@ export const guest = {
         autoFetch: '搜尋建議功能',
       },
       homePage: {
-        title: '首頁',
+        title: '設置／首頁',
         homepage: '首頁',
       },
       pdfViewerPage: {
-        title: 'PDF瀏覽器',
+        title: '設置／PDF瀏覽器',
       },
       tabConfigPage: {
-        title: '分頁',
+        title: '設置／分頁',
         url: '預設開啟',
         favicon: '預設圖示',
       },
       LanguagePage: {
-        title: '語言',
+        title: '設置／語言',
       },
     },
     historyPage: {
@@ -250,7 +250,21 @@ export default {
       title: '關於 Lulumi',
     },
     preferencesPage: {
-      title: '設定',
+      searchEngineProviderPage: {
+        title: '設置／搜尋引擎提供者',
+      },
+      homePage: {
+        title: '設置／首頁',
+      },
+      pdfViewerPage: {
+        title: '設置／PDF瀏覽器',
+      },
+      tabConfigPage: {
+        title: '設置／分頁',
+      },
+      LanguagePage: {
+        title: '設置／語言',
+      },
     },
     historyPage: {
       title: '歷史紀錄',

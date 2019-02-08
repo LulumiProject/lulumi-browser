@@ -155,26 +155,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       if (close) {
         close = false;
       } else {
-        ipcMain.once('tabs-closed', () => {
-          store.dispatch('closeWindow', window.id);
-          delete windows[window.id];
-          window.webContents.removeAllListeners('blur');
-          window.webContents.removeAllListeners('focus');
-          window.webContents.removeAllListeners('maximize');
-          window.webContents.removeAllListeners('unmaximize');
-          window.webContents.removeAllListeners('minimize');
-          window.webContents.removeAllListeners('restore');
-          window.webContents.removeAllListeners('resize');
-          window.webContents.removeAllListeners('move');
-          if (isWindows) {
-            window.webContents.removeAllListeners('app-command');
-          }
-          window.webContents.removeAllListeners('scroll-touch-end');
-          window.webContents.removeAllListeners('scroll-touch-edge');
-          window.webContents.removeAllListeners('window-id');
-          close = true;
-          window.close();
-        });
+        event.preventDefault();
 
         // store the properties of this window
         handleWindowProperty(window, 'update');
@@ -184,13 +165,36 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
             if (state && state.amount > 1) {
               promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));
             }
-            window.webContents.send('close-all-tabs', state.amount);
+            this.$store.dispatch('closeAllTabs', {
+              windowId: window.id,
+              amount: state.amount,
+            });
           });
         } else {
-          window.webContents.send('close-all-tabs', -1);
+          this.$store.dispatch('closeAllTabs', {
+            windowId: window.id,
+            amount: -1,
+          });
         }
 
-        event.preventDefault();
+        store.dispatch('closeWindow', window.id);
+        delete windows[window.id];
+        window.webContents.removeAllListeners('blur');
+        window.webContents.removeAllListeners('focus');
+        window.webContents.removeAllListeners('maximize');
+        window.webContents.removeAllListeners('unmaximize');
+        window.webContents.removeAllListeners('minimize');
+        window.webContents.removeAllListeners('restore');
+        window.webContents.removeAllListeners('resize');
+        window.webContents.removeAllListeners('move');
+        if (isWindows) {
+          window.webContents.removeAllListeners('app-command');
+        }
+        window.webContents.removeAllListeners('scroll-touch-end');
+        window.webContents.removeAllListeners('scroll-touch-edge');
+        window.webContents.removeAllListeners('window-id');
+        close = true;
+        window.close();
       }
     });
 

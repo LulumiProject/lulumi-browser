@@ -2,9 +2,9 @@
 el-row#preferences-menu
   el-col(:span="4")
     el-menu#menu(background-color="#545c64",
-                  text-color="#fff",
-                  active-text-color="#ffd04b",
-                  :router="true")
+                 text-color="#fff",
+                 active-text-color="#ffd04b",
+                 :router="true")
       div(v-for="(data, index) in datas.preferences", :key="index")
         el-menu-item(:index="`${path}/${data[1]}`") {{ data[0] }}
   el-col(:span="18", :offset="1")

@@ -197,8 +197,20 @@ export default class BrowserMainView extends Vue {
         case 'about:lulumi':
           lastOpenedTab.title = this.$t('lulumi.lulumiPage.title');
           break;
-        case 'about:preferences':
-          lastOpenedTab.title = this.$t('lulumi.preferencesPage.title');
+        case 'about:preferences/search':
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.searchEngineProviderPage.title');
+          break;
+        case 'about:preferences/homepage':
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.homePage.title');
+          break;
+        case 'about:preferences/pdfViewer':
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.pdfViewerPage.title');
+          break;
+        case 'about:preferences/tab':
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.tabConfigPage.title');
+          break;
+        case 'about:preferences/language':
+          lastOpenedTab.title = this.$t('lulumi.preferencesPage.LanguagePage.title');
           break;
         case 'about:downloads':
           lastOpenedTab.title = this.$t('lulumi.downloadsPage.title');
@@ -1493,13 +1505,6 @@ export default class BrowserMainView extends Vue {
 
   beforeMount() {
     const ipc = this.$electron.ipcRenderer;
-
-    ipc.once('close-all-tabs', (event: Electron.Event, amount: number) => {
-      this.$store.dispatch('closeAllTabs', {
-        amount,
-        windowId: this.windowId,
-      }).then(() => ipc.send('tabs-closed'));
-    });
 
     if (!(process.env.NODE_ENV === 'test'
       && process.env.TEST_ENV === 'unit')) {

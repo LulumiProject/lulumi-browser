@@ -79,14 +79,27 @@ let windowCount: number = 0;
 const { default: lulumiExtension } = require('./api/lulumi-extension');
 
 function lulumiStateSave(soft: boolean = true): void {
+  windowCount = Object.keys(windows).length;
   if (!soft) {
-    windowCount = Object.keys(windows).length;
+    let count = 0;
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
       const window = windows[id];
+      window.once('closed', () => {
+        count += 1;
+        if (count === windowCount) {
+          if (setLanguage) {
+            mainStore.bumpWindowIds(windowCount);
+            windowCount = 0;
+          }
+        }
+      });
       window.close();
       window.removeAllListeners('close');
     });
+  }
+  if (setLanguage) {
+    return;
   }
   mainStore.saveLulumiState(soft)
     .then((state) => {
@@ -286,12 +299,6 @@ app.on('activate', () => {
 
 app.on('before-quit', (event: Electron.Event) => {
   if (shuttingDown) {
-    if (setLanguage) {
-      event.preventDefault();
-      shuttingDown = false;
-      mainStore.bumpWindowIds(windowCount);
-      windowCount = 0;
-    }
     return;
   }
   event.preventDefault();
