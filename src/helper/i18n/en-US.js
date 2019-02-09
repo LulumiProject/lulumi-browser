@@ -272,5 +272,8 @@ export default {
     extensionsPage: {
       title: 'Extensions',
     },
+    newtabPage: {
+      title: 'Newtab',
+    },
   },
 };

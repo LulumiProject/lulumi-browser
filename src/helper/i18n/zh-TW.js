@@ -272,5 +272,8 @@ export default {
     extensionsPage: {
       title: '擴充功能',
     },
+    newtabPage: {
+      title: '新分頁',
+    },
   },
 };

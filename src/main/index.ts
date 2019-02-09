@@ -241,7 +241,7 @@ app.whenReady().then(() => {
   lulumiExtension.loadExtensions();
 
   // load lulumi-state
-  let data: string = '""';
+  let data: any = '""';
   try {
     data = readFileSync(storagePath, 'utf8');
   } catch (readError) {
@@ -250,32 +250,8 @@ app.whenReady().then(() => {
   try {
     data = JSON.parse(data);
     if (data) {
-      if ((data as any).windows.length > 0) {
-        let tmpWindow: Electron.BrowserWindow;
-        (data as any).windows.forEach((window) => {
-          tmpWindow = createWindow({
-            width: window.width,
-            height: window.height,
-            x: window.left,
-            y: window.top,
-          });
-          if (window.focused) {
-            tmpWindow.focus();
-          }
-          if (window.windowState === 'minimized') {
-            tmpWindow.minimize();
-          } else if (window.windowState === 'maximized') {
-            tmpWindow.maximize();
-          } else if (window.windowState === 'fullscreen') {
-            tmpWindow.setFullScreen(true);
-          }
-        });
-        (data as any).windows = [];
-        store.dispatch('setLulumiState', data);
-      } else {
-        store.dispatch('setLulumiState', data);
-        createWindow();
-      }
+      store.dispatch('setLulumiState', data);
+      createWindow();
     } else {
       createWindow();
     }

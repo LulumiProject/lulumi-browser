@@ -165,13 +165,13 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
             if (state && state.amount > 1) {
               promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));
             }
-            this.$store.dispatch('closeAllTabs', {
+            store.dispatch('closeAllTabs', {
               windowId: window.id,
               amount: state.amount,
             });
           });
         } else {
-          this.$store.dispatch('closeAllTabs', {
+          store.dispatch('closeAllTabs', {
             windowId: window.id,
             amount: -1,
           });

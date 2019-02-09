@@ -221,6 +221,9 @@ export default class BrowserMainView extends Vue {
         case 'about:extensions':
           lastOpenedTab.title = this.$t('lulumi.extensionsPage.title');
           break;
+        case 'about:newtab':
+          lastOpenedTab.title = this.$t('lulumi.newtabPage.title');
+          break;
       }
     });
     return lastOpenedTabs;

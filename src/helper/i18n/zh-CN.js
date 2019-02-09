@@ -272,5 +272,8 @@ export default {
     extensionsPage: {
       title: '扩展程序',
     },
+    newtabPage: {
+      title: '新标签页',
+    },
   },
 };
