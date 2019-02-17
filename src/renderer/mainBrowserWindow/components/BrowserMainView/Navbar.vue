@@ -255,8 +255,8 @@ export default class Navbar extends Vue {
     return suggestionItems;
   }
   get fancyContent(): string {
-    if (!this.value) {
-      return '<div class="security-hint">...</div>';
+    if (!this.value && this.tab.url === 'lulumi://about/#/newtab') {
+      return '<div class="security-hint">about:newtab</div>';
     }
     const currentUrl = url.parse(this.value, true);
     if (currentUrl.href && currentUrl.protocol) {
