@@ -123,7 +123,7 @@ export default class Tab extends Vue {
   @Watch('isActive')
   onIsActive(newState: string): void {
     if (newState && !this.hidden) {
-      this.$nextTick(() => (this.$refs.findinpageInput as HTMLInputElement).focus());
+      (this.$refs.findinpageInput as HTMLInputElement).focus();
     }
   }
 

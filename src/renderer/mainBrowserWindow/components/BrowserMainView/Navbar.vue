@@ -33,6 +33,9 @@
         div.insecure(v-else)
           awesome-icon(name="unlock")
           span {{ $t('navbar.indicator.insecure') }}
+      #security-indicator(slot="append",
+                          class="el-input__inner",
+                          v-html="fancyContent")
       template(slot-scope="props")
         component(:is="'suggestion-item'", :item="props.item")
   .extensions-group(v-sortable="")
@@ -196,6 +199,9 @@ export default class Navbar extends Vue {
   onbrowserActionClickedEvent: Event = new Event();
   onpageActionClickedEvent: Event = new Event();
 
+  fancyOmnibox: HTMLDivElement;
+  realOmnibox: HTMLInputElement;
+
   windowId: number;
 
   get dummyTabObject(): Lulumi.Store.TabObject {
@@ -248,6 +254,30 @@ export default class Navbar extends Vue {
     });
     return suggestionItems;
   }
+  get fancyContent(): string {
+    if (!this.value) {
+      return '<div class="security-hint">...</div>';
+    }
+    const currentUrl = url.parse(this.value, true);
+    if (currentUrl.href && currentUrl.protocol) {
+      if (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:') {
+        const hint = this.secure ? 'secure' : 'insecure';
+        return `
+          <div class="security-hint">
+            <span class="${hint}-origin">${currentUrl.protocol}</span>
+            <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
+          </div>
+        `;
+      }
+      return `
+        <div class="security-hint">
+          <span>${currentUrl.protocol}</span>
+          <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
+        </div>
+      `;
+    }
+    return `<div class="security-hint">${this.value}</div>`;
+  }
 
   @Watch('url')
   onUrl(newUrl: string): void {
@@ -276,46 +306,14 @@ export default class Navbar extends Vue {
     return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
   }
   updateOmnibox(newUrl: string): void {
-    if (!this.focused) {
-      if (newUrl === 'about:newtab') {
-        this.secure = true;
-        this.value = '';
-        const newElement = document.getElementById('security-indicator');
-        if (newElement) {
-          newElement.click();
-        }
-        return;
-      }
-      let tmp = '';
-      const currentUrl = url.parse(newUrl, true);
-      const originalInput = document.querySelector('.el-input__inner') as HTMLInputElement;
-      const newElement = document.getElementById('security-indicator');
-      if (newElement && currentUrl.href && currentUrl.protocol) {
-        if (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:') {
-          const hint = this.secure ? 'secure' : 'insecure';
-          tmp = `
-            <div class="security-hint">
-              <span class="${hint}-origin">${currentUrl.protocol}</span>
-              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
-            </div>
-          `;
-        } else {
-          tmp = `
-            <div class="security-hint">
-              <span>${currentUrl.protocol}</span>
-              <span>${currentUrl.href.substr(currentUrl.protocol.length)}</span>
-            </div>
-          `;
-        }
-        originalInput.style.display = 'none';
-        newElement.innerHTML = tmp;
-        newElement.style.display = 'block';
+    this.realOmnibox.style.display = 'none';
+    this.fancyOmnibox.style.display = 'block';
 
-        newElement.removeEventListener('click', this.clickHandler, false);
-        originalInput.removeEventListener('blur', this.blurHandler, false);
-        newElement.addEventListener('click', this.clickHandler);
-        originalInput.addEventListener('blur', this.blurHandler);
-      }
+    if (newUrl === 'about:newtab') {
+      this.secure = true;
+      this.value = '';
+      this.onNewElementParentClick();
+      return;
     }
   }
   updateSecure(url: string): void {
@@ -419,16 +417,26 @@ export default class Navbar extends Vue {
   }
   onBlur(): void {
     this.focused = false;
+    this.fancyOmnibox.parentElement!.style.display = 'block';
+    this.realOmnibox.style.display = 'none';
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
     const item: Lulumi.Renderer.SuggestionItem = event.item;
     this.focused = false;
     if (item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
-      (this.$parent as BrowserMainView).onEnterUrl(
-        this.currentSearchEngine.search.replace('{queryString}', encodeURIComponent(item.url)));
+      this.value = this.currentSearchEngine.search.replace(
+        '{queryString}', encodeURIComponent(item.url));
     } else {
-      (this.$parent as BrowserMainView).onEnterUrl(item.url);
+      this.value = item.url;
     }
+    this.realOmnibox.setSelectionRange(0, 0);
+    (this.$parent as BrowserMainView).onEnterUrl(this.value);
+    this.realOmnibox.blur();
+  }
+  onNewElementParentClick(): void {
+    this.fancyOmnibox.parentElement!.style.display = 'none';
+    this.realOmnibox.style.display = 'block';
+    (this.$refs.input as any).focus();
   }
   async querySearch(queryString: string, cb: Function): Promise<void> {
     const ipc = this.$electron.ipcRenderer;
@@ -821,27 +829,13 @@ export default class Navbar extends Vue {
     if (!(process.env.NODE_ENV === 'test'
       && process.env.TEST_ENV === 'unit')) {
       // .el-input-group__prepend event(s)
-      const prepend = document.getElementsByClassName('el-input-group__prepend')[0];
+      const prepend = document.querySelector('.el-input-group__prepend') as HTMLDivElement;
       prepend.addEventListener('click', this.showCertificate);
 
       // .el-input__inner event(s)
-      const originalInput = document.getElementsByClassName('el-input__inner')[0];
-      const newElement = document.createElement('div');
-      newElement.id = 'security-indicator';
-      (newElement as any).classList = 'el-input__inner';
-      newElement.innerHTML = '';
-      newElement.style.display = 'none';
-      (originalInput.parentElement as any).append(newElement);
-
-      this.clickHandler = () => {
-        newElement.style.display = 'none';
-        (originalInput as HTMLInputElement).style.display = 'block';
-        (this.$refs.input as any).broadcast('ElInput', 'inputSelect');
-      };
-      this.blurHandler = () => {
-        newElement.style.display = 'block';
-        (originalInput as HTMLInputElement).style.display = 'none';
-      };
+      this.fancyOmnibox = document.querySelector('#security-indicator') as HTMLDivElement;
+      this.realOmnibox = document.querySelector('.el-input__inner') as HTMLInputElement;
+      this.fancyOmnibox.parentElement!.addEventListener('click', this.onNewElementParentClick);
     }
 
     this.showUrl(this.url, this.tab.id);

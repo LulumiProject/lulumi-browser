@@ -320,8 +320,6 @@ export default class BrowserMainView extends Vue {
   }
   onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, tabId: number): void {
     if (event.isMainFrame) {
-      const navbar = (this.$refs.navbar as Navbar);
-      navbar.showUrl(event.url, tabId);
       this.$store.dispatch('loadCommit', {
         tabId,
         tabIndex,
@@ -459,10 +457,12 @@ export default class BrowserMainView extends Vue {
   }
   onIpcMessage(event: Electron.IpcMessageEvent): void {
     if (event.channel === 'newtab') {
+      const navbar = (this.$refs.navbar as Navbar);
       if (this.extensionService.newtabOverrides !== '') {
         (event.target as Electron.WebviewTag).send('newtab', this.extensionService.newtabOverrides);
       } else {
         (event.target as Electron.WebviewTag).send('newtab', '');
+        navbar.showUrl(this.getTabObject().url, this.getTabObject().id);
       }
     }
   }
