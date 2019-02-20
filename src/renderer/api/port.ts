@@ -1,5 +1,5 @@
 import Event from './event';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 
 const ports: Port[] = [];
 
@@ -81,16 +81,16 @@ class Port {
       this.disconnect();
     });
     if (this.responseScriptType) {
-      remote.webContents.fromId(this.webContentsId)
+      require('electron').remote.webContents.fromId(this.webContentsId)
         .send('lulumi-runtime-before-connect', this.extensionId, this.connectInfo, this.scriptType);
     } else {
       const extension = ipcRenderer.sendSync('get-background-pages')[this.extensionId];
-      remote.webContents.fromId(extension.webContentsId).send(
+      require('electron').remote.webContents.fromId(extension.webContentsId).send(
         'lulumi-runtime-before-connect',
         this.extensionId,
         this.connectInfo,
         this.scriptType,
-        remote.getCurrentWebContents().id,
+        require('electron').remote.getCurrentWebContents().id,
       );
       this.updateResponse(extension.webContentsId);
     }
@@ -112,7 +112,7 @@ class Port {
   }
 
   postMessage(message) {
-    remote.webContents.fromId(this.webContentsId).send(
+    require('electron').remote.webContents.fromId(this.webContentsId).send(
       `lulumi-runtime-port-${this.extensionId}-${this.name}`,
       message,
     );
@@ -125,7 +125,7 @@ class Port {
     if (!this.otherEnd) {
       ipcRenderer.removeAllListeners(
         `lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
-      remote.webContents.fromId(this.webContentsId)
+      require('electron').remote.webContents.fromId(this.webContentsId)
         .send(`lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
     }
     // https://developer.chrome.com/extensions/runtime#property-Port-onDisconnect
