@@ -233,9 +233,9 @@ const tabsMapping = (tabs: Lulumi.Store.TabObject[], tabsOrder: number[]): numbe
 function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: number = -1): Lulumi.Store.TabsOrdering {
   let newTabId: number = newStart;
   let newTabs: Lulumi.Store.TabObject[] = [];
-  const newCurrentTabIndexes: number[] = [];
+  const newCurrentTabIndexes: number[] = [0];
   let windowId: number = bumpWindowIdsBy === 0
-    ? (1 + bumpWindowIdsBy)
+    ? 1
     : (parseInt(Object.keys(windows)[0], 10) + bumpWindowIdsBy);
   if (oneWindow !== -1) {
     const tmpTabs: Lulumi.Store.TabObject[] = [];
