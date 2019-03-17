@@ -3,7 +3,9 @@ import * as path from 'path';
 const lulumiRootPath = process.env.NODE_ENV === 'development'
   ? path.resolve(__dirname, '../../')
   : path.resolve(__dirname, '../');
-const lulumiHelperPath = path.resolve(lulumiRootPath, 'src', 'helper');
+const lulumiHelperPath = process.env.NODE_ENV === 'development'
+? path.resolve(lulumiRootPath, 'src', 'helper')
+: path.resolve(lulumiRootPath, 'dist');
 
 export default {
   lulumiRootPath,
@@ -12,7 +14,6 @@ export default {
   testUserData: `${path.resolve(lulumiRootPath, 'test', 'userData')}`,
   lulumiPagesCustomProtocol: 'lulumi://',
   lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
-  lulumiPagesPath: `${path.resolve(lulumiHelperPath, 'pages')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: 'ef09d61709ce152cc64705389893401f0ed6d661',
+  lulumiRev: '1e40b5004b46a2da3c720ab8ee0ce069d906b27f',
 };

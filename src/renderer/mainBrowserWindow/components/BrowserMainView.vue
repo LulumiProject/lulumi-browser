@@ -434,10 +434,10 @@ export default class BrowserMainView extends Vue {
       windowId: this.windowId,
     });
     const appPath = process.env.NODE_ENV === 'development'
-      ? path.join(process.cwd(), 'src/helper/pages')
+      ? path.join(process.cwd(), 'src/helper')
       : path.join(this.$electron.remote.app.getAppPath(), 'dist');
     let errorCode = event.errorCode;
-    let errorPage = `file://${appPath}/error/index.html`;
+    let errorPage = `file://${appPath}/pages/error/index.html`;
 
     if (errorCode === -501) {
       const hostname = urlUtil.getHostname(event.validatedURL);

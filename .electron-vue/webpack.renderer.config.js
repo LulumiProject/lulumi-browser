@@ -259,7 +259,7 @@ let mainBrowserWindowConfig = {
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([{
-      from: 'src/helper/pages/',
+      from: 'src/helper/',
       to: path.join(__dirname, '../dist'),
       toType: 'dir'
     }])
