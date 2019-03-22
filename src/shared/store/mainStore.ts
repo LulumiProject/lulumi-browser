@@ -134,7 +134,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       window.webContents.send('scroll-touch-edge');
     });
 
-    window.on('enter-full-screen', (event) => {
+    window.on('enter-full-screen', () => {
       window.webContents.send('enter-full-screen', isDarwin);
     });
     window.on('leave-full-screen', () => {
