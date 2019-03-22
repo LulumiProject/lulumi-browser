@@ -4,8 +4,8 @@ const lulumiRootPath = process.env.NODE_ENV === 'development'
   ? path.resolve(__dirname, '../../')
   : path.resolve(__dirname, '../');
 const lulumiHelperPath = process.env.NODE_ENV === 'development'
-? path.resolve(lulumiRootPath, 'src', 'helper')
-: path.resolve(lulumiRootPath, 'dist');
+  ? path.resolve(lulumiRootPath, 'src', 'helper')
+  : path.resolve(lulumiRootPath, 'dist');
 
 export default {
   lulumiRootPath,
@@ -15,5 +15,5 @@ export default {
   lulumiPagesCustomProtocol: 'lulumi://',
   lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: '1e40b5004b46a2da3c720ab8ee0ce069d906b27f',
+  lulumiRev: '6f78fb7be724214b3e4284edf2986a38e6500e70',
 };

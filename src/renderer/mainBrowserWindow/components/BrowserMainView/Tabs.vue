@@ -1,7 +1,15 @@
 <template lang="pug">
 #chrome-tabs-shell(@dblclick.self="onDoubleClick")
   .chrome-tabs(v-sortable="")
-    div(v-for="(tab, index) in tabs", @click="$parent.onTabClick(index)", @contextmenu.prevent="$parent.onTabContextMenu($event, index)", :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'", :id="`${index}`", :ref="`tab-${index}`", :data-id="index", :key="`tab-${tab.id}`")
+    div(v-for="(tab, index) in tabs",
+        @click="$parent.onTabClick(index)",
+        @click.middle="$parent.onTabClose(index)",
+        @contextmenu.prevent="$parent.onTabContextMenu($event, index)",
+        :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'",
+        :id="`${index}`",
+        :ref="`tab-${index}`",
+        :data-id="index",
+        :key="`tab-${tab.id}`")
       svg.left-edge(width="15", height="30")
         path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
         path.edge-border(d="m0.5,31l14,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
