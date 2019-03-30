@@ -908,7 +908,7 @@
     array-from "^2.1.1"
     lodash "^4.17.11"
 
-"@sinonjs/samsam@^3.3.0":
+"@sinonjs/samsam@^3.3.1":
   version "3.3.1"
   resolved "https://registry.npmjs.org/@sinonjs/samsam/-/samsam-3.3.1.tgz#e88c53fbd9d91ad9f0f2b0140c16c7c107fe0d07"
   integrity sha512-wRSfmyd81swH0hA1bxJZJ57xr22kC07a1N4zuIL47yTS04bDk6AoCkczcqHEjcRPmJ+FruGJ9WBQiJwMtIElFw==
@@ -1620,10 +1620,10 @@ author-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/author-regex/-/author-regex-1.0.0.tgz#d08885be6b9bbf9439fe087c76287245f0a81450"
 
-ava@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/ava/-/ava-1.4.0.tgz#acd5149bdf7eadfcc9fb82fb33d2e658d1303ae0"
-  integrity sha512-0k0YzgIhRWPibh4guIe1XdmJw985EQ86haALTosN8fRWEUDjWe3h2f7brTYfS7OsvKrHalO2p5AhaMwIFGY5/A==
+ava@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.npmjs.org/ava/-/ava-1.4.1.tgz#4a59289e0c9728e492ec3a5be21d1072636be172"
+  integrity sha512-wKpgOPTL7hJSBWpfbU4SA8rlsTZrph9g9g7qYDV7M6uK1rKeW8oCUJWRwCd8B24S4N0Y5myf6cTEnA66WIk0sA==
   dependencies:
     "@ava/babel-preset-stage-4" "^2.0.0"
     "@ava/babel-preset-transform-test-files" "^5.0.0"
@@ -2661,10 +2661,10 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.6.4:
-  version "4.6.4"
-  resolved "https://registry.npmjs.org/collect.js/-/collect.js-4.6.4.tgz#1b0f6037488892ec8e08f2dad277d9d59f28680d"
-  integrity sha512-/uLJFL4jPDwZAfNVdMYl8y3P64hDfa+W8T7Sm2TQ2K8jB9q8WKg0PKeSS/qx00NDGEqD+hmSQN3RfEZ0LsMiXg==
+collect.js@^4.6.5:
+  version "4.6.5"
+  resolved "https://registry.npmjs.org/collect.js/-/collect.js-4.6.5.tgz#d1c82d6f7baa2d7a55dab0fe0a653c70a62cd075"
+  integrity sha512-oDEkmno9/VPUp5J5/AlrgGsMkSfAYY0ihPnfSy7wQjX7jp99snhr3RsV7dtrP6ayi0/b6XPN/BJ8sPsfify4Mg==
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -3868,10 +3868,10 @@ electron-util@^0.11.0:
     electron-is-dev "^1.0.1"
     new-github-issue-url "^0.2.0"
 
-electron@^3.1.7:
-  version "3.1.7"
-  resolved "https://registry.npmjs.org/electron/-/electron-3.1.7.tgz#2041031db272e88f167b2e5fe2de9eecabcf4632"
-  integrity sha512-rvmucnAsB4hQVdD0fOd1ad7+5u/BX1ak6emcSyPsLUk6rTqvVfOMk5ryC19h7Yd/5X8NWvCGkgYzSyQbgAJngA==
+electron@^3.1.8:
+  version "3.1.8"
+  resolved "https://registry.npmjs.org/electron/-/electron-3.1.8.tgz#01b0b147dfcca47967ff07dbf72bf5e96125a2ac"
+  integrity sha512-1MiFoMzxGaR0wDfwFE5Ydnuk6ry/4lKgF0c+NFyEItxM/WyEHNZPNjJAeKJ+M/0sevmZ+6W4syNZnQL5M3GgsQ==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^4.1.0"
@@ -3883,10 +3883,10 @@ element-resize-detector@^1.2.0:
   dependencies:
     batch-processor "1.0.0"
 
-element-ui@^2.6.3:
-  version "2.6.3"
-  resolved "https://registry.npmjs.org/element-ui/-/element-ui-2.6.3.tgz#e5c87ca3cdc988586320c826872720a8cdc7db44"
-  integrity sha512-vV2HfFkCH8KhxunSBFLnA+/jJY3UxMMbhBjiHoO3pZOX/8OQ8QbeatAnjBFDu6dRRGb0DGERUtY2WBeVYegs/A==
+element-ui@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.npmjs.org/element-ui/-/element-ui-2.7.0.tgz#6bfcdfa5c75bfc4cda835186f2a1f98b93cd5d14"
+  integrity sha512-FalWzOmT/K4w4C/8tw2kGvzzQnRJ5MqEvSL5rEKNa081PFGIcUS9exyVpYrNPKF8ua/W6qaqrXPC6DQ8sNcmOQ==
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -4217,10 +4217,10 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^5.15.3:
-  version "5.15.3"
-  resolved "https://registry.npmjs.org/eslint/-/eslint-5.15.3.tgz#c79c3909dc8a7fa3714fb340c11e30fd2526b8b5"
-  integrity sha512-vMGi0PjCHSokZxE0NLp2VneGw5sio7SSiDNgIUn2tC0XkWJRNOIoHIg3CliLVfXnJsiHxGAYrkw0PieAu8+KYQ==
+eslint@^5.16.0:
+  version "5.16.0"
+  resolved "https://registry.npmjs.org/eslint/-/eslint-5.16.0.tgz#a1e3ac1aae4a3fbd8296fcf8f7ab7314cbb6abea"
+  integrity sha512-S3Rz11i7c8AA5JPv7xAH+dOyq/Cu/VXHiHXBPOU1k/JAM5dXqQPt3qcrhpHSorXmrpu2g0gkIBVXAqCpzfoZIg==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     ajv "^6.9.1"
@@ -4242,7 +4242,7 @@ eslint@^5.15.3:
     import-fresh "^3.0.0"
     imurmurhash "^0.1.4"
     inquirer "^6.2.2"
-    js-yaml "^3.12.0"
+    js-yaml "^3.13.0"
     json-stable-stringify-without-jsonify "^1.0.1"
     levn "^0.3.0"
     lodash "^4.17.11"
@@ -4733,10 +4733,10 @@ fork-ts-checker-notifier-webpack-plugin@^1.0.0:
   dependencies:
     node-notifier "^5.1.2"
 
-fork-ts-checker-webpack-plugin@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-1.0.0.tgz#0f9ff0219f9b6f1a1b10fa25d7cc5015e60c997a"
-  integrity sha512-Kc7LI0OlnWB0FRbDQO+nnDCfZr+LhFSJIP8kZppDXvuXI/opeMg3IrlMedBX/EGgOUK0ma5Hafgkdp3DuxgYdg==
+fork-ts-checker-webpack-plugin@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-1.0.1.tgz#140453c4dc3dc35937034b7416b66a3bacfbc3a8"
+  integrity sha512-RrVxSiNtngsFDLQpP2QlrVaJK1zqRdwhtwslmDUWQTg3t3GW8QN7D3EpW/EAI+oqTqL0dGvLyluyYQ/eIrIHvQ==
   dependencies:
     babel-code-frame "^6.22.0"
     chalk "^2.4.1"
@@ -6021,6 +6021,14 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
 js-yaml@3.12.0, js-yaml@3.x, js-yaml@^3.10.0, js-yaml@^3.12.0, js-yaml@^3.7.0, js-yaml@^3.9.0:
   version "3.12.0"
   resolved "https://registry.npmjs.org/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
+js-yaml@^3.13.0:
+  version "3.13.0"
+  resolved "https://registry.npmjs.org/js-yaml/-/js-yaml-3.13.0.tgz#38ee7178ac0eea2c97ff6d96fff4b18c7d8cf98e"
+  integrity sha512-pZZoSxcCYco+DIKBTimr67J6Hy+EYGZDY/HCWC+iAEA9h1ByhMXAIVUXMcMFpOCxQ/xjXmPI2MkDL5HRm5eFrQ==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -9272,14 +9280,14 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
-sinon@^7.3.0:
-  version "7.3.0"
-  resolved "https://registry.npmjs.org/sinon/-/sinon-7.3.0.tgz#fd409432bf2ef8ee6a302cf47ca1b0c95fd4de38"
-  integrity sha512-0pYvgRv46fODzT/PByqb79MVNpyxsxf38WEiXTABOF8RfIMcIARfZ+1ORuxwAmHkreZ/jST3UDBdKCRhUy/e1A==
+sinon@^7.3.1:
+  version "7.3.1"
+  resolved "https://registry.npmjs.org/sinon/-/sinon-7.3.1.tgz#e8276522104e6c08d1cb52a907270b0e316655c4"
+  integrity sha512-eQKMaeWovtOtYe2xThEvaHmmxf870Di+bim10c3ZPrL5bZhLGtu8cz+rOBTFz0CwBV4Q/7dYwZiqZbGVLZ+vjQ==
   dependencies:
     "@sinonjs/commons" "^1.4.0"
     "@sinonjs/formatio" "^3.2.1"
-    "@sinonjs/samsam" "^3.3.0"
+    "@sinonjs/samsam" "^3.3.1"
     diff "^3.5.0"
     lolex "^3.1.0"
     nise "^1.4.10"
@@ -10226,10 +10234,10 @@ typescript-formatter@^7.2.2:
     commandpost "^1.0.0"
     editorconfig "^0.15.0"
 
-typescript@^3.3.4000:
-  version "3.3.4000"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-3.3.4000.tgz#76b0f89cfdbf97827e1112d64f283f1151d6adf0"
-  integrity sha512-jjOcCZvpkl2+z7JFn0yBOoLQyLoIkNZAs/fYJkUG6VKy6zLPHJGfQJYFHzibB6GJaF/8QrcECtlQ5cpvRHSMEA==
+typescript@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.4.1.tgz#b6691be11a881ffa9a05765a205cb7383f3b63c6"
+  integrity sha512-3NSMb2VzDQm8oBTLH6Nj55VVtUEpe/rgkIzMir0qVoLyjDZlnMBva0U6vDiV3IH+sl/Yu6oP5QwsAQtHPmDd2Q==
 
 uglify-js@2.6.x:
   version "2.6.4"
@@ -10560,10 +10568,10 @@ vue-html-loader@^1.2.4:
     loader-utils "^1.0.2"
     object-assign "^4.1.0"
 
-vue-i18n@^8.9.0:
-  version "8.9.0"
-  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.9.0.tgz#5f084001fe5b4c7ad8c00ee5f11396a88ff2e55b"
-  integrity sha512-8wr/D9yU8CLC8ne9stdQn/N58E7GRSUSO75bCucj2AIFTDyjGfoze5RxFvh2w3e7yxgnz5x+ooOIcoX59PHguQ==
+vue-i18n@^8.10.0:
+  version "8.10.0"
+  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.10.0.tgz#e95f215b5548bedf5610c14506acb3438717b6bd"
+  integrity sha512-n2A9Q5dbwk3q4r6cOdT5jJaMb/mV4JtkNmgSiUNtoDp+N00bQHzpALM2XRyNzu7WZSHyi10/wBrNKl0unNKpVg==
 
 vue-loader@^15.7.0:
   version "15.7.0"
