@@ -73,13 +73,11 @@ const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
-let windowCount: number = 0;
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
 
-function lulumiStateSave(soft: boolean = true): void {
-  windowCount = Object.keys(windows).length;
+function lulumiStateSave(soft: boolean = true, windowCount = Object.keys(windows).length): void {
   if (!soft) {
     let count = 0;
     Object.keys(windows).forEach((key) => {
@@ -90,7 +88,6 @@ function lulumiStateSave(soft: boolean = true): void {
         if (count === windowCount) {
           if (setLanguage) {
             mainStore.bumpWindowIds(windowCount);
-            windowCount = 0;
           }
         }
       });
