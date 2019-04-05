@@ -12,9 +12,8 @@
         :data-id="index",
         :key="`tab-${tab.id}`")
         .tab-favicon
-          .loader(v-if="tab.isLoading")
-            svg(viewBox="25 25 50 50", class="circular")
-              circle(cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10" class="path")
+          svg(v-if="tab.isLoading", viewBox="25 25 50 50", class="circular")
+            circle(cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10" class="path")
           img(v-else, :src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16')
           awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
           awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
@@ -214,13 +213,6 @@ export default class Tabs extends Vue {
             margin-right: 4px;
             user-select: none;
 
-            .loader {
-              width: 16px;
-              height: 16px;
-              position: relative;
-              margin: 0 auto;
-            }
-
             .volume {
               align-self: center;
               width: 14px;
@@ -232,16 +224,16 @@ export default class Tabs extends Vue {
               &.circular {
                 -webkit-animation: rotate 2s linear infinite;
                 animation: rotate 2s linear infinite;
-                height: 100%;
                 -webkit-transform-origin: center center;
                 transform-origin: center center;
-                width: 100%;
-                position: absolute;
                 top: 0;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                margin: auto;
+                width: 16px;
+                height: 16px;
+                position: relative;
+                margin: 0 auto;
               }
 
               circle.path {
