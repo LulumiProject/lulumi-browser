@@ -247,7 +247,7 @@ describe('BrowserMainView.vue', () => {
         title: name,
       });
       await vm.$nextTick();
-      expect(vm.$el.querySelector('.chrome-tab-current .chrome-tab-title').innerHTML).to.equal(name);
+      expect(vm.$el.querySelector('.active .tab-content').innerHTML).to.equal(name);
     });
 
     it('shows the volume icon when there exists at least one media in the page, and it\'s playing', async () => {
@@ -275,7 +275,7 @@ describe('BrowserMainView.vue', () => {
     it('adds one more tab', async () => {
       vm.onNewTab(undefined, 'https://github.com/LulumiProject/lulumi-browser', true);
       await vm.$nextTick();
-      expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(2);
+      expect(vm.$el.querySelectorAll('.tab').length).to.equal(2);
     });
 
     it('clicks last created tab', async () => {
@@ -285,14 +285,14 @@ describe('BrowserMainView.vue', () => {
         tabIndex: 1,
       });
       await vm.$nextTick();
-      expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('1');
+      expect(vm.$el.querySelector('.active').id).to.equal('1');
     });
 
     it('removes last created tab and moves to adjacent tab', async () => {
       vm.onTabClose(1);
       await vm.$nextTick();
-      expect(vm.$el.querySelectorAll('.chrome-tab-draggable').length).to.equal(1);
-      expect(vm.$el.querySelector('.chrome-tab-current').id).to.equal('0');
+      expect(vm.$el.querySelectorAll('.tab').length).to.equal(1);
+      expect(vm.$el.querySelector('.active').id).to.equal('0');
     });
   });
 

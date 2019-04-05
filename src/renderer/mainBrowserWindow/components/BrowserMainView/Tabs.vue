@@ -1,39 +1,30 @@
 <template lang="pug">
-#chrome-tabs-shell(@dblclick.self="onDoubleClick")
-  .chrome-tabs(v-sortable="")
-    div(v-for="(tab, index) in tabs",
+.tabs-container(@dblclick="onDoubleClick")
+  .tabs
+    ul(v-sortable="")
+      li.tab(v-for="(tab, index) in tabs",
         @click="$parent.onTabClick(index)",
         @click.middle="$parent.onTabClose(index)",
         @contextmenu.prevent="$parent.onTabContextMenu($event, index)",
-        :class="index == currentTabIndex ? 'chrome-tab chrome-tab-draggable chrome-tab-current' : 'chrome-tab chrome-tab-draggable'",
+        :class="index == currentTabIndex ? 'active' : ''",
         :id="`${index}`",
         :ref="`tab-${index}`",
         :data-id="index",
         :key="`tab-${tab.id}`")
-      svg.left-edge(width="15", height="30")
-        path.edge-bg(d="m15,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-        path.edge-border(d="m0.5,31l14,-32l3,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
-      .chrome-tab-bg
-        .chrome-tab-favicon
-          iview-icon.spin(v-if="tab.isLoading", type="ios-loading", size="16")
-          img(:src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16', v-else)
-          awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", v-if="tab.hasMedia && tab.isAudioMuted", class="volume volume-off")
-          awesome-icon(@click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", v-else-if="tab.hasMedia && !tab.isAudioMuted", class="volume volume-up")
+        .tab-favicon
+          .loader(v-if="tab.isLoading")
+            svg(viewBox="25 25 50 50", class="circular")
+              circle(cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10" class="path")
+          img(v-else, :src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16')
+          awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
+          awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
         el-tooltip(:content="tab.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
-          span(class="chrome-tab-title")
+          span(class="tab-content")
             | {{ tab.title || $t('tabs.loading') }}
-      a.close(@click.stop="$parent.onTabClose(index)", class="chrome-tab-close")
-      svg.right-edge(width="15", height="30")
-        path.edge-bg(d="m15,32l0,-32l-2,3l-15,34l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-        path.edge-border(d="m0.5,30l14,-30l4,0", stroke-linejoin="round", stroke-dasharray="null", stroke-width="null", fill="none")
-    div(class="chrome-tab chrome-tab-add-btn", @click="$parent.onNewTab(windowId, 'about:newtab', false)")
-      svg.left-edge(width="15", height="30")
-        path.edge-bg(d="m14,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
-      .chrome-tab-bg(style="width: 10px;padding: 1px 0 0 7px;")
-      .chrome-tab-favicon
-        i.el-icon-plus
-      svg(width="15", height="30", class="right-edge")
-        path.edge-bg(d="m14,32l0,-32l-2,3l-15,32l10,0z", stroke-linecap="null", stroke-linejoin="null", stroke-dasharray="null", stroke-width="0")
+        .tab-close(@click.stop="$parent.onTabClose(index)")
+          svg(viewBox="0 0 24 24")
+            path(d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z")
+      li.tabs-add(@click="$parent.onNewTab(windowId, 'about:newtab', false)")
   .custom-buttons(v-if="enableCustomButtons")
     svg(@click="onCustomButtonClick")
       use(:xlink:href="loadButton('minimize-window')")
@@ -56,19 +47,17 @@ import { fixPathForAsarUnpack, is } from 'electron-util';
 import Sortable from 'sortablejs';
 
 import { Button, Tooltip } from 'element-ui';
-import IViewIcon from 'iview/src/components/icon';
 
 declare const __static: string;
 
 @Component({
   directives: {
     sortable: {
-      update(el, binding, vnode) {
+      bind(el, binding, vnode) {
         (vnode.context as Tabs).sortable =
           Sortable.create(el, {
-            draggable: '.chrome-tab-draggable',
             animation: 150,
-            ghostClass: 'ghost',
+            swapThreshold: 0.5,
             onUpdate() {
               if (vnode.context !== undefined) {
                 vnode.context.$store.dispatch('setTabsOrder', {
@@ -76,6 +65,12 @@ declare const __static: string;
                   tabsOrder: this.toArray(),
                 });
               }
+            },
+            onMove(event) {
+              if (event.related.classList.contains('tabs-add')) {
+                return false;
+              }
+              return true;
             },
           });
       },
@@ -91,7 +86,6 @@ declare const __static: string;
     'awesome-icon': AwesomeIcon,
     'el-button': Button,
     'el-tooltip': Tooltip,
-    'iview-icon': IViewIcon,
   },
 })
 export default class Tabs extends Vue {
@@ -155,53 +149,26 @@ export default class Tabs extends Vue {
       }
     }
   }
-  onMouseMove(event: MouseEvent) {
-    const x = event.pageX - (event.target as HTMLDivElement).offsetLeft;
-    const y = event.pageY - (event.target as HTMLDivElement).offsetTop;
-    const xy = `${x} ${y}`;
-
-    const bgWebKit
-      = `-webkit-gradient(
-        radial,
-        ${xy},
-        0,
-        ${xy},
-        100,
-        from(rgba(255,255,255,0.8)),
-        to(rgba(255,255,255,0.0))),
-        linear-gradient(to bottom, #ddd 90%, #f5f5f5)`;
-
-    const target = (event.target as HTMLDivElement).parentNode!.parentNode as HTMLDivElement;
-    if (!target.classList.contains('chrome-tab-current')) {
-      (target.querySelector('.left-edge') as HTMLElement).style.background = bgWebKit;
-      (target.querySelector('.chrome-tab-bg') as HTMLElement).style.background = bgWebKit;
-      (target.querySelector('.right-edge') as HTMLElement).style.background = bgWebKit;
-    }
-  }
-  onMouseLeave(event: MouseEvent) {
-    const target = (event.target as Element).parentNode!.parentNode as HTMLDivElement;
-    if (!target.classList.contains('chrome-tab-current')) {
-      (target.querySelector('.left-edge') as HTMLElement).style.background = '';
-      (target.querySelector('.chrome-tab-bg') as HTMLElement).style.background = '';
-      (target.querySelector('.right-edge') as HTMLElement).style.background = '';
-    }
-  }
 }
 </script>
 
 <style lang="less" scoped>
-#chrome-tabs-shell {
+.tabs-container {
   display: flex;
-  height: 31px;
-  padding-left: 10px;
-  border-bottom: 1px solid #999;
+  height: 36px;
+  align-items: center;
+  background: #dbdbdb;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
   user-select: none;
   -webkit-user-select: none;
   -webkit-app-region: drag;
 
-  .chrome-tabs {
-    flex: 1;
+  .tabs {
+    flex-grow: 1;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     * {
       user-select: none;
@@ -211,228 +178,201 @@ export default class Tabs extends Vue {
       line-height: 16px;
     }
 
-    .chrome-tab {
-      border: 0 !important;
-      position: relative;
-      margin: 0 -5px;
-      height: 30px;
-      z-index: 1;
-      transition: .1s transform;
-      border-bottom: 1px solid #999;
-      text-align: start;
-      -webkit-app-region: no-drag;
+    ul {
+      margin: 0;
+      flex-grow: 1;
+      display: flex;
+      padding: 8px 20px 0 12px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      height: 36px;
 
-      &:not(:last-child) {
-        flex: 1;
-      }
-      &.ghost {
-        opacity: .5;
-      }
+      li {
+        list-style: none;
+        text-align: -webkit-left;
+        justify-content: space-between;
+        -webkit-app-region: no-drag;
 
-      // tab decoration
-      svg {
-        position: absolute;
-
-        .edge-bg {
-          fill: #ddd;
-          transition: .2s fill;
-        }
-        .edge-border {
-          stroke: #808080;
-          stroke-width: 1px;
-        }
-
-        &.right-edge {
-          transform: scaleX(-1);
-          right: 0;
-        }
-      }
-
-      .chrome-tab-bg {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        top: 0;
-        left: 14px;
-        right: 14px;
-        height: 29px;
-        padding-right: 20px;
-        background: #ddd;
-        border-top: 1px solid #808080;
-        transition: .2s background;
-      }
-
-      .chrome-tab-favicon {
-        position: relative;
-        display: flex;
-        align-items: center;
-        left: 5px;
-
-        img {
-          width: 16px;
-          height: 16px;
-          padding-right: 1px;
-        }
-
-        .spin {
-          color: #2d8cf0;
-          animation: ani-spin 1s linear infinite;
-        }
-
-        @keyframes ani-spin {
-          from { transform: rotate(0deg); }
-          50%  { transform: rotate(180deg); }
-          to   { transform: rotate(360deg); }
-        }
-
-        svg.volume {
+        &.tab {
+          flex-basis: 220px;
+          display: flex;
+          min-width: 0; /* http://stackoverflow.com/questions/34934586/white-space-nowrap-and-flexbox-did-not-work-in-chrome */
           position: relative;
-          flex: 1;
-          width: 16px;
-          height: 16px;
-          padding: 0 2px;
-        }
-      }
+          background-color: #dbdbdb;
+          z-index: 5;
+          height: 31px;
+          border-top: 1px solid #bbb;
+          margin: 0 5px;
+          font-size: 0;
 
-      .spinner {
-        position: relative;
-        left: 1px;
-        top: 1px;
-      }
+          .tab-favicon {
+            z-index: 100;
+            align-self: center;
+            width: auto;
+            height: 16px;
+            margin-left: 4px;
+            margin-right: 4px;
+            user-select: none;
 
-      &.chrome-tab-pinned {
-        .chrome-tab-favicon {
-          left: 20px;
-        }
-      }
+            .loader {
+              width: 16px;
+              height: 16px;
+              position: relative;
+              margin: 0 auto;
+            }
 
-      .chrome-tab-title {
-        color: #222222;
-        padding: 15px 0 0 10px;
-        height: 28px;
-        overflow: hidden;
-        white-space: nowrap;
-      }
+            .volume {
+              align-self: center;
+              width: 14px;
+              height: 14px;
+              margin: 0 3px;
+            }
 
-      span.focusing {
-        outline: 0;
-      }
+            svg {
+              &.circular {
+                -webkit-animation: rotate 2s linear infinite;
+                animation: rotate 2s linear infinite;
+                height: 100%;
+                -webkit-transform-origin: center center;
+                transform-origin: center center;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+              }
 
-      &.chrome-tab-nofavicon .chrome-tab-title {
-        padding-left: 15px;
-      }
+              circle.path {
+                stroke-dasharray: 1,200;
+                stroke-dashoffset: 0;
+                -webkit-animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
+                animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
+                stroke-linecap: round;
+              }
+            }
+          }
+          .tab-content {
+            z-index: 100;
+            position: absolute;
+            left: 40px;
+            right: 16px;
+            font-size: 12.6px;
+            line-height: 32px;
+            cursor: default;
+            max-width: 160px;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip;
 
-      .chrome-tab-close {
-        display: none;
-        position: absolute;
-        right: 18px;
-        top: 8px;
-        width: 15px;
-        height: 15px;
-        border-radius: 8px;
+            &:focus {
+              outline: none;
+            }
+          }
+          .tab-close {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 100;
+            align-self: center;
+            margin-left: 2px;
+            margin-right: 2px;
+            border-radius: 50%;
 
-        &:before {
-          content: "\00D7";
-          position: absolute;
-          top: 1px;
-          right: 3px;
-          font-size: 12px;
-          line-height: 12px;
-          color: #777777;
-        }
-        &:hover:before,
-        &:active:before {
-          color: #f1f1f1;
-        }
-        &:hover,
-        &:active {
-          background: #f17469;
-        }
-      }
+            svg {
+              width: 12px;
+              height: 12px;
 
-      &:hover {
-        .chrome-tab-bg {
-          background: #f0f0f0;
-        }
+              path {
+                fill: #555;
+              }
+            }
 
-        svg .edge-bg {
-          fill: #f0f0f0;
-        }
+            &:hover {
+              fill: #fff;
+              background: #e25c4d;
 
-        .chrome-tab-close {
-          display: block;
-        }
-      }
+              svg path {
+                fill: #fff;
+              }
+            }
+          }
 
-      &.chrome-tab-dragging {
-        transition: none !important;
-      }
+          &.active {
+            z-index: 10;
+            background: #f2f2f2;
+            height: 31px;
+            border-bottom: 1px solid #f2f2f2;
 
-      &.chrome-tab-current {
-        border: 0;
-        z-index: 2;
+            &::before,
+            &::after {
+              z-index: 10;
+              align-self: flex-start;
+              height: 31px;
+              background: #f2f2f2;
+              border-bottom: 1px solid #f2f2f2;
+            }
+          }
 
-        .chrome-tab-favicon {
-          left: 10px;
-        }
+          &:hover {
+            transition: background-color 0.5s;
+            background: #eee;
 
-        svg {
-          height: 32px;
+            &::before,
+            &::after {
+              transition: background-color 0.5s;
+              background: #eee;
+            }
+          }
 
-          .edge-bg {
-            fill: #f1f1f1;
+          &::before {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            left: 0;
+            width: 16px;
+            height: 31px;
+            background-color: #dbdbdb;
+            border-left: 1px solid #bbb;
+            border-bottom: 1px solid #bbb;
+            transform: skewx(-25deg);
+            transform-origin: left top;
+          }
+          &::after {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            right: 0;
+            width: 16px;
+            height: 31px;
+            background-color: #dbdbdb;
+            border-right: 1px solid #bbb;
+            border-bottom: 1px solid #bbb;
+            transform: skewx(25deg);
+            transform-origin: right top;
           }
         }
 
-        .chrome-tab-bg {
-          padding-top: 2px;
-          background: #f1f1f1;
+        &.tabs-add {
+          flex-shrink: 0;
+          background: #d9d9d9;
+          width: 26px;
+          height: 15px;
+          border-radius: 2px;
+          margin-left: 8px;
+          border: 1px solid #bbb;
+          align-self: center;
+          transform: skewx(25deg);
 
-          .chrome-tab-title {
-            padding: 13px 0 0 15px;
+          &:hover {
+            background: #e4e4e4;
           }
-        }
-
-        .chrome-tab-close {
-          top: 10px;
-        }
-      }
-
-      &.chrome-tab-add-btn {
-        width: 45px;
-        margin-right: 20px;
-        opacity: .7;
-        z-index: 0;
-
-        svg, .chrome-tab-bg {
-          visibility: hidden;
-          border: 0;
-        }
-
-        .chrome-tab-favicon {
-          top: 16px;
-          width: 35px;
-          height: 0px;
-          justify-content: center;
-        }
-        .icon {
-          font-size: 17px;
-          line-height: 15px;
-          color: #666;
-        }
-
-        &:hover {
-          svg, .chrome-tab-bg {
-            visibility: visible;
-          }
-          svg .edge-bg {
-            fill: #ccc;
-          }
-          .chrome-tab-bg {
+          &:active {
             background: #ccc;
-          }
-          .icon {
-            color: #444;
           }
         }
       }
@@ -465,6 +405,36 @@ export default class Tabs extends Vue {
     &:active {
       opacity: 0.8;
     }
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes color {
+  0%, 100% {
+    stroke: #d62d20;
+  }
+  40% {
+    stroke: #0057e7;
+  }
+  66% {
+    stroke: #008744;
+  }
+  80%, 90% {
+    stroke: #ffa700;
   }
 }
 </style>

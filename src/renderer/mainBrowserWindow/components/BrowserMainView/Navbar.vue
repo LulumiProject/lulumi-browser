@@ -291,23 +291,29 @@ export default class Navbar extends Vue {
   }
   @Watch('focused')
   onFocused(isFocus: boolean): void {
-    setTimeout(
-      () => {
-        if (!isFocus) {
-          (document.querySelector('.my-autocomplete') as HTMLDivElement)
-            .style.display = 'none';
-          (this.$refs.input as any).suggestions.length = 0;
-        }
-      },
-      200);
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
+      setTimeout(
+        () => {
+          if (!isFocus) {
+            (document.querySelector('.my-autocomplete') as HTMLDivElement)
+              .style.display = 'none';
+            (this.$refs.input as any).suggestions.length = 0;
+          }
+        },
+        200);
+    }
   }
 
   chunk(r: any[], j: number): any[][] {
     return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
   }
   updateOmnibox(newUrl: string): void {
-    this.realOmnibox.style.display = 'none';
-    this.fancyOmnibox.style.display = 'block';
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
+      this.realOmnibox.style.display = 'none';
+      this.fancyOmnibox.style.display = 'block';
+    }
 
     if (newUrl === 'about:newtab') {
       this.secure = true;
@@ -417,8 +423,11 @@ export default class Navbar extends Vue {
   }
   onBlur(): void {
     this.focused = false;
-    this.fancyOmnibox.parentElement!.style.display = 'block';
-    this.realOmnibox.style.display = 'none';
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
+      this.fancyOmnibox.parentElement!.style.display = 'block';
+      this.realOmnibox.style.display = 'none';
+    }
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
     const item: Lulumi.Renderer.SuggestionItem = event.item;
@@ -434,8 +443,11 @@ export default class Navbar extends Vue {
     this.realOmnibox.blur();
   }
   onNewElementParentClick(): void {
-    this.fancyOmnibox.parentElement!.style.display = 'none';
-    this.realOmnibox.style.display = 'block';
+    if (!(process.env.NODE_ENV === 'test'
+      && process.env.TEST_ENV === 'unit')) {
+      this.fancyOmnibox.parentElement!.style.display = 'none';
+      this.realOmnibox.style.display = 'block';
+    }
     (this.$refs.input as any).focus();
   }
   async querySearch(queryString: string, cb: Function): Promise<void> {
@@ -881,11 +893,12 @@ export default class Navbar extends Vue {
 <style lang="less" scoped>
 #browser-navbar {
   display: flex;
-  height: 35px;
+  height: 36px;
   padding: 0 5px;
   font-size: 15px;
   font-weight: 100;
   background: #f5f5f5;
+  border-top: 1px solid #bbb;
   border-bottom: 1px solid #aaa;
 
   a {

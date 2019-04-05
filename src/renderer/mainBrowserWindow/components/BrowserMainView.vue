@@ -1601,7 +1601,7 @@ export default class BrowserMainView extends Vue {
       }
     });
     ipc.on('tab-click', (event: Electron.Event, tabIndexThatWeSee: number) => {
-      const els = document.querySelectorAll('.chrome-tab-draggable') as NodeListOf<HTMLDivElement>;
+      const els = document.querySelectorAll('.tab') as NodeListOf<HTMLDivElement>;
       const el = (tabIndexThatWeSee === -1)
         ? els[els.length - 1]
         : els[tabIndexThatWeSee];
@@ -1613,8 +1613,8 @@ export default class BrowserMainView extends Vue {
       'tab-select',
       (event: Electron.Event, direction: 'next' | 'previous') => {
         const els: HTMLDivElement[] = [].slice.call(
-          document.querySelectorAll('.chrome-tab-draggable'));
-        const el = document.querySelector('.chrome-tab-current');
+          document.querySelectorAll('.tab'));
+        const el = document.querySelector('.active');
         if (el) {
           const elIndex: number = els.findIndex(ele => ele.id === el.id);
           if (elIndex !== -1) {

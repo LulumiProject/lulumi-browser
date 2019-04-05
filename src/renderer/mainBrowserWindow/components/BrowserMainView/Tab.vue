@@ -282,7 +282,7 @@ export default class Tab extends Vue {
 <style lang="less" scoped>
 #notification {
   width: 100vw;
-  height: 35px;
+  height: 36px;
   background: rgba(255, 193, 7, 0.28);
   display: flex;
   align-items: center;

@@ -34,18 +34,8 @@ body {
   &.darwin {
     &:not(.fullscreen) {
       // make room for the traffic lights
-      .chrome-tabs {
+      .tabs {
         padding-left: 70px;
-      }
-    }
-
-    #chrome-tabs-shell {
-      height: 38px;
-      padding-right: 26px;
-      -webkit-app-region: drag;
-
-      .chrome-tab {
-        top: 7px;
       }
     }
   }
