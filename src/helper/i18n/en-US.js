@@ -96,8 +96,19 @@ export const guest = {
         url: 'Opening Url',
         favicon: 'Default Favicon',
       },
-      LanguagePage: {
+      languagePage: {
         title: 'Preferences / Language',
+      },
+      proxyPage: {
+        title: 'Preferences / Proxy',
+        pacScript: 'PAC',
+        proxyRules: 'Rules',
+        proxyBypassRules: 'Bypass Rules',
+      },
+      authPage: {
+        title: 'Preferences / Auth',
+        username: 'Username',
+        password: 'Password',
       },
     },
     historyPage: {
@@ -262,8 +273,14 @@ export default {
       tabConfigPage: {
         title: 'Preferences / Tab',
       },
-      LanguagePage: {
+      languagePage: {
         title: 'Preferences / Language',
+      },
+      proxyPage: {
+        title: 'Preferences / Proxy',
+      },
+      authPage: {
+        title: 'Preferences / Auth',
       },
     },
     historyPage: {

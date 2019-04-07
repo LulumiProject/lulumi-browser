@@ -19,6 +19,8 @@ const state: Lulumi.Store.State = {
   pdfViewer: constants.pdfViewer,
   tabConfig: constants.tabConfig,
   lang: 'en',
+  proxyConfig: constants.proxyConfig,
+  auth: { username: '', password: '' },
   downloads: [],
   history: [],
   permissions: {},
@@ -528,6 +530,15 @@ const mutations = {
   [types.SET_LANG](state: Lulumi.Store.State, { val }) {
     state.lang = val.lang;
   },
+  [types.SET_PROXY_CONFIG](state: Lulumi.Store.State, { val }) {
+    Vue.set(state.proxyConfig, 'pacScript', val.pacScript);
+    Vue.set(state.proxyConfig, 'proxyRules', val.proxyRules);
+    Vue.set(state.proxyConfig, 'proxyBypassRules', val.proxyBypassRules);
+  },
+  [types.SET_AUTH](state: Lulumi.Store.State, { val }) {
+    Vue.set(state.auth, 'username', val.username);
+    Vue.set(state.auth, 'password', val.password);
+  },
   [types.SET_DOWNLOADS](state: Lulumi.Store.State, { val }) {
     state.downloads = val;
   },
@@ -629,6 +640,7 @@ const mutations = {
     state.pdfViewer = newState.pdfViewer;
     state.tabConfig = newState.tabConfig;
     state.lang = newState.lang;
+    state.proxyConfig = newState.proxyConfig;
     state.downloads = newState.downloads;
     state.history = newState.history;
     state.lastOpenedTabs = newState.lastOpenedTabs;

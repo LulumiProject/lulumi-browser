@@ -10,6 +10,8 @@ import Homepage from '../components/AboutMainView/Preferences/Homepage.vue';
 import PDFViewer from '../components/AboutMainView/Preferences/PDFViewer.vue';
 import TabConfig from '../components/AboutMainView/Preferences/TabConfig.vue';
 import Language from '../components/AboutMainView/Preferences/Language.vue';
+import Proxy from '../components/AboutMainView/Preferences/Proxy.vue';
+import Auth from '../components/AboutMainView/Preferences/Auth.vue';
 import Downloads from '../components/AboutMainView/Downloads.vue';
 import History from '../components/AboutMainView/History.vue';
 import Extensions from '../components/AboutMainView/Extensions.vue';
@@ -57,6 +59,16 @@ export default new Router({
           path: 'language',
           name: 'language',
           component: Language,
+        },
+        {
+          path: 'proxy',
+          name: 'proxy',
+          component: Proxy,
+        },
+        {
+          path: 'auth',
+          name: 'auth',
+          component: Auth,
         },
         {
           path: '',

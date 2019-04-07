@@ -346,6 +346,7 @@ function collect(newStart: number, newTabs: Lulumi.Store.TabObject[], newCurrent
     pdfViewer: store.getters.pdfViewer,
     tabConfig: store.getters.tabConfig,
     lang: store.getters.lang,
+    proxyConfig: store.getters.proxyConfig,
     downloads: downloads.filter(download => download.state !== 'progressing'),
     history: store.getters.history,
     lastOpenedTabs: store.getters.lastOpenedTabs.slice(0, 8),

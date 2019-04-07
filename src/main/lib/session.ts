@@ -408,10 +408,16 @@ const setPermissionRequestHandler = (windows): void => {
   });
 };
 
+const registerProxy = (proxyConfig): void => {
+  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  sess.setProxy(proxyConfig, () => {});
+};
+
 export default {
   registerWebRequestListeners,
   registerScheme,
   registerCertificateVerifyProc,
   onWillDownload,
   setPermissionRequestHandler,
+  registerProxy,
 };

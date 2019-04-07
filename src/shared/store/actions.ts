@@ -170,6 +170,12 @@ export const actions = {
   setLang({ commit }, val) {
     commit(types.SET_LANG, { val });
   },
+  setProxyConfig({ commit }, val) {
+    commit(types.SET_PROXY_CONFIG, { val });
+  },
+  setAuth({ commit }, val) {
+    commit(types.SET_AUTH, { val });
+  },
   setDownloads({ commit }, val) {
     commit(types.SET_DOWNLOADS, { val });
   },

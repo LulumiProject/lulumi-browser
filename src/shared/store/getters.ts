@@ -36,6 +36,12 @@ export const getters = {
   lang(state: BrowserState) {
     return state.browser.lang;
   },
+  proxyConfig(state: BrowserState) {
+    return state.browser.proxyConfig;
+  },
+  auth(state: BrowserState) {
+    return state.browser.auth;
+  },
   downloads(state: BrowserState) {
     return state.browser.downloads;
   },

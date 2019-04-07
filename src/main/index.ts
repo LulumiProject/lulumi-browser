@@ -227,6 +227,7 @@ app.whenReady().then(() => {
     autoUpdater.init();
     autoUpdater.listen(windows);
   }
+
   // session related operations
   session.onWillDownload(windows, constants.lulumiPDFJSPath);
   session.setPermissionRequestHandler(windows);
@@ -248,6 +249,7 @@ app.whenReady().then(() => {
     data = JSON.parse(data);
     if (data) {
       store.dispatch('setLulumiState', data);
+      session.registerProxy(store.getters.proxyConfig);
       createWindow();
     } else {
       createWindow();
@@ -255,6 +257,22 @@ app.whenReady().then(() => {
   } catch (parseError) {
     console.error(`(lulumi-browser) Could not parse data from ${storagePath}, ${parseError}`);
     createWindow();
+  }
+});
+
+app.on('login', (event, webContents, request, authInfo, callback) => {
+  const auth = store.getters.auth;
+  if (auth.username && auth.password) {
+    callback(auth.username, auth.password);
+  } else {
+    dialog.showMessageBox(null!, {
+      type: 'warning',
+      buttons: ['OK'],
+      title: 'Require authentication',
+      // tslint:disable-next-line:max-line-length
+      message: 'The server requires a username and password. You can set them in "Preferences / Auth".',
+      detail: `Server: ${request.url}\nRealm: ${authInfo.realm}`,
+    });
   }
 });
 
@@ -459,6 +477,8 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       ['PDFViewer', 'pdfViewer'],
       ['Tab', 'tab'],
       ['Language', 'language'],
+      ['Proxy', 'proxy'],
+      ['Auth', 'auth'],
     ];
     data.about = [
       [`${constants.lulumiPagesCustomProtocol}about/#/about`, 'about'],
@@ -493,6 +513,12 @@ ipcMain.on('guest-want-data', (event: Electron.Event, type: string) => {
         break;
       case 'lang':
         window.webContents.send('get-lang', webContentsId);
+        break;
+      case 'proxyConfig':
+        window.webContents.send('get-proxy-config', webContentsId);
+        break;
+      case 'auth':
+        window.webContents.send('get-auth', webContentsId);
         break;
       case 'downloads':
         window.webContents.send('get-downloads', webContentsId);
@@ -561,6 +587,23 @@ ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
           app.quit();
         });
     }
+  });
+});
+ipcMain.on('set-proxy-config', (event: Electron.Event, val) => {
+  session.registerProxy(val);
+  store.dispatch('setProxyConfig', val);
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('get-proxy-config', event.sender.id);
+  });
+});
+ipcMain.on('set-auth', (event: Electron.Event, val) => {
+  store.dispatch('setAuth', val);
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    const window = windows[id];
+    window.webContents.send('get-auth', event.sender.id);
   });
 });
 ipcMain.on('set-downloads', (event: Electron.Event, val) => {

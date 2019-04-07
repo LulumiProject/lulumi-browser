@@ -816,6 +816,20 @@ export default class BrowserMainView extends Vue {
       });
     }
   }
+  onGetProxyConfig(event: Electron.Event, webContentsId: number): void {
+    const webContents: Electron.webContents | null
+      = this.$electron.remote.webContents.fromId(webContentsId);
+    if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+      webContents.send('guest-here-your-data', this.$store.getters.proxyConfig);
+    }
+  }
+  onGetAuth(event: Electron.Event, webContentsId: number): void {
+    const webContents: Electron.webContents | null
+      = this.$electron.remote.webContents.fromId(webContentsId);
+    if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
+      webContents.send('guest-here-your-data', this.$store.getters.auth);
+    }
+  }
   onGetDownloads(event: Electron.Event, webContentsId: number): void {
     const webContents: Electron.webContents | null
       = this.$electron.remote.webContents.fromId(webContentsId);
@@ -1682,6 +1696,12 @@ export default class BrowserMainView extends Vue {
     });
     ipc.on('get-lang', (event: Electron.Event, webContentsId: number) => {
       this.onGetLang(event, webContentsId);
+    });
+    ipc.on('get-proxy-config', (event: Electron.Event, webContentsId: number) => {
+      this.onGetProxyConfig(event, webContentsId);
+    });
+    ipc.on('get-auth', (event: Electron.Event, webContentsId: number) => {
+      this.onGetAuth(event, webContentsId);
     });
     ipc.on('get-downloads', (event: Electron.Event, webContentsId: number) => {
       this.onGetDownloads(event, webContentsId);

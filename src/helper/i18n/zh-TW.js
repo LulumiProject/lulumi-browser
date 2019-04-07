@@ -77,7 +77,7 @@ export const guest = {
     },
     preferencesPage: {
       searchEngineProviderPage: {
-        title: '設置／搜尋引擎提供者',
+        title: '設定／搜尋引擎提供者',
         current: '現在',
         searchEngine: '搜尋引擎',
         name: '提供者',
@@ -85,19 +85,30 @@ export const guest = {
         autoFetch: '搜尋建議功能',
       },
       homePage: {
-        title: '設置／首頁',
+        title: '設定／首頁',
         homepage: '首頁',
       },
       pdfViewerPage: {
-        title: '設置／PDF瀏覽器',
+        title: '設定／PDF瀏覽器',
       },
       tabConfigPage: {
-        title: '設置／分頁',
+        title: '設定／分頁',
         url: '預設開啟',
         favicon: '預設圖示',
       },
-      LanguagePage: {
-        title: '設置／語言',
+      languagePage: {
+        title: '設定／語言',
+      },
+      proxyPage: {
+        title: '設定／代理',
+        pacScript: 'PAC',
+        proxyRules: '規則',
+        proxyBypassRules: '規則白名單',
+      },
+      authPage: {
+        title: '設定／驗證',
+        username: '帳號',
+        password: '密碼',
       },
     },
     historyPage: {
@@ -251,19 +262,25 @@ export default {
     },
     preferencesPage: {
       searchEngineProviderPage: {
-        title: '設置／搜尋引擎提供者',
+        title: '設定／搜尋引擎提供者',
       },
       homePage: {
-        title: '設置／首頁',
+        title: '設定／首頁',
       },
       pdfViewerPage: {
-        title: '設置／PDF瀏覽器',
+        title: '設定／PDF瀏覽器',
       },
       tabConfigPage: {
-        title: '設置／分頁',
+        title: '設定／分頁',
       },
-      LanguagePage: {
-        title: '設置／語言',
+      languagePage: {
+        title: '設定／語言',
+      },
+      proxyPage: {
+        title: '設定／代理',
+      },
+      authPage: {
+        title: '設定／驗證',
       },
     },
     historyPage: {

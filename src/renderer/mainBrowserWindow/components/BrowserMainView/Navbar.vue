@@ -308,6 +308,9 @@ export default class Navbar extends Vue {
   chunk(r: any[], j: number): any[][] {
     return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
   }
+  escapePattern(pattern: string): string {
+    return pattern.replace(/[\\^$+?.()|[\]{}]/g, '\\$&');
+  }
   updateOmnibox(newUrl: string): void {
     if (!(process.env.NODE_ENV === 'test'
       && process.env.TEST_ENV === 'unit')) {
@@ -331,19 +334,18 @@ export default class Navbar extends Vue {
     if (scheme === 'https://' || scheme === 'wss://') {
       const hostname = urlUtil.getHostname(url);
       if (hostname) {
-        const key
-          = Object.keys(this.certificates).filter(key => key.includes(hostname))
-          .find((el) => {
-            const rule
-              = new RegExp(`^(www\\.)?${el.replace(/\./g, '\\.').replace(/\*/g, '.*')}$`);
-            return rule.test(hostname);
-          });
-        const certificateObject = (key === undefined)
-          ? undefined
-          : this.certificates[key];
-        if (certificateObject) {
-          this.secure = (certificateObject.verificationResult === 'net::OK');
-          return;
+        const certificateObjectKey = Object.keys(this.certificates).find((regex) => {
+          return hostname.match(`^${regex.split('*')
+            .map(this.escapePattern).join('.*')}$`) !== null;
+        });
+        if (certificateObjectKey !== undefined) {
+          const certificateObject = this.certificates[certificateObjectKey];
+          if (certificateObject) {
+            if (certificateObject) {
+              this.secure = (certificateObject.verificationResult === 'net::OK');
+              return;
+            }
+          }
         }
       }
     }
@@ -351,14 +353,19 @@ export default class Navbar extends Vue {
   }
   showCertificate(): void {
     const ipc = this.$electron.ipcRenderer;
-    const hostname = urlUtil.getHostname(this.url);
+    const hostname = urlUtil.getHostname(this.value);
     if (hostname) {
-      const certificateObject = this.certificates[hostname];
-      if (certificateObject) {
-        ipc.send(
-          'show-certificate',
-          certificateObject.certificate,
-          `${hostname}\n${certificateObject.verificationResult}`);
+      const certificateObjectKey = Object.keys(this.certificates).find((regex) => {
+        return hostname.match(`^${regex.split('*').map(this.escapePattern).join('.*')}$`) !== null;
+      });
+      if (certificateObjectKey !== undefined) {
+        const certificateObject = this.certificates[certificateObjectKey];
+        if (certificateObject) {
+          ipc.send(
+            'show-certificate',
+            certificateObject.certificate,
+            `${hostname}\n${certificateObject.verificationResult}`);
+        }
       }
     }
   }

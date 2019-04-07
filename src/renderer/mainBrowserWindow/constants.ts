@@ -87,6 +87,12 @@ const tabConfig: Lulumi.Store.TabConfig = {
     .toDataURL(),
 };
 
+const proxyConfig: Electron.Config = {
+  pacScript: '',
+  proxyRules: '',
+  proxyBypassRules: '',
+};
+
 // Top 500 alexa sites sorted by popularity
 const recommendTopSite: Lulumi.Renderer.SuggestionItem[] = [
   {
@@ -273,6 +279,7 @@ const recommendTopSite: Lulumi.Renderer.SuggestionItem[] = [
 
 export default {
   tabConfig,
+  proxyConfig,
   searchEngine,
   homepage,
   pdfViewer,

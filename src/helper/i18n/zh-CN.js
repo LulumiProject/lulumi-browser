@@ -96,8 +96,19 @@ export const guest = {
         url: '主页',
         favicon: '图标',
       },
-      LanguagePage: {
+      languagePage: {
         title: '设置／语言',
+      },
+      proxyPage: {
+        title: '设置／代理',
+        pacScript: 'PAC',
+        proxyRules: '规则',
+        proxyBypassRules: '绕过规则',
+      },
+      authPage: {
+        title: '设置／验证',
+        username: '用户名',
+        password: '密码',
       },
     },
     historyPage: {
@@ -262,8 +273,14 @@ export default {
       tabConfigPage: {
         title: '设置／页面',
       },
-      LanguagePage: {
+      languagePage: {
         title: '设置／语言',
+      },
+      proxyPage: {
+        title: '设置／代理',
+      },
+      authPage: {
+        title: '设置／验证',
       },
     },
     historyPage: {

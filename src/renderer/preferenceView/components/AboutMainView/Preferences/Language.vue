@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  h1 {{ $t('about.preferencesPage.LanguagePage.title') }}
+  h1 {{ $t('about.preferencesPage.languagePage.title') }}
   el-select(
     :placeholder="lang",
     v-model.trim="lang",
