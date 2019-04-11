@@ -251,6 +251,18 @@ const getTemplate = () => {
     },
   ];
 
+  template.forEach((menuItem) => {
+    if (menuItem && menuItem.submenu) {
+      const submenu = menuItem.submenu as Electron.MenuItemConstructorOptions[];
+      for (let i = submenu.length - 1; i >= 0; i -= 1) {
+        if (Object.keys(menuItem.submenu[i]).length === 0) {
+          submenu.splice(i, 1);
+        }
+      }
+      menuItem.submenu = submenu;
+    }
+  });
+
   if (is.macos) {
     const appName = app.getName();
     template.unshift({
@@ -271,9 +283,9 @@ const getTemplate = () => {
           accelerator: 'CmdOrCtrl+N',
           click: () => (BrowserWindow as any).createWindow(),
         },
-        is.macos ? {
+        {
           type: 'separator',
-        } : {},
+        },
         {
           label: i18n.t('file.closeTab') as string,
           accelerator: 'CmdOrCtrl+W',

@@ -247,16 +247,20 @@ app.whenReady().then(() => {
   }
   try {
     data = JSON.parse(data);
+  } catch (parseError) {
+    console.error(`(lulumi-browser) Could not parse data from ${storagePath}, ${parseError}`);
+  } finally {
     if (data) {
       store.dispatch('setLulumiState', data);
       session.registerProxy(store.getters.proxyConfig);
-      createWindow();
-    } else {
-      createWindow();
     }
-  } catch (parseError) {
-    console.error(`(lulumi-browser) Could not parse data from ${storagePath}, ${parseError}`);
-    createWindow();
+    try {
+      createWindow();
+    } catch (createWindowError) {
+      console.error(`(lulumi-browser) Could not create a window: ${createWindowError}`);
+      app.exit(1);
+      return;
+    }
   }
 });
 
