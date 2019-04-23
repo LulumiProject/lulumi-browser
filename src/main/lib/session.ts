@@ -410,7 +410,7 @@ const setPermissionRequestHandler = (windows): void => {
 
 const registerProxy = (proxyConfig): void => {
   const sess = session.fromPartition('persist:webview') as Electron.Session;
-  sess.setProxy(proxyConfig, () => {});
+  sess.setProxy(proxyConfig, () => { });
 };
 
 export default {
