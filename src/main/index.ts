@@ -402,6 +402,14 @@ ipcMain.on('show-certificate',
     }, () => { });
   });
 
+// focus the window
+ipcMain.on('focus-window', (event, windowId) => {
+  const window: Electron.BrowserWindow = windows[windowId];
+  if (window) {
+    window.focus();
+  }
+});
+
 // set the title for the focused BrowserWindow
 ipcMain.on('set-browser-window-title', (event, data) => {
   const window: Electron.BrowserWindow = windows[data.windowId];
@@ -659,31 +667,11 @@ ipcMain.on('register-local-commands', (event: Electron.Event) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    Object.keys(lulumiExtension.manifestMap).forEach((manifest) => {
-      lulumiExtension.registerLocalCommands(window, lulumiExtension.manifestMap[manifest]);
+    Object.keys(lulumiExtension.getManifestMap()).forEach((manifest) => {
+      lulumiExtension.registerLocalCommands(window, lulumiExtension.getManifestMap()[manifest]);
     });
   });
-  event.sender.send('registered-local-commands', lulumiExtension.manifestMap);
-});
-
-// get manifestMap
-ipcMain.on('get-manifest-map', (event) => {
-  event.returnValue = lulumiExtension.manifestMap;
-});
-
-// get manifestNameMap
-ipcMain.on('get-manifest-name-map', (event) => {
-  event.returnValue = lulumiExtension.manifestNameMap;
-});
-
-// get backgroundPages
-ipcMain.on('get-background-pages', (event) => {
-  event.returnValue = lulumiExtension.backgroundPages;
-});
-
-// get renderProcessPreferences
-ipcMain.on('get-render-process-preferences', (event) => {
-  event.returnValue = lulumiExtension.renderProcessPreferences;
+  event.sender.send('registered-local-commands', lulumiExtension.getManifestMap());
 });
 
 ipcMain.on('fetch-search-suggestions',

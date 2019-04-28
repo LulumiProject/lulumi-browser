@@ -263,6 +263,7 @@ const mutations = {
     if (state.tabs[tabsIndex]) {
       state.tabs[tabsIndex].webContentsId = webContentsId;
       state.tabs[tabsIndex].url = url;
+      state.tabs[tabsIndex].title = url;
       state.tabs[tabsIndex].isLoading = true;
       state.tabs[tabsIndex].status = 'loading';
       state.tabs[tabsIndex].error = false;

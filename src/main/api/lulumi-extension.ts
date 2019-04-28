@@ -376,11 +376,32 @@ const loadExtensions = () => {
   }
 };
 
+function getManifestMap() {
+  return manifestMap;
+}
+
+// get manifestMap
+ipcMain.on('get-manifest-map', (event) => {
+  event.returnValue = manifestMap;
+});
+
+// get manifestNameMap
+ipcMain.on('get-manifest-name-map', (event) => {
+  event.returnValue = manifestNameMap;
+});
+
+// get backgroundPages
+ipcMain.on('get-background-pages', (event) => {
+  event.returnValue = backgroundPages;
+});
+
+// get renderProcessPreferences
+ipcMain.on('get-render-process-preferences', (event) => {
+  event.returnValue = renderProcessPreferences;
+});
+
 export default {
-  manifestMap,
-  manifestNameMap,
-  backgroundPages,
-  renderProcessPreferences,
+  getManifestMap,
   registerLocalCommands,
   loadExtensions,
 };
