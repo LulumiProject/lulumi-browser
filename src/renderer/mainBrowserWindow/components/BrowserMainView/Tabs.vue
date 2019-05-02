@@ -12,8 +12,14 @@
         :data-id="index",
         :key="`tab-${tab.id}`")
         .tab-favicon
-          svg(v-if="tab.isLoading", viewBox="25 25 50 50", class="circular")
-            circle(cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10" class="path")
+          svg(v-if="tab.isLoading", viewBox="25 25 50 50", :class="tab.loadCommitted ? 'circular' : 'circular-reverse'")
+            circle(cx="50",
+                   cy="50",
+                   r="20",
+                   fill="none",
+                   stroke-width="5",
+                   stroke-miterlimit="10",
+                   :class="tab.loadCommitted ? 'path' : 'path-reverse'")
           img(v-else, :src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16')
           awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
           awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
@@ -235,13 +241,36 @@ export default class Tabs extends Vue {
                 position: relative;
                 margin: 0 auto;
               }
+              &.circular-reverse {
+                -webkit-animation: rotate 2s linear infinite reverse;
+                animation: rotate 2s linear infinite reverse;
+                -webkit-transform-origin: center center;
+                transform-origin: center center;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 16px;
+                height: 16px;
+                position: relative;
+                margin: 0 auto;
+              }
 
-              circle.path {
-                stroke-dasharray: 1,200;
-                stroke-dashoffset: 0;
-                -webkit-animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
-                animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
-                stroke-linecap: round;
+              circle {
+                &.path {
+                  stroke-dasharray: 1,200;
+                  stroke-dashoffset: 0;
+                  -webkit-animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
+                  animation: dash 1.5s ease-in-out infinite,color 6s ease-in-out infinite;
+                  stroke-linecap: round;
+                }
+                &.path-reverse {
+                  stroke-dasharray: 1,200;
+                  stroke-dashoffset: 0;
+                  -webkit-animation: dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
+                  animation: dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
+                  stroke-linecap: round;
+                }
               }
             }
           }
