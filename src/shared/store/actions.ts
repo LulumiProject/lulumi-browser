@@ -45,11 +45,12 @@ export const actions = {
       url,
     });
   },
-  didNavigate({ commit }, { windowId, tabId, tabIndex }) {
+  didNavigate({ commit }, { windowId, tabId, tabIndex, url }) {
     commit(types.DID_NAVIGATE, {
       windowId,
       tabId,
       tabIndex,
+      url,
     });
   },
   pageTitleSet({ commit }, { windowId, tabId, tabIndex, title }) {

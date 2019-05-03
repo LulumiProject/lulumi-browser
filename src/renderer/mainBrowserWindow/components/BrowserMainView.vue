@@ -322,6 +322,7 @@ export default class BrowserMainView extends Vue {
     this.$store.dispatch('didNavigate', {
       tabId,
       tabIndex,
+      url: event.url,
       windowId: this.windowId,
     });
     this.onCompleted.emit({

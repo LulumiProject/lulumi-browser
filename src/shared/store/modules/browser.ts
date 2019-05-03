@@ -264,7 +264,6 @@ const mutations = {
     if (state.tabs[tabsIndex]) {
       state.tabs[tabsIndex].webContentsId = webContentsId;
       state.tabs[tabsIndex].url = url;
-      state.tabs[tabsIndex].title = url;
       state.tabs[tabsIndex].isLoading = true;
       state.tabs[tabsIndex].didNavigate = false;
       state.tabs[tabsIndex].status = 'loading';
@@ -285,11 +284,13 @@ const mutations = {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
+    const url: string = payload.url;
 
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex]) {
       state.tabs[tabsIndex].didNavigate = true;
+      state.tabs[tabsIndex].title = url;
       state.tabs[tabsIndex].hasMedia = false;
     }
   },

@@ -3,14 +3,15 @@
   .tabs
     ul(v-sortable="")
       li.tab(v-for="(tab, index) in tabs",
-        @click="$parent.onTabClick(index)",
-        @click.middle="$parent.onTabClose(index)",
-        @contextmenu.prevent="$parent.onTabContextMenu($event, index)",
-        :class="index == currentTabIndex ? 'active' : ''",
-        :id="`${index}`",
-        :ref="`tab-${index}`",
-        :data-id="index",
-        :key="`tab-${tab.id}`")
+             @dblclick.stop="",
+             @click.stop="$parent.onTabClick(index)",
+             @click.middle="$parent.onTabClose(index)",
+             @contextmenu.prevent="$parent.onTabContextMenu($event, index)",
+             :class="index == currentTabIndex ? 'active' : ''",
+             :id="`${index}`",
+             :ref="`tab-${index}`",
+             :data-id="index",
+             :key="`tab-${tab.id}`")
         .tab-favicon
           svg(v-if="tab.isLoading", viewBox="25 25 50 50", :class="tab.didNavigate ? 'circular' : 'circular-reverse'")
             circle(cx="50",
