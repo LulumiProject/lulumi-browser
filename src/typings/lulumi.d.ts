@@ -98,7 +98,7 @@ declare namespace Lulumi {
       sessionId?: number; // session 標識符。(如果使用 session 匯入 tab 可能導致沒有 tab 的 id 而只有 session 的 id)
       statusText: string | boolean;
       isLoading: boolean;
-      loadCommitted: boolean;
+      didNavigate: boolean;
       isSearching: boolean;
       canGoBack: boolean;
       canGoForward: boolean;

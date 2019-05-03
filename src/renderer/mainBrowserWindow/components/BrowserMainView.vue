@@ -318,14 +318,20 @@ export default class BrowserMainView extends Vue {
       url: webview.getAttribute('src'),
     });
   }
-  onLoadCommit(event: Electron.LoadCommitEvent, tabIndex: number, tabId: number): void {
-    if (event.isMainFrame) {
-      this.$store.dispatch('loadCommit', {
-        tabId,
-        tabIndex,
-        windowId: this.windowId,
-      });
-    }
+  onDidNavigate(event: Electron.DidNavigateEvent, tabIndex: number, tabId: number): void {
+    this.$store.dispatch('didNavigate', {
+      tabId,
+      tabIndex,
+      windowId: this.windowId,
+    });
+    this.onCompleted.emit({
+      frameId: 0,
+      parentFrameId: -1,
+      processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+      tabId: this.getTabObject(tabIndex).id,
+      timeStamp: Date.now(),
+      url: event.url,
+    });
   }
   onPageTitleSet(event: Electron.PageTitleUpdatedEvent, tabIndex: number, tabId: number): void {
     const webview = this.getWebView(tabIndex);
@@ -759,16 +765,6 @@ export default class BrowserMainView extends Vue {
       frameId: 0,
       parentFrameId: -1,
       timeStamp: Date.now(),
-    });
-  }
-  onDidNavigate(event: Electron.DidNavigateEvent, tabIndex: number): void {
-    this.onCompleted.emit({
-      frameId: 0,
-      parentFrameId: -1,
-      processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
-      tabId: this.getTabObject(tabIndex).id,
-      timeStamp: Date.now(),
-      url: event.url,
     });
   }
   onGetSearchEngineProvider(event: Electron.Event, webContentsId: number): void {

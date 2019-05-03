@@ -6,7 +6,7 @@ export const CLOSE_ALL_TABS = 'CLOSE_ALL_TABS';
 export const CLICK_TAB = 'CLICK_TAB';
 
 export const DID_START_LOADING = 'DID_START_LOADING';
-export const LOAD_COMMIT = 'LOAD_COMMIT';
+export const DID_NAVIGATE = 'DID_NAVIGATE';
 export const PAGE_TITLE_SET = 'PAGE_TITLE_SET';
 export const DOM_READY = 'DOM_READY';
 export const DID_FRAME_FINISH_LOAD = 'DID_FRAME_FINISH_LOAD';

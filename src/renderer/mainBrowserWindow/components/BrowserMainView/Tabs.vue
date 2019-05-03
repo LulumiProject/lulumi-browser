@@ -12,14 +12,14 @@
         :data-id="index",
         :key="`tab-${tab.id}`")
         .tab-favicon
-          svg(v-if="tab.isLoading", viewBox="25 25 50 50", :class="tab.loadCommitted ? 'circular' : 'circular-reverse'")
+          svg(v-if="tab.isLoading", viewBox="25 25 50 50", :class="tab.didNavigate ? 'circular' : 'circular-reverse'")
             circle(cx="50",
                    cy="50",
                    r="20",
                    fill="none",
                    stroke-width="5",
                    stroke-miterlimit="10",
-                   :class="tab.loadCommitted ? 'path' : 'path-reverse'")
+                   :class="tab.didNavigate ? 'path' : 'path-reverse'")
           img(v-else, :src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16')
           awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
           awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")

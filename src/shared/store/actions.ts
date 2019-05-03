@@ -45,8 +45,8 @@ export const actions = {
       url,
     });
   },
-  loadCommit({ commit }, { windowId, tabId, tabIndex }) {
-    commit(types.LOAD_COMMIT, {
+  didNavigate({ commit }, { windowId, tabId, tabIndex }) {
+    commit(types.DID_NAVIGATE, {
       windowId,
       tabId,
       tabIndex,

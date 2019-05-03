@@ -132,7 +132,7 @@ export default class Tab extends Vue {
 
     const webviewEvents = {
       'did-start-loading': 'onDidStartLoading',
-      'load-commit': 'onLoadCommit',
+      'did-navigate': 'onDidNavigate',
       'page-title-set': 'onPageTitleSet',
       'dom-ready': 'onDomReady',
       'did-frame-finish-load': 'onDidFrameFinishLoad',
@@ -152,7 +152,6 @@ export default class Tab extends Vue {
       'scroll-touch-end': 'onScrollTouchEnd',
       'context-menu': 'onContextMenu',
       'will-navigate': 'onWillNavigate',
-      'did-navigate': 'onDidNavigate',
       'did-navigate-in-page': 'onDidNavigateInPage',
     };
 
