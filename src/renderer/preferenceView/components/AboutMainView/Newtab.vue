@@ -11,8 +11,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
 @Component
 export default class Newtab extends Vue {
   beforeMount() {
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
+    if (document) {
       ipcRenderer.once('newtab', (event, newtab: string) => {
         if (document.location && newtab !== '') {
           document.location.href = newtab;

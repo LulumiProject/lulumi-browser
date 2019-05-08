@@ -289,12 +289,14 @@ const urlUtil = {
   getUrlIfAbout(url: string): Lulumi.Renderer.AboutLocationObject {
     if (url.startsWith(constants.lulumiPagesCustomProtocol)) {
       const guestUrl = require('url').parse(url);
-      const guestHash = guestUrl.hash.substr(2);
-      const item = `${guestUrl.host}:${guestHash === '' ? 'about' : guestHash}`;
-      return {
-        title: item,
-        url: item,
-      };
+      if (guestUrl.hash) {
+        const guestHash = guestUrl.hash.substr(2);
+        const item = `${guestUrl.host}:${guestHash === '' ? 'about' : guestHash}`;
+        return {
+          title: item,
+          url: item,
+        };
+      }
     }
     return {
       url,

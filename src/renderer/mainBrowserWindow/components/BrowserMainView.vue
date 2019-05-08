@@ -464,12 +464,10 @@ export default class BrowserMainView extends Vue {
   }
   onIpcMessage(event: Electron.IpcMessageEvent): void {
     if (event.channel === 'newtab') {
-      const navbar = (this.$refs.navbar as Navbar);
       if (this.extensionService.newtabOverrides !== '') {
         (event.target as Electron.WebviewTag).send('newtab', this.extensionService.newtabOverrides);
       } else {
         (event.target as Electron.WebviewTag).send('newtab', '');
-        navbar.showUrl(this.getTabObject().url, this.getTabObject().id);
       }
     }
   }

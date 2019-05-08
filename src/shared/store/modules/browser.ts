@@ -371,8 +371,6 @@ const mutations = {
           }
         }
       }
-      state.tabs[tabsIndex].isLoading = false;
-      state.tabs[tabsIndex].status = 'complete';
     }
   },
   [types.PAGE_FAVICON_UPDATED](state: Lulumi.Store.State, payload) {

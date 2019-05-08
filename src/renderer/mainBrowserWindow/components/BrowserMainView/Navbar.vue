@@ -16,17 +16,17 @@
                                        @contextmenu.native="$parent.onNavContextMenu",
                                        @keyup.shift.up.native="selectPortion",
                                        @keyup.shift.down.native="selectPortion",
-                                       @input="onChange",
                                        @focus="onFocus",
                                        @blur="onBlur",
                                        @select="onSelect",
+                                       v-model="value",
                                        :trigger-on-focus="false",
                                        :placeholder="$t('navbar.placeholder')",
                                        :fetch-suggestions="querySearch",
-                                       :value="value",
+                                       :value="showUrl",
                                        popper-class="my-autocomplete",
                                        :debounce="0")
-      el-button(slot="prepend")
+      el-button(slot="prepend", @click.native="showCertificate()")
         div.secure(v-if="secure")
           awesome-icon(name="lock")
           span {{ $t('navbar.indicator.secure') }}
@@ -35,7 +35,8 @@
           span {{ $t('navbar.indicator.insecure') }}
       #security-indicator(slot="append",
                           class="el-input__inner",
-                          v-html="fancyContent")
+                          v-html="fancyContent",
+                          @click="onNewElementParentClick()")
       template(slot-scope="props")
         component(:is="'suggestion-item'", :item="props.item")
   .extensions-group(v-sortable="")
@@ -199,9 +200,6 @@ export default class Navbar extends Vue {
   onbrowserActionClickedEvent: Event = new Event();
   onpageActionClickedEvent: Event = new Event();
 
-  fancyOmnibox: HTMLDivElement;
-  realOmnibox: HTMLInputElement;
-
   windowId: number;
 
   get dummyTabObject(): Lulumi.Store.TabObject {
@@ -233,9 +231,25 @@ export default class Navbar extends Vue {
   }
   get url(): string {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
-      return '';
+      this.value = '';
+    } else if (this.tabs[this.currentTabIndex].isLoading) {
+      this.value = this.tabs[this.currentTabIndex].url;
     }
-    return this.tabs[this.currentTabIndex].url;
+    if (this.value === 'lulumi://about/#/newtab') {
+      this.value = '';
+      this.onNewElementParentClick();
+    }
+    return this.value;
+  }
+  get showUrl(): string {
+    this.updateSecure(this.url);
+    if (!this.url.startsWith('lulumi-extension') && urlUtil.canParseURL(this.url)) {
+      let newUrl = decodeURIComponent(this.url);
+      newUrl = urlUtil.getUrlIfError(newUrl);
+      newUrl = urlUtil.getUrlIfPDF(newUrl);
+      return urlUtil.getUrlIfAbout(newUrl).url;
+    }
+    return this.url;
   }
   get currentSearchEngine(): Lulumi.Store.SearchEngineObject {
     return this.$store.getters.currentSearchEngine;
@@ -255,12 +269,12 @@ export default class Navbar extends Vue {
     return suggestionItems;
   }
   get fancyContent(): string {
-    if (!this.value && this.tab.url === 'lulumi://about/#/newtab') {
+    if (this.tab.url === 'lulumi://about/#/newtab') {
       return '<div class="security-hint">about:newtab</div>';
     }
-    const currentUrl = url.parse(this.value, true);
+    const currentUrl = url.parse(this.url, true);
     if (currentUrl.href && currentUrl.protocol) {
-      if (currentUrl.protocol === 'https:' || currentUrl.protocol === 'wss:') {
+      if (currentUrl.protocol === 'https:') {
         const hint = this.secure ? 'secure' : 'insecure';
         return `
           <div class="security-hint">
@@ -276,14 +290,12 @@ export default class Navbar extends Vue {
         </div>
       `;
     }
-    return `<div class="security-hint">${this.value}</div>`;
+    return `<div class="security-hint">${this.url}</div>`;
   }
 
   @Watch('url')
   onUrl(newUrl: string): void {
-    this.showUrl(newUrl, this.tab.id);
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
+    if (document) {
       (document.querySelector('.my-autocomplete') as HTMLDivElement)
         .style.display = 'none';
     }
@@ -291,13 +303,20 @@ export default class Navbar extends Vue {
   }
   @Watch('focused')
   onFocused(isFocus: boolean): void {
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
+    if (document) {
       setTimeout(
         () => {
           if (!isFocus) {
-            (document.querySelector('.my-autocomplete') as HTMLDivElement)
-              .style.display = 'none';
+            if (document) {
+              const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+              const si = document.getElementById('security-indicator') as HTMLDivElement;
+              if (el && si && si.parentElement && this.$refs.input) {
+                el.querySelector('input')!.setAttribute('style', 'display: none;');
+                si.parentElement.setAttribute('style', 'display: block;');
+              }
+              (document.querySelector('.my-autocomplete') as HTMLDivElement)
+                .style.display = 'none';
+            }
             (this.$refs.input as any).suggestions.length = 0;
           }
         },
@@ -311,27 +330,17 @@ export default class Navbar extends Vue {
   escapePattern(pattern: string): string {
     return pattern.replace(/[\\^$+?.()|[\]{}]/g, '\\$&');
   }
-  updateOmnibox(newUrl: string): void {
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
-      this.realOmnibox.style.display = 'none';
-      this.fancyOmnibox.style.display = 'block';
-    }
-
-    if (newUrl === 'about:newtab') {
+  updateSecure(url: string): void {
+    if (url === '') {
       this.secure = true;
-      this.value = '';
-      this.onNewElementParentClick();
       return;
     }
-  }
-  updateSecure(url: string): void {
     const scheme = urlUtil.getScheme(url);
     if (scheme === 'lulumi://') {
       this.secure = true;
       return;
     }
-    if (scheme === 'https://' || scheme === 'wss://') {
+    if (scheme === 'https://') {
       const hostname = urlUtil.getHostname(url);
       if (hostname) {
         const certificateObjectKey = Object.keys(this.certificates).find((regex) => {
@@ -391,19 +400,6 @@ export default class Navbar extends Vue {
     });
     return newSuggestions;
   }
-  showUrl(url: string, tabId: number): void {
-    if (tabId === this.tab.id) {
-      this.updateSecure(url);
-      if (this.focused || url.startsWith('lulumi-extension')) {
-        return;
-      }
-      let newUrl = decodeURIComponent(url);
-      newUrl = urlUtil.getUrlIfError(newUrl);
-      newUrl = urlUtil.getUrlIfPDF(newUrl);
-      this.value = urlUtil.getUrlIfAbout(newUrl).url;
-      this.updateOmnibox(this.value);
-    }
-  }
   onGoBackMouseDown(): void {
     this.handler
       = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
@@ -422,40 +418,50 @@ export default class Navbar extends Vue {
       clearTimeout(this.handler);
     }
   }
-  onChange(val: string): void {
-    this.value = val;
-  }
   onFocus(): void {
     this.focused = true;
   }
   onBlur(): void {
     this.focused = false;
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
-      this.fancyOmnibox.parentElement!.style.display = 'block';
-      this.realOmnibox.style.display = 'none';
+    if (document) {
+      const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+      const si = document.getElementById('security-indicator') as HTMLDivElement;
+      if (el && si && si.parentElement && this.$refs.input) {
+        el.querySelector('input')!.setAttribute('style', 'display: none;');
+        si.parentElement.setAttribute('style', 'display: block;');
+      }
     }
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
-    const item: Lulumi.Renderer.SuggestionItem = event.item;
     this.focused = false;
-    if (item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
-      this.value = this.currentSearchEngine.search.replace(
-        '{queryString}', encodeURIComponent(item.url));
+    if (event.item) {
+      if (event.item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
+        const item: Lulumi.Renderer.SuggestionItem = event.item;
+        this.value = this.currentSearchEngine.search.replace(
+          '{queryString}', encodeURIComponent(item.url));
+      } else {
+        this.value = event.item.url;
+      }
     } else {
-      this.value = item.url;
+      this.value = (event as any).value;
     }
-    this.realOmnibox.setSelectionRange(0, 0);
-    (this.$parent as BrowserMainView).onEnterUrl(this.value);
-    this.realOmnibox.blur();
+    const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+    if (el) {
+      el.querySelector('input')!.setSelectionRange(0, 0);
+      (this.$parent as BrowserMainView).onEnterUrl(this.value);
+      el.querySelector('input')!.blur();
+    }
   }
   onNewElementParentClick(): void {
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
-      this.fancyOmnibox.parentElement!.style.display = 'none';
-      this.realOmnibox.style.display = 'block';
+    if (document) {
+      const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+      const si = document.getElementById('security-indicator') as HTMLDivElement;
+      if (el && si && si.parentElement && this.$refs.input) {
+        el.querySelector('input')!.setAttribute('style', 'display: block;');
+        si.parentElement.setAttribute('style', 'display: none;');
+        el.querySelector('input')!.focus();
+      }
     }
-    (this.$refs.input as any).focus();
   }
   async querySearch(queryString: string, cb: Function): Promise<void> {
     const ipc = this.$electron.ipcRenderer;
@@ -845,20 +851,6 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
-    if (!(process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'unit')) {
-      // .el-input-group__prepend event(s)
-      const prepend = document.querySelector('.el-input-group__prepend') as HTMLDivElement;
-      prepend.addEventListener('click', this.showCertificate);
-
-      // .el-input__inner event(s)
-      this.fancyOmnibox = document.querySelector('#security-indicator') as HTMLDivElement;
-      this.realOmnibox = document.querySelector('.el-input__inner') as HTMLInputElement;
-      this.fancyOmnibox.parentElement!.addEventListener('click', this.onNewElementParentClick);
-    }
-
-    this.showUrl(this.url, this.tab.id);
-
     const ipc = this.$electron.ipcRenderer;
 
     ipc.on(
