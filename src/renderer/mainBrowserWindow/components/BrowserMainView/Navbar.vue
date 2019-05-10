@@ -224,7 +224,7 @@ export default class Navbar extends Vue {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
       return {};
     }
-    return this.tabs[this.currentTabIndex].pageActionMapping;
+    return this.tab.pageActionMapping;
   }
   get certificates(): Lulumi.Store.Certificates {
     return this.$store.getters.certificates;
@@ -232,8 +232,8 @@ export default class Navbar extends Vue {
   get url(): string {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
       this.value = '';
-    } else if (this.tabs[this.currentTabIndex].isLoading) {
-      this.value = this.tabs[this.currentTabIndex].url;
+    } else if (this.tab.isLoading) {
+      this.value = this.tab.url;
     }
     if (this.value === 'lulumi://about/#/newtab') {
       this.value = '';
@@ -293,6 +293,10 @@ export default class Navbar extends Vue {
     return `<div class="security-hint">${this.url}</div>`;
   }
 
+  @Watch('tab')
+  onTab(newTab: Lulumi.Store.TabObject) {
+    this.value = newTab.url;
+  }
   @Watch('url')
   onUrl(newUrl: string): void {
     if (document) {
@@ -851,6 +855,15 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
+    if (document) {
+      const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+      const si = document.getElementById('security-indicator') as HTMLDivElement;
+      if (el && si && si.parentElement && this.$refs.input) {
+        el.querySelector('input')!.setAttribute('style', 'display: none;');
+        si.parentElement.setAttribute('style', 'display: block;');
+      }
+    }
+
     const ipc = this.$electron.ipcRenderer;
 
     ipc.on(
