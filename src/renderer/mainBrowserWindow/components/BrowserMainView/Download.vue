@@ -110,9 +110,11 @@ export default class Download extends Vue {
   getFileIcon(savePath: string, index: number): void {
     if (savePath) {
       imageUtil.getBase64FromFileIcon(savePath, 'normal').then((dataURL) => {
-        const el = document.getElementById(`icon-${index}`);
-        if (el) {
-          el.setAttribute('src', dataURL);
+        if (dataURL) {
+          const el = document.getElementById(`icon-${index}`);
+          if (el) {
+            el.setAttribute('src', dataURL);
+          }
         }
       });
     }

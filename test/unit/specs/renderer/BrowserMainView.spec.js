@@ -26,11 +26,13 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   data() {
     return {
       activated: false,
-      isOnComposition: false,
+      isComposing: false,
       suggestions: [],
       loading: false,
       highlightedIndex: -1,
+      suggestionDisabled: false,
       lastQueryString: '',
+      pending: false,
     };
   },
   computed: {
@@ -58,7 +60,11 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       }
     },
     getData(queryString) {
-      const el = this.$refs.input.$el.querySelector('.el-input__inner');
+      if (this.suggestionDisabled) {
+        return;
+      }
+      const el = this.$refs.input.$el
+        .querySelector('input');
       this.loading = true;
       this.fetchSuggestions(queryString, (suggestions) => {
         this.loading = false;
@@ -66,7 +72,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           this.suggestions = suggestions;
           this.highlightedIndex = 0;
 
-          if (el.selectionStart === queryString.length) {
+          if (el && el.selectionStart === queryString.length) {
             if (this.lastQueryString !== queryString) {
               const startPos = queryString.length;
               const endPos = this.suggestions[0].item.url.length;
@@ -82,14 +88,15 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           }
         } else {
           // tslint:disable-next-line no-console
-          console.error('autocomplete suggestions must be an array');
+          console.error('[Element Error][Autocomplete]autocomplete suggestions must be an array');
         }
       });
     },
     handleChange(value) {
       this.$emit('input', value);
-      if (this.isOnComposition || (!this.triggerOnFocus && !value)) {
-        this.lastQueryString = '';
+      this.suggestionDisabled = false;
+      if (!this.triggerOnFocus && !value) {
+        this.suggestionDisabled = true;
         this.suggestions = [];
         return;
       }
@@ -104,51 +111,23 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       }
     },
     handleKeyEnter(event) {
-      if (this.suggestionVisible
+      if (!this.pending
+        && this.suggestionVisible
         && this.highlightedIndex >= 0
         && this.highlightedIndex < this.suggestions.length) {
         event.preventDefault();
         this.select(this.suggestions[this.highlightedIndex]);
-      } else {
-        this.$parent.$parent.onEnterUrl(event.target.value);
-        this.$emit('select', {
-          item: {
-            title: '',
-            value: event.target.value,
-            url: event.target.value,
-          },
+      } else if (this.selectWhenUnmatched) {
+        this.$emit('select', { value: this.value });
+        this.$nextTick(() => {
+          this.suggestions = [];
+          this.highlightedIndex = -1;
         });
+      } else if (this.pending) {
+        this.pending = false;
+      } else {
+        this.pending = true;
       }
-    },
-    highlight(index) {
-      let newIndex = index;
-      if (!this.suggestionVisible || this.loading) {
-        return;
-      }
-      if (index < 0) {
-        newIndex = 0;
-      }
-      if (index >= this.suggestions.length) {
-        newIndex = this.suggestions.length - 1;
-      }
-      const suggestion
-        = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
-      const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
-
-      const highlightItem = suggestionList[newIndex];
-      const scrollTop = suggestion.scrollTop;
-      const offsetTop = highlightItem.offsetTop;
-
-      if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
-        suggestion.scrollTop += highlightItem.scrollHeight;
-      }
-      if (offsetTop < scrollTop) {
-        suggestion.scrollTop -= highlightItem.scrollHeight;
-      }
-      this.highlightedIndex = newIndex;
-      this.$el.querySelector('.el-input__inner')
-        .setAttribute('aria-activedescendant', `${this.id}-item-${this.highlightedIndex}`);
-      this.$emit('input', this.suggestions[this.highlightedIndex].item.url);
     },
   },
 });

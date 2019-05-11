@@ -40,7 +40,8 @@ module.exports = (config) => {
     customLaunchers: {
       'visibleElectron': {
         base: 'Electron',
-        flags: ['--show']
+        flags: ['--show'],
+        require: path.join('test', 'unit', 'override.js')
       }
     },
     frameworks: ['mocha', 'chai'],

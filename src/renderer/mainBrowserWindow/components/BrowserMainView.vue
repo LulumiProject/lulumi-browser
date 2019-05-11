@@ -1561,15 +1561,13 @@ export default class BrowserMainView extends Vue {
     });
     ipc.on('zoom-in', () => {
       const webContents = this.getWebView().getWebContents();
-      webContents.getZoomLevel((zoomLevel) => {
-        webContents.setZoomLevel(zoomLevel + 0.5);
-      });
+      const zoomLevel = webContents.getZoomLevel();
+      webContents.setZoomLevel(zoomLevel + 0.5);
     });
     ipc.on('zoom-out', () => {
       const webContents = this.getWebView().getWebContents();
-      webContents.getZoomLevel((zoomLevel) => {
-        webContents.setZoomLevel(zoomLevel - 0.5);
-      });
+      const zoomLevel = webContents.getZoomLevel();
+      webContents.setZoomLevel(zoomLevel - 0.5);
     });
     ipc.on('go-back', () => {
       this.onClickBack();

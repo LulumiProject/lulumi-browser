@@ -19,6 +19,7 @@ Vue.use(Vuex);
 
 const isDarwin: boolean = is.macos;
 const isWindows: boolean = is.windows;
+const isLinux: boolean = is.linux;
 
 const windows: Electron.BrowserWindow[] = [];
 
@@ -114,7 +115,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       handleWindowProperty(window, 'update');
     });
 
-    if (isWindows) {
+    if (isWindows || isLinux) {
       window.on('app-command', (event, command) => {
         if (command === 'browser-backward') {
           window.webContents.send('go-back');

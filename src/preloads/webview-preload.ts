@@ -41,7 +41,9 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
   if (extension === undefined) {
     isolatedWorldMaps[extensionId] = isolatedWorldId;
     injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
-    webFrame.setIsolatedWorldHumanReadableName(isolatedWorldId, name);
+    webFrame.setIsolatedWorldInfo(isolatedWorldId, {
+      name,
+    });
     webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
       code: 'window',
     }], false, (window) => {

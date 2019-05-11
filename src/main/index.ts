@@ -121,6 +121,11 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     minWidth: 320,
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
+    webPreferences: {
+      contextIsolation: false,
+      nodeIntegration: true,
+      webviewTag: true,
+    },
   };
   if (options && Object.keys(options).length !== 0) {
     mainWindow = new BrowserWindow(Object.assign({}, defaultOption, options));
@@ -173,6 +178,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // webPreferences.nativeWindowOpen = true;
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
+    webPreferences.nodeIntegrationInSubFrames = true;
 
     const backgroundRegExp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
     if (params.src.startsWith('lulumi-extension://')) {
@@ -219,7 +225,10 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 (BrowserWindow as any).createWindow = createWindow;
 
 // register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
-protocol.registerStandardSchemes(['lulumi', 'lulumi-extension'], { secure: true });
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'lulumi', privileges: { standard: true, secure: true } },
+  { scheme: 'lulumi-extension', privileges: { standard: true, secure: true } },
+]);
 
 app.whenReady().then(() => {
   // autoUpdater
@@ -263,6 +272,19 @@ app.whenReady().then(() => {
     }
   }
 });
+
+if (process.env.TEST_ENV !== 'e2e') {
+  app.on('remote-require', (event, webContents) => {
+    console.error(
+      `(lulumi-browser) Invalid module to require at webContents ${webContents.id}`);
+    event.preventDefault();
+  });
+  app.on('remote-get-global', (event, webContents) => {
+    console.error(
+      `(lulumi-browser) Invalid object to get at webContents ${webContents.id}`);
+    event.preventDefault();
+  });
+}
 
 app.on('login', (event, webContents, request, authInfo, callback) => {
   const auth = store.getters.auth;
@@ -656,8 +678,15 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
   try {
     lang = readFileSync(langPath, 'utf8');
   } catch (langError) {
-    lang = '"en-US"';
     console.error(`(lulumi-browser) ${langError}`);
+    lang = app.getLocaleCountryCode();
+    if (lang === 'TW') {
+      lang = '"zh-TW"';
+    } else if (lang === 'CN') {
+      lang = '"zh-CN"';
+    } else {
+      lang = '"en-US"';
+    }
   }
   event.returnValue = JSON.parse(lang);
 });

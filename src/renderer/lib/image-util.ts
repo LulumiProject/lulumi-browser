@@ -49,16 +49,16 @@ const imageUtil = {
    * @param {String} size The size of returned icon (small, normal, large).
    * @returns {String} The found image encoded by base64.
    */
-  getBase64FromFileIcon(path: string, size: any = 'normal'): Promise<string> {
-    return new Promise((resolve, reject) => {
-      require('electron').remote.app.getFileIcon(path, { size }, (err, icon) => {
-        if (icon) {
-          resolve(icon.toDataURL());
-        } else {
-          reject(err);
-        }
-      });
-    });
+  async getBase64FromFileIcon(path: string, size: any = 'normal'): Promise<string> {
+    try {
+      const icon = await require('electron').remote.app.getFileIcon(path, { size });
+      if (icon) {
+        return icon.toDataURL();
+      }
+      return '';
+    } catch (err) {
+      return '';
+    }
   },
 
   /**
