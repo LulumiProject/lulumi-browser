@@ -1744,7 +1744,7 @@ export default class BrowserMainView extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 * {
   margin: 0;
   padding: 0;
@@ -1766,27 +1766,33 @@ html {
 #footer {
   bottom: 0;
   position: absolute;
-}
-#footer > .browser-tab-status {
-  background: #F3F3F3;
-  border-color: #d3d3d3;
-  border-style: solid;
-  border-width: 1px 1px 0 0;
-  border-top-right-radius: 4px;
-  bottom: 0;
-  color: #555555;
-  font-size: 13px;
-  float: left;
-  width: auto;
-  overflow-x: hidden;
-  padding: 0.2em 0.5em;
-  position: relative;
-}
-#footer > .extend-enter-active {
-  transition-property: text-overflow, white-space;
-  transition-duration: 1s;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 50vw;
+
+  .browser-tab-status {
+    transition-property: max-width;
+    background: #F3F3F3;
+    border-color: #d3d3d3;
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 4px;
+    bottom: 0;
+    color: #555555;
+    font-size: 12px;
+    float: left;
+    width: auto;
+    max-width: 95vw;
+    overflow-x: hidden;
+    padding: 0.1em 0.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .extend-enter-active {
+    transition-property: max-width;
+    transition-duration: 1s;
+    max-width: 40vw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 </style>

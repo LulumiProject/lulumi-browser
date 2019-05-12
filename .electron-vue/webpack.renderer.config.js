@@ -188,11 +188,12 @@ let mainBrowserWindowConfig = {
           'default-src': "'none'",
           'object-src': "'self'",
           'connect-src': ["'self'"],
-          'script-src': ["'self'"],
+          // https://github.com/GoogleChromeLabs/comlink/pull/274
+          'script-src': ["'self'", "'unsafe-eval'"],
           'style-src': ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
           'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
           'img-src': ["'self'", "https:", "http:", "data:"],
-          'worker-src': ["blob:"]
+          'worker-src': ["'self'"]
         },
         nonceEnabled: {
           'style-src': false,
@@ -542,6 +543,34 @@ let preferenceViewConfig = {
   target: 'web'
 }
 
+let searchWorkerConfig = {
+  name: 'search-worker',
+  devtool: '#cheap-module-eval-source-map',
+  entry: {
+    'search-worker': path.join(__dirname, '../src/renderer/mainBrowserWindow/js/search-worker.js')
+  },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    })
+  ],
+  output: {
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+    path: path.join(__dirname, '../dist')
+  },
+  target: 'webworker'
+}
+
 /**
  * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
  * for production settings
@@ -550,11 +579,13 @@ if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.mode = 'production'
   preloadsConfig.mode = 'production'
   preferenceViewConfig.mode = 'production'
+  searchWorkerConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   preferenceViewConfig.performance = { hints: false }
   mainBrowserWindowConfig.devtool = false
   preloadsConfig.devtool = false
   preferenceViewConfig.devtool = false
+  searchWorkerConfig.devtool = false
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({
@@ -571,6 +602,11 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     })
   )
+  searchWorkerConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
 } else {
   /**
    * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
@@ -579,6 +615,7 @@ if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.mode = 'development'
   preloadsConfig.mode = 'development'
   preferenceViewConfig.mode = 'development'
+  searchWorkerConfig.mode = 'development'
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.DefinePlugin({
@@ -620,10 +657,17 @@ if (process.env.TEST_ENV === 'e2e') {
       'process.env.TEST_ENV': '"e2e"'
     })
   )
+  searchWorkerConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"test"',
+      'process.env.TEST_ENV': '"e2e"'
+    })
+  )
 }
 
 module.exports = [
-  Object.assign({} , mainBrowserWindowConfig),
-  Object.assign({} , preloadsConfig),
-  Object.assign({} , preferenceViewConfig)
+  Object.assign({}, mainBrowserWindowConfig),
+  Object.assign({}, preloadsConfig),
+  Object.assign({}, preferenceViewConfig),
+  Object.assign({}, searchWorkerConfig)
 ]

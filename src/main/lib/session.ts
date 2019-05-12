@@ -212,21 +212,17 @@ const registerScheme = (scheme: string): void => {
   if (process.env.NODE_ENV === 'development') {
     sess.protocol.registerHttpProtocol('lulumi', async (request, callback) => {
       const url: string = request.url.substr(scheme.length);
-      const [type, tmpParam] = url.split('/');
+      const [type, ...param] = url.split('/');
       if (type === 'about') {
-        if (tmpParam.indexOf('#') === 0) {
+        if (param[0].indexOf('#') === 0) {
           callback({
             method: request.method,
             url: `http://localhost:${require('../../../.electron-vue/config').port}/about.html`,
           });
         } else {
-          let param = tmpParam;
-          if (tmpParam === 'vendor.dll.js') {
-            param = `dist/${tmpParam}`;
-          }
           callback({
             method: request.method,
-            url: `http://localhost:${require('../../../.electron-vue/config').port}/${param}`,
+            url: `http://localhost:${require('../../../.electron-vue/config').port}/${param.join('/')}`,
           });
         }
       }
@@ -238,12 +234,12 @@ const registerScheme = (scheme: string): void => {
   } else {
     sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
       const url: string = request.url.substr(scheme.length);
-      const [type, param] = url.split('/');
+      const [type, ...param] = url.split('/');
       if (type === 'about') {
         if (param.indexOf('#') === 0) {
           callback(`${__dirname}/about.html`);
         } else {
-          callback(`${__dirname}/${param}`);
+          callback(`${__dirname}/${param.join('/')}`);
         }
       }
     }, (error) => {

@@ -2,20 +2,23 @@
 
 const chalk = require('chalk')
 const electron = require('electron')
+const express = require('express')
+const config = require('./config')
 const path = require('path')
 const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
-const WebpackDevServer = require('webpack-dev-server')
 const openInEditor = require('launch-editor-middleware')
+const webpackDevMiddleware = require('webpack-dev-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
+const dllConfig = require('./webpack.dll.config')
 const mainConfig = require('./webpack.main.config')
 const Configs = require('./webpack.renderer.config')
 
 let electronProcess = null
 let manualRestart = false
-let hotMiddleware
+let hotMiddleware = null
 
 function logStats (proc, data) {
   let log = ''
@@ -49,16 +52,27 @@ function startRenderer () {
       }
     })
 
+    const app = express()
     const multiCompiler = webpack(Configs)
-    hotMiddleware = webpackHotMiddleware(multiCompiler, {
-      logLevel: 'warn',
-      heartbeat: 2500
+    const instance = webpackDevMiddleware(multiCompiler, {
+      hot: true
     })
+    hotMiddleware = webpackHotMiddleware(multiCompiler, {
+      log: false,
+      heartbeat: 2500
+    });
+    app.use(instance)
+    instance.waitUntilValid(() => {
+      resolve()
+    })
+    app.use(express.static(path.join(__dirname, '../', 'dist')));
+    app.use(hotMiddleware)
+    app.use('/__open-in-editor', openInEditor())
 
     multiCompiler.compilers.map(c => {
       if (c.name !== 'preloads') {
-        c.hooks.compilation.tap('dev-runner', compilation => {
-          compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('dev-runner', (data, cb) => {
+        c.hooks.compilation.tap('compilation', compilation => {
+          compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
             hotMiddleware.publish({ action: 'reload' })
             cb()
           })
@@ -66,26 +80,13 @@ function startRenderer () {
       }
     })
 
-    multiCompiler.compilers.map(c => c.hooks.done.tap('dev-runner', stats => {
+    multiCompiler.compilers.map(c => c.hooks.done.tap('done', stats => {
       logStats('Renderer', stats)
     }))
 
-    const server = new WebpackDevServer(
-      multiCompiler,
-      {
-        contentBase: path.join(__dirname, '../'),
-        quiet: true,
-        before(app, ctx) {
-          app.use('/__open-in-editor', openInEditor())
-          app.use(hotMiddleware)
-          ctx.middleware.waitUntilValid(() => {
-            resolve()
-          })
-        }
-      }
-    )
-
-    server.listen(9080)
+    app.listen(config.port, () => {
+      console.log(`Listening on port ${config.port}`)
+    })
   })
 }
 
@@ -95,7 +96,7 @@ function startMain () {
 
     const compiler = webpack(mainConfig)
 
-    compiler.hooks.watchRun.tapAsync('dev-runner', (compilation, done) => {
+    compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
       logStats('Main', chalk.white.bold('compiling...'))
       hotMiddleware.publish({ action: 'compiling' })
       done()
@@ -177,13 +178,25 @@ function greeting () {
 function init () {
   greeting()
 
-  Promise.all([startRenderer(), startMain()])
-    .then(() => {
-      startElectron()
-    })
-    .catch(err => {
-      console.error(err)
-    })
+  const compiler = webpack(dllConfig)
+
+  console.log('prebuild vendor.dll.js')
+  compiler.watch({}, (err, stats) => {
+    if (err) {
+      console.log(err)
+      return
+    }
+
+    logStats('Dll', stats)
+
+    Promise.all([startRenderer(), startMain()])
+      .then(() => {
+        startElectron()
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  })
 }
 
 init()

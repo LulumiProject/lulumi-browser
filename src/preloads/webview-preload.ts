@@ -43,6 +43,7 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
     injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
     webFrame.setIsolatedWorldInfo(isolatedWorldId, {
       name,
+      securityOrigin: origin,
     });
     webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
       code: 'window',

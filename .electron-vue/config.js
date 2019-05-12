@@ -9,7 +9,7 @@ const config = {
   // Further changes can be made in `.eslintrc.js`
   eslint: true,
 
-  // webpack-dev-server port
+  // express port
   port: 9080,
 
   // electron-packager options

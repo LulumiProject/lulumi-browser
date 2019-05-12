@@ -69,7 +69,6 @@
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
 
-import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -77,7 +76,7 @@ import AwesomeIcon from 'vue-awesome/components/Icon.vue';
 import 'vue-awesome/icons/lock';
 import 'vue-awesome/icons/unlock';
 
-import Workerize from 'workerize';
+import * as Comlink from 'comlink';
 import Sortable from 'sortablejs';
 
 import { Badge, Button, Popover } from 'element-ui';
@@ -195,6 +194,7 @@ export default class Navbar extends Vue {
   secure: boolean = false;
   focused: boolean = false;
   value: string = '';
+  search: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   extensions: Lulumi.API.ManifestObject[] = [];
   onbrowserActionClickedEvent: Event = new Event();
@@ -243,7 +243,7 @@ export default class Navbar extends Vue {
   }
   get showUrl(): string {
     this.updateSecure(this.url);
-    if (!this.url.startsWith('lulumi-extension') && urlUtil.canParseURL(this.url)) {
+    if (urlUtil.canParseURL(this.url)) {
       let newUrl = decodeURIComponent(this.url);
       newUrl = urlUtil.getUrlIfError(newUrl);
       newUrl = urlUtil.getUrlIfPDF(newUrl);
@@ -340,7 +340,7 @@ export default class Navbar extends Vue {
       return;
     }
     const scheme = urlUtil.getScheme(url);
-    if (scheme === 'lulumi://') {
+    if (scheme === 'lulumi://' || scheme === 'lulumi-extension://') {
       this.secure = true;
       return;
     }
@@ -494,30 +494,10 @@ export default class Navbar extends Vue {
       });
     }
 
-    const worker = Workerize(`
-      // Ref: https://github.com/webpack/webpack/issues/1554#issuecomment-336462319
-      ${fs.readFileSync(__non_webpack_require__.resolve('fuse.js'), 'utf8')}
-      export function search(suggestionItems, niddle) {
-        const fuse = new Fuse(suggestionItems, {
-          shouldSort: true,
-          threshold: 0.4,
-          includeMatches: true,
-          keys: [{
-            name: 'value',
-            weight: 0.7,
-          }, {
-            name: 'title',
-            weight: 0.3,
-          }],
-        });
-        return fuse.search(niddle);
-      }
-    `);
-
     // calling out fuse results using web workers
     const entries: Lulumi.Renderer.SuggestionObject[][]
       = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
-        .map(suggestionItem => worker.search(suggestionItem, queryString.toLowerCase()))) as any;
+        .map(suggestionItem => this.search(suggestionItem, queryString.toLowerCase()))) as any;
     if (entries.length !== 0) {
       entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
     }
@@ -863,6 +843,8 @@ export default class Navbar extends Vue {
         si.parentElement.setAttribute('style', 'display: block;');
       }
     }
+
+    this.search = Comlink.wrap(new Worker('search-worker.js'));
 
     const ipc = this.$electron.ipcRenderer;
 

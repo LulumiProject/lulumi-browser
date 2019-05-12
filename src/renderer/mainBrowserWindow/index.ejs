@@ -16,6 +16,6 @@
       if (process.env.NODE_ENV !== 'development') window.__static = require('path').resolve(__dirname, '../static').replace(/\\/g, '\\\\')
     </script>
     <!-- webpack builds are automatically injected -->
-    <script src="<%= webpackConfig.output.publicPath %><% if (process.env.NODE_ENV === 'development') { %>dist/<% } %>vendor.dll.js"></script>
+    <script src="<%= webpackConfig.output.publicPath %>vendor.dll.js"></script>
   </body>
 </html>

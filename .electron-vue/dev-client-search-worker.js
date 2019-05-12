@@ -1,4 +1,4 @@
-const hotClient = require('webpack-hot-middleware/client?name=main-browser-window&reload=true')
+const hotClient = require('webpack-hot-middleware/client?name=search-worker&reload=true')
 
 hotClient.subscribe((event) => {
   /**
