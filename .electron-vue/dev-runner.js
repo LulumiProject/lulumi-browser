@@ -66,6 +66,7 @@ function startRenderer () {
       resolve()
     })
     app.use(express.static(path.join(__dirname, '../', 'dist')));
+    app.use('/static', express.static(path.join(__dirname, '../', 'static')));
     app.use(hotMiddleware)
     app.use('/__open-in-editor', openInEditor())
 
