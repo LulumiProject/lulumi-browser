@@ -19,7 +19,7 @@
                                        @focus="onFocus",
                                        @blur="onBlur",
                                        @select="onSelect",
-                                       v-model="value",
+                                       @input="onChange",
                                        :trigger-on-focus="false",
                                        :placeholder="$t('navbar.placeholder')",
                                        :fetch-suggestions="querySearch",
@@ -36,7 +36,11 @@
       #security-indicator(slot="append",
                           class="el-input__inner",
                           v-html="fancyContent",
-                          @click="onNewElementParentClick()")
+                          @click="onNewElementParentClick()",
+                          @drop="onDrop"
+                          @dragenter.self="onDragEnter",
+                          @dragleave.self="onDragLeave"
+                          @dragover.prevent)
       template(slot-scope="props")
         component(:is="'suggestion-item'", :item="props.item")
   .extensions-group(v-sortable="")
@@ -192,6 +196,7 @@ export default class Navbar extends Vue {
   clickHandler: any;
   blurHandler: any;
   secure: boolean = false;
+  typing: boolean = false;
   focused: boolean = false;
   value: string = '';
   search: any;
@@ -232,8 +237,9 @@ export default class Navbar extends Vue {
   get url(): string {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
       this.value = '';
-    } else if (this.tab.isLoading) {
+    } else if (this.tab.isLoading && !this.typing) {
       this.value = this.tab.url;
+      this.$nextTick(() => this.selectText());
     }
     if (this.value === 'lulumi://about/#/newtab') {
       this.value = '';
@@ -314,7 +320,7 @@ export default class Navbar extends Vue {
             if (document) {
               const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
               const si = document.getElementById('security-indicator') as HTMLDivElement;
-              if (el && si && si.parentElement && this.$refs.input) {
+              if (el && si && si.parentElement) {
                 el.querySelector('input')!.setAttribute('style', 'display: none;');
                 si.parentElement.setAttribute('style', 'display: block;');
               }
@@ -426,17 +432,65 @@ export default class Navbar extends Vue {
     this.focused = true;
   }
   onBlur(): void {
+    this.typing = false;
     this.focused = false;
     if (document) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement && this.$refs.input) {
+      if (el && si && si.parentElement) {
         el.querySelector('input')!.setAttribute('style', 'display: none;');
         si.parentElement.setAttribute('style', 'display: block;');
+        si.querySelector('.security-hint')!.classList.remove('selection');
+      }
+    }
+  }
+  onDrop(event): void {
+    const url = event.dataTransfer.getData('url');
+    if (url) {
+      this.onNewElementParentClick();
+      this.value = url;
+    }
+  }
+  onDragEnter(event): void {
+    if (document) {
+      const si = document.getElementById('security-indicator');
+      if (si) {
+        if (event.fromElement
+          && event.toElement
+          // tslint:disable-next-line:max-line-length
+          && event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend'
+          && event.toElement.className === 'el-input__inner') {
+          si.querySelector('.security-hint')!.classList.add('selection');
+        } else if (event.fromElement
+          && event.toElement
+          && event.fromElement.className === 'el-input-group__append'
+          && event.toElement.className === 'el-input__inner') {
+          si.querySelector('.security-hint')!.classList.add('selection');
+        }
+      }
+    }
+  }
+  onDragLeave(event): void {
+    if (document) {
+      const si = document.getElementById('security-indicator');
+      if (si) {
+        if (event.fromElement
+          && event.toElement
+          && event.fromElement.className === 'el-input-group__append'
+          && event.toElement.className === 'el-input__inner') {
+          si.querySelector('.security-hint')!.classList.remove('selection');
+        } else if (event.fromElement
+          && event.toElement
+          // tslint:disable-next-line:max-line-length
+          && event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend'
+          && event.toElement.className === 'el-input__inner') {
+          si.querySelector('.security-hint')!.classList.remove('selection');
+        }
       }
     }
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
+    this.typing = false;
     this.focused = false;
     if (event.item) {
       if (event.item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
@@ -456,11 +510,24 @@ export default class Navbar extends Vue {
       el.querySelector('input')!.blur();
     }
   }
+  onChange(val: string) {
+    this.typing = true;
+    this.value = val;
+  }
+  selectText(): void {
+    if (document) {
+      const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
+      if (el) {
+        el.querySelector('input')!.selectionStart = 0;
+        el.querySelector('input')!.selectionEnd = this.value.length;
+      }
+    }
+  }
   onNewElementParentClick(): void {
     if (document) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement && this.$refs.input) {
+      if (el && si && si.parentElement) {
         el.querySelector('input')!.setAttribute('style', 'display: block;');
         si.parentElement.setAttribute('style', 'display: none;');
         el.querySelector('input')!.focus();
@@ -838,7 +905,7 @@ export default class Navbar extends Vue {
     if (document) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement && this.$refs.input) {
+      if (el && si && si.parentElement) {
         el.querySelector('input')!.setAttribute('style', 'display: none;');
         si.parentElement.setAttribute('style', 'display: block;');
       }
@@ -942,6 +1009,10 @@ export default class Navbar extends Vue {
     #url-input {
       flex: 1;
       display: flex;
+
+      &:hover {
+        cursor: text;
+      }
     }
   }
 
