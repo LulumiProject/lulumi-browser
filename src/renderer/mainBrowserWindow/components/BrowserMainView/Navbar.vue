@@ -135,6 +135,20 @@ Vue.component('suggestion-item', {
         } else if (renderElementsOfValue.length === 0) {
           renderElementsOfValue.push(item.value);
         }
+        if (item.icon.startsWith('http')
+          || item.icon.startsWith('data:')) {
+          return h('div', { attrs: { class: 'url' } }, [
+            h('img', { attrs: {
+              src: item.icon,
+              style: 'padding-right: 10px; height: 14px; width: 14px;',
+            } }),
+            h('span', renderElementsOfValue),
+            h('span', { attrs: { class: 'name' } }, [
+              ' - ',
+              ...renderElementsOfTitle,
+            ]),
+          ]);
+        }
         return h('div', { attrs: { class: 'url' } }, [
           h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
           h('span', renderElementsOfValue),
@@ -269,7 +283,7 @@ export default class Navbar extends Vue {
         title: history.title,
         value: part,
         url: part,
-        icon: 'document',
+        icon: history.favIconUrl,
       });
     });
     return suggestionItems;
