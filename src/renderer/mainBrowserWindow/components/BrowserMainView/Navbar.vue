@@ -21,6 +21,7 @@
                                        @select="onSelect",
                                        @input="onChange",
                                        :trigger-on-focus="false",
+                                       :select-when-unmatched="true",
                                        :placeholder="$t('navbar.placeholder')",
                                        :fetch-suggestions="querySearch",
                                        :value="showUrl",
@@ -95,6 +96,7 @@ import urlUtil from '../../../lib/url-util';
 import config from '../../constants';
 
 import BrowserMainView from '../BrowserMainView.vue';
+import Tabs from './Tabs.vue';
 
 Vue.component('suggestion-item', {
   functional: true,
@@ -138,10 +140,16 @@ Vue.component('suggestion-item', {
         if (item.icon.startsWith('http')
           || item.icon.startsWith('data:')) {
           return h('div', { attrs: { class: 'url' } }, [
-            h('img', { attrs: {
-              src: item.icon,
-              style: 'padding-right: 10px; height: 14px; width: 14px;',
-            } }),
+            h('img', {
+              attrs: {
+                src: item.icon,
+                style: 'padding-right: 10px; height: 14px; width: 14px;',
+              },
+              on: {
+                error: ((ctx.parent.$parent as BrowserMainView).$children[0] as Tabs)
+                  .loadDefaultFavicon,
+              },
+            }),
             h('span', renderElementsOfValue),
             h('span', { attrs: { class: 'name' } }, [
               ' - ',
@@ -235,6 +243,9 @@ export default class Navbar extends Vue {
       return this.dummyTabObject;
     }
     return this.tabs[this.currentTabIndex];
+  }
+  get defaultFavicon(): string {
+    return this.$store.getters.defaultFavicon;
   }
   get autoFetch(): boolean {
     return this.$store.getters.autoFetch;
@@ -461,8 +472,8 @@ export default class Navbar extends Vue {
   onDrop(event): void {
     const url = event.dataTransfer.getData('url');
     if (url) {
-      this.onNewElementParentClick();
       this.value = url;
+      this.onNewElementParentClick();
     }
   }
   onDragEnter(event): void {

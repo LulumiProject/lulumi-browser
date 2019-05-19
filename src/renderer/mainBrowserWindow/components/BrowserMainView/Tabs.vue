@@ -116,7 +116,8 @@ export default class Tabs extends Vue {
       : fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
   }
   loadDefaultFavicon(event: Electron.Event) {
-    (event.target as HTMLImageElement).src = this.$store.getters.tabConfig.defaultFavicon;
+    (event.target as any).classList
+      += `el-icon-${this.$store.getters.tabConfig.defaultFavicon}`;
   }
   onCustomButtonClick(event) {
     const currentWindow: Electron.BrowserWindow | null

@@ -18,7 +18,11 @@ div
       ref="input")
       template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.favicon') }}
       template(slot="append")
-        img.preview(:src="defaultFavicon", width="24px")
+        i.preview(:class="`el-icon-${defaultFavicon}`")
+  div {{ `&lt;i class="el-icon-${defaultFavicon}"&gt;&lt;/i&gt;` }}
+    hr
+    | Ref:&nbsp;
+    a(href="https://element.eleme.io/#/en-US/component/icon", target="_blank") https://element.eleme.io/#/en-US/component/icon
 </template>
 
 <script lang="ts">

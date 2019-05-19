@@ -80,9 +80,7 @@ const tabConfig: Lulumi.Store.TabConfig = {
     pageActionMapping: {},
     extensionsMetadata: {},
   },
-  defaultFavicon: nativeImage
-    .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'document.png')))
-    .toDataURL(),
+  defaultFavicon: 'document',
   lulumiFavicon: nativeImage
     .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'icon.png')))
     .toDataURL(),
