@@ -245,7 +245,7 @@ export default class Navbar extends Vue {
     return this.tabs[this.currentTabIndex];
   }
   get defaultFavicon(): string {
-    return this.$store.getters.defaultFavicon;
+    return this.$store.getters.tabConfig.defaultFavicon;
   }
   get autoFetch(): boolean {
     return this.$store.getters.autoFetch;
@@ -564,7 +564,10 @@ export default class Navbar extends Vue {
     const currentSearchEngine: string = this.currentSearchEngine.name;
     const navbarSearch = this.$t('navbar.search');
     let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
-    this.suggestionItems.forEach(item => suggestions.push({ item }));
+    this.suggestionItems.forEach((item) => {
+      item.icon = this.defaultFavicon;
+      suggestions.push({ item });
+    });
     if (queryString) {
       suggestions = suggestions.filter(this.createFilter(queryString));
     }
@@ -581,7 +584,7 @@ export default class Navbar extends Vue {
         item: {
           value: this.value,
           url: this.value,
-          icon: 'document',
+          icon: this.defaultFavicon,
         },
       });
     }
