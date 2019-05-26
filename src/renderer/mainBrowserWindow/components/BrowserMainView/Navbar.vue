@@ -13,7 +13,7 @@
       iview-icon(type="md-refresh", size="16")
   .input-group
     good-custom-autocomplete#url-input(ref="input",
-                                       @contextmenu.native="$parent.onNavContextMenu",
+                                       @contextmenu.native="onNavContextMenu",
                                        @keyup.shift.up.native="selectPortion",
                                        @keyup.shift.down.native="selectPortion",
                                        @focus="onFocus",
@@ -452,6 +452,10 @@ export default class Navbar extends Vue {
     if (this.handler) {
       clearTimeout(this.handler);
     }
+  }
+  onNavContextMenu(event): void {
+    this.onNewElementParentClick();
+    (this.$parent as BrowserMainView).onNavContextMenu(event);
   }
   onFocus(): void {
     this.focused = true;

@@ -7,6 +7,9 @@ import {
   BrowserWindow,
   dialog,
   ipcMain,
+  Menu,
+  MenuItem,
+  nativeImage,
   protocol,
   shell,
   systemPreferences,
@@ -124,6 +127,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
+      webSecurity: false,
       webviewTag: true,
     },
   };
@@ -710,6 +714,39 @@ ipcMain.on('fetch-search-suggestions',
       event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
     });
   });
+
+ipcMain.on('popup', (event: Electron.Event, popupObject: any) => {
+  const menu = new Menu();
+  popupObject.menuItems.forEach((menuItem) => {
+    if (menuItem.icon) {
+      if (menuItem.icon === 'base64') {
+        const icon = nativeImage.createFromDataURL(menuItem.base64Icon).resize({
+          width: 14,
+          height: 14,
+        });
+        delete menuItem.base64Icon;
+        menuItem.icon = icon;
+      }
+    }
+    if (menuItem.click) {
+      if (menuItem.click === 'open-history') {
+        menuItem.click = () => (event.sender.send('open-history'));
+      } else if (menuItem.click === 'go-to-index') {
+        const index = menuItem.index;
+        delete menuItem.index;
+        menuItem.click = () => {
+          event.sender.send('go-to-index', index);
+        };
+      }
+    }
+    menu.append(new MenuItem(menuItem));
+  });
+  menu.popup({
+    window: BrowserWindow.fromId(popupObject.windowId),
+    x: popupObject.x,
+    y: popupObject.y,
+  });
+});
 
 // reload each BrowserView when we plug in our cable
 globalObject.isOnline = true;

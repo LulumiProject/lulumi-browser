@@ -1037,8 +1037,7 @@ export default class BrowserMainView extends Vue {
     const currentWindow: Electron.BrowserWindow | null
       = this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
-      const { Menu, MenuItem } = this.$electron.remote;
-      const menu = new Menu();
+      const menuItems: any[] = [];
       const webview = this.getWebView();
       const webContents: any = webview.getWebContents();
       const navbar = document.getElementById('browser-navbar');
@@ -1053,26 +1052,32 @@ export default class BrowserMainView extends Vue {
         if (current <= urls.length - 1 && current !== 0) {
           for (let i = current - 1; i >= 0; i = i-1) {
             try {
-              menu.append(new MenuItem({
+              const base64Icon = await imageUtil.getBase64FromImageUrl(history[urls[i]].icon);
+              menuItems.push({
+                base64Icon,
+                icon: 'base64',
                 label: history[urls[i]].title,
-                click: () => webview.goToIndex(i),
-              }));
+                click: 'go-to-index',
+                index: i,
+              });
             } catch (e) {
-              menu.append(new MenuItem({
+              menuItems.push({
                 label: urls[i],
-                click: () => webview.goToIndex(i),
-              }));
+                click: 'go-to-index',
+                index: i,
+              });
             }
           }
 
-          menu.append(new MenuItem({ type: 'separator' }));
-          menu.append(new MenuItem({
+          menuItems.push({ type: 'separator' });
+          menuItems.push({
             label: this.$t('navbar.navigator.history') as string,
-            click: () => this.onNewTab(this.windowId, 'about:history', false),
-          }));
+            click: 'open-history',
+          });
 
-          menu.popup({
-            window: currentWindow,
+          this.$electron.ipcRenderer.send('popup', {
+            menuItems,
+            windowId: currentWindow.id,
             x: Math.floor(goBack.getBoundingClientRect().left),
             y: Math.floor(navbar.getBoundingClientRect().bottom),
           });
@@ -1085,8 +1090,7 @@ export default class BrowserMainView extends Vue {
     const currentWindow: Electron.BrowserWindow | null
       = this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
-      const { Menu, MenuItem } = this.$electron.remote;
-      const menu = new Menu();
+      const menuItems: any[] = [];
       const webview = this.getWebView();
       const webContents: any = webview.getWebContents();
       const navbar = document.getElementById('browser-navbar');
@@ -1101,26 +1105,32 @@ export default class BrowserMainView extends Vue {
         if (current <= urls.length - 1 && current !== urls.length - 1) {
           for (let i = current + 1; i < urls.length; i = i+1) {
             try {
-              menu.append(new MenuItem({
+              const base64Icon = await imageUtil.getBase64FromImageUrl(history[urls[i]].icon);
+              menuItems.push({
+                base64Icon,
+                icon: 'base64',
                 label: history[urls[i]].title,
-                click: () => webview.goToIndex(i),
-              }));
+                click: 'go-to-index',
+                index: i,
+              });
             } catch (e) {
-              menu.append(new MenuItem({
+              menuItems.push({
                 label: urls[i],
-                click: () => webview.goToIndex(i),
-              }));
+                click: 'go-to-index',
+                index: i,
+              });
             }
           }
 
-          menu.append(new MenuItem({ type: 'separator' }));
-          menu.append(new MenuItem({
+          menuItems.push({ type: 'separator' });
+          menuItems.push({
             label: this.$t('navbar.navigator.history') as string,
-            click: () => this.onNewTab(this.windowId, 'about:history', false),
-          }));
+            click: 'open-history',
+          });
 
-          menu.popup({
-            window: currentWindow,
+          this.$electron.ipcRenderer.send('popup', {
+            menuItems,
+            windowId: currentWindow.id,
             x: Math.floor(goForward.getBoundingClientRect().left),
             y: Math.floor(navbar.getBoundingClientRect().bottom),
           });
@@ -1574,6 +1584,13 @@ export default class BrowserMainView extends Vue {
     });
     ipc.on('go-forward', () => {
       this.onClickForward();
+    });
+    ipc.on('go-to-index', (event, index) => {
+      const webview = this.getWebView();
+      webview.goToIndex(index);
+    });
+    ipc.on('open-history', () => {
+      this.onNewTab(this.windowId, 'about:history', false);
     });
     ipc.on('reload', () => {
       this.onClickRefresh();
