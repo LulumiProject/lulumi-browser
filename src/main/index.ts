@@ -180,7 +180,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
   menu.init();
 
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
-    // webPreferences.nativeWindowOpen = true;
+    webPreferences.nativeWindowOpen = true;
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
     webPreferences.nodeIntegrationInSubFrames = true;
 

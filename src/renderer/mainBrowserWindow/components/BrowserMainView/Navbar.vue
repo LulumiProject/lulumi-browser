@@ -67,7 +67,6 @@
                         :class="showOrNot(extension)",
                         :title="showTitle(extension)")
         webview.extension(:ref="`webview-${extension.extensionId}`",
-                          webpreferences="nativeWindowOpen=1",
                           allowpopups="")
   .common-group
     a(id="browser-navbar__common", @click="$parent.onCommonMenu", class="enabled")
