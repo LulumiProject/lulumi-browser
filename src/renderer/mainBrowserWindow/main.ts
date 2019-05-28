@@ -31,7 +31,6 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       highlightedIndex: -1,
       suggestionDisabled: false,
       lastQueryString: '',
-      pending: false,
     };
   },
   computed: {
@@ -110,22 +109,19 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       }
     },
     handleKeyEnter(event) {
-      if (!this.pending
-        && this.suggestionVisible
-        && this.highlightedIndex >= 0
-        && this.highlightedIndex < this.suggestions.length) {
-        event.preventDefault();
-        this.select(this.suggestions[this.highlightedIndex]);
-      } else if (this.selectWhenUnmatched) {
-        this.$emit('select', { value: this.value });
-        this.$nextTick(() => {
-          this.suggestions = [];
-          this.highlightedIndex = -1;
-        });
-      } else if (this.pending) {
-        this.pending = false;
-      } else {
-        this.pending = true;
+      if (!this.isComposing) {
+        if (this.suggestionVisible
+          && this.highlightedIndex >= 0
+          && this.highlightedIndex < this.suggestions.length) {
+          event.preventDefault();
+          this.select(this.suggestions[this.highlightedIndex]);
+        } else if (this.selectWhenUnmatched) {
+          this.$emit('select', { value: this.value });
+          this.$nextTick(() => {
+            this.suggestions = [];
+            this.highlightedIndex = -1;
+          });
+        }
       }
     },
   },

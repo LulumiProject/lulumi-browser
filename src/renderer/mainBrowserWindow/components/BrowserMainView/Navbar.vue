@@ -13,6 +13,9 @@
       iview-icon(type="md-refresh", size="16")
   .input-group
     good-custom-autocomplete#url-input(ref="input",
+                                       @compositionstart.native="handleComposition",
+                                       @compositionupdate.native="handleComposition",
+                                       @compositionend.native="handleComposition",
                                        @contextmenu.native="onNavContextMenu",
                                        @keyup.shift.up.native="selectPortion",
                                        @keyup.shift.down.native="selectPortion",
@@ -321,6 +324,13 @@ export default class Navbar extends Vue {
         </div>
       `;
     }
+    if (this.url === '') {
+      return `
+        <div class="security-hint" style="color: #c0c4cc">
+          ${this.$t('navbar.placeholder')}
+        </div>
+      `;
+    }
     return `<div class="security-hint">${this.url}</div>`;
   }
 
@@ -451,6 +461,13 @@ export default class Navbar extends Vue {
   onGoForwardMouseUp(): void {
     if (this.handler) {
       clearTimeout(this.handler);
+    }
+  }
+  handleComposition(event): void {
+    if (event.type === 'compositionend') {
+      (this.$refs.input as any).isComposing = false;
+    } else {
+      (this.$refs.input as any).isComposing = true;
     }
   }
   onNavContextMenu(event): void {
@@ -989,7 +1006,6 @@ export default class Navbar extends Vue {
   height: 36px;
   padding: 0 5px;
   font-size: 15px;
-  font-weight: 100;
   background: #f5f5f5;
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #aaa;
