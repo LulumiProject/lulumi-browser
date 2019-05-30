@@ -98,7 +98,6 @@ import urlUtil from '../../../lib/url-util';
 import config from '../../constants';
 
 import BrowserMainView from '../BrowserMainView.vue';
-import Tabs from './Tabs.vue';
 
 Vue.component('suggestion-item', {
   functional: true,
@@ -142,16 +141,20 @@ Vue.component('suggestion-item', {
         if (item.icon.startsWith('http')
           || item.icon.startsWith('data:')) {
           return h('div', { attrs: { class: 'url' } }, [
-            h('img', {
+            h('object', {
               attrs: {
-                src: item.icon,
+                data: item.icon,
+                type: 'image/x-icon',
                 style: 'padding-right: 10px; height: 14px; width: 14px;',
               },
-              on: {
-                error: ((ctx.parent.$parent as BrowserMainView).$children[0] as Tabs)
-                  .loadDefaultFavicon,
-              },
-            }),
+            },
+              [
+                h('i', {
+                  attrs: {
+                    class: `el-icon-${ctx.parent.$store.getters.tabConfig.defaultFavicon}`,
+                  },
+                }),
+              ]),
             h('span', renderElementsOfValue),
             h('span', { attrs: { class: 'name' } }, [
               ' - ',

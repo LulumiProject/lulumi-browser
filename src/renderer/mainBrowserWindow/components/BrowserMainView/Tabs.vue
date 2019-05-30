@@ -21,7 +21,8 @@
                    stroke-width="5",
                    stroke-miterlimit="10",
                    :class="tab.didNavigate ? 'path' : 'path-reverse'")
-          img(v-else, :src="tab.favIconUrl", @error="loadDefaultFavicon($event)", height='16', width='16')
+          object(v-else, :data="tab.favIconUrl", type='image/x-icon', height='16', width='16')
+            i(:class="`el-icon-${$store.getters.tabConfig.defaultFavicon}`", style='font-size: 16px;')
           awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
           awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
         el-tooltip(:content="tab.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
@@ -114,10 +115,6 @@ export default class Tabs extends Vue {
     return process.env.NODE_ENV !== 'production'
       ? `${path.join('static', 'icons', 'icons.svg')}#${id}`
       : fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
-  }
-  loadDefaultFavicon(event: Electron.Event) {
-    (event.target as any).classList
-      += `el-icon-${this.$store.getters.tabConfig.defaultFavicon}`;
   }
   onCustomButtonClick(event) {
     const currentWindow: Electron.BrowserWindow | null
