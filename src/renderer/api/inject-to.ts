@@ -358,7 +358,7 @@ export default function injectTo(guestInstanceId, thisExtensionId, scriptType, c
           // https://github.com/ecrmnn/collect.js#reduce
           callback(
             collect(Object.values(groups)).reduce(
-              (a, b) => collect(a!).sortBy('index').all().concat((collect(b).sortBy('index').all() as any)), []));
+              (a, b) => collect(a!).sortBy('index').all().concat((collect(b as any).sortBy('index').all() as any)), []));
         }
       }, 'lulumi-tabs-query', queryInfo);
     },
