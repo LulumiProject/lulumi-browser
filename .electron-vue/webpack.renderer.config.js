@@ -186,7 +186,7 @@ let mainBrowserWindowConfig = {
         policy: {
           'base-uri': "'self'",
           'default-src': "'none'",
-          'object-src': "'self'",
+          'object-src': ["'self'", "data:"],
           'connect-src': ["'self'"],
           // https://github.com/GoogleChromeLabs/comlink/pull/274
           'script-src': ["'self'", "'unsafe-eval'"],

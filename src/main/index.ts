@@ -719,13 +719,12 @@ ipcMain.on('popup', (event: Electron.Event, popupObject: any) => {
   const menu = new Menu();
   popupObject.menuItems.forEach((menuItem) => {
     if (menuItem.icon) {
-      if (menuItem.icon === 'base64') {
-        const icon = nativeImage.createFromDataURL(menuItem.base64Icon).resize({
+      if (menuItem.type === 'base64') {
+        menuItem.icon = nativeImage.createFromDataURL(menuItem.icon).resize({
           width: 14,
           height: 14,
         });
-        delete menuItem.base64Icon;
-        menuItem.icon = icon;
+        delete menuItem.type;
       }
     }
     if (menuItem.click) {

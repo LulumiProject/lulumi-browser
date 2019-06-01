@@ -21,7 +21,7 @@ const imageUtil = {
         canvas.height = img.naturalHeight;
         canvas.getContext('2d')!
           .drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
+        resolve(canvas.toDataURL());
       };
       img.src = input;
     });

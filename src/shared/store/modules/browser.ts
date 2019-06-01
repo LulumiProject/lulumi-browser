@@ -333,8 +333,10 @@ const mutations = {
         state.tabs[tabsIndex].url = url;
         state.tabs[tabsIndex].error = false;
         if (url.match(regexp)) {
+          // lulumi://
           if (url.match(regexp)![1] === undefined) {
             state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
+          // lulumi-extension://
           } else {
             state.tabs[tabsIndex].statusText = false;
             state.tabs[tabsIndex].canGoBack = payload.canGoBack;
@@ -346,8 +348,9 @@ const mutations = {
             state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
           }
           // history
-          if (!(state.tabs[tabsIndex].url.startsWith('file://')
-            && state.tabs[tabsIndex].url.includes('/error/index.html'))) {
+          if (!((state.tabs[tabsIndex].url.startsWith('file://')
+            && state.tabs[tabsIndex].url.includes('/error/index.html'))
+            || state.tabs[tabsIndex].url.startsWith('about:blank'))) {
             const dates = timeUtil.getLocaleCurrentTime().split(' ');
             const mtime = timeUtil.getMillisecondsTime();
             const index = state.history.findIndex(entry => entry.url === state.tabs[tabsIndex].url);
@@ -382,7 +385,11 @@ const mutations = {
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex]) {
-      state.tabs[tabsIndex].favIconUrl = url;
+      const index = state.history.findIndex(entry => entry.url === state.tabs[tabsIndex].url);
+      if (index !== -1) {
+        state.history[index].favIconUrl = url;
+        state.tabs[tabsIndex].favIconUrl = url;
+      }
     }
   },
   [types.DID_STOP_LOADING](state: Lulumi.Store.State, payload) {
@@ -390,25 +397,11 @@ const mutations = {
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;
     const url: string = payload.url;
-    const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
 
     const tabsIndex = state.tabs.findIndex(tab => tab.id === tabId);
 
     if (state.tabs[tabsIndex] && url) {
       state.tabs[tabsIndex].url = url;
-      if (!url.match(regexp)) {
-        if (!state.tabs[tabsIndex].favIconUrl) {
-          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.defaultFavicon;
-        }
-        // update favicon of the certain history
-        if (state.tabs[tabsIndex].title !== 'error') {
-          for (let i = 0; i < ((state.history.length < 10) ? state.history.length : 10); i += 1) {
-            if (state.history[i].url === url) {
-              state.history[i].favIconUrl = state.tabs[tabsIndex].favIconUrl;
-            }
-          }
-        }
-      }
       state.tabs[tabsIndex].canGoBack = payload.canGoBack;
       state.tabs[tabsIndex].canGoForward = payload.canGoForward;
       state.tabs[tabsIndex].statusText = false;

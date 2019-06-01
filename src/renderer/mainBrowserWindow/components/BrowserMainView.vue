@@ -31,6 +31,7 @@ import Tab from './BrowserMainView/Tab.vue';
 import Download from './BrowserMainView/Download.vue';
 
 import { is } from 'electron-util';
+import constants from '../../mainBrowserWindow/constants';
 import urlUtil from '../../lib/url-util';
 import imageUtil from '../../lib/image-util';
 import urlResource from '../../lib/url-resource';
@@ -404,12 +405,18 @@ export default class BrowserMainView extends Vue {
       });
     }
   }
-  onPageFaviconUpdated(
-    event: Electron.PageFaviconUpdatedEvent, tabIndex: number, tabId: number): void {
+  async onPageFaviconUpdated(
+    event: Electron.PageFaviconUpdatedEvent, tabIndex: number, tabId: number): Promise<void> {
+    let dataUrl = event.favicons[0];
+    try {
+      dataUrl = await imageUtil.getBase64FromImageUrl(dataUrl);
+    } catch (err) {
+      dataUrl = dataUrl;
+    }
     this.$store.dispatch('pageFaviconUpdated', {
       tabId,
       tabIndex,
-      url: event.favicons[0],
+      url: dataUrl,
       windowId: this.windowId,
     });
     if (!(process.env.NODE_ENV === 'test'
@@ -417,7 +424,7 @@ export default class BrowserMainView extends Vue {
       this.onUpdatedEvent.emit(
         tabId,
         {
-          favIconUrl: event.favicons[0],
+          favIconUrl: dataUrl,
         },
         this.getTabObject(tabIndex));
     }
@@ -1052,20 +1059,31 @@ export default class BrowserMainView extends Vue {
         if (current <= urls.length - 1 && current !== 0) {
           for (let i = current - 1; i >= 0; i = i-1) {
             try {
-              const base64Icon = await imageUtil.getBase64FromImageUrl(history[urls[i]].icon);
               menuItems.push({
-                base64Icon,
-                icon: 'base64',
+                type: 'base64',
+                icon: history[urls[i]].icon,
                 label: history[urls[i]].title,
                 click: 'go-to-index',
                 index: i,
               });
             } catch (e) {
-              menuItems.push({
-                label: urls[i],
-                click: 'go-to-index',
-                index: i,
-              });
+              const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
+              const match = urls[i].match(regexp);
+              if (match) {
+                menuItems.push({
+                  type: 'base64',
+                  icon: constants.tabConfig.lulumiFavicon,
+                  label: urls[i],
+                  click: 'go-to-index',
+                  index: i,
+                });
+              } else {
+                menuItems.push({
+                  label: urls[i],
+                  click: 'go-to-index',
+                  index: i,
+                });
+              }
             }
           }
 
@@ -1105,20 +1123,31 @@ export default class BrowserMainView extends Vue {
         if (current <= urls.length - 1 && current !== urls.length - 1) {
           for (let i = current + 1; i < urls.length; i = i+1) {
             try {
-              const base64Icon = await imageUtil.getBase64FromImageUrl(history[urls[i]].icon);
               menuItems.push({
-                base64Icon,
-                icon: 'base64',
+                type: 'base64',
+                icon: history[urls[i]].icon,
                 label: history[urls[i]].title,
                 click: 'go-to-index',
                 index: i,
               });
             } catch (e) {
-              menuItems.push({
-                label: urls[i],
-                click: 'go-to-index',
-                index: i,
-              });
+              const regexp: RegExp = new RegExp('^lulumi(-extension)?://.+$');
+              const match = urls[i].match(regexp);
+              if (match) {
+                menuItems.push({
+                  type: 'base64',
+                  icon: constants.tabConfig.lulumiFavicon,
+                  label: urls[i],
+                  click: 'go-to-index',
+                  index: i,
+                });
+              } else {
+                menuItems.push({
+                  label: urls[i],
+                  click: 'go-to-index',
+                  index: i,
+                });
+              }
             }
           }
 

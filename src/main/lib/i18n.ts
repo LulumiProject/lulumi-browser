@@ -14,11 +14,18 @@ import * as zhTW from '../../helper/i18n/zh-TW';
 
 const langPath: string = path.join(app.getPath('userData'), 'lululmi-lang');
 
-let lang: string;
+let lang: string = '';
 try {
   lang = readFileSync(langPath, 'utf8');
-} catch (event) {
-  lang = '"en-US"';
+} catch (langError) {
+  lang = app.getLocaleCountryCode();
+  if (lang === 'TW') {
+    lang = '"zh-TW"';
+  } else if (lang === 'CN') {
+    lang = '"zh-CN"';
+  } else {
+    lang = '"en-US"';
+  }
 }
 lang = JSON.parse(lang);
 
