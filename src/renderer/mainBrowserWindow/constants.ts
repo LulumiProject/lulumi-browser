@@ -4,49 +4,48 @@ import * as path from 'path';
 
 declare const __static;
 
+/* tslint:disable:max-line-length */
+
 const searchEngine = [
   {
     name: 'Google',
     search: 'https://www.google.com/search?ie=UTF-8&q={queryString}',
-    autocomplete:
-      'https://www.google.com/complete/search?client=chrome&q={queryString}',
+    autocomplete: 'https://www.google.com/complete/search?client=chrome&q={queryString}',
   },
   {
     name: 'Bing',
     search: 'http://www.bing.com/search?setmkt={language}&q={queryString}',
-    autocomplete:
-      'http://api.bing.com/osjson.aspx?query={queryString}&language={language}',
+    autocomplete: 'http://api.bing.com/osjson.aspx?query={queryString}&language={language}',
   },
   {
     name: 'Yahoo!',
     search: 'http://search.yahoo.com/search?ei=UTF-8&fr=crmas&p={queryString}',
-    autocomplete:
-      'http://ff.search.yahoo.com/gossip?output=fxjson&command={queryString}',
+    autocomplete: 'http://ff.search.yahoo.com/gossip?output=fxjson&command={queryString}',
   },
   {
     name: 'Yahoo! UK & Ireland',
     search: 'http://uk.search.yahoo.com/search?ei=UTF-8&fr=crmas&p={queryString}',
-    autocomplete:
-      'http://uk-sayt.ff.search.yahoo.com/gossip-uk-sayt?output=fxjson&command={queryString}',
+    autocomplete: 'http://uk-sayt.ff.search.yahoo.com/gossip-uk-sayt?output=fxjson&command={queryString}',
   },
   {
     name: 'Yahoo! JAPAN',
     search: 'http://search.yahoo.co.jp/search?ei=UTF-8&fr=crmas&p={queryString}',
-    autocomplete:
-      /* tslint:disable-next-line:max-line-length */
-      'http://search.yahooapis.jp/AssistSearchService/V2/webassistSearch?appid=oQsoxcyxg66enp0TYoirkKoryq6rF8bK76mW0KYxZ0v0WPLtn.Lix6wy8F_LwGWHUII-&output=iejson&p={queryString}',
+    autocomplete: 'http://search.yahooapis.jp/AssistSearchService/V2/webassistSearch?appid=oQsoxcyxg66enp0TYoirkKoryq6rF8bK76mW0KYxZ0v0WPLtn.Lix6wy8F_LwGWHUII-&output=iejson&p={queryString}',
   },
   {
     name: 'Daum',
     search: 'http://search.daum.net/search?q={queryString}',
-    autocomplete:
-      'http://sug.search.daum.net/search_nsuggest?mod=fxjson&q={queryString}',
+    autocomplete: 'http://sug.search.daum.net/search_nsuggest?mod=fxjson&q={queryString}',
   },
   {
     name: 'Naver',
     search: 'http://search.naver.com/search.naver?ie=UTF-8&query={queryString}',
-    autocomplete:
-      'http://ac.search.naver.com/nx/ac?of=os&ie=utf-8&q={queryString}',
+    autocomplete: 'http://ac.search.naver.com/nx/ac?of=os&ie=utf-8&q={queryString}',
+  },
+  {
+    name: 'StartPage',
+    search: 'https://www.startpage.com/do/dsearch?prfe=36c84513558a2d34bf0d89ea505333ad9c86bd6598735d590adc2e9be9271a9b5065027ac0acf3048b0efafd7d93a95c&query={queryString}',
+    autocomplete: 'https://www.startpage.com/do/suggest?limit=10&format=json&query={queryString}&prfe=36c84513558a2d34bf0d89ea505333ad9c86bd6598735d590adc2e9be9271a9b5065027ac0acf3048b0efafd7d93a95c',
   },
 ];
 
