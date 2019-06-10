@@ -543,6 +543,191 @@ let preferenceViewConfig = {
   target: 'web'
 }
 
+let commandPaletteConfig = {
+  name: 'command-palette',
+  devtool: '#cheap-module-eval-source-map',
+  entry: {
+    'command-palette': path.join(__dirname, '../src/renderer/commandPalette/main.ts')
+  },
+  externals: [
+    /^electron-debug/,
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: {
+          loader: 'happypack/loader?id=happy-ts'
+        },
+        include: [ path.join(__dirname, '../src/shared'), path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/mainBrowserWindow'), path.join(__dirname, '../src/renderer/commandPalette') ],
+        exclude: /node_modules/
+      },
+      {
+        test: /\.less$/,
+        use: returnLess,
+        include: [ path.join(__dirname, '../src/renderer/commandPalette') ]
+      },
+      {
+        test: /\.css$/,
+        use: returnCss,
+        include: [
+          path.join(__dirname, '../src/renderer/commandPalette'),
+          path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
+          path.join(__dirname, '../node_modules/modern-normalize')
+        ]
+      },
+      {
+        test: /\.html$/,
+        use: [{
+          loader: 'happypack/loader?id=happy-html'
+        }]
+      },
+      {
+        test: /\.pug$/,
+        use: [{
+          loader: 'happypack/loader?id=happy-pug'
+        }]
+      },
+      {
+        test: /\.vue$/,
+        use: {
+          loader: 'vue-loader'
+        },
+        include: [ path.join(__dirname, '../src/renderer/commandPalette') ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
+      }
+    ]
+  },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
+    new OptimizeCssAssetsPlugin({
+      cssProcessorOptions: { discardComments: { removeAll: true } },
+      canPrint: false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'cp.html',
+      template: path.join(__dirname, '../src/renderer/commandPalette/index.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      cspPlugin: {
+        enabled: process.env.NODE_ENV === 'production',
+        policy: {
+          'default-src': "'none'",
+          'object-src': "'none'",
+          'connect-src': ["'self'"],
+          'script-src': ["'self'"],
+          'style-src': ["'self'", "'unsafe-inline'"],
+          'font-src': ["'self'", "data:"],
+          'img-src': ["'self'", "https:", "http:", "data:"]
+        },
+        nonceEnabled: {
+          'style-src': false,
+        },
+      },
+      nodeModules: process.env.NODE_ENV !== 'production'
+        ? path.join(__dirname, '../node_modules')
+        : false
+    }),
+    new CspHtmlWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    }),
+    createHappyPlugin('happy-html',  [{
+      loader: 'vue-html-loader'
+    }]),
+    createHappyPlugin('happy-pug', [{
+      loader: 'pug-plain-loader'
+    }]),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        appendTsSuffixTo: [/\.vue$/],
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
+      }
+    }]),
+    // https://github.com/amireh/happypack/pull/131
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          loaders: {
+            pug: 'pug-plain-loader'
+          }
+        }
+      }]
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [commandPalette]', excludeWarnings: false }),
+    new VueLoaderPlugin()
+  ],
+  output: {
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+    libraryTarget: 'commonjs2',
+    path: path.join(__dirname, '../dist')
+  },
+  resolve: {
+    alias: {
+      'components': path.join(__dirname, '../src/renderer/commandPalette/components'),
+      'renderer': path.join(__dirname, '../src/renderer/commandPalette'),
+      'shared': path.join(__dirname, '../src/shared'),
+      'i18n': path.join(__dirname, '../src/helper/i18n'),
+      'vue$': 'vue/dist/vue.runtime.esm.js'
+    },
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
+  },
+  target: 'electron-renderer'
+}
+
 let searchWorkerConfig = {
   name: 'search-worker',
   devtool: '#cheap-module-eval-source-map',
@@ -572,19 +757,21 @@ let searchWorkerConfig = {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig and preloadsConfig
  * for production settings
  */
 if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.mode = 'production'
   preloadsConfig.mode = 'production'
   preferenceViewConfig.mode = 'production'
+  commandPaletteConfig.mode = 'production'
   searchWorkerConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   preferenceViewConfig.performance = { hints: false }
   mainBrowserWindowConfig.devtool = false
   preloadsConfig.devtool = false
   preferenceViewConfig.devtool = false
+  commandPaletteConfig.devtool = false
   searchWorkerConfig.devtool = false
 
   mainBrowserWindowConfig.plugins.push(
@@ -602,6 +789,11 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     })
   )
+  commandPaletteConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
   searchWorkerConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -615,6 +807,7 @@ if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.mode = 'development'
   preloadsConfig.mode = 'development'
   preferenceViewConfig.mode = 'development'
+  commandPaletteConfig.mode = 'development'
   searchWorkerConfig.mode = 'development'
 
   mainBrowserWindowConfig.plugins.push(
@@ -632,10 +825,15 @@ if (process.env.NODE_ENV === 'production') {
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
   )
+  commandPaletteConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+    })
+  )
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig
  * and preloadsConfig for e2e settings
  */
 if (process.env.TEST_ENV === 'e2e') {
@@ -657,6 +855,12 @@ if (process.env.TEST_ENV === 'e2e') {
       'process.env.TEST_ENV': '"e2e"'
     })
   )
+  commandPaletteConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"test"',
+      'process.env.TEST_ENV': '"e2e"'
+    })
+  )
   searchWorkerConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"test"',
@@ -669,5 +873,6 @@ module.exports = [
   Object.assign({}, mainBrowserWindowConfig),
   Object.assign({}, preloadsConfig),
   Object.assign({}, preferenceViewConfig),
+  Object.assign({}, commandPaletteConfig),
   Object.assign({}, searchWorkerConfig)
 ]

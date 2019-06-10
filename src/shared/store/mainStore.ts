@@ -21,7 +21,7 @@ const isDarwin: boolean = is.macos;
 const isWindows: boolean = is.windows;
 const isLinux: boolean = is.linux;
 
-const windows: Electron.BrowserWindow[] = [];
+const windows: Electron.BrowserWindow[] | { 'webContents': Electron.WebContents }[] = [];
 
 const broadcastMutations = (store) => {
   store.subscribe((mutation) => {
@@ -80,128 +80,134 @@ function handleWindowProperty(window: Electron.BrowserWindow, action: string) {
 const register = (storagePath: string, swipeGesture: boolean): void => {
   ipcMain.on('vuex-connect', (event: Electron.Event) => {
     let close: boolean = false;
-    const window: BrowserWindow = BrowserWindow.fromWebContents(event.sender);
+    const window: BrowserWindow | undefined = BrowserWindow.fromWebContents(event.sender);
+    // command-palette window
+    if (window === undefined || event.sender.getURL().endsWith('cp.html#/')) {
+      windows[0] = { webContents: event.sender };
+    } else {
+      const windowId = window.id;
 
-    // we've registered this window, so we just return
-    if (windows[window.id] !== undefined) {
-      event.returnValue = store.state;
-      return;
-    }
+      // we've registered this window, so we just return
+      if (windows[windowId] !== undefined) {
+        event.returnValue = store.state;
+        return;
+      }
 
-    window.setMaxListeners(0);
+      window.setMaxListeners(0);
 
-    window.on('blur', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('focus', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('maximize', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('unmaximize', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('minimize', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('restore', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('resize', () => {
-      handleWindowProperty(window, 'update');
-    });
-    window.on('move', () => {
-      handleWindowProperty(window, 'update');
-    });
+      window.on('blur', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('focus', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('maximize', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('unmaximize', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('minimize', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('restore', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('resize', () => {
+        handleWindowProperty(window, 'update');
+      });
+      window.on('move', () => {
+        handleWindowProperty(window, 'update');
+      });
 
-    if (isWindows || isLinux) {
-      window.on('app-command', (event, command) => {
-        if (command === 'browser-backward') {
-          window.webContents.send('go-back');
-        } else if (command === 'browser-forward') {
-          window.webContents.send('go-forward');
+      if (isWindows || isLinux) {
+        window.on('app-command', (event, command) => {
+          if (command === 'browser-backward') {
+            window.webContents.send('go-back');
+          } else if (command === 'browser-forward') {
+            window.webContents.send('go-forward');
+          }
+        });
+      }
+
+      window.on('scroll-touch-begin', () => {
+        window.webContents.send('scroll-touch-begin', swipeGesture);
+      });
+      window.on('scroll-touch-end', () => {
+        window.webContents.send('scroll-touch-end');
+      });
+      window.on('scroll-touch-edge', () => {
+        window.webContents.send('scroll-touch-edge');
+      });
+
+      window.on('enter-full-screen', () => {
+        window.webContents.send('enter-full-screen', isDarwin);
+      });
+      window.on('leave-full-screen', () => {
+        window.webContents.send('leave-full-screen', isDarwin);
+      });
+
+      ipcMain.on('window-id', (event: Electron.Event) => {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        event.returnValue = {
+          windowId: window.id,
+          windowWebContentsId: window.webContents.id,
+        };
+      });
+
+      (window as any).callback(`any-new-tab-suggestion-for-window-${windowId}`);
+
+      window.on('close', (event: Electron.Event) => {
+        if (close) {
+          close = false;
+        } else {
+          event.preventDefault();
+
+          // store the properties of this window
+          handleWindowProperty(window, 'update');
+
+          if (process.env.NODE_ENV !== 'test') {
+            saveWindowState(windowId).then((state) => {
+              if (state && state.amount > 1) {
+                promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));
+              }
+              store.dispatch('closeAllTabs', {
+                windowId,
+                amount: state.amount,
+              });
+            });
+          } else {
+            store.dispatch('closeAllTabs', {
+              windowId,
+              amount: -1,
+            });
+          }
+
+          store.dispatch('closeWindow', windowId);
+          delete windows[windowId];
+          window.webContents.removeAllListeners('blur');
+          window.webContents.removeAllListeners('focus');
+          window.webContents.removeAllListeners('maximize');
+          window.webContents.removeAllListeners('unmaximize');
+          window.webContents.removeAllListeners('minimize');
+          window.webContents.removeAllListeners('restore');
+          window.webContents.removeAllListeners('resize');
+          window.webContents.removeAllListeners('move');
+          if (isWindows) {
+            window.webContents.removeAllListeners('app-command');
+          }
+          window.webContents.removeAllListeners('scroll-touch-end');
+          window.webContents.removeAllListeners('scroll-touch-edge');
+          window.webContents.removeAllListeners('window-id');
+          close = true;
+          window.close();
         }
       });
+
+      handleWindowProperty(window, 'create');
+
+      windows[windowId] = window;
     }
-
-    window.on('scroll-touch-begin', () => {
-      window.webContents.send('scroll-touch-begin', swipeGesture);
-    });
-    window.on('scroll-touch-end', () => {
-      window.webContents.send('scroll-touch-end');
-    });
-    window.on('scroll-touch-edge', () => {
-      window.webContents.send('scroll-touch-edge');
-    });
-
-    window.on('enter-full-screen', () => {
-      window.webContents.send('enter-full-screen', isDarwin);
-    });
-    window.on('leave-full-screen', () => {
-      window.webContents.send('leave-full-screen', isDarwin);
-    });
-
-    ipcMain.on('window-id', (event: Electron.Event) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
-      event.returnValue = {
-        windowId: window.id,
-        windowWebContentsId: window.webContents.id,
-      };
-    });
-
-    (window as any).callback(`any-new-tab-suggestion-for-window-${window.id}`);
-
-    window.on('close', (event: Electron.Event) => {
-      if (close) {
-        close = false;
-      } else {
-        event.preventDefault();
-
-        // store the properties of this window
-        handleWindowProperty(window, 'update');
-
-        if (process.env.NODE_ENV !== 'test') {
-          saveWindowState(window.id).then((state) => {
-            if (state && state.amount > 1) {
-              promisify(writeFile, `${storagePath}-window-${Date.now()}`, JSON.stringify(state));
-            }
-            store.dispatch('closeAllTabs', {
-              windowId: window.id,
-              amount: state.amount,
-            });
-          });
-        } else {
-          store.dispatch('closeAllTabs', {
-            windowId: window.id,
-            amount: -1,
-          });
-        }
-
-        store.dispatch('closeWindow', window.id);
-        delete windows[window.id];
-        window.webContents.removeAllListeners('blur');
-        window.webContents.removeAllListeners('focus');
-        window.webContents.removeAllListeners('maximize');
-        window.webContents.removeAllListeners('unmaximize');
-        window.webContents.removeAllListeners('minimize');
-        window.webContents.removeAllListeners('restore');
-        window.webContents.removeAllListeners('resize');
-        window.webContents.removeAllListeners('move');
-        if (isWindows) {
-          window.webContents.removeAllListeners('app-command');
-        }
-        window.webContents.removeAllListeners('scroll-touch-end');
-        window.webContents.removeAllListeners('scroll-touch-edge');
-        window.webContents.removeAllListeners('window-id');
-        close = true;
-        window.close();
-      }
-    });
-
-    handleWindowProperty(window, 'create');
-
-    windows[window.id] = window;
     event.returnValue = store.state;
   });
 
@@ -212,8 +218,11 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 };
 
 const updateWindowStates = (): void => {
-  Object.values(windows).forEach((window) => {
-    handleWindowProperty(window, 'update');
+  Object.keys(windows).forEach((key) => {
+    const id = parseInt(key, 10);
+    if (id !== 0) {
+      handleWindowProperty((windows[id] as Electron.BrowserWindow), 'update');
+    }
   });
 };
 

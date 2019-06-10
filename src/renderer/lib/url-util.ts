@@ -287,7 +287,7 @@ const urlUtil = {
    * @return {object}
    */
   getUrlIfAbout(url: string): Lulumi.Renderer.AboutLocationObject {
-    if (url.startsWith(constants.lulumiPagesCustomProtocol)) {
+    if (url.startsWith(`${constants.lulumiPagesCustomProtocol}://`)) {
       const guestUrl = require('url').parse(url);
       if (guestUrl.hash) {
         const guestHash = guestUrl.hash.substr(2);

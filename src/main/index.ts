@@ -6,14 +6,17 @@ import {
   app,
   BrowserWindow,
   dialog,
+  globalShortcut,
   ipcMain,
   Menu,
   MenuItem,
   nativeImage,
   protocol,
   shell,
+  screen,
   systemPreferences,
 } from 'electron';
+import { PanelWindow } from 'electron-panel-window';
 import collect from 'collect.js';
 import { is } from 'electron-util';
 
@@ -67,6 +70,9 @@ const swipeGesture: boolean = is.macos
 const winURL: string = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../.electron-vue/config').port}`
   : `file://${__dirname}/index.html`;
+const cpURL: string = process.env.NODE_ENV === 'development'
+  ? `http://localhost:${require('../../.electron-vue/config').port}/cp.html`
+  : `file://${__dirname}/cp.html`;
 
 // ./lib/session.ts
 const { default: session } = require('./lib/session');
@@ -75,7 +81,8 @@ const { default: session } = require('./lib/session');
 const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
-const windows: Electron.BrowserWindow[] = mainStore.getWindows();
+const windows: Electron.BrowserWindow[] | { 'webContents': Electron.WebContents }[]
+  = mainStore.getWindows();
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
@@ -85,17 +92,19 @@ function lulumiStateSave(soft: boolean = true, windowCount = Object.keys(windows
     let count = 0;
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
-      const window = windows[id];
-      window.once('closed', () => {
-        count += 1;
-        if (count === windowCount) {
-          if (setLanguage) {
-            mainStore.bumpWindowIds(windowCount);
+      if (id !== 0) {
+        const window = windows[id] as Electron.BrowserWindow;
+        window.once('closed', () => {
+          count += 1;
+          if (count === windowCount) {
+            if (setLanguage) {
+              mainStore.bumpWindowIds(windowCount);
+            }
           }
-        }
-      });
-      window.close();
-      window.removeAllListeners('close');
+        });
+        window.close();
+        window.removeAllListeners('close');
+      }
     });
   }
   if (setLanguage) {
@@ -228,7 +237,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register the method to BrowserWindow
 (BrowserWindow as any).createWindow = createWindow;
 
-// register 'lulumi://' and 'lulumi-extension://' as standard protocols that are secure
+// register 'lulumi', 'lulumi-extension' and 'command-palette' as standard protocols that are secure
 protocol.registerSchemesAsPrivileged([
   { scheme: 'lulumi', privileges: { standard: true, secure: true } },
   { scheme: 'lulumi-extension', privileges: { standard: true, secure: true } },
@@ -268,6 +277,79 @@ app.whenReady().then(() => {
       session.registerProxy(store.getters.proxyConfig);
     }
     try {
+      const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
+      if (is.macos) {
+        const alfred = new PanelWindow({
+          width: width / 2,
+          height: height / 1.94,
+          show: false,
+          fullscreenable: false,
+          resizable: false,
+          webPreferences: {
+            partition: 'command-palette',
+            contextIsolation: false,
+            nodeIntegration: true,
+          },
+        });
+        alfred.setVisibleOnAllWorkspaces(false);
+        alfred.loadURL(cpURL);
+        globalShortcut.register('CmdOrCtrl+Shift+K', () => {
+          if (alfred.isVisible()) {
+            alfred.hide();
+          } else {
+            alfred.show();
+            alfred.webContents.send('send-focus');
+          }
+        });
+        alfred.on('blur', () => alfred.hide());
+        ipcMain.on('alfred-blur', () => alfred.hide());
+        ipcMain.on('alfred-resize', (event, bounds) => {
+          const xyBounds: Electron.Rectangle = alfred.getBounds();
+          alfred.setBounds({
+            x: xyBounds.x,
+            y: xyBounds.y,
+            width: bounds.width,
+            height: bounds.height,
+          });
+        });
+      } else {
+        const alfred = new BrowserWindow({
+          width: width / 2,
+          height: height / 1.94,
+          show: false,
+          frame: false,
+          alwaysOnTop: true,
+          fullscreenable: false,
+          resizable: false,
+          webPreferences: {
+            partition: 'command-palette',
+            contextIsolation: false,
+            nodeIntegration: true,
+          },
+        });
+        alfred.setVisibleOnAllWorkspaces(false);
+        alfred.loadURL(cpURL);
+        globalShortcut.register('CmdOrCtrl+Shift+K', () => {
+          if (alfred.isVisible()) {
+            alfred.hide();
+          } else {
+            alfred.show();
+            alfred.webContents.send('send-focus');
+          }
+        });
+        alfred.on('blur', () => alfred.hide());
+        ipcMain.on('alfred-blur', () => alfred.hide());
+        ipcMain.on('alfred-resize', (event, bounds) => {
+          const xyBounds: Electron.Rectangle = alfred.getBounds();
+          alfred.setBounds({
+            x: xyBounds.x,
+            y: xyBounds.y,
+            width: bounds.width,
+            height: bounds.height,
+          });
+        });
+      }
       createWindow();
     } catch (createWindowError) {
       console.error(`(lulumi-browser) Could not create a window: ${createWindowError}`);
@@ -336,12 +418,14 @@ app.on('second-instance', () => {
   // Someone tried to run a second instance, we should focus our window.
   if (Object.keys(windows).length !== 0) {
     const id = parseInt(Object.keys(windows)[0], 10);
-    const window = windows[id];
-    if (window) {
-      if (window.isMinimized()) {
-        window.restore();
+    if (id !== 0) {
+      const window = windows[id] as Electron.BrowserWindow;
+      if (window) {
+        if (window.isMinimized()) {
+          window.restore();
+        }
+        window.focus();
       }
-      window.focus();
     }
   }
 });
@@ -430,17 +514,21 @@ ipcMain.on('show-certificate',
 
 // focus the window
 ipcMain.on('focus-window', (event, windowId) => {
-  const window: Electron.BrowserWindow = windows[windowId];
-  if (window) {
-    window.focus();
+  if (windowId !== 0) {
+    const window = windows[windowId] as Electron.BrowserWindow;
+    if (window) {
+      window.focus();
+    }
   }
 });
 
 // set the title for the focused BrowserWindow
 ipcMain.on('set-browser-window-title', (event, data) => {
-  const window: Electron.BrowserWindow = windows[data.windowId];
-  if (window) {
-    window.setTitle(data.title);
+  if (data.windowId !== 0) {
+    const window = windows[data.windowId] as Electron.BrowserWindow;
+    if (window) {
+      window.setTitle(data.title);
+    }
   }
 });
 
@@ -458,9 +546,9 @@ ipcMain.on('open-item', (event, path) => {
   }
 });
 
-// load preference things into global when users accessing 'lulumi://' protocol
+// load preference things into global when users accessing 'lulumi' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const type: string = val.substr((constants.lulumiPagesCustomProtocol).length).split('/')[0];
+  const type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
   const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
   if (type === 'about') {
     const versions = process.versions;
@@ -519,12 +607,12 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       ['Auth', 'auth'],
     ];
     data.about = [
-      [`${constants.lulumiPagesCustomProtocol}about/#/about`, 'about'],
-      [`${constants.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
-      [`${constants.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
-      [`${constants.lulumiPagesCustomProtocol}about/#/downloads`, 'downloads'],
-      [`${constants.lulumiPagesCustomProtocol}about/#/history`, 'history'],
-      [`${constants.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/about`, 'about'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/lulumi`, 'lulumi'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/preferences`, 'preferences'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/downloads`, 'downloads'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/history`, 'history'],
+      [`${constants.lulumiPagesCustomProtocol}://about/#/extensions`, 'extensions'],
     ];
   }
   event.returnValue = data;

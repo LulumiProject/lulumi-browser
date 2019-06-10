@@ -15,7 +15,7 @@ test.serial('has working about: handlers for redirecting requests to lulumi: pro
     .elementIdValue(el.value.ELEMENT, keys.ENTER);
 
   expect(await app.client
-    .tabByIndex(0)
+    .tabByIndex(1) // tabByIndex(0) is command-palatte page
     .waitForVisible('#app')
     .elementActive()
     .getUrl()).to.equal('lulumi://about/#/newtab');

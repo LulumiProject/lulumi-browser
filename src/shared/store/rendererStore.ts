@@ -29,11 +29,7 @@ const store = new Vuex.Store({
 
 if (!(process.env.NODE_ENV === 'test'
   && process.env.TEST_ENV === 'unit')) {
-  interface CustomStore {
-    dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
-  }
-
-  (store as CustomStore).dispatch = function (type, ...payload) {
+  (store as Lulumi.Store.CustomStore).dispatch = function (type, ...payload) {
     let newType = type;
     let newPayload = payload;
     if (typeof type === 'object' && type.type && arguments.length === 1) {

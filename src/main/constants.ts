@@ -12,8 +12,8 @@ export default {
   lulumiHelperPath,
   devUserData: `${path.resolve(lulumiRootPath, 'userData')}`,
   testUserData: `${path.resolve(lulumiRootPath, 'test', 'userData')}`,
-  lulumiPagesCustomProtocol: 'lulumi://',
+  lulumiPagesCustomProtocol: 'lulumi',
   lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: '4ffa6eeb1d4019d929f64c7efdfac6df77adecc8',
+  lulumiRev: 'f1fedeb18d795dedf70563f0e43bb2345dc1ce74',
 };

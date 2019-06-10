@@ -282,7 +282,7 @@ export default {
   homepage,
   pdfViewer,
   recommendTopSite,
-  lulumiPagesCustomProtocol: 'lulumi://',
+  lulumiPagesCustomProtocol: 'lulumi',
   aboutPages: {
     about: 'List of about pages',
   },

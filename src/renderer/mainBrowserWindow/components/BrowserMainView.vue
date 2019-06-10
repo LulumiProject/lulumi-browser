@@ -3,7 +3,7 @@ div
   #nav(ref="nav")
     tabs(ref="tabs", :windowId="windowId")
     navbar(ref="navbar", :windowId="windowId")
-  swipeArrow
+  SwipeArrow
   tab(v-for="(tab, index) in tabs",
       :isActive="index === currentTabIndex",
       :windowId="windowId",
@@ -26,7 +26,7 @@ import * as urlPackage from 'url';
 
 import Tabs from './BrowserMainView/Tabs.vue';
 import Navbar from './BrowserMainView/Navbar.vue';
-import swipeArrow from './BrowserMainView/SwipeArrow.vue';
+import SwipeArrow from './BrowserMainView/SwipeArrow.vue';
 import Tab from './BrowserMainView/Tab.vue';
 import Download from './BrowserMainView/Download.vue';
 
@@ -44,7 +44,7 @@ import Event from '../../api/event';
   components: {
     Tabs,
     Navbar,
-    swipeArrow,
+    SwipeArrow,
     Tab,
     Download,
   },

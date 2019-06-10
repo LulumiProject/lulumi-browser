@@ -336,7 +336,7 @@ const mutations = {
           // lulumi://
           if (url.match(regexp)![1] === undefined) {
             state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
-          // lulumi-extension://
+            // lulumi-extension://
           } else {
             state.tabs[tabsIndex].statusText = false;
             state.tabs[tabsIndex].canGoBack = payload.canGoBack;

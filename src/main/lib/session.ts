@@ -208,23 +208,26 @@ const registerWebRequestListeners = (): void => {
 };
 
 const registerScheme = (scheme: string): void => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  let sess: Electron.Session | null = null;
+  if (scheme === 'lulumi') {
+    sess = session.fromPartition('persist:webview');
+  } else {
+    sess = session.fromPartition('command-palette');
+  }
   if (process.env.NODE_ENV === 'development') {
-    sess.protocol.registerHttpProtocol('lulumi', async (request, callback) => {
-      const url: string = request.url.substr(scheme.length);
+    sess.protocol.registerHttpProtocol(scheme, async (request, callback) => {
+      const url: string = request.url.substr(`${scheme}://`.length);
       const [type, ...param] = url.split('/');
-      if (type === 'about') {
-        if (param[0].indexOf('#') === 0) {
-          callback({
-            method: request.method,
-            url: `http://localhost:${require('../../../.electron-vue/config').port}/about.html`,
-          });
-        } else {
-          callback({
-            method: request.method,
-            url: `http://localhost:${require('../../../.electron-vue/config').port}/${param.join('/')}`,
-          });
-        }
+      if (param[0].indexOf('#') === 0) {
+        callback({
+          method: request.method,
+          url: `http://localhost:${require('../../../.electron-vue/config').port}/${type}.html`,
+        });
+      } else {
+        callback({
+          method: request.method,
+          url: `http://localhost:${require('../../../.electron-vue/config').port}/${param.join('/')}`,
+        });
       }
     }, (error) => {
       if (error) {
@@ -232,15 +235,13 @@ const registerScheme = (scheme: string): void => {
       }
     });
   } else {
-    sess.protocol.registerFileProtocol('lulumi', (request, callback) => {
-      const url: string = request.url.substr(scheme.length);
+    sess.protocol.registerFileProtocol(scheme, (request, callback) => {
+      const url: string = request.url.substr(`${scheme}://`.length);
       const [type, ...param] = url.split('/');
-      if (type === 'about') {
-        if (param.indexOf('#') === 0) {
-          callback(`${__dirname}/about.html`);
-        } else {
-          callback(`${__dirname}/${param.join('/')}`);
-        }
+      if (param.indexOf('#') === 0) {
+        callback(`${__dirname}/${type}.html`);
+      } else {
+        callback(`${__dirname}/${param.join('/')}`);
       }
     }, (error) => {
       if (error) {

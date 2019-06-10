@@ -15,18 +15,18 @@ Vue.config.productionTip = false;
 Vue.config.devtools = false;
 
 const config = {
-  lulumiPagesCustomProtocol: 'lulumi://',
+  lulumiPagesCustomProtocol: 'lulumi',
 };
 
 const about = {
   lulumi: [],
   about: [
-    [`${config.lulumiPagesCustomProtocol}about/#/about`, 'about'],
-    [`${config.lulumiPagesCustomProtocol}about/#/lulumi`, 'lulumi'],
-    [`${config.lulumiPagesCustomProtocol}about/#/preferences`, 'preferences'],
-    [`${config.lulumiPagesCustomProtocol}about/#/downloads`, 'downloads'],
-    [`${config.lulumiPagesCustomProtocol}about/#/history`, 'history'],
-    [`${config.lulumiPagesCustomProtocol}about/#/extensions`, 'extensions'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/about`, 'about'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/lulumi`, 'lulumi'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/preferences`, 'preferences'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/downloads`, 'downloads'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/history`, 'history'],
+    [`${config.lulumiPagesCustomProtocol}://about/#/extensions`, 'extensions'],
   ],
 };
 

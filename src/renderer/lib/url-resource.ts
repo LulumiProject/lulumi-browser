@@ -1,7 +1,7 @@
 import constants from '../mainBrowserWindow/constants';
 
 function getLulumiExtUrl(relativeUrl: string): string {
-  return `${constants.lulumiPagesCustomProtocol}${relativeUrl}`;
+  return `${constants.lulumiPagesCustomProtocol}://${relativeUrl}`;
 }
 
 const urlResource = {

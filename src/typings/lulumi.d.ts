@@ -70,6 +70,9 @@ declare namespace Lulumi {
 
   export namespace Store {
     // store
+    export interface CustomStore {
+      dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
+    }
     export interface ExtensionMetadata {
       browserActionIcon: string;
       pageActionIcon: string;
