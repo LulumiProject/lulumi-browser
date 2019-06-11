@@ -84,7 +84,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     let close: boolean = false;
     const window: BrowserWindow | undefined = BrowserWindow.fromWebContents(event.sender);
     // command-palette window
-    if (window === undefined && event.sender.getURL().endsWith('cp.html#/')) {
+    if (window === undefined || event.sender.getURL().endsWith('cp.html#/')) {
       windows[globalObject.commandPalette.id] = globalObject.commandPalette;
     } else {
       const windowId = window.id;

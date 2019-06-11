@@ -29,6 +29,9 @@ export default class Hits extends Vue {
   suggestions: Lulumi.Renderer.SuggestionObject[] = [];
   searchBar: SearchBar | null = null;
 
+  get lastActiveWindow(): Lulumi.Store.LulumiBrowserWindowProperty {
+    return this.$store.getters.windows.find(window => window.lastActive);
+  }
   get hitHeaders() {
     return ['Browsing History'];
   }
@@ -41,8 +44,9 @@ export default class Hits extends Vue {
   }
   select(item) {
     this.$nextTick(() => {
-      const browserWindow = this.$electron.remote.BrowserWindow.getFocusedWindow();
+      const browserWindow = this.$electron.remote.BrowserWindow.fromId(this.lastActiveWindow.id);
       if (browserWindow !== null) {
+        browserWindow.show();
         browserWindow.webContents.send('new-tab', {
           url: item.url,
           follow: true,

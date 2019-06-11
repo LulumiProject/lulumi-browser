@@ -165,6 +165,7 @@ declare namespace Lulumi {
       top: number;
       state: string;
       tabs?: TabObject[];
+      lastActive: boolean;
     }
     export interface ExtensionInfoDict extends Object {
       [index: string]: chrome.management.ExtensionInfo;

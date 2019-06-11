@@ -125,6 +125,7 @@ export default class SearchBar extends Vue {
       this.spanValue = '';
       return;
     }
+    this.value = queryString;
     suggestions = suggestions.filter(this.createFilter(queryString));
     suggestions.push({
       item: {
@@ -178,7 +179,6 @@ export default class SearchBar extends Vue {
         if (this.hits) {
           this.hits.suggestions = this.unique(suggestions);
           this.hits.highlightedIndex = 0;
-          this.value = queryString;
           const item = this.hits.suggestions[0].item;
           if (item.title !== undefined) {
             this.spanValue = item.title;
@@ -196,7 +196,6 @@ export default class SearchBar extends Vue {
       if (this.hits) {
         this.hits.suggestions = this.unique(suggestions);
         this.hits.highlightedIndex = 0;
-        this.value = queryString;
         const item = this.hits.suggestions[0].item;
         if (item.title !== undefined) {
           this.spanValue = item.title;

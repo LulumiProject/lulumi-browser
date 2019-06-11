@@ -652,6 +652,7 @@ const mutations = {
     const windowState: string = payload.windowState;
     const type: string = payload.type;
 
+    state.windows.forEach((window, index) => Vue.set(state.windows[index], 'lastActive', false));
     const windowsIndex: number = state.windows.findIndex(window => window.id === windowId);
     if (windowsIndex === -1) {
       state.windows.push({
@@ -662,6 +663,7 @@ const mutations = {
         top,
         state: windowState,
         type,
+        lastActive: true,
       });
     } else {
       Vue.set(state.windows, windowsIndex, {
@@ -672,12 +674,17 @@ const mutations = {
         top,
         state: windowState,
         type,
+        lastActive: true,
       });
     }
   },
   [types.CLOSE_WINDOW](state: Lulumi.Store.State, { windowId }) {
     const index: number = state.windows.findIndex(window => (window.id === windowId));
     if (index !== -1) {
+      if (state.windows[index].lastActive) {
+        const keys = Object.keys(state.windows);
+        Vue.set(state.windows[parseInt(keys[keys.length - 1], 10)], 'lastActive', true);
+      }
       Vue.delete(state.windows, index);
     }
   },
@@ -697,6 +704,12 @@ const mutations = {
       Vue.set(state.windows[index], 'top', top);
       Vue.set(state.windows[index], 'focused', focused);
       Vue.set(state.windows[index], 'state', windowState);
+      if (focused) {
+        state.windows.forEach((window, index) => {
+          Vue.set(state.windows[index], 'lastActive', false);
+        });
+        Vue.set(state.windows[index], 'lastActive', true);
+      }
     }
   },
   // extensions
