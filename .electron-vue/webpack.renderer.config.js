@@ -652,7 +652,8 @@ let commandPaletteConfig = {
           'default-src': "'none'",
           'object-src': "'none'",
           'connect-src': ["'self'"],
-          'script-src': ["'self'"],
+          // https://github.com/GoogleChromeLabs/comlink/pull/274
+          'script-src': ["'self'", "'unsafe-eval'"],
           'style-src': ["'self'", "'unsafe-inline'"],
           'font-src': ["'self'", "data:"],
           'img-src': ["'self'", "https:", "http:", "data:"]

@@ -16,11 +16,12 @@
         style="fill: #a6a6a6;")
       path(d="M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z")
   input(type="text",
-        ref="input",
         class="search-input",
         placeholder="Spotlight Search",
+        @blur="focus = false",
         @input="querySearch",
         :value="value",
+        v-focus="focus",
         v-autowidth="{maxWidth: '85vw'}")
   span.description(@click.self="sendFocus") {{ spanValue === '' ? '' : `- ${spanValue}` }}
   </div>
@@ -38,10 +39,23 @@ import config from '../../../mainBrowserWindow/constants';
 
 @Component({
   name: 'search-bar',
+  // https://vuejs.org/v2/guide/custom-directive.html
+  directives: {
+    focus: {
+      // When the bound element is inserted into the DOM...
+      update (el, { value }) {
+        if (value) {
+          // Focus the element
+          el.focus();
+        }
+      },
+    },
+  },
 })
 export default class SearchBar extends Vue {
   value: string = '';
   spanValue: string = '';
+  focus: boolean = false;
   search: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   hits: Hits | null = null;
@@ -231,7 +245,7 @@ export default class SearchBar extends Vue {
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {
-      (this.$refs.input as HTMLInputElement).focus();
+      this.focus = true;
     });
   }
 }

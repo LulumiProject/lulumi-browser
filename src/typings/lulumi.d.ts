@@ -65,6 +65,7 @@ declare namespace Lulumi {
       manifestMap: ManifestMap;
       manifestNameMap: ManifestNameMap;
       guestData: Scheme.LulumiObject;
+      commandPalette: Electron.BrowserWindow;
     }
   }
 

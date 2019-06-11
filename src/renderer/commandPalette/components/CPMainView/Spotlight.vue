@@ -21,7 +21,7 @@ import SearchBar from './SearchBar.vue';
 })
 export default class Spotlight extends Vue {
   handleClear() {
-    this.$electron.ipcRenderer.send('alfred-blur');
+    this.$electron.remote.getGlobal('commandPalette').hide();
   }
 }
 </script>

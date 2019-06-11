@@ -21,7 +21,9 @@ const isDarwin: boolean = is.macos;
 const isWindows: boolean = is.windows;
 const isLinux: boolean = is.linux;
 
-const windows: Electron.BrowserWindow[] | { 'webContents': Electron.WebContents }[] = [];
+const globalObject = global as Lulumi.API.GlobalObject;
+
+const windows: Electron.BrowserWindow[] = [];
 
 const broadcastMutations = (store) => {
   store.subscribe((mutation) => {
@@ -82,8 +84,8 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     let close: boolean = false;
     const window: BrowserWindow | undefined = BrowserWindow.fromWebContents(event.sender);
     // command-palette window
-    if (window === undefined || event.sender.getURL().endsWith('cp.html#/')) {
-      windows[0] = { webContents: event.sender };
+    if (window === undefined && event.sender.getURL().endsWith('cp.html#/')) {
+      windows[globalObject.commandPalette.id] = globalObject.commandPalette;
     } else {
       const windowId = window.id;
 
@@ -220,7 +222,8 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 const updateWindowStates = (): void => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
-    if (id !== 0) {
+    const window = windows[id];
+    if (window.getTitle() !== 'command-palette') {
       handleWindowProperty((windows[id] as Electron.BrowserWindow), 'update');
     }
   });
@@ -280,33 +283,36 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
     Object.keys(windows).forEach((key) => {
       const tmpTabs: Lulumi.Store.TabObject[] = [];
       const id = parseInt(key, 10);
-      const currentTabIndex: number = store.getters.currentTabIndexes[id];
-      const oldTabs: Lulumi.Store.TabObject[]
-        = store.getters.tabs.filter(tab => tab.windowId === id);
-      const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
-      oldTabs.forEach((_, index) => {
-        tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
-      });
-      tmpTabs.forEach((tab) => {
-        tab.id = (newTabId += 1);
-        tab.windowId = windowId;
-        if (tab.url.startsWith('about:')) {
-          tab.url = urlResource.aboutUrls(tab.url);
-        }
-        if (tab.url.startsWith('lulumi-extension:')) {
-          tab.url = urlResource.aboutUrls('about:newtab');
-        }
-        Object.keys(tab.extensionsMetadata).forEach((key) => {
-          if (store.getters.extensionInfoDict[key] === undefined) {
-            delete tab.extensionsMetadata[key];
-          }
+      const window = windows[id];
+      if (window.getTitle() !== 'command-palette') {
+        const currentTabIndex: number = store.getters.currentTabIndexes[id];
+        const oldTabs: Lulumi.Store.TabObject[]
+          = store.getters.tabs.filter(tab => tab.windowId === id);
+        const tabsOrder: number[] = tabsMapping(oldTabs, store.getters.tabsOrder[id]);
+        oldTabs.forEach((_, index) => {
+          tmpTabs.push(Object.assign({}, oldTabs[tabsOrder[index]]));
         });
-      });
-      newTabs = newTabs.concat(tmpTabs);
-      newCurrentTabIndexes[windowId] = !tabsOrder.includes(currentTabIndex)
-        ? currentTabIndex
-        : tabsOrder.indexOf(currentTabIndex);
-      windowId += 1;
+        tmpTabs.forEach((tab) => {
+          tab.id = (newTabId += 1);
+          tab.windowId = windowId;
+          if (tab.url.startsWith('about:')) {
+            tab.url = urlResource.aboutUrls(tab.url);
+          }
+          if (tab.url.startsWith('lulumi-extension:')) {
+            tab.url = urlResource.aboutUrls('about:newtab');
+          }
+          Object.keys(tab.extensionsMetadata).forEach((key) => {
+            if (store.getters.extensionInfoDict[key] === undefined) {
+              delete tab.extensionsMetadata[key];
+            }
+          });
+        });
+        newTabs = newTabs.concat(tmpTabs);
+        newCurrentTabIndexes[windowId] = !tabsOrder.includes(currentTabIndex)
+          ? currentTabIndex
+          : tabsOrder.indexOf(currentTabIndex);
+        windowId += 1;
+      }
     });
   }
   return {

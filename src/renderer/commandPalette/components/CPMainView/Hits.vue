@@ -37,7 +37,7 @@ export default class Hits extends Vue {
   }
 
   handleBlur() {
-    this.$electron.ipcRenderer.send('alfred-blur');
+    this.$electron.remote.getGlobal('commandPalette').hide();
   }
   select(item) {
     this.$nextTick(() => {
@@ -49,7 +49,7 @@ export default class Hits extends Vue {
         });
       }
     });
-    this.$electron.ipcRenderer.send('alfred-blur');
+    this.$electron.remote.getGlobal('commandPalette').hide();
   }
   currentHitProp(prop) {
     if (this.suggestions[this.highlightedIndex] === undefined) {

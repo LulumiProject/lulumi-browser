@@ -81,8 +81,7 @@ const { default: session } = require('./lib/session');
 const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
-const windows: Electron.BrowserWindow[] | { 'webContents': Electron.WebContents }[]
-  = mainStore.getWindows();
+const windows: Electron.BrowserWindow[] = mainStore.getWindows();
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
@@ -92,19 +91,18 @@ function lulumiStateSave(soft: boolean = true, windowCount = Object.keys(windows
     let count = 0;
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
-      if (id !== 0) {
-        const window = windows[id] as Electron.BrowserWindow;
-        window.once('closed', () => {
-          count += 1;
-          if (count === windowCount) {
-            if (setLanguage) {
-              mainStore.bumpWindowIds(windowCount);
-            }
+      const window = windows[id];
+      window.once('closed', () => {
+        count += 1;
+        if (count === windowCount) {
+          if (setLanguage) {
+            // don't count in 'command-palette'
+            mainStore.bumpWindowIds(windowCount - 1);
           }
-        });
-        window.close();
-        window.removeAllListeners('close');
-      }
+        }
+      });
+      window.close();
+      window.removeAllListeners('close');
     });
   }
   if (setLanguage) {
@@ -280,7 +278,7 @@ app.whenReady().then(() => {
       const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
       if (is.macos) {
-        const alfred = new PanelWindow({
+        globalObject.commandPalette = new PanelWindow({
           width: width / 2,
           height: height / 1.94,
           show: false,
@@ -292,29 +290,8 @@ app.whenReady().then(() => {
             nodeIntegration: true,
           },
         });
-        alfred.setVisibleOnAllWorkspaces(false);
-        alfred.loadURL(cpURL);
-        globalShortcut.register('CmdOrCtrl+Shift+K', () => {
-          if (alfred.isVisible()) {
-            alfred.hide();
-          } else {
-            alfred.show();
-            alfred.webContents.send('send-focus');
-          }
-        });
-        alfred.on('blur', () => alfred.hide());
-        ipcMain.on('alfred-blur', () => alfred.hide());
-        ipcMain.on('alfred-resize', (event, bounds) => {
-          const xyBounds: Electron.Rectangle = alfred.getBounds();
-          alfred.setBounds({
-            x: xyBounds.x,
-            y: xyBounds.y,
-            width: bounds.width,
-            height: bounds.height,
-          });
-        });
       } else {
-        const alfred = new BrowserWindow({
+        globalObject.commandPalette = new BrowserWindow({
           width: width / 2,
           height: height / 1.94,
           show: false,
@@ -328,28 +305,18 @@ app.whenReady().then(() => {
             nodeIntegration: true,
           },
         });
-        alfred.setVisibleOnAllWorkspaces(false);
-        alfred.loadURL(cpURL);
-        globalShortcut.register('CmdOrCtrl+Shift+K', () => {
-          if (alfred.isVisible()) {
-            alfred.hide();
-          } else {
-            alfred.show();
-            alfred.webContents.send('send-focus');
-          }
-        });
-        alfred.on('blur', () => alfred.hide());
-        ipcMain.on('alfred-blur', () => alfred.hide());
-        ipcMain.on('alfred-resize', (event, bounds) => {
-          const xyBounds: Electron.Rectangle = alfred.getBounds();
-          alfred.setBounds({
-            x: xyBounds.x,
-            y: xyBounds.y,
-            width: bounds.width,
-            height: bounds.height,
-          });
-        });
       }
+      globalObject.commandPalette.setVisibleOnAllWorkspaces(false);
+      globalObject.commandPalette.loadURL(cpURL);
+      globalShortcut.register('CmdOrCtrl+Shift+K', () => {
+        if (globalObject.commandPalette.isVisible()) {
+          globalObject.commandPalette.hide();
+        } else {
+          globalObject.commandPalette.show();
+          globalObject.commandPalette.webContents.send('send-focus');
+        }
+      });
+      globalObject.commandPalette.on('blur', () => globalObject.commandPalette.hide());
       createWindow();
     } catch (createWindowError) {
       console.error(`(lulumi-browser) Could not create a window: ${createWindowError}`);
@@ -365,10 +332,14 @@ if (process.env.TEST_ENV !== 'e2e') {
       `(lulumi-browser) Invalid module to require at webContents ${webContents.id}`);
     event.preventDefault();
   });
-  app.on('remote-get-global', (event, webContents) => {
-    console.error(
-      `(lulumi-browser) Invalid object to get at webContents ${webContents.id}`);
-    event.preventDefault();
+  app.on('remote-get-global', (event, webContents, globalName) => {
+    if (globalName === 'commandPalette') {
+      event.returnValue = globalObject.commandPalette;
+    } else {
+      console.error(
+        `(lulumi-browser) Invalid object to get at webContents ${webContents.id}`);
+      event.preventDefault();
+    }
   });
 }
 
@@ -416,16 +387,14 @@ app.on('before-quit', (event: Electron.Event) => {
 // https://github.com/electron/electron/pull/12782
 app.on('second-instance', () => {
   // Someone tried to run a second instance, we should focus our window.
-  if (Object.keys(windows).length !== 0) {
-    const id = parseInt(Object.keys(windows)[0], 10);
-    if (id !== 0) {
-      const window = windows[id] as Electron.BrowserWindow;
-      if (window) {
-        if (window.isMinimized()) {
-          window.restore();
-        }
-        window.focus();
+  for (let id = 0; id < Object.keys(windows).length; id += 1) {
+    const window = windows[id] as Electron.BrowserWindow;
+    if (window.getTitle() !== 'command-palette') {
+      if (window.isMinimized()) {
+        window.restore();
       }
+      window.focus();
+      return;
     }
   }
 });
@@ -514,21 +483,17 @@ ipcMain.on('show-certificate',
 
 // focus the window
 ipcMain.on('focus-window', (event, windowId) => {
-  if (windowId !== 0) {
-    const window = windows[windowId] as Electron.BrowserWindow;
-    if (window) {
-      window.focus();
-    }
+  const window = windows[windowId] as Electron.BrowserWindow;
+  if (window) {
+    window.focus();
   }
 });
 
 // set the title for the focused BrowserWindow
 ipcMain.on('set-browser-window-title', (event, data) => {
-  if (data.windowId !== 0) {
-    const window = windows[data.windowId] as Electron.BrowserWindow;
-    if (window) {
-      window.setTitle(data.title);
-    }
+  const window = windows[data.windowId] as Electron.BrowserWindow;
+  if (window) {
+    window.setTitle(data.title);
   }
 });
 
@@ -788,9 +753,11 @@ ipcMain.on('register-local-commands', (event: Electron.Event) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
-    Object.keys(lulumiExtension.getManifestMap()).forEach((manifest) => {
-      lulumiExtension.registerLocalCommands(window, lulumiExtension.getManifestMap()[manifest]);
-    });
+    if (window.getTitle() !== 'command-palette') {
+      Object.keys(lulumiExtension.getManifestMap()).forEach((manifest) => {
+        lulumiExtension.registerLocalCommands(window, lulumiExtension.getManifestMap()[manifest]);
+      });
+    }
   });
   event.sender.send('registered-local-commands', lulumiExtension.getManifestMap());
 });

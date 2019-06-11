@@ -18,7 +18,7 @@ export default class CPMainView extends Vue {
     const resizeSensor = require('css-element-queries/src/ResizeSensor.js');
     const overlay = this.$el.querySelector('.overlay') as HTMLDivElement;
     new resizeSensor(overlay, () => {
-      this.$electron.ipcRenderer.send('alfred-resize', {
+      this.$electron.remote.getGlobal('commandPalette').setBounds({
         width: overlay.clientWidth,
         height: overlay.clientHeight,
       });
