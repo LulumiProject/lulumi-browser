@@ -2,17 +2,17 @@
 .hits(:class="{ open: isOpen }")
   .hit-list-container
     ul
-      li(v-for="hitHeader in hitHeaders")
+      li.results-category(v-for="hitHeader in hitHeaders")
         .highlighted-header(@click="handleBlur") {{ hitHeader }}
         ul
-          li(v-for="(suggestion, index) in suggestions"
+          li.results-items(v-for="(suggestion, index) in suggestions"
               :class="{'highlighted': highlightedIndex === index}"
               @click="select(suggestion.item)")
             | {{ suggestion.item.title }}
   .hit-detail-container
     .hit-detail
       img.hit-detail-image(:src="currentHitProp('icon')")
-      h1.hit-detail-title {{ currentHitProp('value') }}
+      .hit-detail-title {{ currentHitProp('value') }}
       span {{ currentHitProp('title') }}
 </template>
 
@@ -73,73 +73,74 @@ export default class Hits extends Vue {
   max-height: 0;
   min-height: 0;
   overflow: hidden;
-  transition: all 0.3s;
-  background-color: rgba(0, 20, 41, 0.97);
+  transition: all 0.1s;
 }
 
 .hits.open {
-  min-height: 375px;
+  max-height: 375px;
   max-height: 400px;
-  border-top: 1px solid #515253;
+  border-top: 1px solid #cccecf
 }
 
 .hit-list-container {
-  width: 290px;
+  width: 40%;
   overflow: hidden;
   overflow-y: auto;
   user-select: none;
   position: absolute;
   height: calc(100% - 55px);
-  background-color: rgba(0, 20, 41, 0.97);
-  border-right: 1px solid #515253;
-}
+  border-right: 1px solid #d6d7d9;
+  background-color: rgba(229,231,232,.97);
 
-ul {
-  min-height: calc(100% - 55px);
-}
+  ul,
+  li.results-category {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
 
-ul,
-li {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  padding: 3px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  list-style-type: none;
+  li.results-items {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    color: #333435;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 6px 0 6px 25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    list-style-type: none;
+
+    &.highlighted {
+      color: #fff;
+      background-color: #337ef1;
+    }
+  }
 }
 
 .highlighted-header {
-  color: #ffffff;
+  color: #333435;
   font-size: 12px;
   padding: 4px 0 2px 25px;
   text-transform: uppercase;
-  background-color: rgba(53, 75, 84, 0.97);
-}
-
-.highlighted {
-  color: black;
-  background: #F9FAFC;
-  cursor: pointer;
-  font-size: 12px;
+  background-color: #dcdddf;
 }
 
 .hit-detail-container {
-  width: 390px;
-  height: 375px;
+  width: 60%;
+  margin-left: 40%;
+  height: 475px;
+  padding: 10px;
   display: block;
-  color: #ffffff;
+  color: #333435;
   overflow-y: auto;
-  margin-left: 290px;
-  background-color: rgba(1, 20, 41, 0.97);
+  background-color: rgba(229,230,232,.97);
 }
 
 .hit-detail {
-  padding: 8px;
+  padding-top: 20%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -147,12 +148,14 @@ li {
 }
 
 .hit-detail-image {
-  height: 250px;
-  border-radius: 15px;
+  width: 64px;
+  height: 64px;
 }
 
 .hit-detail-title {
-  color: #ffffff;
+  width: 100%;
+  font-size: 26px;
+  margin-top: 15px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

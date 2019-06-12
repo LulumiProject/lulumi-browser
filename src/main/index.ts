@@ -286,7 +286,6 @@ app.whenReady().then(() => {
           resizable: false,
           webPreferences: {
             partition: 'command-palette',
-            contextIsolation: false,
             nodeIntegration: true,
           },
         });
@@ -301,7 +300,6 @@ app.whenReady().then(() => {
           resizable: false,
           webPreferences: {
             partition: 'command-palette',
-            contextIsolation: false,
             nodeIntegration: true,
           },
         });

@@ -13,7 +13,7 @@
         viewBox="0 0 283.753 284.51",
         enable-background="new 0 0 283.753 284.51",
         xml:space="preserve",
-        style="fill: #a6a6a6;")
+        style="fill: #635d5c;")
       path(d="M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z")
   input(type="text",
         class="search-input",
@@ -24,6 +24,8 @@
         v-focus="focus",
         v-autowidth="{maxWidth: '85vw'}")
   span.description(@click.self="sendFocus") {{ spanValue === '' ? '' : `- ${spanValue}` }}
+  .result-icon(v-show="value !== ''")
+    img(style="width: 32px; height: 32px;", :src="icon")
   </div>
 </template>
 
@@ -55,6 +57,7 @@ import config from '../../../mainBrowserWindow/constants';
 export default class SearchBar extends Vue {
   value: string = '';
   spanValue: string = '';
+  icon: string = '';
   focus: boolean = false;
   search: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
@@ -182,6 +185,7 @@ export default class SearchBar extends Vue {
           const item = this.hits.suggestions[0].item;
           if (item.title !== undefined) {
             this.spanValue = item.title;
+            this.icon = item.icon;
           }
         }
       });
@@ -199,6 +203,7 @@ export default class SearchBar extends Vue {
         const item = this.hits.suggestions[0].item;
         if (item.title !== undefined) {
           this.spanValue = item.title;
+          this.icon = item.icon;
         }
       }
     }
@@ -222,8 +227,10 @@ export default class SearchBar extends Vue {
     const item = this.hits.suggestions[this.hits.highlightedIndex].item;
     if (item.title !== undefined) {
       this.spanValue = item.title;
+      this.icon = item.icon;
     } else {
       this.spanValue = '';
+      this.icon = '';
     }
   }
   handleKeyEnter(event) {
@@ -257,7 +264,7 @@ export default class SearchBar extends Vue {
   z-index: 10;
   height: 55px;
   position: relative;
-  background-color: rgba(0, 21, 41, 0.97);
+  background-color: rgba(230,231,232,.97);
   -webkit-user-select: none;
   -webkit-app-region: drag;
 }
@@ -280,7 +287,7 @@ export default class SearchBar extends Vue {
   padding: 0;
   float: left;
   height: 55px;
-  color: #ffffff;
+  color: #333435;
   font-size: 1.7em;
   font-weight: 100;
   box-sizing: content-box;
@@ -292,9 +299,24 @@ export default class SearchBar extends Vue {
 
 .description {
   flex: 1;
-  color: #dddddd77;
+  color: #606162;
   font-size: 1.2em;
-  padding-left: 5px;
+  padding: 0 50px 0 5px;
+  overflow: hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
+}
+
+.result-icon {
+  position: absolute;
+  top: 11.5px;
+  right: 20px;
+  line-height: 31px;
+  height: 32px;
+  width: 32px;
+  font-size: 31px;
+  color: #333435;
+  background-size: cover;
 }
 
 .search-input:-ms-input-placeholder {
