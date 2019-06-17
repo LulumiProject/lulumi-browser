@@ -42,10 +42,15 @@ module.exports = (config) => {
       ]
     },
     customLaunchers: {
-      'visibleElectron': {
+      visibleElectron: {
         base: 'Electron',
         flags: ['--show'],
-        require: path.join('test', 'unit', 'override.js')
+        browserWindowOptions: {
+          webPreferences: {
+            contextIsolation: false,
+            nodeIntegration: true
+          }
+        }
       }
     },
     frameworks: ['mocha', 'chai'],

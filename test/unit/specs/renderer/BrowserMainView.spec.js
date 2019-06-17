@@ -278,7 +278,7 @@ describe('BrowserMainView.vue', () => {
   describe('Navbar.vue (integrated)', () => {
     it('shows the corresponding url to the webview', () => {
       const tabObject = vm.getTabObject(0);
-      expect(vm.$el.querySelector('webview.active').src).to.equal(tabObject.url);
+      expect(vm.getWebView(0).getAttribute('src')).to.equal(tabObject.url);
     });
 
     it('has four controls in .control-group', () => {
