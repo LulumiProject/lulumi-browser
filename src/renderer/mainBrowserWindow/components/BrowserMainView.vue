@@ -3,6 +3,10 @@ div
   #nav(ref="nav")
     tabs(ref="tabs", :windowId="windowId")
     navbar(ref="navbar", :windowId="windowId")
+  transition(name="notification")
+    #notification(v-show="showNotification")
+      notification(:windowWebContentsId="windowWebContentsId",
+                   :tabId="tab.id")
   SwipeArrow
   tab(v-for="(tab, index) in tabs",
       :isActive="index === currentTabIndex",
@@ -29,6 +33,7 @@ import Navbar from './BrowserMainView/Navbar.vue';
 import SwipeArrow from './BrowserMainView/SwipeArrow.vue';
 import Tab from './BrowserMainView/Tab.vue';
 import Download from './BrowserMainView/Download.vue';
+import Notification from './BrowserMainView/Notification.vue';
 
 import { is } from 'electron-util';
 import constants from '../../mainBrowserWindow/constants';
@@ -47,11 +52,13 @@ import Event from '../../api/event';
     SwipeArrow,
     Tab,
     Download,
+    Notification,
   },
 })
 export default class BrowserMainView extends Vue {
   windowId: number = 0;
   windowWebContentsId: number = 0;
+  showNotification: boolean = false;
   htmlFullscreen: boolean = false;
   trackingFingers: boolean = false;
   swipeGesture: boolean = false;
@@ -684,7 +691,7 @@ export default class BrowserMainView extends Vue {
             body: `${data.name} download successfully!`,
           };
         }
-        new Notification(option.title, option);
+        new (window as any).Notification(option.title, option);
       } else {
         this.showDownloadBar
           = this.$store.getters.downloads.every(download => download.style === 'hidden')
@@ -1803,6 +1810,21 @@ body,
 html {
   position: relative;
   overflow: hidden;
+}
+
+#notification {
+  width: 100vw;
+  height: 36px;
+  background: rgba(255, 193, 7, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.notification-enter-active, .notification-leave-active {
+  transition: opacity .5s;
+}
+.notification-enter, .notification-leave-active {
+  opacity: 0
 }
 
 #nav {

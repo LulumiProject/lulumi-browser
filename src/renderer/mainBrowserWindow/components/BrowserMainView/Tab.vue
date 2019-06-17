@@ -1,8 +1,5 @@
 <template lang="pug">
 div
-  transition(name="notification")
-    #notification(v-show="showNotification && isActive")
-      notification(:windowWebContentsId="windowWebContentsId")
   webview(partition="persist:webview",
           plugins,
           :element-loading-text="$t('tab.loading')",
@@ -23,8 +20,6 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import urlUtil from '../../../lib/url-util';
 
 import Event from '../../../api/event';
-
-import Notification from './Notification.vue';
 
 const resizeSensor = require('css-element-queries/src/ResizeSensor');
 
@@ -51,14 +46,10 @@ const resizeSensor = require('css-element-queries/src/ResizeSensor');
       required: true,
     },
   },
-  components: {
-    Notification,
-  },
 })
 export default class Tab extends Vue {
   hidden: boolean = true;
   requestId: number | null | void = null;
-  showNotification: boolean = false;
   onMessageEvent: Event = new Event();
 
   isActive: boolean;
@@ -279,21 +270,6 @@ export default class Tab extends Vue {
 </script>
 
 <style lang="less" scoped>
-#notification {
-  width: 100vw;
-  height: 36px;
-  background: rgba(255, 193, 7, 0.28);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.notification-enter-active, .notification-leave-active {
-  transition: opacity .5s;
-}
-.notification-enter, .notification-leave-active {
-  opacity: 0
-}
-
 webview {
   height: 0px;
   width: 100vw;
