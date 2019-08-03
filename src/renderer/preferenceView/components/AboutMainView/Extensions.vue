@@ -77,7 +77,7 @@ export default class Extensions extends Vue {
   addLulumiExtension(): void {
     ipcRenderer.once(
       'add-lulumi-extension-result',
-      (event: Electron.IpcMessageEvent, data): void => {
+      (event, data: any): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
@@ -90,7 +90,7 @@ export default class Extensions extends Vue {
     const id = this.findId(extensionId);
     ipcRenderer.once(
       'remove-lulumi-extension-result',
-      (event: Electron.IpcMessageEvent, data): void => {
+      (event, data: any): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {

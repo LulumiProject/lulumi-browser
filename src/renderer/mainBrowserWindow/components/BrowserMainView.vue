@@ -305,7 +305,7 @@ export default class BrowserMainView extends Vue {
       tabId,
       tabIndex,
       url: webview.getAttribute('src'),
-      webContentsId: webview.getWebContents().id,
+      webContentsId: webview.getWebContentsId(),
       windowId: this.windowId,
     });
     if (!(process.env.NODE_ENV === 'test'
@@ -1464,33 +1464,28 @@ export default class BrowserMainView extends Vue {
         }));
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.saveImageAs') as string,
-          click: () => {
+          click: async () => {
             const fs = require('fs');
             const electron = this.$electron;
-            urlUtil.getFilenameFromUrl(params.srcURL).then(
-              (filename) => {
-                const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
-                electron.remote.dialog.showSaveDialog(
-                  currentWindow,
+            const filename = await urlUtil.getFilenameFromUrl(params.srcURL);
+            const defaultPath = path.join(electron.remote.app.getPath('downloads'), filename);
+            const result = await electron.remote.dialog.showSaveDialog(
+              currentWindow,
+              {
+                defaultPath,
+                filters: [
                   {
-                    defaultPath,
-                    filters: [
-                      {
-                        name: 'Images',
-                        extensions: ['jpg', 'jpeg', 'png', 'gif'],
-                      },
-                    ],
+                    name: 'Images',
+                    extensions: ['jpg', 'jpeg', 'png', 'gif'],
                   },
-                  async (filename) => {
-                    if (filename) {
-                      const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
-                      fs.writeFileSync(
-                        filename, electron.nativeImage.createFromDataURL(dataURL).toPNG());
-                    }
-                  },
-                );
+                ],
               },
             );
+            if (!result.canceled) {
+              const dataURL = await imageUtil.getBase64FromImageUrl(params.srcURL);
+              fs.writeFileSync(
+                result.filePath, electron.nativeImage.createFromDataURL(dataURL).toPNG());
+            }
           },
         }));
         menu.append(new MenuItem({
@@ -1760,28 +1755,30 @@ export default class BrowserMainView extends Vue {
     ipc.on('remove-non-bg-lulumi-extension', (event: Electron.Event, extensionId: string) => {
       ipc.send(`remove-lulumi-extension-${extensionId}`);
     });
-    ipc.on('about-to-quit', () => {
+    ipc.on('about-to-quit', async () => {
+      const currentWindow: Electron.BrowserWindow | null
+        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
       const downloads = this.$store.getters.downloads;
       const pendingDownloads = downloads.filter(download => download.state === 'progressing');
 
       if (pendingDownloads.length !== 0) {
-        this.$electron.remote.dialog.showMessageBox(
+        const result = await this.$electron.remote.dialog.showMessageBox(
+          currentWindow,
           {
             type: 'warning',
             title: 'Warning',
             message: 'You still have some files progressing.',
             buttons: ['Abort and Leave', 'Cancel'],
           },
-          (index) => {
-            if (index === 0) {
-              pendingDownloads.forEach((download) => {
-                this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
-              });
-              ipc.send('okay-to-quit', true);
-            } else {
-              ipc.send('okay-to-quit', false);
-            }
+        );
+        if (result.response === 0) {
+          pendingDownloads.forEach((download) => {
+            this.$electron.ipcRenderer.send('cancel-downloads-progress', download.startTime);
           });
+          ipc.send('okay-to-quit', true);
+        } else {
+          ipc.send('okay-to-quit', false);
+        }
       }
     });
 

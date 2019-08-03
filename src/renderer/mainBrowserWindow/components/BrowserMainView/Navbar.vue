@@ -968,31 +968,31 @@ export default class Navbar extends Vue {
 
     ipc.on(
       'lulumi-commands-execute-page-action',
-      (event: Electron.IpcMessageEvent, extensionId: string) => {
+      (event, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
       });
     ipc.on(
       'lulumi-commands-execute-browser-action',
-      (event: Electron.IpcMessageEvent, extensionId: string) => {
+      (event, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
       });
 
-    ipc.on('add-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+    ipc.on('add-lulumi-extension-result', (event, data: any): void => {
       if (data.result === 'OK') {
         (this.$parent as BrowserMainView).extensionService.update();
         ipc.send('lulumi-extension-added', data.name);
       }
     });
-    ipc.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+    ipc.on('remove-lulumi-extension-result', (event, data: any): void => {
       if (data.result === 'OK') {
         (this.$parent as BrowserMainView).extensionService.update();
       } else {
         alert(data.result);
       }
     });
-    ipc.on('remove-lulumi-extension', (event: Electron.IpcMessageEvent, extensionId) => {
+    ipc.on('remove-lulumi-extension', (event, extensionId) => {
       ipc.send('remove-lulumi-extension', extensionId);
     });
     ipc.on('omnibox-ready', (): void => {

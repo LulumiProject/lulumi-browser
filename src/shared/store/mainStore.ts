@@ -80,7 +80,7 @@ function handleWindowProperty(window: Electron.BrowserWindow, action: string) {
 }
 
 const register = (storagePath: string, swipeGesture: boolean): void => {
-  ipcMain.on('vuex-connect', (event: Electron.Event) => {
+  ipcMain.on('vuex-connect', (event: Electron.IpcMainEvent) => {
     let close: boolean = false;
     const window: BrowserWindow | undefined = BrowserWindow.fromWebContents(event.sender);
     // command-palette window
@@ -149,7 +149,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         window.webContents.send('leave-full-screen', isDarwin);
       });
 
-      ipcMain.on('window-id', (event: Electron.Event) => {
+      ipcMain.on('window-id', (event: Electron.IpcMainEvent) => {
         const window = BrowserWindow.fromWebContents(event.sender);
         event.returnValue = {
           windowId: window.id,
@@ -159,7 +159,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
       (window as any).callback(`any-new-tab-suggestion-for-window-${windowId}`);
 
-      window.on('close', (event: Electron.Event) => {
+      window.on('close', (event: Electron.IpcMainEvent) => {
         if (close) {
           close = false;
         } else {

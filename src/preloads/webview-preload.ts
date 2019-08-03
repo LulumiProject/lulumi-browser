@@ -1,6 +1,5 @@
 import { ipcRenderer, remote, webFrame } from 'electron';
 import * as urllib from 'url';
-import { runInThisContext } from 'vm';
 
 import requirePreload from './require-preload';
 import injectTo from '../renderer/api/inject-to';
@@ -63,17 +62,7 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
 };
 
 const runStylesheet = (url, code) => {
-  const wrapper = `((code) => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = code;
-    document.head.append(styleElement);
-  })`;
-  const compiledWrapper = runInThisContext(wrapper, {
-    filename: url,
-    lineOffset: 1,
-    displayErrors: true,
-  });
-  return compiledWrapper.call(this, code);
+  webFrame.insertCSS(code);
 };
 
 // run injected scripts
@@ -154,10 +143,10 @@ process.once('loaded', () => {
       }) as any);
     }
   }
-  ipcRenderer.on('lulumi-tabs-send-message', (event: Electron.IpcMessageEvent, message) => {
+  ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
     ipcRenderer.send('lulumi-runtime-emit-on-message', message);
   });
-  ipcRenderer.on('remove-lulumi-extension-result', (event: Electron.IpcMessageEvent, data): void => {
+  ipcRenderer.on('remove-lulumi-extension-result', (event, data): void => {
     if (data.result === 'OK') {
       delete isolatedWorldMaps[data.extensionId];
     }

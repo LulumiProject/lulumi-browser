@@ -137,7 +137,7 @@ export default class Notification extends Vue {
         = this.$electron.remote.webContents.fromId(data.webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         if ((this.$parent as BrowserMainView).getWebView()
-          .getWebContents().id === data.webContentsId) {
+          .getWebContentsId() === data.webContentsId) {
           const webview = (this.$parent as BrowserMainView).getWebView();
           this.id = data.webContentsId;
           this.hostname = urlUtil.getHostname(webContents.getURL());

@@ -224,7 +224,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     (mainWindow as any).callback = callback;
   } else {
     (mainWindow as any).callback = (eventName) => {
-      ipcMain.once(eventName, (event: Electron.Event) => {
+      ipcMain.once(eventName, (event: Electron.IpcMainEvent) => {
         event.sender.send(eventName.substr(4), { url: 'about:newtab', follow: true });
       });
     };
@@ -330,7 +330,7 @@ if (process.env.TEST_ENV !== 'e2e') {
       `(lulumi-browser) Invalid module to require at webContents ${webContents.id}`);
     event.preventDefault();
   });
-  app.on('remote-get-global', (event, webContents, globalName) => {
+  app.on('remote-get-global', (event: Electron.IpcMainEvent, webContents, globalName) => {
     if (globalName === 'commandPalette') {
       event.returnValue = globalObject.commandPalette;
     } else {
@@ -398,7 +398,7 @@ app.on('second-instance', () => {
 });
 
 // load windowProperties
-ipcMain.on('get-window-properties', (event: Electron.Event) => {
+ipcMain.on('get-window-properties', (event: Electron.IpcMainEvent) => {
   const windowProperties: any[] = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
@@ -432,7 +432,7 @@ ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: an
   options.y = window.top;
 
   tmpWindow = createWindow(options, (eventName) => {
-    ipcMain.once(eventName, (event: Electron.Event) => {
+    ipcMain.once(eventName, (event: Electron.IpcMainEvent) => {
       event.sender.send(eventName.substr(4), null);
       windowProperty.tabs.forEach((tab, index) => {
         tmpWindow.webContents.send(
@@ -465,13 +465,13 @@ ipcMain.on('open-process-manager', () => {
 });
 
 // return the number of BrowserWindow
-ipcMain.on('get-window-count', (event: Electron.Event) => {
+ipcMain.on('get-window-count', (event: Electron.IpcMainEvent) => {
   event.returnValue = Object.keys(windows).length;
 });
 
 // show the certificate
 ipcMain.on('show-certificate',
-  (event: Electron.Event, certificate: Electron.Certificate, message: string) => {
+  (event: Electron.IpcMainEvent, certificate: Electron.Certificate, message: string) => {
     dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
       certificate,
       message,
@@ -582,7 +582,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
 });
 
 // about:* pages are eager to getting preference datas
-ipcMain.on('guest-want-data', (event: Electron.Event, type: string) => {
+ipcMain.on('guest-want-data', (event: Electron.IpcMainEvent, type: string) => {
   const webContentsId: number = event.sender.id;
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -623,7 +623,7 @@ ipcMain.on('guest-want-data', (event: Electron.Event, type: string) => {
   });
 });
 
-ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) => {
+ipcMain.on('set-current-search-engine-provider', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setCurrentSearchEngineProvider', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -631,7 +631,7 @@ ipcMain.on('set-current-search-engine-provider', (event: Electron.Event, val) =>
     window.webContents.send('get-search-engine-provider', event.sender.id);
   });
 });
-ipcMain.on('set-homepage', (event: Electron.Event, val) => {
+ipcMain.on('set-homepage', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setHomepage', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -639,7 +639,7 @@ ipcMain.on('set-homepage', (event: Electron.Event, val) => {
     window.webContents.send('get-homepage', event.sender.id);
   });
 });
-ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
+ipcMain.on('set-pdf-viewer', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setPDFViewer', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -647,7 +647,7 @@ ipcMain.on('set-pdf-viewer', (event: Electron.Event, val) => {
     window.webContents.send('get-pdf-viewer', event.sender.id);
   });
 });
-ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
+ipcMain.on('set-tab-config', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setTabConfig', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -655,7 +655,7 @@ ipcMain.on('set-tab-config', (event: Electron.Event, val) => {
     window.webContents.send('get-tab-config', event.sender.id);
   });
 });
-ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
+ipcMain.on('set-lang', (eventOne: Electron.IpcMainEvent, val) => {
   const webContentsId: number = eventOne.sender.id;
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -666,7 +666,7 @@ ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
       label: val.label,
     });
   });
-  ipcMain.once(`response-permission-${eventOne.sender.id}`, (eventTwo: Electron.Event, data) => {
+  ipcMain.once(`response-permission-${eventOne.sender.id}`, (eventTwo, data) => {
     if (data.accept) {
       store.dispatch('setLang', val);
       promisify(writeFile, langPath, JSON.stringify(val.lang))
@@ -678,7 +678,7 @@ ipcMain.on('set-lang', (eventOne: Electron.Event, val) => {
     }
   });
 });
-ipcMain.on('set-proxy-config', (event: Electron.Event, val) => {
+ipcMain.on('set-proxy-config', (event: Electron.IpcMainEvent, val) => {
   session.registerProxy(val);
   store.dispatch('setProxyConfig', val);
   Object.keys(windows).forEach((key) => {
@@ -687,7 +687,7 @@ ipcMain.on('set-proxy-config', (event: Electron.Event, val) => {
     window.webContents.send('get-proxy-config', event.sender.id);
   });
 });
-ipcMain.on('set-auth', (event: Electron.Event, val) => {
+ipcMain.on('set-auth', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setAuth', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -695,7 +695,7 @@ ipcMain.on('set-auth', (event: Electron.Event, val) => {
     window.webContents.send('get-auth', event.sender.id);
   });
 });
-ipcMain.on('set-downloads', (event: Electron.Event, val) => {
+ipcMain.on('set-downloads', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setDownloads', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -703,7 +703,7 @@ ipcMain.on('set-downloads', (event: Electron.Event, val) => {
     window.webContents.send('get-downloads', event.sender.id);
   });
 });
-ipcMain.on('set-history', (event: Electron.Event, val) => {
+ipcMain.on('set-history', (event: Electron.IpcMainEvent, val) => {
   store.dispatch('setHistory', val);
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
@@ -713,14 +713,14 @@ ipcMain.on('set-history', (event: Electron.Event, val) => {
 });
 
 // listen to new-lulumi-window event
-ipcMain.on('new-lulumi-window', (event: Electron.Event, data) => {
+ipcMain.on('new-lulumi-window', (event: Electron.IpcMainEvent, data) => {
   if (data.url) {
     event.returnValue = createWindow({
       width: 800,
       height: 500,
       // tslint:disable-next-line:align
     }, (eventName) => {
-      ipcMain.once(eventName, (event: Electron.Event) => {
+      ipcMain.once(eventName, (event: Electron.IpcMainEvent) => {
         event.sender.send(eventName.substr(4), { url: data.url, follow: data.follow });
       });
     });
@@ -728,7 +728,7 @@ ipcMain.on('new-lulumi-window', (event: Electron.Event, data) => {
 });
 
 // load the lang file
-ipcMain.on('request-lang', (event: Electron.Event) => {
+ipcMain.on('request-lang', (event: Electron.IpcMainEvent) => {
   let lang: string = '';
   try {
     lang = readFileSync(langPath, 'utf8');
@@ -747,7 +747,7 @@ ipcMain.on('request-lang', (event: Electron.Event) => {
 });
 
 // load extension objects for each BrowserWindow instance
-ipcMain.on('register-local-commands', (event: Electron.Event) => {
+ipcMain.on('register-local-commands', (event: Electron.IpcMainEvent) => {
   Object.keys(windows).forEach((key) => {
     const id = parseInt(key, 10);
     const window = windows[id];
@@ -762,13 +762,13 @@ ipcMain.on('register-local-commands', (event: Electron.Event) => {
 
 ipcMain.on('fetch-search-suggestions',
   // tslint:disable-next-line:align
-  (event: Electron.Event, provider: string, url: string, timestamp: number) => {
+  (event: Electron.IpcMainEvent, provider: string, url: string, timestamp: number) => {
     request(provider, url, (result) => {
       event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
     });
   });
 
-ipcMain.on('popup', (event: Electron.Event, popupObject: any) => {
+ipcMain.on('popup', (event: Electron.IpcMainEvent, popupObject: any) => {
   const menu = new Menu();
   popupObject.menuItems.forEach((menuItem) => {
     if (menuItem.icon) {
@@ -802,7 +802,7 @@ ipcMain.on('popup', (event: Electron.Event, popupObject: any) => {
 
 // reload each BrowserView when we plug in our cable
 globalObject.isOnline = true;
-ipcMain.on('online-status-changed', (event: Electron.Event, status: boolean) => {
+ipcMain.on('online-status-changed', (event, status: boolean) => {
   if (status) {
     if (!globalObject.isOnline) {
       Object.keys(windows).forEach((key) => {
