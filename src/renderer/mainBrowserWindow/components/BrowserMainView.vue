@@ -1428,13 +1428,13 @@ export default class BrowserMainView extends Vue {
           }));
           menu.append(new MenuItem({
             label: this.$t('webview.contextMenu.pasteAndMatchStyle') as string,
-            role: 'pasteandmatchstyle',
+            role: 'pasteAndMatchStyle',
           }));
         }
 
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.selectAll') as string,
-          role: 'selectall',
+          role: 'selectAll',
         }));
       } else if (params.linkURL) {
         menu.append(new MenuItem({

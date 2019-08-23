@@ -15,5 +15,5 @@ export default {
   lulumiPagesCustomProtocol: 'lulumi',
   lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: 'a70d1a456ded9ca55adf7f29b7b45f9c33c19fd4',
+  lulumiRev: 'ac65e83efff72f9f30d683915cf8677d5cf6f4b7',
 };

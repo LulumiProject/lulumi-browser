@@ -34,7 +34,7 @@ const getTemplate = () => {
         },
         is.macos ? {
           label: i18n.t('edit.pasteAndMatchStyle') as string,
-          role: 'pasteandmatchstyle',
+          role: 'pasteAndMatchStyle',
         } : {},
         {
           label: i18n.t('edit.delete') as string,
@@ -42,7 +42,7 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('edit.selectAll') as string,
-          role: 'selectall',
+          role: 'selectAll',
         },
         {
           type: 'separator',
@@ -62,11 +62,11 @@ const getTemplate = () => {
           submenu: [
             {
               label: i18n.t('edit.speech.startSpeaking') as string,
-              role: 'startspeaking',
+              role: 'startSpeaking',
             },
             {
               label: i18n.t('edit.speech.stopSpeaking') as string,
-              role: 'stopspeaking',
+              role: 'stopSpeaking',
             },
           ],
         },
@@ -330,7 +330,7 @@ const getTemplate = () => {
         },
         {
           label: i18n.t('app.hideOthers') as string,
-          role: 'hideothers',
+          role: 'hideOthers',
         },
         {
           label: i18n.t('app.unhide') as string,
