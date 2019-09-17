@@ -44,8 +44,8 @@ module.exports = (config) => {
     customLaunchers: {
       visibleElectron: {
         base: 'Electron',
-        flags: ['--show'],
         browserWindowOptions: {
+          show: true,
           webPreferences: {
             contextIsolation: false,
             nodeIntegration: true
