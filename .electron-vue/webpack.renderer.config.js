@@ -650,7 +650,7 @@ let commandPaletteConfig = {
         enabled: process.env.NODE_ENV === 'production',
         policy: {
           'default-src': "'none'",
-          'object-src': "'none'",
+          'object-src': ["'self'", "data:"],
           'connect-src': ["'self'"],
           // https://github.com/GoogleChromeLabs/comlink/pull/274
           'script-src': ["'self'", "'unsafe-eval'"],
@@ -729,11 +729,12 @@ let commandPaletteConfig = {
   target: 'electron-renderer'
 }
 
-let searchWorkerConfig = {
-  name: 'search-worker',
+let workerConfig = {
+  name: 'worker',
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    'search-worker': path.join(__dirname, '../src/renderer/mainBrowserWindow/js/search-worker.js')
+    'search-worker': path.join(__dirname, '../src/renderer/mainBrowserWindow/js/search-worker.js'),
+    'recommender': path.join(__dirname, '../src/renderer/commandPalette/js/recommender.js'),
   },
   node: {
     __dirname: process.env.NODE_ENV !== 'production',
@@ -758,7 +759,8 @@ let searchWorkerConfig = {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig and preloadsConfig
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
+ * workerConfig and preloadsConfig
  * for production settings
  */
 if (process.env.NODE_ENV === 'production') {
@@ -766,14 +768,14 @@ if (process.env.NODE_ENV === 'production') {
   preloadsConfig.mode = 'production'
   preferenceViewConfig.mode = 'production'
   commandPaletteConfig.mode = 'production'
-  searchWorkerConfig.mode = 'production'
+  workerConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   preferenceViewConfig.performance = { hints: false }
   mainBrowserWindowConfig.devtool = false
   preloadsConfig.devtool = false
   preferenceViewConfig.devtool = false
   commandPaletteConfig.devtool = false
-  searchWorkerConfig.devtool = false
+  workerConfig.devtool = false
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({
@@ -795,21 +797,22 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     })
   )
-  searchWorkerConfig.plugins.push(
+  workerConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
   )
 } else {
   /**
-   * Adjust mainBrowserWindowConfig, preferenceViewConfig and preloadsConfig
+   * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
+   * workerConfig and preloadsConfig
    * for development settings
    */
   mainBrowserWindowConfig.mode = 'development'
   preloadsConfig.mode = 'development'
   preferenceViewConfig.mode = 'development'
   commandPaletteConfig.mode = 'development'
-  searchWorkerConfig.mode = 'development'
+  workerConfig.mode = 'development'
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.DefinePlugin({
@@ -834,8 +837,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig
- * and preloadsConfig for e2e settings
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
+ * workerConfig and preloadsConfig
+ * for e2e settings
  */
 if (process.env.TEST_ENV === 'e2e') {
   mainBrowserWindowConfig.plugins.push(
@@ -862,7 +866,7 @@ if (process.env.TEST_ENV === 'e2e') {
       'process.env.TEST_ENV': '"e2e"'
     })
   )
-  searchWorkerConfig.plugins.push(
+  workerConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
@@ -875,5 +879,5 @@ module.exports = [
   Object.assign({}, preloadsConfig),
   Object.assign({}, preferenceViewConfig),
   Object.assign({}, commandPaletteConfig),
-  Object.assign({}, searchWorkerConfig)
+  Object.assign({}, workerConfig)
 ]

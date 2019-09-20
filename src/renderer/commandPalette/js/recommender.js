@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink';
 import Fuse from 'fuse.js';
 
-function search(suggestionItems, niddle) {
+function recommend(suggestionItems, niddle) {
   const fuse = new Fuse(suggestionItems, {
     shouldSort: true,
     threshold: 0.4,
@@ -17,4 +17,4 @@ function search(suggestionItems, niddle) {
   return fuse.search(niddle);
 }
 
-Comlink.expose(search);
+Comlink.expose(recommend);

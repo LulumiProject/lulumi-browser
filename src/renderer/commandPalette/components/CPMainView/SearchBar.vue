@@ -61,7 +61,7 @@ export default class SearchBar extends Vue {
   icon: string = '';
   focus: boolean = false;
   loading: boolean = false;
-  search: any;
+  recommend: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   hits: Hits | null = null;
 
@@ -153,7 +153,7 @@ export default class SearchBar extends Vue {
     // calling out fuse results using web workers
     const entries: Lulumi.Renderer.SuggestionObject[][]
       = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
-        .map(suggestionItem => this.search(suggestionItem, queryString.toLowerCase()))) as any;
+        .map(suggestionItem => this.recommend(suggestionItem, queryString.toLowerCase()))) as any;
     if (entries.length !== 0) {
       entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
     }
@@ -253,7 +253,7 @@ export default class SearchBar extends Vue {
   }
 
   mounted() {
-    this.search = Comlink.wrap(new Worker('search-worker.js'));
+    this.recommend = Comlink.wrap(new Worker('recommender.js'));
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {
