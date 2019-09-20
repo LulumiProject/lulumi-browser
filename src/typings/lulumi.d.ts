@@ -113,10 +113,17 @@ declare namespace Lulumi {
       pageActionMapping: object;
       extensionsMetadata: ExtensionsMetadata;
     }
+    export interface commandPaletteConfig {
+      browsingHistory: string;
+    }
+    export interface lulumiObject {
+      systemFavicon: string;
+      tabFavicon: string;
+      commandPalette: commandPaletteConfig;
+    }
     export interface TabConfig {
       dummyTabObject: TabObject;
-      defaultFavicon: string;
-      lulumiFavicon: string;
+      lulumiDefault: lulumiObject;
     }
     export interface SearchEngineObject {
       name: string;

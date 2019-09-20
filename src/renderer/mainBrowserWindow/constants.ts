@@ -79,10 +79,15 @@ const tabConfig: Lulumi.Store.TabConfig = {
     pageActionMapping: {},
     extensionsMetadata: {},
   },
-  defaultFavicon: 'document',
-  lulumiFavicon: nativeImage
-    .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'icon.png')))
-    .toDataURL(),
+  lulumiDefault: {
+    systemFavicon: nativeImage
+      .createFromPath(fixPathForAsarUnpack(path.join(__static, 'icons', 'icon.png')))
+      .toDataURL(),
+    tabFavicon: 'document',
+    commandPalette: {
+      browsingHistory: 'reading',
+    },
+  },
 };
 
 const proxyConfig: Electron.Config = {

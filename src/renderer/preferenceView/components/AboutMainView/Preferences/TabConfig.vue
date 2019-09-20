@@ -13,13 +13,13 @@ div
     el-input(
       placeholder="Input default favicon url you want",
       @change="setTabConfig",
-      v-model.trim="defaultFavicon",
+      v-model.trim="tabFavicon",
       :autofocus="true",
       ref="input")
       template(slot="prepend") {{ $t('about.preferencesPage.tabConfigPage.favicon') }}
       template(slot="append")
-        i.preview(:class="`el-icon-${defaultFavicon}`")
-  div {{ `&lt;i class="el-icon-${defaultFavicon}"&gt;&lt;/i&gt;` }}
+        i.preview(:class="`el-icon-${tabFavicon}`")
+  div {{ `&lt;i class="el-icon-${tabFavicon}"&gt;&lt;/i&gt;` }}
     hr
     | Ref:&nbsp;
     a(href="https://element.eleme.io/#/en-US/component/icon", target="_blank") https://element.eleme.io/#/en-US/component/icon
@@ -39,12 +39,12 @@ declare const ipcRenderer: Electron.IpcRenderer;
 })
 export default class TabConfig extends Vue {
   defaultUrl: string = '';
-  defaultFavicon: string = '';
+  tabFavicon: string = '';
 
   setTabConfig(): void {
     ipcRenderer.send('set-tab-config', {
       defaultUrl: this.defaultUrl,
-      defaultFavicon: this.defaultFavicon,
+      tabFavicon: this.tabFavicon,
     });
   }
 
@@ -52,7 +52,7 @@ export default class TabConfig extends Vue {
     ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, tabConfig: Lulumi.Store.TabConfig) => {
         this.defaultUrl = tabConfig.dummyTabObject.url;
-        this.defaultFavicon = tabConfig.defaultFavicon;
+        this.tabFavicon = tabConfig.lulumiDefault.tabFavicon;
       });
     ipcRenderer.send('guest-want-data', 'tabConfig');
   }

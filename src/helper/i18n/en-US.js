@@ -133,6 +133,16 @@ export const guest = {
   },
 };
 
+export const commandPalette = {
+  searchBar: {
+  },
+  hits: {
+    navbar: {
+      search: 'Search',
+    },
+  },
+};
+
 export default {
   file: {
     newTab: 'New Tab',

@@ -11,8 +11,10 @@
             | {{ suggestion.item.title }}
   .hit-detail-container
     .hit-detail
-      img.hit-detail-image(:src="currentHitProp('icon')")
+      object(v-if="!loading", :data="currentHitProp('icon')", type='image/png', height='64', width='64')
+        i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`", style='font-size: 64px;')
       .hit-detail-title {{ currentHitProp('value') }}
+      hr.hit-detail-hr
       span {{ currentHitProp('title') }}
 </template>
 
@@ -28,6 +30,7 @@ export default class Hits extends Vue {
   highlightedIndex: number = -1;
   suggestions: Lulumi.Renderer.SuggestionObject[] = [];
   searchBar: SearchBar | null = null;
+  loading: boolean = false;
 
   get lastActiveWindow(): Lulumi.Store.LulumiBrowserWindowProperty {
     return this.$store.getters.windows.find(window => window.lastActive);
@@ -125,7 +128,7 @@ export default class Hits extends Vue {
   font-size: 12px;
   padding: 4px 0 2px 25px;
   text-transform: uppercase;
-  background-color: #dcdddf;
+  background-color: #a7a7a7;
 }
 
 .hit-detail-container {
@@ -147,17 +150,20 @@ export default class Hits extends Vue {
   justify-content: center;
 }
 
-.hit-detail-image {
-  width: 64px;
-  height: 64px;
-}
-
 .hit-detail-title {
   width: 100%;
   font-size: 26px;
   margin-top: 15px;
+  padding: 5px 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.hit-detail-hr {
+  border: 0;
+  border-top: 1px solid #d6d7d9;
+  margin: 20px 0;
+  width: 95%;
 }
 </style>

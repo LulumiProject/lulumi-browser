@@ -22,7 +22,7 @@
                    stroke-miterlimit="10",
                    :class="tab.didNavigate ? 'path' : 'path-reverse'")
           object(v-else, :data="tab.favIconUrl", type='image/png', height='16', width='16')
-            i(:class="`el-icon-${$store.getters.tabConfig.defaultFavicon}`", style='font-size: 16px;')
+            i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`", style='font-size: 16px;')
           awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
           awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
         el-tooltip(:content="tab.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")

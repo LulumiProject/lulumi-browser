@@ -1079,7 +1079,7 @@ export default class BrowserMainView extends Vue {
               if (match) {
                 menuItems.push({
                   type: 'base64',
-                  icon: constants.tabConfig.lulumiFavicon,
+                  icon: constants.tabConfig.lulumiDefault.systemFavicon,
                   label: urls[i],
                   click: 'go-to-index',
                   index: i,
@@ -1143,7 +1143,7 @@ export default class BrowserMainView extends Vue {
               if (match) {
                 menuItems.push({
                   type: 'base64',
-                  icon: constants.tabConfig.lulumiFavicon,
+                  icon: constants.tabConfig.lulumiDefault.systemFavicon,
                   label: urls[i],
                   click: 'go-to-index',
                   index: i,

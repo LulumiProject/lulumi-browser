@@ -17,7 +17,7 @@
       path(d="M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z")
   input(type="text",
         class="search-input",
-        placeholder="Spotlight Search",
+        placeholder="Search",
         @blur="focus = false",
         @input="querySearch",
         :value="value",
@@ -25,7 +25,8 @@
         v-autowidth="{maxWidth: '85vw'}")
   span.description(@click.self="sendFocus") {{ spanValue === '' ? '' : `- ${spanValue}` }}
   .result-icon(v-show="value !== ''")
-    img(style="width: 32px; height: 32px;", :src="icon")
+    object(v-if="!loading", :data="icon", type='image/png', height='32', width='32')
+      i(:class="`el-icon-${icon}`", style='font-size: 32px;')
   </div>
 </template>
 
@@ -59,12 +60,13 @@ export default class SearchBar extends Vue {
   spanValue: string = '';
   icon: string = '';
   focus: boolean = false;
+  loading: boolean = false;
   search: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   hits: Hits | null = null;
 
-  get defaultFavicon(): string {
-    return this.$store.getters.tabConfig.defaultFavicon;
+  get tabFavicon(): string {
+    return this.$store.getters.tabConfig.lulumiDefault.tabFavicon;
   }
   get autoFetch(): boolean {
     return this.$store.getters.autoFetch;
@@ -116,10 +118,10 @@ export default class SearchBar extends Vue {
     const queryString: string = event.target.value;
     const ipc = this.$electron.ipcRenderer;
     const currentSearchEngine: string = this.currentSearchEngine.name;
-    const navbarSearch = this.$t('navbar.search');
+    const navbarSearch = this.$t('hits.navbar.search');
     let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
     this.suggestionItems.forEach((item) => {
-      item.icon = this.defaultFavicon;
+      item.icon = this.tabFavicon;
       suggestions.push({ item });
     });
     if (queryString === '') {
@@ -132,7 +134,7 @@ export default class SearchBar extends Vue {
     suggestions = suggestions.filter(this.createFilter(queryString));
     suggestions.push({
       item: {
-        title: `${currentSearchEngine} ${this.$t('navbar.search')}`,
+        title: `${currentSearchEngine} ${navbarSearch}`,
         value: this.value,
         url: this.value,
         icon: 'search',
@@ -143,7 +145,7 @@ export default class SearchBar extends Vue {
         item: {
           value: this.value,
           url: this.value,
-          icon: this.defaultFavicon,
+          icon: this.tabFavicon,
         },
       });
     }
@@ -185,7 +187,7 @@ export default class SearchBar extends Vue {
           const item = this.hits.suggestions[0].item;
           if (item.title !== undefined) {
             this.spanValue = item.title;
-            this.icon = item.icon;
+            this.icon = this.$store.getters.tabConfig.lulumiDefault.commandPalette.browsingHistory;
           }
         }
       });
@@ -203,7 +205,7 @@ export default class SearchBar extends Vue {
         const item = this.hits.suggestions[0].item;
         if (item.title !== undefined) {
           this.spanValue = item.title;
-          this.icon = item.icon;
+          this.icon = this.$store.getters.tabConfig.lulumiDefault.commandPalette.browsingHistory;
         }
       }
     }
@@ -219,19 +221,23 @@ export default class SearchBar extends Vue {
       this.hits.highlightedIndex = 0;
       return;
     }
-    let newIndex = index;
-    if (index >= this.hits.suggestions.length) {
-      newIndex = this.hits.suggestions.length - 1;
-    }
-    this.hits.highlightedIndex = newIndex;
-    const item = this.hits.suggestions[this.hits.highlightedIndex].item;
-    if (item.title !== undefined) {
-      this.spanValue = item.title;
-      this.icon = item.icon;
-    } else {
-      this.spanValue = '';
-      this.icon = '';
-    }
+    this.loading = true;
+    this.hits!.loading = true;
+    this.$nextTick(() => {
+      let newIndex = index;
+      if (index >= this.hits!.suggestions.length) {
+        newIndex = this.hits!.suggestions.length - 1;
+      }
+      this.hits!.highlightedIndex = newIndex;
+      const item = this.hits!.suggestions[this.hits!.highlightedIndex].item;
+      if (item.title !== undefined) {
+        this.spanValue = item.title;
+      } else {
+        this.spanValue = '';
+      }
+      this.loading = false;
+      this.hits!.loading = false;
+    });
   }
   handleKeyEnter(event) {
     if (this.hits && this.hits.highlightedIndex >= 0

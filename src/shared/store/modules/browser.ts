@@ -342,7 +342,7 @@ const mutations = {
             state.tabs[tabsIndex].canGoBack = payload.canGoBack;
             state.tabs[tabsIndex].canGoForward = payload.canGoForward;
           }
-          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.lulumiFavicon;
+          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.lulumiDefault.tabFavicon;
         } else {
           if (state.tabs[tabsIndex].title === '') {
             state.tabs[tabsIndex].title = state.tabs[tabsIndex].url;
@@ -365,7 +365,7 @@ const mutations = {
                 mtime,
                 title: state.tabs[tabsIndex].title,
                 url: state.tabs[tabsIndex].url,
-                favIconUrl: constants.tabConfig.defaultFavicon,
+                favIconUrl: constants.tabConfig.lulumiDefault.tabFavicon,
                 label: dates[0],
                 time: dates[1],
               };
@@ -520,7 +520,7 @@ const mutations = {
     state.pdfViewer = val.pdfViewer;
   },
   [types.SET_TAB_CONFIG](state: Lulumi.Store.State, { val }) {
-    Vue.set(state.tabConfig, 'defaultFavicon', val.defaultFavicon);
+    Vue.set(state.tabConfig.lulumiDefault, 'tabFavicon', val.tabFavicon);
     Vue.set(state.tabConfig.dummyTabObject, 'url', val.defaultUrl);
   },
   [types.SET_LANG](state: Lulumi.Store.State, { val }) {

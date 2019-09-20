@@ -151,7 +151,8 @@ Vue.component('suggestion-item', {
               [
                 h('i', {
                   attrs: {
-                    class: `el-icon-${ctx.parent.$store.getters.tabConfig.defaultFavicon}`,
+                    class:
+                      `el-icon-${ctx.parent.$store.getters.tabConfig.lulumiDefault.tabFavicon}`,
                   },
                 }),
               ]),
@@ -249,8 +250,8 @@ export default class Navbar extends Vue {
     }
     return this.tabs[this.currentTabIndex];
   }
-  get defaultFavicon(): string {
-    return this.$store.getters.tabConfig.defaultFavicon;
+  get tabFavicon(): string {
+    return this.$store.getters.tabConfig.lulumiDefault.tabFavicon;
   }
   get autoFetch(): boolean {
     return this.$store.getters.autoFetch;
@@ -588,7 +589,7 @@ export default class Navbar extends Vue {
     const navbarSearch = this.$t('navbar.search');
     let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
     this.suggestionItems.forEach((item) => {
-      item.icon = this.defaultFavicon;
+      item.icon = this.tabFavicon;
       suggestions.push({ item });
     });
     if (queryString) {
@@ -607,7 +608,7 @@ export default class Navbar extends Vue {
         item: {
           value: this.value,
           url: this.value,
-          icon: this.defaultFavicon,
+          icon: this.tabFavicon,
         },
       });
     }

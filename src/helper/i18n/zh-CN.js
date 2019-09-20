@@ -133,6 +133,16 @@ export const guest = {
   },
 };
 
+export const commandPalette = {
+  searchBar: {
+  },
+  hits: {
+    navbar: {
+      search: '搜索',
+    },
+  },
+};
+
 export default {
   file: {
     newTab: '新标签页',
