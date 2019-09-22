@@ -86,6 +86,7 @@ const tabConfig: Lulumi.Store.TabConfig = {
     tabFavicon: 'document',
     commandPalette: {
       browsingHistory: 'reading',
+      onlineSearch: 'view',
     },
   },
 };

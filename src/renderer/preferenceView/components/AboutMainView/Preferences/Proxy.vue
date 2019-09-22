@@ -44,8 +44,6 @@ export default class TabConfig extends Vue {
   proxyRules: string = '';
   proxyBypassRules: string = '';
 
-  debounceSetProxy: Function;
-
   setProxy(): void {
     ipcRenderer.send('set-proxy-config', {
       pacScript: this.pacScript,

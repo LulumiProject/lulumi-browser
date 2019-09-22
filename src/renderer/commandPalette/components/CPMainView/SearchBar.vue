@@ -1,7 +1,7 @@
 <template lang="pug">
 .search-bar(@click.self="sendFocus",
-            @keydown.up.prevent="highlight(hits.highlightedIndex - 1)",
-            @keydown.down.prevent="highlight(hits.highlightedIndex + 1)",
+            @keydown.up.prevent="highlight(hits.highlightedIndex, -1)",
+            @keydown.down.prevent="highlight(hits.highlightedIndex, 1)",
             @keydown.enter="handleKeyEnter")
   .search-icon
     svg(@click.self="sendFocus",
@@ -18,8 +18,11 @@
   input(type="text",
         class="search-input",
         placeholder="Search",
+        @compositionstart="handleComposition",
+        @compositionupdate="handleComposition",
+        @compositionend="handleComposition",
         @blur="focus = false",
-        @input="querySearch",
+        @input="debouncedInput",
         :value="value",
         v-focus="focus",
         v-autowidth="{maxWidth: '85vw'}")
@@ -36,6 +39,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Hits from './Hits.vue';
 
 import * as Comlink from 'comlink';
+import debounce from 'throttle-debounce/debounce';
 
 import urlUtil from '../../../lib/url-util';
 import config from '../../../mainBrowserWindow/constants';
@@ -61,8 +65,10 @@ export default class SearchBar extends Vue {
   icon: string = '';
   focus: boolean = false;
   loading: boolean = false;
-  recommend: any;
-  suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
+  isComposing: boolean = false;
+  recommender: any;
+  suggestionItems: Lulumi.CommandPalette.SuggestionItem[] = config.recommendTopSite;
+  debouncedQuerySearch: Function;
   hits: Hits | null = null;
 
   get tabFavicon(): string {
@@ -75,7 +81,7 @@ export default class SearchBar extends Vue {
     return this.$store.getters.currentSearchEngine;
   }
   get suggestionItemsByHistory(): any {
-    const suggestionItems: Lulumi.Renderer.SuggestionItem[] = [];
+    const suggestionItems: Lulumi.CommandPalette.SuggestionItem[] = [];
     const regex = new RegExp('(^\w+:|^)\/\/');
     this.$store.getters.history.forEach((history) => {
       const part: string = history.url.replace(regex, '');
@@ -102,37 +108,62 @@ export default class SearchBar extends Vue {
   chunk(r: any[], j: number): any[][] {
     return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
   }
-  unique(suggestions: Lulumi.Renderer.SuggestionObject[]): Lulumi.Renderer.SuggestionObject[] {
-    const newSuggestions: Lulumi.Renderer.SuggestionObject[] = [];
+  unique(suggestions: Lulumi.CommandPalette.Suggestion[]): Lulumi.CommandPalette.Suggestion[] {
+    let suggestionObjects: Lulumi.CommandPalette.SuggestionObject[] = [];
     const seen: Set<string> = new Set();
 
     suggestions.forEach((suggestion) => {
-      if (!seen.has(`${suggestion.item.icon}:${suggestion.item.url}`)) {
-        seen.add(`${suggestion.item.icon}:${suggestion.item.url}`);
-        newSuggestions.push(suggestion);
-      }
+      suggestion.results.forEach((result) => {
+        if (!seen.has(`${result.item.icon}:${result.item.url}`)) {
+          seen.add(`${result.item.icon}:${result.item.url}`);
+          suggestionObjects.push(result);
+        }
+      });
+      suggestion.results = suggestionObjects;
+      suggestionObjects = [];
     });
-    return newSuggestions;
+    return suggestions;
   }
-  async querySearch(event): Promise<void> {
+  handleComposition(event): void {
+    if (event.type === 'compositionend') {
+      this.isComposing = false;
+    } else {
+      this.isComposing = true;
+    }
+  }
+  debouncedInput(event): void {
     const queryString: string = event.target.value;
-    const ipc = this.$electron.ipcRenderer;
-    const currentSearchEngine: string = this.currentSearchEngine.name;
-    const navbarSearch = this.$t('hits.navbar.search');
-    let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
-    this.suggestionItems.forEach((item) => {
-      item.icon = this.tabFavicon;
-      suggestions.push({ item });
-    });
+
     if (queryString === '') {
-      this.hits!.suggestions = [];
-      this.value = '';
-      this.spanValue = '';
+      this.$nextTick(() => {
+        if (this.hits) {
+          this.hits.isOpen = false;
+          this.icon = '';
+          this.value = '';
+          this.spanValue = '';
+        }
+      });
       return;
     }
     this.value = queryString;
-    suggestions = suggestions.filter(this.createFilter(queryString));
-    suggestions.push({
+    this.debouncedQuerySearch(queryString);
+    this.hits!.isOpen = true;
+  }
+  async querySearch(queryString: string): Promise<void> {
+    const ipc = this.$electron.ipcRenderer;
+    const suggestions: Lulumi.CommandPalette.Suggestion[] = [];
+    let suggestionObjects: Lulumi.CommandPalette.SuggestionObject[] = [];
+
+    // browsingHistories
+    const currentSearchEngine: string = this.currentSearchEngine.name;
+    const navbarSearch = this.$t('hits.navbar.search');
+    this.suggestionItems.forEach((item) => {
+      item.icon = this.tabFavicon;
+      suggestionObjects.push({ item });
+    });
+
+    suggestionObjects = suggestionObjects.filter(this.createFilter(queryString));
+    suggestionObjects.push({
       item: {
         title: `${currentSearchEngine} ${navbarSearch}`,
         value: this.value,
@@ -140,8 +171,8 @@ export default class SearchBar extends Vue {
         icon: 'search',
       },
     });
-    if (suggestions.length === 1 && urlUtil.isURL(this.value)) {
-      suggestions.unshift({
+    if (suggestionObjects.length === 1 && urlUtil.isURL(this.value)) {
+      suggestionObjects.unshift({
         item: {
           value: this.value,
           url: this.value,
@@ -151,14 +182,40 @@ export default class SearchBar extends Vue {
     }
 
     // calling out fuse results using web workers
-    const entries: Lulumi.Renderer.SuggestionObject[][]
-      = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
-        .map(suggestionItem => this.recommend(suggestionItem, queryString.toLowerCase()))) as any;
+    const entries: Lulumi.CommandPalette.SuggestionObject[][]
+      = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10).map(
+        suggestionItem => this.recommender.browsingHistories(
+          suggestionItem, queryString.toLowerCase()))) as any;
     if (entries.length !== 0) {
-      entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
+      entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestionObjects.push(entry));
     }
 
-    if (this.autoFetch && this.currentSearchEngine.autocomplete !== '') {
+    suggestions.push({
+      header: 'Browsing History',
+      icon: this.$store.getters.tabConfig.lulumiDefault.commandPalette.browsingHistory,
+      results: suggestionObjects,
+    });
+    suggestionObjects = [];
+
+    suggestions.push({
+      header: 'Online Search',
+      icon: this.$store.getters.tabConfig.lulumiDefault.commandPalette.onlineSearch,
+      results: suggestionObjects,
+    });
+
+    // first results
+    if (this.hits) {
+      this.hits.suggestions = this.unique(suggestions);
+      this.hits.highlightedIndex = '0-0';
+      const item = this.hits.suggestions[0].results[0].item;
+      if (item.title !== undefined) {
+        this.spanValue = item.title;
+        this.icon = this.hits.suggestions[0].icon;
+      }
+    }
+
+    // onlineSearch
+    if (this.currentSearchEngine.autocomplete !== '') {
       const timestamp: number = Date.now();
       // autocomplete suggestions
       ipc.once(`fetch-search-suggestions-${timestamp}`, (event, result) => {
@@ -167,28 +224,27 @@ export default class SearchBar extends Vue {
           const returnedSuggestions = (parsed[1] !== undefined)
             ? parsed[1]
             : parsed.items;
-          returnedSuggestions.forEach((suggestion) => {
-            suggestions.push({
+          returnedSuggestions.slice(0, 5).forEach((suggestion) => {
+            suggestionObjects.push({
               item: {
-                title: `${currentSearchEngine} ${navbarSearch}`,
+                title: `${suggestion} - ${currentSearchEngine} ${navbarSearch}`,
                 value: suggestion,
                 url: suggestion,
                 icon: 'search',
               },
             });
           });
+          this.$nextTick(() => {
+            if (this.hits) {
+              suggestions[suggestions
+                .findIndex(suggestion => suggestion.header === 'Online Search')]
+                  .results = suggestionObjects;
+              this.hits.suggestions = this.unique(suggestions);
+            }
+          });
         } else {
           // tslint:disable-next-line no-console
           console.error(result.error);
-        }
-        if (this.hits) {
-          this.hits.suggestions = this.unique(suggestions);
-          this.hits.highlightedIndex = 0;
-          const item = this.hits.suggestions[0].item;
-          if (item.title !== undefined) {
-            this.spanValue = item.title;
-            this.icon = this.$store.getters.tabConfig.lulumiDefault.commandPalette.browsingHistory;
-          }
         }
       });
       ipc.send(
@@ -198,38 +254,67 @@ export default class SearchBar extends Vue {
         .replace('{queryString}', this.value)
         .replace('{language}', this.$store.getters.lang),
         timestamp);
-    } else {
-      if (this.hits) {
-        this.hits.suggestions = this.unique(suggestions);
-        this.hits.highlightedIndex = 0;
-        const item = this.hits.suggestions[0].item;
-        if (item.title !== undefined) {
-          this.spanValue = item.title;
-          this.icon = this.$store.getters.tabConfig.lulumiDefault.commandPalette.browsingHistory;
-        }
-      }
+    }
+
+    const items = await this.recommender.onlineSearch(queryString);
+    items.slice(0, 5).forEach((item) => {
+      suggestionObjects.push({
+        item: {
+          title: `${item.full_name} - ${item.description}`,
+          value: `${item.full_name} - ${item.description}`,
+          url: item.html_url,
+          icon: 'search',
+        },
+      });
+    });
+
+    if (this.hits) {
+      suggestions[suggestions
+        .findIndex(suggestion => suggestion.header === 'Online Search')]
+          .results = suggestionObjects;
+      this.hits.suggestions = this.unique(suggestions);
     }
   }
   createFilter(queryString: string): (suggestion: any) => boolean {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
-  highlight(index) {
+  highlight(index, direction) {
     if (this.hits === null) {
       return;
     }
-    if (index < 0) {
-      this.hits.highlightedIndex = 0;
+    if (index === '') {
       return;
     }
     this.loading = true;
     this.hits!.loading = true;
     this.$nextTick(() => {
-      let newIndex = index;
-      if (index >= this.hits!.suggestions.length) {
-        newIndex = this.hits!.suggestions.length - 1;
+      let [hIndex, newIndex] = index.split('-', 2);
+      hIndex = parseInt(hIndex, 10);
+      newIndex = parseInt(newIndex, 10);
+      if (direction > 0) {
+        newIndex += 1;
+      } else {
+        newIndex -= 1;
       }
-      this.hits!.highlightedIndex = newIndex;
-      const item = this.hits!.suggestions[this.hits!.highlightedIndex].item;
+      if (hIndex >= 0 && hIndex < this.hits!.suggestions.length) {
+        if (newIndex === this.hits!.suggestions[hIndex].results.length) {
+          hIndex += 1;
+          newIndex = 0;
+        } else if (newIndex < 0) {
+          hIndex -= 1;
+          newIndex = this.hits!.suggestions[hIndex].results.length - 1;
+        }
+      }
+      if (hIndex === this.hits!.suggestions.length) {
+        hIndex -= 1;
+        newIndex = this.hits!.suggestions[hIndex].results.length - 1;
+      } else if (hIndex < 0) {
+        hIndex = 0;
+        newIndex = 0;
+      }
+      this.hits!.highlightedIndex = `${hIndex}-${newIndex}`;
+      this.icon = this.hits!.suggestions[hIndex].icon;
+      const item = this.hits!.suggestions[hIndex].results[newIndex].item;
       if (item.title !== undefined) {
         this.spanValue = item.title;
       } else {
@@ -240,20 +325,23 @@ export default class SearchBar extends Vue {
     });
   }
   handleKeyEnter(event) {
-    if (this.hits && this.hits.highlightedIndex >= 0
-      && this.hits.highlightedIndex < this.hits.suggestions.length) {
-      event.preventDefault();
-      const item = this.hits.suggestions[this.hits.highlightedIndex].item;
-      if (item.title !== undefined) {
-        this.value = item.value;
-        this.spanValue = item.title;
+    if (!this.isComposing && this.hits && this.hits.highlightedIndex !== '') {
+      const [hIndex, index] = this.hits.highlightedIndex.split('-', 2);
+      if (parseInt(hIndex, 10) < this.hits.suggestions.length) {
+        event.preventDefault();
+        const item = this.hits.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)].item;
+        if (item.title !== undefined) {
+          this.value = item.value;
+          this.spanValue = item.title;
+        }
+        this.hits.select(item);
       }
-      this.hits.select(item);
     }
   }
 
   mounted() {
-    this.recommend = Comlink.wrap(new Worker('recommender.js'));
+    this.recommender = Comlink.wrap(new Worker('recommender.js'));
+    this.debouncedQuerySearch = debounce(1000, this.querySearch);
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {

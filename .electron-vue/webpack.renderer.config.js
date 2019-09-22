@@ -651,7 +651,7 @@ let commandPaletteConfig = {
         policy: {
           'default-src': "'none'",
           'object-src': ["'self'", "data:"],
-          'connect-src': ["'self'"],
+          'connect-src': ["'self'", "https://api.github.com"],
           // https://github.com/GoogleChromeLabs/comlink/pull/274
           'script-src': ["'self'", "'unsafe-eval'"],
           'style-src': ["'self'", "'unsafe-inline'"],

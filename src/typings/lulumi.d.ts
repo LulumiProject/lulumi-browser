@@ -115,6 +115,7 @@ declare namespace Lulumi {
     }
     export interface commandPaletteConfig {
       browsingHistory: string;
+      onlineSearch: string;
     }
     export interface lulumiObject {
       systemFavicon: string;
@@ -232,6 +233,28 @@ declare namespace Lulumi {
     export interface AboutLocationObject {
       title: string;
       url: string;
+    }
+  }
+
+  export namespace CommandPalette {
+    export interface SuggestionItem {
+      title?: string;
+      value: string;
+      url: string;
+      icon: string;
+    }
+    export interface SuggestionMatch {
+      indices: number[];
+      key: string;
+    }
+    export interface SuggestionObject {
+      item: SuggestionItem;
+      matches?: SuggestionMatch[];
+    }
+    export interface Suggestion {
+      header: string;
+      icon: string;
+      results: SuggestionObject[];
     }
   }
 

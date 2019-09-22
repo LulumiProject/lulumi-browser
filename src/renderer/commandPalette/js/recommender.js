@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink';
 import Fuse from 'fuse.js';
 
-function recommend(suggestionItems, niddle) {
+function browsingHistories(suggestionItems, niddle) {
   const fuse = new Fuse(suggestionItems, {
     shouldSort: true,
     threshold: 0.4,
@@ -17,4 +17,14 @@ function recommend(suggestionItems, niddle) {
   return fuse.search(niddle);
 }
 
-Comlink.expose(recommend);
+function onlineSearch(niddle) {
+  return fetch(`https://api.github.com/search/repositories?q=${niddle}&sort=stars&order=desc`)
+    .then(r => r.json())
+    .then(r => r.items)
+    .catch(() => {});
+}
+
+Comlink.expose({
+  browsingHistories,
+  onlineSearch,
+});

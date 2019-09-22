@@ -2,20 +2,20 @@
 .hits(:class="{ open: isOpen }")
   .hit-list-container
     ul
-      li.results-category(v-for="hitHeader in hitHeaders")
-        .highlighted-header(@click="handleBlur") {{ hitHeader }}
+      li.results-category(v-for="(suggestion, hIndex) in suggestions")
+        .highlighted-header(@click="handleBlur") {{ suggestion.header }}
         ul
-          li.results-items(v-for="(suggestion, index) in suggestions"
-              :class="{'highlighted': highlightedIndex === index}"
-              @click="select(suggestion.item)")
-            | {{ suggestion.item.title }}
+          li.results-items(v-for="(result, index) in suggestion.results"
+              :class="{'highlighted': highlightedIndex === `${hIndex}-${index}`}"
+              @click="select(result.item)")
+            | {{ result.item.title }}
   .hit-detail-container
     .hit-detail
       object(v-if="!loading", :data="currentHitProp('icon')", type='image/png', height='64', width='64')
         i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`", style='font-size: 64px;')
-      .hit-detail-title {{ currentHitProp('value') }}
+      .hit-detail-title {{ currentHitProp('title') }}
       hr.hit-detail-hr
-      span {{ currentHitProp('title') }}
+      span {{ currentHitProp('value') }}
 </template>
 
 <script lang="ts">
@@ -27,19 +27,14 @@ import SearchBar from './SearchBar.vue';
   name: 'hits',
 })
 export default class Hits extends Vue {
-  highlightedIndex: number = -1;
-  suggestions: Lulumi.Renderer.SuggestionObject[] = [];
+  highlightedIndex: string = '';
+  suggestions: Lulumi.CommandPalette.Suggestion[] = [];
   searchBar: SearchBar | null = null;
   loading: boolean = false;
+  isOpen: boolean = false;
 
   get lastActiveWindow(): Lulumi.Store.LulumiBrowserWindowProperty {
     return this.$store.getters.windows.find(window => window.lastActive);
-  }
-  get hitHeaders() {
-    return ['Browsing History'];
-  }
-  get isOpen() {
-    return this.suggestions.length > 0;
   }
 
   handleBlur() {
@@ -59,10 +54,11 @@ export default class Hits extends Vue {
     this.$electron.remote.getGlobal('commandPalette').hide();
   }
   currentHitProp(prop) {
-    if (this.suggestions[this.highlightedIndex] === undefined) {
+    const [hIndex, index] = this.highlightedIndex.split('-', 2);
+    if (this.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)] === undefined) {
       return '';
     }
-    return this.suggestions[this.highlightedIndex].item[prop];
+    return this.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)].item[prop];
   }
 
   mounted() {
