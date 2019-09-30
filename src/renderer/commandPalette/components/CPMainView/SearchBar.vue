@@ -17,7 +17,7 @@
       path(d="M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z")
   input(type="text",
         class="search-input",
-        placeholder="Search",
+        :placeholder="$t('hits.navbar.search')",
         @compositionstart="handleComposition",
         @compositionupdate="handleComposition",
         @compositionend="handleComposition",
@@ -144,7 +144,6 @@ export default class SearchBar extends Vue {
     }
     this.value = queryString;
     this.debouncedQuerySearch(queryString);
-    this.hits!.isOpen = true;
   }
   async querySearch(queryString: string): Promise<void> {
     const ipc = this.$electron.ipcRenderer;
@@ -204,6 +203,7 @@ export default class SearchBar extends Vue {
     if (this.hits) {
       this.hits.suggestions = this.unique(suggestions);
       this.hits.highlightedIndex = '0-0';
+      this.hits!.isOpen = true;
       const item = this.hits.suggestions[0].results[0].item;
       if (item.title !== undefined) {
         this.spanValue = item.title;
@@ -282,36 +282,63 @@ export default class SearchBar extends Vue {
     if (index === '') {
       return;
     }
+
     this.loading = true;
     this.hits!.loading = true;
     this.$nextTick(() => {
-      let [hIndex, newIndex] = index.split('-', 2);
-      hIndex = parseInt(hIndex, 10);
-      newIndex = parseInt(newIndex, 10);
+      const [oldHIndex, oldIndex] = index.split('-', 2);
+      let newHIndex = parseInt(oldHIndex, 10);
+      let newIndex = parseInt(oldIndex, 10);
       if (direction > 0) {
         newIndex += 1;
       } else {
         newIndex -= 1;
       }
-      if (hIndex >= 0 && hIndex < this.hits!.suggestions.length) {
-        if (newIndex === this.hits!.suggestions[hIndex].results.length) {
-          hIndex += 1;
+      if (newHIndex >= 0 && newHIndex < this.hits!.suggestions.length) {
+        if (newIndex === this.hits!.suggestions[newHIndex].results.length) {
+          newHIndex += 1;
           newIndex = 0;
         } else if (newIndex < 0) {
-          hIndex -= 1;
-          newIndex = this.hits!.suggestions[hIndex].results.length - 1;
+          newHIndex -= 1;
+          newIndex = this.hits!.suggestions[newHIndex].results.length - 1;
         }
       }
-      if (hIndex === this.hits!.suggestions.length) {
-        hIndex -= 1;
-        newIndex = this.hits!.suggestions[hIndex].results.length - 1;
-      } else if (hIndex < 0) {
-        hIndex = 0;
+      if (newHIndex === this.hits!.suggestions.length) {
+        newHIndex -= 1;
+        newIndex = this.hits!.suggestions[newHIndex].results.length - 1;
+      } else if (newHIndex < 0) {
+        newHIndex = 0;
         newIndex = 0;
       }
-      this.hits!.highlightedIndex = `${hIndex}-${newIndex}`;
-      this.icon = this.hits!.suggestions[hIndex].icon;
-      const item = this.hits!.suggestions[hIndex].results[newIndex].item;
+
+      const suggestion = this.hits!.$el.querySelector('.hit-list-container');
+      if (suggestion !== null) {
+        const header = suggestion.querySelector(
+          'li.results-category > div.highlighted-header') as Element;
+        const results = suggestion.querySelectorAll(
+          `li.results-category:nth-child(${newHIndex + 1}) > ul > li.results-items`);
+
+        const highlightItem = results[newIndex];
+        const scrollTop = suggestion.scrollTop;
+        const offsetTop = (highlightItem as HTMLDataListElement).offsetTop;
+
+        if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
+          if (newHIndex !== oldHIndex) {
+            suggestion.scrollTop += header.clientHeight;
+          }
+          suggestion.scrollTop += highlightItem.scrollHeight;
+        }
+        if (offsetTop < scrollTop) {
+          if (newHIndex !== oldHIndex) {
+            suggestion.scrollTop -= header.clientHeight;
+          }
+          suggestion.scrollTop -= highlightItem.scrollHeight;
+        }
+      }
+
+      this.hits!.highlightedIndex = `${newHIndex}-${newIndex}`;
+      this.icon = this.hits!.suggestions[newHIndex].icon;
+      const item = this.hits!.suggestions[newHIndex].results[newIndex].item;
       if (item.title !== undefined) {
         this.spanValue = item.title;
       } else {
@@ -328,7 +355,6 @@ export default class SearchBar extends Vue {
         event.preventDefault();
         const item = this.hits.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)].item;
         if (item.title !== undefined) {
-          this.value = item.value;
           this.spanValue = item.title;
         }
         this.hits.select(item);
@@ -338,7 +364,7 @@ export default class SearchBar extends Vue {
 
   mounted() {
     this.recommender = Comlink.wrap(new Worker('recommender.js'));
-    this.debouncedQuerySearch = debounce(this.querySearch, 1000);
+    this.debouncedQuerySearch = debounce(this.querySearch, 250);
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {
