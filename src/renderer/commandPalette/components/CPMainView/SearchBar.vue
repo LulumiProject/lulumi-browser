@@ -39,7 +39,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Hits from './Hits.vue';
 
 import * as Comlink from 'comlink';
-import debounce from 'throttle-debounce/debounce';
+import { debounce } from 'lodash';
 
 import urlUtil from '../../../lib/url-util';
 import config from '../../../mainBrowserWindow/constants';
@@ -135,12 +135,11 @@ export default class SearchBar extends Vue {
     const queryString: string = event.target.value;
 
     if (queryString === '') {
-      if (this.hits) {
-        this.hits.isOpen = false;
-        this.icon = '';
-        this.value = '';
-        this.spanValue = '';
-      }
+      (this.debouncedQuerySearch as any).cancel();
+      this.hits!.isOpen = false;
+      this.icon = '';
+      this.value = '';
+      this.spanValue = '';
       return;
     }
     this.value = queryString;
@@ -339,7 +338,7 @@ export default class SearchBar extends Vue {
 
   mounted() {
     this.recommender = Comlink.wrap(new Worker('recommender.js'));
-    this.debouncedQuerySearch = debounce(1000, true, this.querySearch);
+    this.debouncedQuerySearch = debounce(this.querySearch, 1000);
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {
