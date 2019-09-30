@@ -135,14 +135,12 @@ export default class SearchBar extends Vue {
     const queryString: string = event.target.value;
 
     if (queryString === '') {
-      this.$nextTick(() => {
-        if (this.hits) {
-          this.hits.isOpen = false;
-          this.icon = '';
-          this.value = '';
-          this.spanValue = '';
-        }
-      });
+      if (this.hits) {
+        this.hits.isOpen = false;
+        this.icon = '';
+        this.value = '';
+        this.spanValue = '';
+      }
       return;
     }
     this.value = queryString;
@@ -341,7 +339,7 @@ export default class SearchBar extends Vue {
 
   mounted() {
     this.recommender = Comlink.wrap(new Worker('recommender.js'));
-    this.debouncedQuerySearch = debounce(1000, this.querySearch);
+    this.debouncedQuerySearch = debounce(1000, true, this.querySearch);
     this.hits = this.$parent.$refs.hits as Hits;
 
     this.$electron.ipcRenderer.on('send-focus', () => {

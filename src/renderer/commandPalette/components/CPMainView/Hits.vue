@@ -54,6 +54,9 @@ export default class Hits extends Vue {
     this.$electron.remote.getGlobal('commandPalette').hide();
   }
   currentHitProp(prop) {
+    if (this.highlightedIndex === '') {
+      return '';
+    }
     const [hIndex, index] = this.highlightedIndex.split('-', 2);
     if (this.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)] === undefined) {
       return '';
