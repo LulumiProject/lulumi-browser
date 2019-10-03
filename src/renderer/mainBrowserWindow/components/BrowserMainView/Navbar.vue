@@ -12,7 +12,7 @@
     a(v-else, @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
       iview-icon(type="md-refresh", size="16")
   .input-group
-    good-custom-autocomplete#url-input(ref="input",
+    good-custom-autocomplete#url-input.hidden(ref="input",
                                        @compositionstart.native="handleComposition",
                                        @compositionupdate.native="handleComposition",
                                        @compositionend.native="handleComposition",
@@ -44,7 +44,9 @@
                           @drop="onDrop"
                           @dragenter.self="onDragEnter",
                           @dragleave.self="onDragLeave"
-                          @dragover.prevent)
+                          @dragover.prevent,
+                          @mouseenter.self="onMouseEnter",
+                          @mouseleave.self="onMouseLeave")
       template(slot-scope="props")
         component(:is="'suggestion-item'", :item="props.item")
   .extensions-group(v-sortable="")
@@ -356,14 +358,16 @@ export default class Navbar extends Vue {
         () => {
           if (!isFocus) {
             if (document) {
+              (document.querySelector('.my-autocomplete') as HTMLDivElement)
+                .style.display = 'none';
               const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
               const si = document.getElementById('security-indicator') as HTMLDivElement;
               if (el && si && si.parentElement) {
-                el.querySelector('input')!.setAttribute('style', 'display: none;');
-                si.parentElement.setAttribute('style', 'display: block;');
+                if (!el.querySelector('input')!.classList.contains('hidden')) {
+                  el.querySelector('input')!.classList.add('hidden');
+                  si.parentElement.classList.remove('hidden');
+                }
               }
-              (document.querySelector('.my-autocomplete') as HTMLDivElement)
-                .style.display = 'none';
             }
             (this.$refs.input as any).suggestions.length = 0;
           }
@@ -466,6 +470,38 @@ export default class Navbar extends Vue {
       clearTimeout(this.handler);
     }
   }
+  onMouseEnter(event): void {
+    const securityIndicator = event.target as HTMLDivElement;
+
+    if (securityIndicator) {
+      const input
+        = securityIndicator.parentElement!
+          .previousElementSibling! as HTMLDivElement;
+
+      if (input) {
+        securityIndicator.setAttribute(
+          'style', 'border: 2px cadetblue groove; margin: 4px 0 0 -2px; line-height: 20px;');
+        input.setAttribute(
+          'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
+      }
+    }
+  }
+  onMouseLeave(event): void {
+    const securityIndicator = event.target as HTMLDivElement;
+
+    if (securityIndicator) {
+      const input
+        = securityIndicator.parentElement!
+          .previousElementSibling! as HTMLDivElement;
+
+      if (input) {
+        securityIndicator.setAttribute(
+          'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
+        input.setAttribute(
+          'style', 'border: 2px cadetblue groove; margin: 4px 0 2px -1px; line-height: 18px;');
+      }
+    }
+  }
   handleComposition(event): void {
     if (event.type === 'compositionend') {
       (this.$refs.input as any).isComposing = false;
@@ -487,9 +523,11 @@ export default class Navbar extends Vue {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
       if (el && si && si.parentElement) {
-        el.querySelector('input')!.setAttribute('style', 'display: none;');
-        si.parentElement.setAttribute('style', 'display: block;');
-        si.querySelector('.security-hint')!.classList.remove('selection');
+        if (!el.querySelector('input')!.classList.contains('hidden')) {
+          el.querySelector('input')!.classList.add('hidden');
+          si.parentElement.classList.remove('hidden');
+          si.querySelector('.security-hint')!.classList.remove('selection');
+        }
       }
     }
   }
@@ -577,9 +615,11 @@ export default class Navbar extends Vue {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
       if (el && si && si.parentElement) {
-        el.querySelector('input')!.setAttribute('style', 'display: block;');
-        si.parentElement.setAttribute('style', 'display: none;');
-        el.querySelector('input')!.focus();
+        if (el.querySelector('input')!.classList.contains('hidden')) {
+          el.querySelector('input')!.classList.remove('hidden');
+          si.parentElement.classList.add('hidden');
+          el.querySelector('input')!.focus();
+        }
       }
     }
   }
@@ -958,8 +998,10 @@ export default class Navbar extends Vue {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
       if (el && si && si.parentElement) {
-        el.querySelector('input')!.setAttribute('style', 'display: none;');
-        si.parentElement.setAttribute('style', 'display: block;');
+        if (!el.querySelector('input')!.classList.contains('hidden')) {
+          el.querySelector('input')!.classList.add('hidden');
+          si.parentElement.classList.remove('hidden');
+        }
       }
     }
 
@@ -1047,6 +1089,10 @@ export default class Navbar extends Vue {
     flex: 9;
     display: flex;
     margin: 0 5px;
+
+    .hidden {
+      display: none;
+    }
 
     a {
       border: 1px solid #bbb;
