@@ -474,32 +474,16 @@ export default class Navbar extends Vue {
     const securityIndicator = event.target as HTMLDivElement;
 
     if (securityIndicator) {
-      const input
-        = securityIndicator.parentElement!
-          .previousElementSibling! as HTMLDivElement;
-
-      if (input) {
-        securityIndicator.setAttribute(
-          'style', 'border: 2px cadetblue groove; margin: 4px 0 0 -2px; line-height: 20px;');
-        input.setAttribute(
-          'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
-      }
+      securityIndicator.setAttribute(
+        'style', 'border: 2px ridge #ccc; margin: 4px 0 2px -4px; line-height: 20px;');
     }
   }
   onMouseLeave(event): void {
     const securityIndicator = event.target as HTMLDivElement;
 
     if (securityIndicator) {
-      const input
-        = securityIndicator.parentElement!
-          .previousElementSibling! as HTMLDivElement;
-
-      if (input) {
-        securityIndicator.setAttribute(
-          'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
-        input.setAttribute(
-          'style', 'border: 2px cadetblue groove; margin: 4px 0 2px -1px; line-height: 18px;');
-      }
+      securityIndicator.setAttribute(
+        'style', 'border: 1px solid #bbb; border-left: 0; margin: 4px 0 2px; line-height: 22px;');
     }
   }
   handleComposition(event): void {
@@ -513,10 +497,24 @@ export default class Navbar extends Vue {
     this.onNewElementParentClick();
     (this.$parent as BrowserMainView).onNavContextMenu(event);
   }
-  onFocus(): void {
+  onFocus(event): void {
+    const input = event.target as HTMLDivElement;
+
+    if (input) {
+      input.setAttribute(
+        'style', 'border: 2px ridge #0089ff; margin: 4px 0 2px -2px; line-height: 22px;');
+    }
+
     this.focused = true;
   }
-  onBlur(): void {
+  onBlur(event): void {
+    const input = event.target as HTMLDivElement;
+
+    if (input) {
+      input.setAttribute(
+        'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
+    }
+
     this.typing = false;
     this.focused = false;
     if (document) {
