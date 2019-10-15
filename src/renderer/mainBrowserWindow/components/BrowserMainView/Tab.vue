@@ -21,6 +21,8 @@ import urlUtil from '../../../lib/url-util';
 
 import Event from '../../../api/event';
 
+import BrowserMainView from '../BrowserMainView.vue';
+
 const resizeSensor = require('css-element-queries/src/ResizeSensor');
 
 @Component({
@@ -253,13 +255,13 @@ export default class Tab extends Vue {
         */
       new resizeSensor(nav, () => {
         webview.style.height
-          = `calc(100vh - ${nav.clientHeight}px)`;
+          = (this.$parent as BrowserMainView).getViewHeight();
         findinpageBar.style.top = `${nav.clientHeight}px`;
       });
 
       // fired once
       webview.style.height
-        = `calc(100vh - ${nav.clientHeight}px)`;
+        = (this.$parent as BrowserMainView).getViewHeight();
       findinpageBar.style.top = `${nav.clientHeight}px`;
 
       // navigate

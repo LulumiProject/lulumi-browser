@@ -7,7 +7,7 @@ div
     #notification(v-show="showNotification")
       notification(:windowWebContentsId="windowWebContentsId",
                    :tabId="tab.id")
-  SwipeArrow
+  swipe-arrow
   tab(v-for="(tab, index) in tabs",
       :isActive="index === currentTabIndex",
       :windowId="windowId",
@@ -20,6 +20,7 @@ div
     transition(name="extend")
       .browser-tab-status(v-show="tab.statusText") {{ decodeURIComponent(tab.statusText) }}
     download(v-show="$store.getters.downloads.length !== 0 && showDownloadBar")
+  status-bar(:windowId="windowId")
 </template>
 
 <script lang="ts">
@@ -34,6 +35,7 @@ import SwipeArrow from './BrowserMainView/SwipeArrow.vue';
 import Tab from './BrowserMainView/Tab.vue';
 import Download from './BrowserMainView/Download.vue';
 import Notification from './BrowserMainView/Notification.vue';
+import StatusBar from './BrowserMainView/StatusBar.vue';
 
 import { is } from 'electron-util';
 import constants from '../../mainBrowserWindow/constants';
@@ -53,6 +55,7 @@ import Event from '../../api/event';
     Tab,
     Download,
     Notification,
+    StatusBar,
   },
 })
 export default class BrowserMainView extends Vue {
@@ -179,6 +182,17 @@ export default class BrowserMainView extends Vue {
       }
     }
     return this.tabs[index];
+  }
+  getViewHeight(): string {
+    const nav = this.$el.querySelector('#nav') as HTMLDivElement;
+    if (nav) {
+      const statusBar = this.$el.querySelector('#status-bar') as HTMLDivElement;
+      if (statusBar) {
+        return `calc(100vh - ${nav.clientHeight}px - ${statusBar.clientHeight}px)`;
+      }
+      return `calc(100vh - ${nav.clientHeight}px)`;
+    }
+    return '';
   }
   async historyMappings() {
     const out: any = {};
@@ -538,7 +552,7 @@ export default class BrowserMainView extends Vue {
       const nav = this.$el.querySelector('#nav') as HTMLDivElement;
       if (nav) {
         nav.style.display = 'block';
-        this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+        this.getWebView().style.height = this.getViewHeight();
         const jsScript = 'document.webkitExitFullscreen()';
         this.getWebView().executeJavaScript(jsScript, true);
       }
@@ -754,7 +768,7 @@ export default class BrowserMainView extends Vue {
     const nav = this.$el.querySelector('#nav') as HTMLDivElement;
     if (nav) {
       nav.style.display = 'block';
-      this.getWebView().style.height = `calc(100vh - ${nav.clientHeight}px)`;
+      this.getWebView().style.height = this.getViewHeight();
     }
     if (this.htmlFullscreen) {
       this.onLeaveHtmlFullScreen();
@@ -1829,7 +1843,7 @@ html {
 }
 
 #footer {
-  bottom: 0;
+  bottom: 22px;
   position: absolute;
 
   .browser-tab-status {

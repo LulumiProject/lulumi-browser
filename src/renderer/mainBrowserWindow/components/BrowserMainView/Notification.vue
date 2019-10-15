@@ -76,7 +76,8 @@ export default class Notification extends Vue {
         accept: true,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height = 'calc(100vh - 72px)';
+    (this.$parent as BrowserMainView).getWebView().style.height
+      = (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -103,7 +104,8 @@ export default class Notification extends Vue {
         accept: false,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height = 'calc(100vh - 72px)';
+    (this.$parent as BrowserMainView).getWebView().style.height
+      = (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -114,7 +116,8 @@ export default class Notification extends Vue {
 
   @Watch('tabId')
   onTabId(newId) {
-    (this.$parent as BrowserMainView).getWebView().style.height = 'calc(100vh - 72px)';
+    (this.$parent as BrowserMainView).getWebView().style.height
+      = (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
   }
 
@@ -129,7 +132,7 @@ export default class Notification extends Vue {
       this.template
         = this.$t('notification.update.updateAvailable', { releaseName: data.releaseName });
       (this.$parent as BrowserMainView).getWebView().style.height
-        = 'calc((100vh - 72px) - 36px)';
+        = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
       (this.$parent as BrowserMainView).showNotification = true;
     });
     ipc.on('request-permission', (event, data) => {
@@ -151,14 +154,14 @@ export default class Notification extends Vue {
                 = this.$t(
                   'notification.permission.request.setLanguage',
                   { hostname: this.hostname, lang: data.label });
-              webview.style.height = 'calc((100vh - 72px) - 36px)';
+              webview.style.height = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
               (this.$parent as BrowserMainView).showNotification = true;
               this.handler = setTimeout(
                 () => {
                   ipc.send(`response-permission-${this.id}`, {
                     accept: false,
                   });
-                  webview.style.height = 'calc(100vh - 72px)';
+                  webview.style.height = (this.$parent as BrowserMainView).getViewHeight();
                   (this.$parent as BrowserMainView).showNotification = false;
                   this.id = -1;
                   clearTimeout(this.handler);
@@ -177,14 +180,14 @@ export default class Notification extends Vue {
                   = this.$t(
                     'notification.permission.request.normal',
                     { hostname: this.hostname, permission: this.permission });
-                webview.style.height = 'calc((100vh - 72px) - 36px)';
+                webview.style.height = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
                 (this.$parent as BrowserMainView).showNotification = true;
                 this.handler = setTimeout(
                   () => {
                     ipc.send(`response-permission-${this.id}`, {
                       accept: false,
                     });
-                    webview.style.height = 'calc(100vh - 72px)';
+                    webview.style.height = (this.$parent as BrowserMainView).getViewHeight();
                     (this.$parent as BrowserMainView).showNotification = false;
                     this.id = -1;
                     clearTimeout(this.handler);
