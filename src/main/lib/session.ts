@@ -156,7 +156,7 @@ const unregister = (eventName: string, sess: Electron.Session): void => {
 };
 
 const registerWebRequestListeners = (): void => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   ipcMain.on('lulumi-web-request-add-listener-on-before-request', (event: Electron.IpcMainEvent, extensionName, eventLispCaseName: string, digest: string, filter): void => {
     register('onBeforeRequest', sess, eventLispCaseName, event.sender.id, digest, filter);
   });
@@ -210,49 +210,49 @@ const registerWebRequestListeners = (): void => {
 const registerScheme = (scheme: string): void => {
   let sess: Electron.Session | null = null;
   if (scheme === 'lulumi') {
-    sess = session.fromPartition('persist:webview');
-  } else {
-    sess = session.fromPartition('command-palette');
+    sess = session.fromPartition('persist:lulumi');
   }
-  if (process.env.NODE_ENV === 'development') {
-    sess.protocol.registerHttpProtocol(scheme, async (request, callback) => {
-      const url: string = request.url.substr(`${scheme}://`.length);
-      const [type, ...param] = url.split('/');
-      if (param[0].indexOf('#') === 0) {
-        callback({
-          method: request.method,
-          url: `http://localhost:${require('../../../.electron-vue/config').port}/${type}.html`,
-        });
-      } else {
-        callback({
-          method: request.method,
-          url: `http://localhost:${require('../../../.electron-vue/config').port}/${param.join('/')}`,
-        });
-      }
-    }, (error) => {
-      if (error) {
-        console.error('Failed to register protocol');
-      }
-    });
-  } else {
-    sess.protocol.registerFileProtocol(scheme, (request, callback) => {
-      const url: string = request.url.substr(`${scheme}://`.length);
-      const [type, ...param] = url.split('/');
-      if (param.indexOf('#') === 0) {
-        callback(`${__dirname}/${type}.html`);
-      } else {
-        callback(`${__dirname}/${param.join('/')}`);
-      }
-    }, (error) => {
-      if (error) {
-        console.error('Failed to register protocol');
-      }
-    });
+  if (sess) {
+    if (process.env.NODE_ENV === 'development') {
+      sess.protocol.registerHttpProtocol(scheme, (request, callback) => {
+        const url: string = request.url.substr(`${scheme}://`.length);
+        const [type, ...params] = url.split('/');
+        if (params[0] === '#') {
+          callback({
+            method: request.method,
+            url: `http://localhost:${require('../../../.electron-vue/config').port}/${type}.html`,
+          });
+        } else {
+          callback({
+            method: request.method,
+            url: `http://localhost:${require('../../../.electron-vue/config').port}/${params.join('/')}`,
+          });
+        }
+      }, (error) => {
+        if (error) {
+          console.error('Failed to register protocol');
+        }
+      });
+    } else {
+      sess.protocol.registerFileProtocol(scheme, (request, callback) => {
+        const url: string = request.url.substr(`${scheme}://`.length);
+        const [type, ...params] = url.split('/');
+        if (params[0] === '#') {
+          callback(`${__dirname}/${type}.html`);
+        } else {
+          callback(`${__dirname}/${params.join('/')}`);
+        }
+      }, (error) => {
+        if (error) {
+          console.error('Failed to register protocol');
+        }
+      });
+    }
   }
 };
 
 const registerCertificateVerifyProc = () => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   const store = mainStore.getStore();
   sess.setCertificateVerifyProc((request, callback) => {
     try {
@@ -296,7 +296,7 @@ const registerCertificateVerifyProc = () => {
 };
 
 const onWillDownload = (windows, path: string): void => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
     if (item.getMimeType() === 'application/pdf'
@@ -385,7 +385,7 @@ const onWillDownload = (windows, path: string): void => {
 };
 
 const setPermissionRequestHandler = (windows): void => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.setPermissionRequestHandler((webContents, permission, callback) => {
     Object.keys(windows).forEach((key) => {
       const id = parseInt(key, 10);
@@ -406,7 +406,7 @@ const setPermissionRequestHandler = (windows): void => {
 };
 
 const registerProxy = (proxyConfig: Electron.Config): void => {
-  const sess = session.fromPartition('persist:webview') as Electron.Session;
+  const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.setProxy(proxyConfig, () => { });
 };
 

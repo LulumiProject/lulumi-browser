@@ -286,7 +286,7 @@ export default class Navbar extends Vue {
       let newUrl = decodeURIComponent(this.url);
       newUrl = urlUtil.getUrlIfError(newUrl);
       newUrl = urlUtil.getUrlIfPDF(newUrl);
-      return urlUtil.getUrlIfAbout(newUrl).url;
+      return urlUtil.getUrlIfPrivileged(newUrl).url;
     }
     return this.url;
   }
@@ -308,8 +308,14 @@ export default class Navbar extends Vue {
     return suggestionItems;
   }
   get fancyContent(): string {
+    if (this.tab.url === 'chrome://gpu/') {
+      return '<div class="security-hint">lulumi://gpu</div>';
+    }
     if (this.tab.url === 'lulumi://about/#/newtab') {
-      return '<div class="security-hint">about:newtab</div>';
+      return '<div class="security-hint">lulumi://about/newtab</div>';
+    }
+    if (this.tab.url.startsWith('lulumi://')) {
+      return `<div class="security-hint">${this.showUrl}</div>`;
     }
     const currentUrl = url.parse(this.url, true);
     if (currentUrl.href && currentUrl.protocol) {

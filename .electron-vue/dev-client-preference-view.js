@@ -13,7 +13,7 @@ hotClient.subscribe((event) => {
   // }
 
   /**
-   * Notify `mainWindow` when `main` process is compiling,
+   * Notify `mainWindow` when `renderer` process is compiling,
    * giving notice for an expected reload of the `electron` process
    */
   if (event.action === 'compiling') {
@@ -33,7 +33,7 @@ hotClient.subscribe((event) => {
       </style>
 
       <div id="dev-client">
-        Compiling Main Process...
+        Compiling Renderer Process...
       </div>
     `
   }

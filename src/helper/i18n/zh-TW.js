@@ -130,7 +130,13 @@ export const guest = {
     newtabPage: {
       title: '新分頁',
     },
+    playbooksPage: {
+      title: '劇本',
+    },
   },
+};
+
+export const playbooks = {
 };
 
 export const commandPalette = {

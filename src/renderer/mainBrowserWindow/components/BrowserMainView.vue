@@ -246,6 +246,9 @@ export default class BrowserMainView extends Vue {
         case 'about:newtab':
           lastOpenedTab.title = this.$t('lulumi.newtabPage.title');
           break;
+        case 'about:playbooks':
+          lastOpenedTab.title = this.$t('lulumi.playbooks.title');
+          break;
       }
     });
     return lastOpenedTabs;
@@ -876,7 +879,7 @@ export default class BrowserMainView extends Vue {
           windowId,
           isURL: true,
           follow: true,
-          url: urlResource.aboutUrls(url),
+          url: urlResource.privilegedUrls(url),
         });
         this.$electron.ipcRenderer.send('focus-window', this.windowId);
       } else {
@@ -1023,7 +1026,7 @@ export default class BrowserMainView extends Vue {
   onEnterUrl(url: string): void {
     let newUrl: string;
     if (url.startsWith('about:')) {
-      newUrl = urlResource.aboutUrls(url);
+      newUrl = urlResource.privilegedUrls(url);
     } else if (urlUtil.isNotURL(url)) {
       newUrl = this.$store.getters.currentSearchEngine.search.replace('{queryString}', url);
     } else {

@@ -148,7 +148,7 @@ export default class Notification extends Vue {
           if (this.hostname !== null) {
             if (this.permission === 'setLanguage') {
               this.visible = false;
-              this.hostname = urlUtil.getUrlIfAbout(webContents.getURL()).url;
+              this.hostname = webContents.getURL();
               this.type = 'permission';
               this.template
                 = this.$t(

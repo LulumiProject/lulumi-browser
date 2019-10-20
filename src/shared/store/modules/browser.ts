@@ -332,10 +332,13 @@ const mutations = {
       if (state.tabs[tabsIndex].title !== 'error') {
         state.tabs[tabsIndex].url = url;
         state.tabs[tabsIndex].error = false;
-        if (url.match(regexp)) {
+        if (url === 'chrome://gpu/') {
+          state.tabs[tabsIndex].title = urlUtil.getUrlIfPrivileged(url).title;
+          state.tabs[tabsIndex].favIconUrl = constants.tabConfig.lulumiDefault.tabFavicon;
+        } else if (url.match(regexp)) {
           // lulumi://
           if (url.match(regexp)![1] === undefined) {
-            state.tabs[tabsIndex].title = urlUtil.getUrlIfAbout(url).title;
+            state.tabs[tabsIndex].title = urlUtil.getUrlIfPrivileged(url).title;
             // lulumi-extension://
           } else {
             state.tabs[tabsIndex].statusText = false;
@@ -350,7 +353,7 @@ const mutations = {
           // history
           if (!((state.tabs[tabsIndex].url.startsWith('file://')
             && state.tabs[tabsIndex].url.includes('/error/index.html'))
-            || state.tabs[tabsIndex].url.startsWith('about:blank'))) {
+            || state.tabs[tabsIndex].url.startsWith('lulumi:blank'))) {
             const dates = timeUtil.getLocaleCurrentTime().split(' ');
             const mtime = timeUtil.getMillisecondsTime();
             const index = state.history.findIndex(entry => entry.url === state.tabs[tabsIndex].url);

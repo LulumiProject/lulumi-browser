@@ -1,8 +1,8 @@
 <template lang="pug">
 #status-bar
-  span.status-item(class="left")
+  span.status-item(class="left", @click.self="onClick")
     | [{{ tab.status | capitalize }}]
-  span.status-item(class="right")
+  span.status-item(class="right", @click.self="onClick")
     awesome-icon(name="spinner")
     | {{ "Loading playbooks..." }}
 </template>
@@ -48,6 +48,26 @@ export default class StatusBar extends Vue {
       return this.dummyTabObject;
     }
     return this.tabs[this.currentTabIndex];
+  }
+
+  onClick(event: MouseEvent) {
+    const currentWindow: Electron.BrowserWindow | null
+      = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+
+    if (currentWindow) {
+      const { Menu, MenuItem } = this.$electron.remote;
+      const menu = new Menu();
+
+      menu.append(new MenuItem({
+        label: 'test',
+      }));
+
+      menu.popup({
+        x: event.clientX - event.offsetX,
+        y: event.clientY - (event.target as HTMLElement).clientHeight - event.offsetY,
+        window: currentWindow,
+      });
+    }
   }
 }
 </script>
@@ -95,6 +115,7 @@ export default class StatusBar extends Vue {
     &:hover {
       background: #0099ff6f;
       cursor: pointer;
+      user-select: none;
     }
   }
 }

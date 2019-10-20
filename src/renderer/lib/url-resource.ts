@@ -5,7 +5,7 @@ function getLulumiExtUrl(relativeUrl: string): string {
 }
 
 const urlResource = {
-  aboutUrls(url: string): string {
+  privilegedUrls(url: string): string {
     switch (url) {
       case 'about:about':
         return getLulumiExtUrl('about/#/');
@@ -23,6 +23,8 @@ const urlResource = {
         return 'about:blank';
       case 'about:newtab':
         return getLulumiExtUrl('about/#/newtab');
+      case 'about:playbooks':
+        return getLulumiExtUrl('playbooks/#/');
       case 'about:gpu':
         return 'chrome://gpu';
       default:

@@ -264,10 +264,10 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       tab.id = (newTabId += 1);
       tab.windowId = windowId;
       if (tab.url.startsWith('about:')) {
-        tab.url = urlResource.aboutUrls(tab.url);
+        tab.url = urlResource.privilegedUrls(tab.url);
       }
       if (tab.url.startsWith('lulumi-extension:')) {
-        tab.url = urlResource.aboutUrls('about:newtab');
+        tab.url = urlResource.privilegedUrls('about:newtab');
       }
       Object.keys(tab.extensionsMetadata).forEach((key) => {
         if (store.getters.extensionInfoDict[key] === undefined) {
@@ -296,10 +296,10 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
           tab.id = (newTabId += 1);
           tab.windowId = windowId;
           if (tab.url.startsWith('about:')) {
-            tab.url = urlResource.aboutUrls(tab.url);
+            tab.url = urlResource.privilegedUrls(tab.url);
           }
           if (tab.url.startsWith('lulumi-extension:')) {
-            tab.url = urlResource.aboutUrls('about:newtab');
+            tab.url = urlResource.privilegedUrls('about:newtab');
           }
           Object.keys(tab.extensionsMetadata).forEach((key) => {
             if (store.getters.extensionInfoDict[key] === undefined) {

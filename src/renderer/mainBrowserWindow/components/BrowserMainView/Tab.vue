@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  webview(partition="persist:webview",
+  webview(partition="persist:lulumi",
           plugins,
           :element-loading-text="$t('tab.loading')",
           ref="webview",

@@ -543,6 +543,188 @@ let preferenceViewConfig = {
   target: 'web'
 }
 
+let playbooksViewConfig = {
+  name: 'playbooks-view',
+  devtool: '#cheap-module-eval-source-map',
+  entry: {
+    'playbooks-view': path.join(__dirname, '../src/renderer/playbooksView/main.ts')
+  },
+  externals: [
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: {
+          loader: 'happypack/loader?id=happy-ts'
+        },
+        include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/playbooksView') ],
+        exclude: /node_modules/
+      },
+      {
+        test: /\.less$/,
+        use: returnLess,
+        include: [ path.join(__dirname, '../src/renderer/playbooksView') ]
+      },
+      {
+        test: /\.css$/,
+        use: returnCss,
+        include: [
+          path.join(__dirname, '../src/renderer/playbooksView'),
+          path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
+          path.join(__dirname, '../node_modules/modern-normalize'),
+          path.join(__dirname, '../node_modules/vue-awesome/components')
+        ]
+      },
+      {
+        test: /\.html$/,
+        use: [{
+          loader: 'happypack/loader?id=happy-html'
+        }]
+      },
+      {
+        test: /\.pug$/,
+        use: [{
+          loader: 'happypack/loader?id=happy-pug'
+        }]
+      },
+      {
+        test: /\.vue$/,
+        use: {
+          loader: 'vue-loader'
+        },
+        include: [ path.join(__dirname, '../src/renderer/playbooksView') ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
+      }
+    ]
+  },
+  node: {
+    __dirname: process.env.NODE_ENV !== 'production',
+    __filename: process.env.NODE_ENV !== 'production'
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
+    new OptimizeCssAssetsPlugin({
+      cssProcessorOptions: { discardComments: { removeAll: true } },
+      canPrint: false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'playbooks.html',
+      template: path.join(__dirname, '../src/renderer/playbooksView/index.ejs'),
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      cspPlugin: {
+        enabled: process.env.NODE_ENV === 'production',
+        policy: {
+          'default-src': "'none'",
+          'object-src': "'none'",
+          'connect-src': ["'self'"],
+          'script-src': ["'self'"],
+          'style-src': ["'self'", "'unsafe-inline'"],
+          'font-src': ["'self'", "data:"],
+          'img-src': ["'self'", "https:", "http:", "data:"]
+        },
+        nonceEnabled: {
+          'style-src': false,
+        },
+      },
+      nodeModules: false
+    }),
+    new CspHtmlWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.MinChunkSizePlugin({
+      minChunkSize: 10000
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('../static/vendor-manifest.json')
+    }),
+    createHappyPlugin('happy-html',  [{
+      loader: 'vue-html-loader'
+    }]),
+    createHappyPlugin('happy-pug', [{
+      loader: 'pug-plain-loader'
+    }]),
+    createHappyPlugin('happy-ts', [{
+      loader: 'ts-loader',
+      options: {
+        appendTsSuffixTo: [/\.vue$/],
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        happyPackMode: true,
+        transpileOnly: true
+      }
+    }]),
+    // https://github.com/amireh/happypack/pull/131
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          loaders: {
+            pug: 'pug-plain-loader'
+          }
+        }
+      }]
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
+      tslint: path.join(__dirname, '../tslint.json'),
+      vue: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [playbooksView]', excludeWarnings: false }),
+    new VueLoaderPlugin()
+  ],
+  output: {
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+    libraryTarget: 'commonjs2',
+    path: path.join(__dirname, '../dist')
+  },
+  resolve: {
+    alias: {
+      'components': path.join(__dirname, '../src/renderer/playbooksView/components'),
+      'renderer': path.join(__dirname, '../src/renderer/playbooksView'),
+      'i18n': path.join(__dirname, '../src/helper/i18n'),
+      'vue$': 'vue/dist/vue.runtime.esm.js'
+    },
+    extensions: ['.ts', '.js', '.vue', '.json', '.css', '.less', '.pug']
+  },
+  target: 'web'
+}
+
 let commandPaletteConfig = {
   name: 'command-palette',
   devtool: '#cheap-module-eval-source-map',
@@ -759,14 +941,15 @@ let workerConfig = {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
- * workerConfig and preloadsConfig
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, playbooksViewConfig,
+ * commandPaletteConfig, workerConfig and preloadsConfig
  * for production settings
  */
 if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.mode = 'production'
   preloadsConfig.mode = 'production'
   preferenceViewConfig.mode = 'production'
+  playbooksViewConfig.mode = 'production'
   commandPaletteConfig.mode = 'production'
   workerConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
@@ -774,6 +957,7 @@ if (process.env.NODE_ENV === 'production') {
   mainBrowserWindowConfig.devtool = false
   preloadsConfig.devtool = false
   preferenceViewConfig.devtool = false
+  playbooksViewConfig.devtool = false
   commandPaletteConfig.devtool = false
   workerConfig.devtool = false
 
@@ -792,6 +976,11 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     })
   )
+  playbooksViewConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  )
   commandPaletteConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -804,13 +993,14 @@ if (process.env.NODE_ENV === 'production') {
   )
 } else {
   /**
-   * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
-   * workerConfig and preloadsConfig
+   * Adjust mainBrowserWindowConfig, preferenceViewConfig, playbooksViewConfig,
+   * commandPaletteConfig, workerConfig and preloadsConfig
    * for development settings
    */
   mainBrowserWindowConfig.mode = 'development'
   preloadsConfig.mode = 'development'
   preferenceViewConfig.mode = 'development'
+  playbooksViewConfig.mode = 'development'
   commandPaletteConfig.mode = 'development'
   workerConfig.mode = 'development'
 
@@ -829,6 +1019,11 @@ if (process.env.NODE_ENV === 'production') {
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
   )
+  playbooksViewConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+    })
+  )
   commandPaletteConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
@@ -837,8 +1032,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /**
- * Adjust mainBrowserWindowConfig, preferenceViewConfig, commandPaletteConfig,
- * workerConfig and preloadsConfig
+ * Adjust mainBrowserWindowConfig, preferenceViewConfig, playbooksViewConfig,
+ * commandPaletteConfig, workerConfig and preloadsConfig
  * for e2e settings
  */
 if (process.env.TEST_ENV === 'e2e') {
@@ -855,6 +1050,12 @@ if (process.env.TEST_ENV === 'e2e') {
     })
   )
   preferenceViewConfig.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"test"',
+      'process.env.TEST_ENV': '"e2e"'
+    })
+  )
+  playbooksViewConfig.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"test"',
       'process.env.TEST_ENV': '"e2e"'
@@ -878,6 +1079,7 @@ module.exports = [
   Object.assign({}, mainBrowserWindowConfig),
   Object.assign({}, preloadsConfig),
   Object.assign({}, preferenceViewConfig),
+  Object.assign({}, playbooksViewConfig),
   Object.assign({}, commandPaletteConfig),
   Object.assign({}, workerConfig)
 ]

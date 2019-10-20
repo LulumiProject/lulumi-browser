@@ -235,7 +235,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 // register the method to BrowserWindow
 (BrowserWindow as any).createWindow = createWindow;
 
-// register 'lulumi', 'lulumi-extension' and 'command-palette' as standard protocols that are secure
+// register 'lulumi' and 'lulumi-extension' as standard protocols that are secure
 protocol.registerSchemesAsPrivileged([
   { scheme: 'lulumi', privileges: { standard: true, secure: true } },
   { scheme: 'lulumi-extension', privileges: { standard: true, secure: true } },

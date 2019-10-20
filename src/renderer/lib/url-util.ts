@@ -282,19 +282,31 @@ const urlUtil = {
   },
 
   /**
-   * Gets about url from a lulumi scheme
+   * Gets privileged url from a lulumi scheme
    * @param {string} url
    * @return {object}
    */
-  getUrlIfAbout(url: string): Lulumi.Renderer.AboutLocationObject {
-    if (url.startsWith(`${constants.lulumiPagesCustomProtocol}://`)) {
-      const guestUrl = require('url').parse(url);
-      if (guestUrl.hash) {
-        const guestHash = guestUrl.hash.substr(2);
-        const item = `${guestUrl.host}:${guestHash === '' ? 'about' : guestHash}`;
+  getUrlIfPrivileged(url: string): Lulumi.Renderer.AboutLocationObject {
+    const pivot = `${constants.lulumiPagesCustomProtocol}://`;
+    if (url === 'chrome://gpu/') {
+      return {
+        title: 'about:gpu',
+        url: `${pivot}gpu`,
+      };
+    }
+    if (url.startsWith(pivot)) {
+      const newUrl = require('url').parse(url);
+      if (newUrl.hash) {
+        const hash = newUrl.hash.substr(2);
+        if (hash === '') {
+          return {
+            title: `about:${newUrl.host}`,
+            url: `${pivot}${newUrl.host}`,
+          };
+        }
         return {
-          title: item,
-          url: item,
+          title: `about:${hash}`,
+          url: `${pivot}${hash}`,
         };
       }
     }
