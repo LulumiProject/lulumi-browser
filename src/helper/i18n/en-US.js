@@ -137,6 +137,7 @@ export const guest = {
 };
 
 export const playbooks = {
+  newStep: 'New Step',
 };
 
 export const commandPalette = {
