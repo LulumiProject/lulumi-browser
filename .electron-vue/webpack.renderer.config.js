@@ -954,6 +954,8 @@ if (process.env.NODE_ENV === 'production') {
   workerConfig.mode = 'production'
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   preferenceViewConfig.performance = { hints: false }
+  // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
+  playbooksViewConfig.performance = { hints: false }
   mainBrowserWindowConfig.devtool = false
   preloadsConfig.devtool = false
   preferenceViewConfig.devtool = false

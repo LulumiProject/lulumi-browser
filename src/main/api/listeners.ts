@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain, webContents } from 'electron';
+import { BrowserWindow, dialog, ipcMain, webContents, IpcMainEvent } from 'electron';
 
 const windows = require('../../shared/store/mainStore').default.getWindows();
 
@@ -9,10 +9,10 @@ ipcMain.on('open-dev-tools', (event, webContentsId) => {
     webContents.fromId(webContentsId).openDevTools();
   }
 });
-ipcMain.on('add-lulumi-extension', (event) => {
-  dialog.showOpenDialog({ properties: ['openDirectory'] }, (dirs) => {
-    if (dirs) {
-      const dir: string = dirs[0];
+ipcMain.on('add-lulumi-extension', (event: IpcMainEvent) => {
+  dialog.showOpenDialog(BrowserWindow.fromWebContents(event.sender), { properties: ['openDirectory'] }).then((res) => {
+    if (!res.canceled && res.filePaths && res.filePaths.length > 0) {
+      const dir: string = res.filePaths[0];
       let name: string = '';
       let result: string = 'OK';
       try {

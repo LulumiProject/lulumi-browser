@@ -228,10 +228,6 @@ const registerScheme = (scheme: string): void => {
             url: `http://localhost:${require('../../../.electron-vue/config').port}/${params.join('/')}`,
           });
         }
-      }, (error) => {
-        if (error) {
-          console.error('Failed to register protocol');
-        }
       });
     } else {
       sess.protocol.registerFileProtocol(scheme, (request, callback) => {
@@ -241,10 +237,6 @@ const registerScheme = (scheme: string): void => {
           callback(`${__dirname}/${type}.html`);
         } else {
           callback(`${__dirname}/${params.join('/')}`);
-        }
-      }, (error) => {
-        if (error) {
-          console.error('Failed to register protocol');
         }
       });
     }
@@ -407,7 +399,7 @@ const setPermissionRequestHandler = (windows): void => {
 
 const registerProxy = (proxyConfig: Electron.Config): void => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
-  sess.setProxy(proxyConfig, () => { });
+  sess.setProxy(proxyConfig).then(() => { });
 };
 
 export default {

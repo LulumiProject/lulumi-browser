@@ -16,7 +16,6 @@ import {
   screen,
   systemPreferences,
 } from 'electron';
-import { PanelWindow } from 'electron-panel-window';
 import collect from 'collect.js';
 import { is } from 'electron-util';
 
@@ -277,33 +276,20 @@ app.whenReady().then(() => {
     try {
       const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-      if (is.macos) {
-        globalObject.commandPalette = new PanelWindow({
-          width: width / 2,
-          height: height / 1.94,
-          show: false,
-          fullscreenable: false,
-          resizable: false,
-          webPreferences: {
-            partition: 'command-palette',
-            nodeIntegration: true,
-          },
-        });
-      } else {
-        globalObject.commandPalette = new BrowserWindow({
-          width: width / 2,
-          height: height / 1.94,
-          show: false,
-          frame: false,
-          alwaysOnTop: true,
-          fullscreenable: false,
-          resizable: false,
-          webPreferences: {
-            partition: 'command-palette',
-            nodeIntegration: true,
-          },
-        });
-      }
+      globalObject.commandPalette = new BrowserWindow({
+        width: width / 2,
+        height: height / 1.94,
+        show: false,
+        frame: false,
+        alwaysOnTop: true,
+        fullscreenable: false,
+        resizable: false,
+        webPreferences: {
+          partition: 'command-palette',
+          nodeIntegration: true,
+        },
+      });
+
       globalObject.commandPalette.setVisibleOnAllWorkspaces(false);
       globalObject.commandPalette.loadURL(cpURL);
       globalShortcut.register('CmdOrCtrl+Shift+K', () => {
@@ -476,7 +462,7 @@ ipcMain.on('show-certificate',
       certificate,
       message,
       // tslint:disable-next-line:align
-    }, () => { });
+    }).then(() => { });
   });
 
 // focus the window

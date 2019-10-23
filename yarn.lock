@@ -1000,9 +1000,9 @@
   integrity sha512-9fq4jZVhPNW8r+UYKnxF1e2HkDWOWKM5bC2/7c9wPV835I0aOrVbS/Hw/pWPk2uKrNXQqg9Z959Kz+IYDd5p3w==
 
 "@types/node@^10.12.18":
-  version "10.14.18"
-  resolved "https://registry.npmjs.org/@types/node/-/node-10.14.18.tgz#b7d45fc950e6ffd7edc685e890d13aa7b8535dce"
-  integrity sha512-ryO3Q3++yZC/+b8j8BdKd/dn9JlzlHBPdm80656xwYUdmPkpTGTjkAdt6BByiNupGPE8w0FhBgvYy/fX9hRNGQ==
+  version "10.14.22"
+  resolved "https://registry.npmjs.org/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
+  integrity sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==
 
 "@types/q@^1.5.1":
   version "1.5.2"
@@ -1060,10 +1060,10 @@
     "@types/webpack-sources" "*"
     source-map "^0.6.0"
 
-"@types/webpack@^4.39.4":
-  version "4.39.4"
-  resolved "https://registry.npmjs.org/@types/webpack/-/webpack-4.39.4.tgz#680139788f63f5279ca6d1ffb08666a7ddeca5cf"
-  integrity sha512-VubX3/qXtpWmHhd422GdtAHwAMLHSsgXx0dtspd2DZ7pMnCRKjduJN8Zp5Ex4e1fH4FKFBBgWTvsry0WL8wHsQ==
+"@types/webpack@^4.39.5":
+  version "4.39.5"
+  resolved "https://registry.npmjs.org/@types/webpack/-/webpack-4.39.5.tgz#3671b65928d9e0c6fcd4adff3f8167d48b174681"
+  integrity sha512-9twG6D97ao13MBLvigwfBJe6rxtb04UY3TcYHBYkW5sXZjUrNhqIRxLYg74VzK/YAE8xlVhOyd+3Whr7E5RrBA==
   dependencies:
     "@types/anymatch" "*"
     "@types/node" "*"
@@ -2080,13 +2080,6 @@ binary-extensions@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/binary-extensions/-/binary-extensions-2.0.0.tgz#23c0df14f6a88077f5f986c0d167ec03c3d5537c"
   integrity sha512-Phlt0plgpIIBOGTT/ehfFnbNlfsDEiqmzE2KRXoX1bLIlir4X/MR+zSyBEkL05ffWgnRSf/DXv+WrUAVr93/ow==
-
-bindings@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
-  integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
-  dependencies:
-    file-uri-to-path "1.0.0"
 
 bl@^1.0.0:
   version "1.2.2"
@@ -4151,12 +4144,6 @@ electron-packager@^14.0.6:
     semver "^6.0.0"
     yargs-parser "^13.0.0"
 
-"electron-panel-window@git+https://github.com/qazbnm456/electron-panel-window.git":
-  version "2.0.2"
-  resolved "git+https://github.com/qazbnm456/electron-panel-window.git#9d23ea6baa94a82506642461726661c8e5b641d1"
-  dependencies:
-    bindings "^1.5.0"
-
 electron-process-manager@^0.7.1:
   version "0.7.1"
   resolved "https://registry.npmjs.org/electron-process-manager/-/electron-process-manager-0.7.1.tgz#fb53f6f80f1d0b10d32da758bc8bc9013751a5e0"
@@ -4202,10 +4189,10 @@ electron-util@^0.12.2:
     electron-is-dev "^1.1.0"
     new-github-issue-url "^0.2.1"
 
-electron@^6.0.12:
-  version "6.0.12"
-  resolved "https://registry.npmjs.org/electron/-/electron-6.0.12.tgz#85bf0061e32f660256cfde95488f1cb75253bc94"
-  integrity sha512-70ODZa1RP6K0gE9IV9YLCXPSyhLjXksCuYSSPb3MljbfwfHo5uE6X0CGxzm+54YuPdE2e7EPnWZxOOsJYrS5iQ==
+electron@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.npmjs.org/electron/-/electron-6.1.0.tgz#f816347cc0b21cb231b829a4ba5133fbfbbbe100"
+  integrity sha512-CGdM6671gA0WUmsQCVO3stqpvm6/x+S+MkKlqgsk2N3GXnIa3KkfR8k4YNp8gnCgLSZQ0yucFQB/DyEYSjrzrA==
   dependencies:
     "@types/node" "^10.12.18"
     electron-download "^4.1.0"
@@ -4992,11 +4979,6 @@ file-loader@^4.2.0:
   dependencies:
     loader-utils "^1.2.3"
     schema-utils "^2.0.0"
-
-file-uri-to-path@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
-  integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
 filesize@^3.6.1:
   version "3.6.1"
@@ -11199,10 +11181,10 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
-ts-loader@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.npmjs.org/ts-loader/-/ts-loader-6.2.0.tgz#52d3993ecbc5474c1513242388e1049da0fce880"
-  integrity sha512-Da8h3fD+HiZ9GvZJydqzk3mTC9nuOKYlJcpuk+Zv6Y1DPaMvBL+56GRzZFypx2cWrZFMsQr869+Ua2slGoLxvQ==
+ts-loader@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.npmjs.org/ts-loader/-/ts-loader-6.2.1.tgz#67939d5772e8a8c6bdaf6277ca023a4812da02ef"
+  integrity sha512-Dd9FekWuABGgjE1g0TlQJ+4dFUfYGbYcs52/HQObE0ZmUNjQlmLAS7xXsSzy23AMaMwipsx5sNHvoEpT2CZq1g==
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^4.0.0"

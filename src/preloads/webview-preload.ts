@@ -46,7 +46,7 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
     });
     webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
       code: 'window',
-    }], false, (window) => {
+    }], false).then((window) => {
       window.chrome = window.lulumi = context.lulumi;
     });
   }
@@ -123,7 +123,7 @@ process.once('loaded', () => {
     if (document.location.href === 'about:newtab') {
       document.location.href = 'lulumi://about/#/newtab';
     } else if (document.location.href.startsWith('lulumi://')) {
-      webFrame.executeJavaScript('window', ((window) => {
+      webFrame.executeJavaScript('window').then((window) => {
         window.about = ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href);
         window.backgroundPages = ipcRenderer.sendSync('get-background-pages');
         window.manifestMap = ipcRenderer.sendSync('get-manifest-map');
@@ -134,13 +134,15 @@ process.once('loaded', () => {
         window.ipcRenderer = ipcRenderer;
         window.require = requirePreload.require;
         window.module = moduleTmp;
-      }) as any);
+        // tslint:disable-next-line:no-console
+      }).catch(err => console.error(err));
     }
     if (process.env.NODE_ENV === 'test'
       && process.env.TEST_ENV === 'e2e') {
-      webFrame.executeJavaScript('window', ((window) => {
+      webFrame.executeJavaScript('window').then((window) => {
         window.require = requirePreload.electronRequire;
-      }) as any);
+        // tslint:disable-next-line:no-console
+      }).catch(err => console.error(err));
     }
   }
   ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {
