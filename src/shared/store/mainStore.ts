@@ -86,6 +86,15 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
     // command-palette window
     if (window === undefined || event.sender.getURL().endsWith('cp.html#/')) {
       windows[globalObject.commandPalette.id] = globalObject.commandPalette;
+      (globalObject.commandPalette as BrowserWindow).on('close', (event: Electron.IpcMainEvent) => {
+        if (close) {
+          close = false;
+        } else {
+          delete windows[globalObject.commandPalette.id];
+          close = true;
+          globalObject.commandPalette.close();
+        }
+      });
     } else {
       const windowId = window.id;
 
