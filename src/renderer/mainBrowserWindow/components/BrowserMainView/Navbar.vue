@@ -637,6 +637,65 @@ export default class Navbar extends Vue {
       suggestions.push({ item });
     });
     if (queryString) {
+      if (queryString.startsWith('about:')) {
+        // Privileged Pages
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://about',
+            url: 'about:about',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://about/lulumi',
+            url: 'about:lulumi',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://preferences',
+            url: 'about:preferences',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://downloads',
+            url: 'about:downloads',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://history',
+            url: 'about:history',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://extensions',
+            url: 'about:extensions',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://playbooks',
+            url: 'about:playbooks',
+            icon: 'document',
+          },
+        });
+      }
       suggestions = suggestions.filter(this.createFilter(queryString));
     }
     suggestions.push({
@@ -702,7 +761,7 @@ export default class Navbar extends Vue {
     }
   }
   createFilter(queryString: string): (suggestion: any) => boolean {
-    return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
+    return suggestion => (suggestion.item.url.indexOf(queryString.toLowerCase()) === 0);
   }
   extensionsMetadata(extensionId: string): Lulumi.Store.ExtensionMetadata | null {
     const extensionsMetadata = this.tab.extensionsMetadata;

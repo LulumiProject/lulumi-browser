@@ -4189,10 +4189,10 @@ electron-util@^0.12.2:
     electron-is-dev "^1.1.0"
     new-github-issue-url "^0.2.1"
 
-electron@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/electron/-/electron-6.1.0.tgz#f816347cc0b21cb231b829a4ba5133fbfbbbe100"
-  integrity sha512-CGdM6671gA0WUmsQCVO3stqpvm6/x+S+MkKlqgsk2N3GXnIa3KkfR8k4YNp8gnCgLSZQ0yucFQB/DyEYSjrzrA==
+electron@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.npmjs.org/electron/-/electron-6.1.1.tgz#28e6ce60c88f236adf7658173e55d802fc9ef693"
+  integrity sha512-OwFJSgPdKNyCnMl7mZvWkYpSh9gMb2jNSXoORX4NivxjL8ALhpMKFJ2YIIfLYXi3lGkmr05VAiTzuTBludSdjw==
   dependencies:
     "@types/node" "^10.12.18"
     electron-download "^4.1.0"
@@ -5129,10 +5129,10 @@ fork-ts-checker-notifier-webpack-plugin@^1.0.2:
   dependencies:
     node-notifier "^5.1.2"
 
-fork-ts-checker-webpack-plugin@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.npmjs.org/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-1.5.1.tgz#f82d078ba8911c7b2c70703ffb3cbe588b33fbaa"
-  integrity sha512-IbVh1Z46dmCXJMg6We8s9jYwCAzzSv2Tgj+G2Sg/8pFantHDBrAg/rQyPnmAWLS/djW7n4VEltoEglbtTvt0wQ==
+fork-ts-checker-webpack-plugin@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.npmjs.org/fork-ts-checker-webpack-plugin/-/fork-ts-checker-webpack-plugin-1.6.0.tgz#a81fd1c6bf5258fa5318cf3e9a7e9bac006f7917"
+  integrity sha512-vqOY5gakcoon2s12V7MMe01OPwfgqulUWFzm+geQaPPOBKjW1I7aqqoBVlU0ECn97liMB0ECs16pRdIGe9qdRw==
   dependencies:
     babel-code-frame "^6.22.0"
     chalk "^2.4.1"
@@ -7852,10 +7852,10 @@ nanoid@^2.0.3:
   resolved "https://registry.npmjs.org/nanoid/-/nanoid-2.1.1.tgz#524fd4acd45c126e0c87cd43ab5ee8346e695df9"
   integrity sha512-0YbJdaL4JFoejIOoawgLcYValFGJ2iyUuVDIWL3g8Es87SSOWFbWdRUMV3VMSiyPs3SQ3QxCIxFX00q5DLkMCw==
 
-nanoid@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.npmjs.org/nanoid/-/nanoid-2.1.4.tgz#c38b2c1f7f4c60cde2291f40854420328d0d621e"
-  integrity sha512-PijW88Ry+swMFfArOrm7uRAdVmJilLbej7WwVY6L5QwLDckqxSOinGGMV596yp5C8+MH3VvCXCSZ6AodGtKrYQ==
+nanoid@^2.1.6:
+  version "2.1.6"
+  resolved "https://registry.npmjs.org/nanoid/-/nanoid-2.1.6.tgz#0665418f692e54cf44f34d4010761f3240a03314"
+  integrity sha512-2NDzpiuEy3+H0AVtdt8LoFi7PnqkOnIzYmJQp7xsEU6VexLluHQwKREuiz57XaQC5006seIadPrIZJhyS2n7aw==
 
 nanomatch@^1.2.9:
   version "1.2.13"
