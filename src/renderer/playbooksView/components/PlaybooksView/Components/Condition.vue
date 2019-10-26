@@ -12,7 +12,7 @@ import { Tree } from 'element-ui';
 @Component({
   props: {
     data: {
-      type: [],
+      type: Array,
       required: true,
     },
   },

@@ -24,21 +24,23 @@ import Condition from './Condition.vue';
   props: {
     type: {
       type: String,
-      required: true,
     },
     title: {
       validator: (value) => {
+        /*
         return [
           'Document Loaded',
           'Conditions',
         ].indexOf(value) !== -1;
+        */
+        return true;
       },
     },
     content: {
-      type: String,
+      type: [String, Array],
     },
     data: {
-      type: Object,
+      type: Array,
     },
   },
   components: {
