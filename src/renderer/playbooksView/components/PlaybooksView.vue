@@ -93,39 +93,68 @@ export default class PlaybooksView extends Vue {
       },
     });
     const h = branch.$createElement;
-    branch.$slots.content = [h('el-row', { attrs: { gutter: 20 } }, [
-      h('el-col', { attrs: { span: 12 } }, [
-        h('trigger', { attrs: { title: 'True', type: 'panel', content: `Redirecing ${this.condsSetup[1].label}` },
-          scopedSlots: {
-            content: props => [
-              h('span', props.content),
-            ],
-          } }),
-      ]),
-      h('el-col', { attrs: { span: 12 } }, [
-        h('trigger', { attrs: { title: 'False', type: 'panel' },
-          scopedSlots: {
-            content: () => [
-              h('trigger', { attrs: { title: 'Document Loaded' } }),
-              // tslint:disable-next-line:max-line-length
-              h('trigger', { attrs: { title: 'Condition Test 2', type: 'condition', data: this.condsSetup } }),
-              h('trigger', { attrs: { title: 'Branch Test 2', type: 'panel' },
-                scopedSlots: {
-                  content: () => [
-                    h('el-row', { attrs: { gutter: 20 } }, [
-                      h('el-col', { attrs: { span: 12 } }, [
-                        h('trigger', { attrs: { title: 'True' } }),
-                      ]),
-                      h('el-col', { attrs: { span: 12 } }, [
-                        h('trigger', { attrs: { title: 'False' } }),
-                      ]),
-                    ]),
-                  ],
-                } }),
-            ],
-          } }),
-      ]),
-    ])];
+    (branch as any).$slots = {
+      content: [
+        h('el-row', { attrs: { gutter: 20 } }, [
+          h('el-col', { attrs: { span: 12 } }, [
+            h(Trigger, {
+              props: {
+                title: 'True',
+                type: 'panel',
+                content: `Redirecing ${this.condsSetup[1].label}`,
+              },
+              scopedSlots: {
+                content: props => [
+                  h('span', props.content),
+                ],
+              },
+            }),
+          ]),
+          h('el-col', { attrs: { span: 12 } }, [
+            h(Trigger, {
+              props: {
+                title: 'False',
+                type: 'panel',
+              },
+              scopedSlots: {
+                content: () => [
+                  h(Trigger, {
+                    props: {
+                      title: 'Document Loaded',
+                    },
+                  }),
+                  h(Trigger, {
+                    props: {
+                      title: 'Condition Test 2',
+                      type: 'condition',
+                      data: this.condsSetup,
+                    },
+                  }),
+                  h(Trigger, {
+                    props: {
+                      title: 'Branch Test 2',
+                      type: 'panel',
+                    },
+                    scopedSlots: {
+                      content: () => [
+                        h('el-row', { attrs: { gutter: 20 } }, [
+                          h('el-col', { attrs: { span: 12 } }, [
+                            h(Trigger, { attrs: { title: 'True' } }),
+                          ]),
+                          h('el-col', { attrs: { span: 12 } }, [
+                            h(Trigger, { attrs: { title: 'False' } }),
+                          ]),
+                        ]),
+                      ],
+                    },
+                  }),
+                ],
+              },
+            }),
+          ]),
+        ]),
+      ],
+    };
     branch.$mount();
     ((this.$refs.panel as Vue).$el as HTMLDivElement).appendChild(branch.$el);
   }
