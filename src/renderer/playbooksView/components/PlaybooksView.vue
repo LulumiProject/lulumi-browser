@@ -18,6 +18,8 @@ import { Button, Card, Col, Dropdown, DropdownMenu, DropdownItem, Row, Table, Tr
 import Sidebar from './PlaybooksView/Sidebar.vue';
 import Trigger from './PlaybooksView/Components/Trigger.vue';
 
+import { cloneDeep } from 'lodash';
+
 @Component({
   components: {
     Sidebar,
@@ -34,129 +36,245 @@ import Trigger from './PlaybooksView/Components/Trigger.vue';
   },
 })
 export default class PlaybooksView extends Vue {
-  condsSetup = [{
-    label: 'Condition 1',
-    children: [{
-      label: 'document.location === "http://example.com/"',
-    }, {
-      label: 'document.location === "https://example.com/',
-    }],
-  }, {
-    label: 'Condition 2',
-    children: [{
-      label: 'document.location === "http://echo.opera.com/"',
-    }],
-  }];
+  sample = {
+    metadata: {
+      comments: 'This playbook will do redirections.',
+      author: 'Boik Su',
+    },
+    resources: [
+      {
+        type: 'workflow',
+        name: 'Do Redirections',
+        properties: {
+          state: 'Enabled',
+          definitions: {
+            triggers: {
+              When_the_page_is_loaded: {
+                type: 'WebPageEvent',
+              },
+            },
+            actions: {
+              Condition: {
+                name: 'Condition Test',
+                expression: {
+                  and: [
+                    {
+                      equals: [
+                        ['document.location', "'http://example.com/'"],
+                        ['document.location', "'https://example.com/'"],
+                      ],
+                    },
+                    {
+                      equals: [
+                        ['document.location', "'http://echo.opera.com/'"],
+                      ],
+                    },
+                  ],
+                },
+                true: {
+                  actions: {
+                    Redirect: {
+                      uri: 'https://github.com/LulumiProject/lulumi-browser',
+                    },
+                  },
+                },
+                false: {},
+              },
+              Panel: {
+                title: 'Panel',
+                Panel: {
+                  title: 'Panel 2',
+                  Panel: {
+                    title: 'Panel 3',
+                    content: 'End',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  };
 
-  onClick(command) {
-    if (command === 'createPanel') {
-      this.createPanel();
-    } else if (command === 'createCond') {
-      this.createCond();
-    }
-  }
-  createPanel() {
+  show(data) {
+    const resource = data.resources[0];
+    const definitions = resource.properties.definitions;
+    const triggers = definitions.triggers;
+    const actions = definitions.actions;
+
     const triggerCtor = Vue.extend(Trigger);
     const instance = new triggerCtor({
       propsData: {
-        title: 'Click Test',
+        title: Object.keys(triggers)[0],
         type: 'panel',
-        content: 'Click Content',
       },
     });
+
     const h = instance.$createElement;
+    const entries = [];
+    Object.keys(actions).forEach((action) => {
+      if (action === 'Condition') {
+        this.createCond(actions[action], h, entries);
+      } else if (action === 'Panel') {
+        this.createPanel(actions[action], h, entries);
+      }
+    });
+
     (instance as any).$scopedSlots = {
-      content: props => [h('span', [
-        props.content,
-      ])],
+      content: () => entries,
     };
     instance.$mount();
     ((this.$refs.panel as Vue).$el as HTMLDivElement).appendChild(instance.$el);
   }
-  createCond() {
-    const triggerCtor = Vue.extend(Trigger);
-    const cond = new triggerCtor({
-      propsData: {
-        title: 'Condition Test',
-        type: 'condition',
-        data: this.condsSetup,
-      },
-    });
-    cond.$mount();
-    ((this.$refs.panel as Vue).$el as HTMLDivElement).appendChild(cond.$el);
-
-    const branch = new triggerCtor({
-      propsData: {
-        title: 'Branch Test',
+  onClick(command) {
+    this.show(this.sample);
+    /*
+    if (command === 'createPanel') {
+      this.sample.resources[0].properties.definitions.actions.Panel = {};
+    } else if (command === 'createCond') {
+      this.sample.resources[0].properties.definitions.actions.Condition = {};
+    }
+    */
+  }
+  createPanel(properties, h, entries) {
+    entries.push(
+      h(Trigger, {
+        props: {
+          title: properties.title,
+          type: 'panel',
+          content: properties.content,
+        },
+        scopedSlots: (properties.Panel !== undefined) ? {
+          content: () => {
+            const temp = [];
+            this.createPanel(properties.Panel, h, temp);
+            return temp;
+          },
+        }: (properties.content !== undefined) ? {
+          content: props => [
+            h('span', props.content),
+          ],
+        }: {},
+      }),
+    );
+  }
+  createCond(properties, h, entries) {
+    const name = properties.name;
+    const expression = properties.expression;
+    const template: any = {
+      props: {
+        title: '',
         type: 'panel',
-        data: this.condsSetup,
       },
-    });
-    const h = branch.$createElement;
-    (branch as any).$slots = {
-      content: [
-        h('el-row', { attrs: { gutter: 20 } }, [
-          h('el-col', { attrs: { span: 12 } }, [
-            h(Trigger, {
-              props: {
-                title: 'True',
-                type: 'panel',
-                content: `Redirecing ${this.condsSetup[1].label}`,
-              },
-              scopedSlots: {
-                content: props => [
-                  h('span', props.content),
-                ],
-              },
-            }),
-          ]),
-          h('el-col', { attrs: { span: 12 } }, [
-            h(Trigger, {
-              props: {
-                title: 'False',
-                type: 'panel',
-              },
-              scopedSlots: {
-                content: () => [
-                  h(Trigger, {
-                    props: {
-                      title: 'Document Loaded',
-                    },
-                  }),
-                  h(Trigger, {
-                    props: {
-                      title: 'Condition Test 2',
-                      type: 'condition',
-                      data: this.condsSetup,
-                    },
-                  }),
-                  h(Trigger, {
-                    props: {
-                      title: 'Branch Test 2',
-                      type: 'panel',
-                    },
-                    scopedSlots: {
-                      content: () => [
-                        h('el-row', { attrs: { gutter: 20 } }, [
-                          h('el-col', { attrs: { span: 12 } }, [
-                            h(Trigger, { attrs: { title: 'True' } }),
-                          ]),
-                          h('el-col', { attrs: { span: 12 } }, [
-                            h(Trigger, { attrs: { title: 'False' } }),
-                          ]),
-                        ]),
-                      ],
-                    },
-                  }),
-                ],
-              },
-            }),
-          ]),
-        ]),
-      ],
+      attrs: {},
+      children: [],
     };
-    branch.$mount();
-    ((this.$refs.panel as Vue).$el as HTMLDivElement).appendChild(branch.$el);
+
+    // initialize conditions
+    const conds: any = [];
+    expression.and.forEach((exp, index) => {
+      const newExp: any = {
+        label: `Condition ${index + 1}`,
+      };
+      if (exp.equals !== undefined) {
+        newExp.children = [];
+        exp.equals.forEach((equal) => {
+          newExp.children.push({
+            label: equal.join(' === '),
+          });
+        });
+        conds.push(newExp);
+      }
+    });
+
+    entries.push(
+      h(Trigger, {
+        props: {
+          title: name,
+          type: 'condition',
+          data: conds,
+        },
+      }),
+    );
+
+    // true
+    const trueBranch = cloneDeep(template);
+    trueBranch.props.title = 'True';
+    if (properties.true.actions !== undefined) {
+      if (properties.true.actions.Redirect) {
+        trueBranch.children.push(
+          h(Trigger, {
+            props: {
+              title: 'Redirect',
+              type: 'panel',
+              content: `Redirecing ${properties.true.actions.Redirect.uri}`,
+            },
+            scopedSlots: {
+              content: props => [
+                h('span', props.content),
+              ],
+            },
+          }),
+        );
+      }
+    } else {
+      delete trueBranch.props.type;
+    }
+    // false
+    const falseBranch = cloneDeep(template);
+    falseBranch.props.title = 'False';
+    if (properties.false.actions !== undefined) {
+      if (properties.false.actions.Redirect) {
+        falseBranch.children.push(
+          h(Trigger, {
+            props: {
+              title: 'Redirect',
+              type: 'panel',
+              content: `Redirecing ${properties.false.actions.Redirect.uri}`,
+            },
+            scopedSlots: {
+              content: props => [
+                h('span', props.content),
+              ],
+            },
+          }),
+        );
+      }
+    } else {
+      delete falseBranch.props.type;
+    }
+
+    entries.push(
+      h(Trigger, {
+        props: {
+          title: 'Branch',
+          type: 'panel',
+        },
+        scopedSlots: {
+          content: () => [
+            h('el-row', { attrs: { gutter: 20 } }, [
+              h('el-col', { attrs: { span: 12 } }, [
+                h(Trigger, {
+                  props: trueBranch.props,
+                  scopedSlots: {
+                    content: () => trueBranch.children,
+                  },
+                }),
+              ]),
+              h('el-col', { attrs: { span: 12 } }, [
+                h(Trigger, {
+                  props: falseBranch.props,
+                  scopedSlots: {
+                    content: () => falseBranch.children,
+                  },
+                }),
+              ]),
+            ]),
+          ],
+        },
+      }),
+    );
   }
 }
 </script>
