@@ -39,12 +39,22 @@ function rev() {
     if (err) {
       console.error(err)
     } else {
-      const result = data.replace(/lulumiRev: ['a-z0-9]*,/, `lulumiRev: '${require('git-rev-sync').long('.')}',`)
-      fs.writeFile(constants, result, 'utf8', (err) => {
-        if (err) {
-          console.error(err)
-        } else build()
-      });
+      try {
+        const result = data.replace(/lulumiRev: ['a-z0-9]*,/, `lulumiRev: '${require('git-rev-sync').long('.')}',`)
+        fs.writeFile(constants, result, 'utf8', (err) => {
+          if (err) {
+            console.error(err)
+          } else build()
+        });
+      } catch (err) {
+        console.error(err)
+        fs.writeFile(constants, '0000000000000000000000000000000000000000', 'utf8', (err) => {
+          if (err) {
+            console.error(err)
+          } else build()
+        });
+        build()
+      }
     }
   })
 }

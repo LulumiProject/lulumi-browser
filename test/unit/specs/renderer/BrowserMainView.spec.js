@@ -276,9 +276,8 @@ describe('BrowserMainView.vue', () => {
   });
 
   describe('Navbar.vue (integrated)', () => {
-    it('shows the corresponding url to the webview', () => {
-      const tabObject = vm.getTabObject(0);
-      expect(vm.getWebView(0).getAttribute('src')).to.equal(tabObject.url);
+    it('shows the secure indicator under the privileged scheme', () => {
+      expect(vm.$el.querySelector('.secure')).to.exist;
     });
 
     it('has four controls in .control-group', () => {

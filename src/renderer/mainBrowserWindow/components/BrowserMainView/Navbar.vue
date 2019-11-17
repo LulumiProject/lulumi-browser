@@ -272,7 +272,7 @@ export default class Navbar extends Vue {
       this.value = '';
     } else if (this.tab.isLoading && !this.typing) {
       this.value = this.tab.url;
-      this.$nextTick(() => this.selectText());
+      this.selectText();
     }
     if (this.value === 'lulumi://about/#/newtab') {
       this.value = '';
@@ -286,7 +286,7 @@ export default class Navbar extends Vue {
       let newUrl = decodeURIComponent(this.url);
       newUrl = urlUtil.getUrlIfError(newUrl);
       newUrl = urlUtil.getUrlIfPDF(newUrl);
-      return urlUtil.getUrlIfPrivileged(newUrl).url;
+      return (this.typing) ? newUrl : urlUtil.getUrlIfPrivileged(newUrl).omniUrl;
     }
     return this.url;
   }
@@ -351,11 +351,13 @@ export default class Navbar extends Vue {
   }
   @Watch('url')
   onUrl(newUrl: string): void {
-    if (document) {
-      (document.querySelector('.my-autocomplete') as HTMLDivElement)
-        .style.display = 'none';
+    if (!this.typing) {
+      if (document) {
+        (document.querySelector('.my-autocomplete') as HTMLDivElement)
+          .style.display = 'none';
+      }
+      (this.$refs.input as any).suggestions.length = 0;
     }
-    (this.$refs.input as any).suggestions.length = 0;
   }
   @Watch('focused')
   onFocused(isFocus: boolean): void {
@@ -394,7 +396,7 @@ export default class Navbar extends Vue {
       return;
     }
     const scheme = urlUtil.getScheme(url);
-    if (scheme === 'lulumi://' || scheme === 'lulumi-extension://') {
+    if (scheme === 'lulumi://' || scheme === 'lulumi-extension://' || scheme === 'about:') {
       this.secure = true;
       return;
     }
@@ -642,7 +644,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://about',
+            value: 'about:about',
             url: 'about:about',
             icon: 'document',
           },
@@ -650,7 +652,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://about/lulumi',
+            value: 'about:lulumi',
             url: 'about:lulumi',
             icon: 'document',
           },
@@ -658,7 +660,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://preferences',
+            value: 'about:preferences',
             url: 'about:preferences',
             icon: 'document',
           },
@@ -666,7 +668,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://downloads',
+            value: 'about:downloads',
             url: 'about:downloads',
             icon: 'document',
           },
@@ -674,7 +676,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://history',
+            value: 'about:history',
             url: 'about:history',
             icon: 'document',
           },
@@ -682,7 +684,7 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://extensions',
+            value: 'about:extensions',
             url: 'about:extensions',
             icon: 'document',
           },
@@ -690,8 +692,66 @@ export default class Navbar extends Vue {
         suggestions.unshift({
           item: {
             title: '',
-            value: 'lulumi://playbooks',
+            value: 'about:playbooks',
             url: 'about:playbooks',
+            icon: 'document',
+          },
+        });
+      } else if (queryString.startsWith('lulumi:')) {
+        // Privileged Pages
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://about',
+            url: 'lulumi://about',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://lulumi',
+            url: 'lulumi://lulumi',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://preferences',
+            url: 'lulumi://preferences',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://downloads',
+            url: 'lulumi://downloads',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://history',
+            url: 'lulumi://history',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://extensions',
+            url: 'lulumi://extensions',
+            icon: 'document',
+          },
+        });
+        suggestions.unshift({
+          item: {
+            title: '',
+            value: 'lulumi://playbooks',
+            url: 'lulumi://playbooks',
             icon: 'document',
           },
         });

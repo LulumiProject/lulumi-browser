@@ -74,12 +74,10 @@ const goodCustomAutocomplete = customAutocomplete.extend({
             if (this.lastQueryString !== queryString) {
               const startPos = queryString.length;
               const endPos = this.suggestions[0].item.url.length;
-              this.$nextTick().then(() => {
-                this.$refs.input.$refs.input.value
-                  = this.suggestions[0].item.url;
-                this.setInputSelection(el, startPos, endPos);
-                this.lastQueryString = queryString;
-              });
+              this.$refs.input.$refs.input.value
+                = `${queryString}${this.suggestions[0].item.url.substr(queryString.length)}`;
+              this.setInputSelection(el, startPos, endPos);
+              this.lastQueryString = queryString;
             } else {
               this.lastQueryString = this.lastQueryString.slice(0, -1);
             }
@@ -123,6 +121,31 @@ const goodCustomAutocomplete = customAutocomplete.extend({
           });
         }
       }
+    },
+    highlight(index) {
+      if (!this.suggestionVisible || this.loading) { return; }
+      if (index < 0) {
+        return;
+      }
+      let newIndex = index;
+      if (index >= this.suggestions.length) {
+        newIndex = this.suggestions.length - 1;
+      }
+      const suggestion = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
+      const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
+      const highlightItem = suggestionList[newIndex];
+      const scrollTop = suggestion.scrollTop;
+      const offsetTop = highlightItem.offsetTop;
+      if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
+        suggestion.scrollTop += highlightItem.scrollHeight;
+      }
+      if (offsetTop < scrollTop) {
+        suggestion.scrollTop -= highlightItem.scrollHeight;
+      }
+      this.highlightedIndex = newIndex;
+      const $input = this.getInput();
+      $input.setAttribute('aria-activedescendant', `${this.id}-item-${this.highlightedIndex}`);
+      this.$emit('input', this.suggestions[this.highlightedIndex].item.value);
     },
   },
 });

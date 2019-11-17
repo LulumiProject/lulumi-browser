@@ -120,9 +120,7 @@ const moduleTmp = module;
 
 process.once('loaded', () => {
   if (document.location) {
-    if (document.location.href === 'about:newtab') {
-      document.location.href = 'lulumi://about/#/newtab';
-    } else if (document.location.href.startsWith('lulumi://')) {
+    if (document.location.href.startsWith('lulumi://')) {
       webFrame.executeJavaScript('window').then((window) => {
         window.about = ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href);
         window.backgroundPages = ipcRenderer.sendSync('get-background-pages');

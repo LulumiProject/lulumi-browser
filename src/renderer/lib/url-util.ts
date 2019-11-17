@@ -6,6 +6,37 @@ const defaultScheme: string = 'http://';
 const fileScheme: string = 'file://';
 const os: any = require('os');
 
+function getLulumiExtUrl(relativeUrl: string): string {
+  return `${constants.lulumiPagesCustomProtocol}://${relativeUrl}`;
+}
+
+function privilegedUrls(shortCode: string): string {
+  switch (shortCode) {
+    case 'about:about':
+      return getLulumiExtUrl('about/#/');
+    case 'about:downloads':
+      return getLulumiExtUrl('about/#/downloads');
+    case 'about:extensions':
+      return getLulumiExtUrl('about/#/extensions');
+    case 'about:history':
+      return getLulumiExtUrl('about/#/history');
+    case 'about:lulumi':
+      return getLulumiExtUrl('about/#/lulumi');
+    case 'about:preferences':
+      return getLulumiExtUrl('about/#/preferences');
+    case 'about:blank':
+      return 'about:blank';
+    case 'about:newtab':
+      return getLulumiExtUrl('about/#/newtab');
+    case 'about:playbooks':
+      return getLulumiExtUrl('playbooks/#/');
+    case 'about:gpu':
+      return 'chrome://gpu';
+    default:
+      return getLulumiExtUrl('about/#/');
+  }
+}
+
 /**
  * A simple class for parsing and dealing with URLs.
  * @class urlUtil
@@ -147,7 +178,7 @@ const urlUtil = {
     let newInput: string = input;
 
     newInput = newInput.trim();
-
+    newInput = urlUtil.getUrlIfPrivileged(newInput).url;
     newInput = urlUtil.prependScheme(newInput);
 
     if (urlUtil.isNotURL(newInput)) {
@@ -290,29 +321,42 @@ const urlUtil = {
     const pivot = `${constants.lulumiPagesCustomProtocol}://`;
     if (url === 'chrome://gpu/') {
       return {
+        omniUrl: `${pivot}gpu`,
         title: 'about:gpu',
-        url: `${pivot}gpu`,
+        url: privilegedUrls('about:gpu'),
       };
     }
-    if (url.startsWith(pivot)) {
-      const newUrl = require('url').parse(url);
-      if (newUrl.hash) {
-        const hash = newUrl.hash.substr(2);
-        if (hash === '') {
-          return {
-            title: `about:${newUrl.host}`,
-            url: `${pivot}${newUrl.host}`,
-          };
-        }
+    if (!(url.startsWith('about:') || url.startsWith(pivot))) {
+      return {
+        url,
+        omniUrl: url,
+        title: '',
+      };
+    }
+    let newUrl: any = url;
+    if (url.startsWith('about:')) {
+      newUrl = privilegedUrls(url);
+    }
+    newUrl = require('url').parse(newUrl);
+    if (newUrl.hash) {
+      const hash = newUrl.hash.substr(2);
+      if (hash === '') {
         return {
-          title: `about:${hash}`,
-          url: `${pivot}${hash}`,
+          omniUrl: `${pivot}${newUrl.host}`,
+          title: `about:${newUrl.host}`,
+          url: privilegedUrls(`about:${newUrl.host}`),
         };
       }
+      return {
+        omniUrl: `${pivot}${hash}`,
+        title: `about:${hash}`,
+        url: privilegedUrls(`about:${hash}`),
+      };
     }
     return {
-      url,
-      title: '',
+      omniUrl: `${pivot}${newUrl.host}`,
+      title: `about:${newUrl.host}`,
+      url: privilegedUrls(`about:${newUrl.host}`),
     };
   },
 

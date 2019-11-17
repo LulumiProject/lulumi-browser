@@ -41,7 +41,6 @@ import { is } from 'electron-util';
 import constants from '../../mainBrowserWindow/constants';
 import urlUtil from '../../lib/url-util';
 import imageUtil from '../../lib/image-util';
-import urlResource from '../../lib/url-resource';
 
 import ExtensionService from '../../api/extension-service';
 import Event from '../../api/event';
@@ -879,7 +878,7 @@ export default class BrowserMainView extends Vue {
           windowId,
           isURL: true,
           follow: true,
-          url: urlResource.privilegedUrls(url),
+          url: urlUtil.getUrlFromInput(url),
         });
         this.$electron.ipcRenderer.send('focus-window', this.windowId);
       } else {
@@ -1025,9 +1024,7 @@ export default class BrowserMainView extends Vue {
   }
   onEnterUrl(url: string): void {
     let newUrl: string;
-    if (url.startsWith('about:')) {
-      newUrl = urlResource.privilegedUrls(url);
-    } else if (urlUtil.isNotURL(url)) {
+    if (urlUtil.isNotURL(url)) {
       newUrl = this.$store.getters.currentSearchEngine.search.replace('{queryString}', url);
     } else {
       newUrl = url;

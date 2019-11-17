@@ -231,6 +231,7 @@ declare namespace Lulumi {
       matches?: SuggestionMatch[];
     }
     export interface AboutLocationObject {
+      omniUrl: string;
       title: string;
       url: string;
     }

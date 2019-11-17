@@ -509,9 +509,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
       },
       {
         key: 'rev',
-        value: process.env.NODE_ENV === 'development'
-          ? require('git-rev-sync').long('.')
-          : constants.lulumiRev,
+        value: constants.lulumiRev,
       },
       {
         key: 'Electron',

@@ -9,7 +9,7 @@ import modules from './modules';
 
 import { writeFile } from 'fs';
 import promisify from '../../main/lib/promisify';
-import urlResource from '../../renderer/lib/url-resource';
+import urlUtil from '../../renderer/lib/url-util';
 
 Vue.use(Vuex);
 
@@ -273,10 +273,10 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
       tab.id = (newTabId += 1);
       tab.windowId = windowId;
       if (tab.url.startsWith('about:')) {
-        tab.url = urlResource.privilegedUrls(tab.url);
+        tab.url = urlUtil.getUrlFromInput(tab.url);
       }
       if (tab.url.startsWith('lulumi-extension:')) {
-        tab.url = urlResource.privilegedUrls('about:newtab');
+        tab.url = urlUtil.getUrlFromInput('about:newtab');
       }
       Object.keys(tab.extensionsMetadata).forEach((key) => {
         if (store.getters.extensionInfoDict[key] === undefined) {
@@ -305,10 +305,10 @@ function tabsOrdering(newStart: number, bumpWindowIdsBy: number, oneWindow: numb
           tab.id = (newTabId += 1);
           tab.windowId = windowId;
           if (tab.url.startsWith('about:')) {
-            tab.url = urlResource.privilegedUrls(tab.url);
+            tab.url = urlUtil.getUrlFromInput(tab.url);
           }
           if (tab.url.startsWith('lulumi-extension:')) {
-            tab.url = urlResource.privilegedUrls('about:newtab');
+            tab.url = urlUtil.getUrlFromInput('about:newtab');
           }
           Object.keys(tab.extensionsMetadata).forEach((key) => {
             if (store.getters.extensionInfoDict[key] === undefined) {
