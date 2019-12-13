@@ -11,22 +11,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WriteFileWebpackPlugin = require('write-file-webpack-plugin')
 const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const HappyPack = require('happypack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
-function createHappyPlugin(id, loaders) {
-  return new HappyPack({
-    id: id,
-    loaders: loaders,
-    threadPool: happyThreadPool,
-    verbose: false
-  })
-}
 
 function returnLess() {
   return [
@@ -70,7 +59,12 @@ let mainBrowserWindowConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src/shared'), path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/mainBrowserWindow'), path.join(__dirname, '../src/renderer/api') ],
         exclude: /node_modules/
@@ -79,7 +73,10 @@ let mainBrowserWindowConfig = {
         test: /\.js$/,
         enforce: 'pre',
         use: {
-          loader: 'happypack/loader?id=happy-eslint'
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
         },
         include: [ path.join(__dirname, '../src/helper') ],
         exclude: /node_modules/
@@ -103,13 +100,16 @@ let mainBrowserWindowConfig = {
       {
         test: /\.html$/,
         use: [{
-          loader: 'happypack/loader?id=happy-html'
+          loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.js$/,
         use: {
-          loader: 'happypack/loader?id=happy-babel'
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
         },
         include: [ path.join(__dirname, '../src/helper') ],
         exclude: /node_modules/
@@ -117,7 +117,7 @@ let mainBrowserWindowConfig = {
       {
         test: /\.pug$/,
         use: [{
-          loader: 'happypack/loader?id=happy-pug'
+          loader: 'pug-plain-loader'
         }]
       },
       {
@@ -212,44 +212,6 @@ let mainBrowserWindowConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', [{
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true
-      }
-    }]),
-    createHappyPlugin('happy-eslint', [{
-      loader: 'eslint-loader',
-      options: {
-        formatter: require('eslint-friendly-formatter')
-      }
-    }]),
-    createHappyPlugin('happy-html',  [{
-      loader: 'vue-html-loader'
-    }]),
-    createHappyPlugin('happy-pug', [{
-      loader: 'pug-plain-loader'
-    }]),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
-    // https://github.com/amireh/happypack/pull/131
-    new HappyPack({
-      loaders: [{
-        path: 'vue-loader',
-        query: {
-          loaders: {
-            pug: 'pug-plain-loader'
-          }
-        }
-      }]
-    }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
@@ -303,7 +265,12 @@ let preloadsConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src/preload'), path.join(__dirname, '../src/renderer/api') ],
         exclude: /node_modules/
@@ -323,15 +290,6 @@ let preloadsConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
     new WriteFileWebpackPlugin({
       test: /-preload\.js$/
     }),
@@ -375,7 +333,12 @@ let preferenceViewConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/preferenceView') ],
         exclude: /node_modules/
@@ -398,13 +361,13 @@ let preferenceViewConfig = {
       {
         test: /\.html$/,
         use: [{
-          loader: 'happypack/loader?id=happy-html'
+          loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
         use: [{
-          loader: 'happypack/loader?id=happy-pug'
+          loader: 'pug-plain-loader'
         }]
       },
       {
@@ -490,32 +453,6 @@ let preferenceViewConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-html',  [{
-      loader: 'vue-html-loader'
-    }]),
-    createHappyPlugin('happy-pug', [{
-      loader: 'pug-plain-loader'
-    }]),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
-    // https://github.com/amireh/happypack/pull/131
-    new HappyPack({
-      loaders: [{
-        path: 'vue-loader',
-        query: {
-          loaders: {
-            pug: 'pug-plain-loader'
-          }
-        }
-      }]
-    }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
@@ -557,7 +494,12 @@ let playbooksViewConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/playbooksView') ],
         exclude: /node_modules/
@@ -580,13 +522,13 @@ let playbooksViewConfig = {
       {
         test: /\.html$/,
         use: [{
-          loader: 'happypack/loader?id=happy-html'
+          loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
         use: [{
-          loader: 'happypack/loader?id=happy-pug'
+          loader: 'pug-plain-loader'
         }]
       },
       {
@@ -672,32 +614,6 @@ let playbooksViewConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-html',  [{
-      loader: 'vue-html-loader'
-    }]),
-    createHappyPlugin('happy-pug', [{
-      loader: 'pug-plain-loader'
-    }]),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
-    // https://github.com/amireh/happypack/pull/131
-    new HappyPack({
-      loaders: [{
-        path: 'vue-loader',
-        query: {
-          loaders: {
-            pug: 'pug-plain-loader'
-          }
-        }
-      }]
-    }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
@@ -740,7 +656,12 @@ let commandPaletteConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src/shared'), path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/mainBrowserWindow'), path.join(__dirname, '../src/renderer/commandPalette') ],
         exclude: /node_modules/
@@ -762,13 +683,13 @@ let commandPaletteConfig = {
       {
         test: /\.html$/,
         use: [{
-          loader: 'happypack/loader?id=happy-html'
+          loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
         use: [{
-          loader: 'happypack/loader?id=happy-pug'
+          loader: 'pug-plain-loader'
         }]
       },
       {
@@ -856,32 +777,6 @@ let commandPaletteConfig = {
     new webpack.DllReferencePlugin({
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
-    }),
-    createHappyPlugin('happy-html',  [{
-      loader: 'vue-html-loader'
-    }]),
-    createHappyPlugin('happy-pug', [{
-      loader: 'pug-plain-loader'
-    }]),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
-    // https://github.com/amireh/happypack/pull/131
-    new HappyPack({
-      loaders: [{
-        path: 'vue-loader',
-        query: {
-          loaders: {
-            pug: 'pug-plain-loader'
-          }
-        }
-      }]
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,

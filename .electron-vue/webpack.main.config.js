@@ -9,17 +9,6 @@ const webpack = require('webpack')
 
 const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const HappyPack = require('happypack')
-
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
-function createHappyPlugin(id, loaders) {
-  return new HappyPack({
-    id: id,
-    loaders: loaders,
-    threadPool: happyThreadPool,
-    verbose: false
-  })
-}
 
 /**
  * List of node_modules to include in webpack bundle
@@ -43,7 +32,12 @@ let mainConfig = {
       {
         test: /\.ts$/,
         use: {
-          loader: 'happypack/loader?id=happy-ts'
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            configFile: path.join(__dirname, '../src/tsconfig.json'),
+            transpileOnly: true
+          }
         },
         include: [ path.join(__dirname, '../src') ],
         exclude: /node_modules/
@@ -52,7 +46,10 @@ let mainConfig = {
         test: /\.js$/,
         enforce: 'pre',
         use: {
-          loader: 'happypack/loader?id=happy-eslint'
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
         },
         include: [ path.join(__dirname, '../src/main') ],
         exclude: /node_modules/
@@ -60,7 +57,10 @@ let mainConfig = {
       {
         test: /\.js$/,
         use: {
-          loader: 'happypack/loader?id=happy-babel'
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
         },
         include: [ path.join(__dirname, '../src/main') ],
         exclude: /node_modules/
@@ -84,27 +84,6 @@ let mainConfig = {
       context: __dirname,
       manifest: require('../static/vendor-manifest.json')
     }),
-    createHappyPlugin('happy-babel', [{
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true
-      }
-    }]),
-    createHappyPlugin('happy-eslint', [{
-      loader: 'eslint-loader',
-      options: {
-        formatter: require('eslint-friendly-formatter')
-      }
-    }]),
-    createHappyPlugin('happy-ts', [{
-      loader: 'ts-loader',
-      options: {
-        appendTsSuffixTo: [/\.vue$/],
-        configFile: path.join(__dirname, '../src/tsconfig.json'),
-        happyPackMode: true,
-        transpileOnly: true
-      }
-    }]),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
