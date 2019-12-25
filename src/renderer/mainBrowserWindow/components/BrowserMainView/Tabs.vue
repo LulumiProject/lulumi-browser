@@ -325,14 +325,14 @@ export default class Tabs extends Vue {
           &.active {
             z-index: 10;
             background: #f2f2f2;
-            height: 31px;
+            height: 32px;
             border-bottom: 1px solid #f2f2f2;
 
             &::before,
             &::after {
               z-index: 10;
               align-self: flex-start;
-              height: 31px;
+              height: 32px;
               background: #f2f2f2;
               border-bottom: 1px solid #f2f2f2;
             }
@@ -355,7 +355,7 @@ export default class Tabs extends Vue {
             z-index: 0;
             left: 0;
             width: 16px;
-            height: 31px;
+            height: 32px;
             background-color: #dbdbdb;
             border-left: 1px solid #bbb;
             border-bottom: 1px solid #bbb;
@@ -368,7 +368,7 @@ export default class Tabs extends Vue {
             z-index: 1;
             right: 0;
             width: 16px;
-            height: 31px;
+            height: 32px;
             background-color: #dbdbdb;
             border-right: 1px solid #bbb;
             border-bottom: 1px solid #bbb;
