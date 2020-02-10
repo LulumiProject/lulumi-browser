@@ -566,12 +566,20 @@ export default class BrowserMainView extends Vue {
   }
   onNewWindow(event: Electron.NewWindowEvent, tabIndex: number): void {
     const disposition: string = event.disposition;
+    const options: any = event.options;
     if (disposition === 'new-window') {
-      event.preventDefault();
-      (event as any).newGuest = this.$electron.ipcRenderer.sendSync('new-lulumi-window', {
-        url: event.url,
-        follow: true,
-      });
+      // https://github.com/electron/electron/blob/6-1-x/lib/browser/api/web-contents.js#L431-L435
+      if (options.width === 800
+        && options.height === 600
+        && options.webPreferences.nativeWindowOpen === false) {
+        this.onNewTab(this.windowId, event.url, true);
+      } else {
+        event.preventDefault();
+        (event as any).newGuest = this.$electron.ipcRenderer.sendSync('new-lulumi-window', {
+          url: event.url,
+          follow: true,
+        });
+      }
     } else if (disposition === 'foreground-tab') {
       this.onNewTab(this.windowId, event.url, true);
     } else if (disposition === 'background-tab') {
