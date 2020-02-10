@@ -1864,6 +1864,7 @@ html {
     text-overflow: ellipsis;
     white-space: nowrap;
     position: relative;
+    user-select: none;
   }
 
   .extend-enter-active {
