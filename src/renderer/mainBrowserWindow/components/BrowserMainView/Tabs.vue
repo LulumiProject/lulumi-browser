@@ -65,6 +65,8 @@ declare const __static: string;
           Sortable.create(el, {
             animation: 150,
             swapThreshold: 0.5,
+            draggable: '.tab',
+            filter: '.tab-close',
             onUpdate() {
               if (vnode.context !== undefined) {
                 vnode.context.$store.dispatch('setTabsOrder', {
@@ -72,12 +74,6 @@ declare const __static: string;
                   tabsOrder: this.toArray(),
                 });
               }
-            },
-            onMove(event) {
-              if (event.related.classList.contains('tabs-add')) {
-                return false;
-              }
-              return true;
             },
           });
       },
