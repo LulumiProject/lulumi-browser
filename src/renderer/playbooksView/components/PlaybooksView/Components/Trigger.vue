@@ -1,66 +1,37 @@
 <template lang="pug">
-el-row
+el-row.handle
   el-col
-    div(class="is-always-shadow", style="text-align: center;")
-      slot(name="header")
-        el-card(:class="`el-alert--success is-light`", :body-style="{ padding: '5px' }")
-          i.el-alert__icon(:class="`el-icon-success`", style="padding: 0 20px 0 5px;")
-          span {{ title }}
-      panel(v-if="type === 'panel'", :content="content")
-        template(v-slot:[checkType(content)]="{ data }")
-          slot(name="content", :content="data")
-      condition(v-else-if="type === 'condition'", :data="data")
+    .blockelem.create-flowy
+      .blockin
+        slot(name="icon")
+          i.blockico.el-icon-menu
+        .blocktext
+          slot(name="title")
+            .blocktitle {{ "New visitor" }}
+          slot(name="desc")
+            .blockdesc {{ "Triggers when somebody visits a specified page" }}
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { Card, Col, Row, Table, Tree } from 'element-ui';
+import { Col, Row } from 'element-ui';
 
-import Panel from './Panel.vue';
-import Condition from './Condition.vue';
+import '../../../css/flowy.min.css';
+import '../../../css/styles.css';
 
 @Component({
-  props: {
-    type: {
-      type: String,
-    },
-    title: {
-      validator: (value) => {
-        /*
-        return [
-          'Document Loaded',
-          'Conditions',
-        ].indexOf(value) !== -1;
-        */
-        return true;
-      },
-    },
-    content: {
-      type: [String, Array],
-    },
-    data: {
-      type: Array,
-    },
-  },
   components: {
-    Condition,
-    Panel,
-    'el-card': Card,
     'el-col': Col,
-    'el-table': Table,
-    'el-tree': Tree,
     'el-row': Row,
   },
 })
 export default class Trigger extends Vue {
-  data: [];
-
-  checkType(content) {
-    return (typeof content === 'string') ? 'plain' : 'rich';
-  }
 }
 </script>
 
 <style lang="less" scoped>
+.handle {
+  z-index: 9999;
+}
 </style>
