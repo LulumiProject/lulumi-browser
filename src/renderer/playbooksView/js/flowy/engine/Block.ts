@@ -1,4 +1,4 @@
-const Block: Flowy.Block.BlockConstructor = class Block implements Flowy.Block.BlockInterface {
+class Block implements Flowy.Block.BlockInterface {
   parent: number;
   childWidth: number;
   id: number;
@@ -20,6 +20,6 @@ const Block: Flowy.Block.BlockConstructor = class Block implements Flowy.Block.B
   }
 
   maxWidth = () => Math.max(this.childWidth, this.width);
-};
+}
 
 export default Block;

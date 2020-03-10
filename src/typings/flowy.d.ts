@@ -1,7 +1,9 @@
+/* tslint:disable:max-line-length */
+
 declare namespace Flowy {
   export namespace Flowy {
     export interface FlowyElementConstructor {
-      new (canvas: HTMLDivElement, onGrab: ((block: HTMLDIVelement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDIVelement, first?: boolean, parent?: HTMLDIVelement) => any) | undefined, spacingX: number, spacingY: number);
+      new(canvas: HTMLDivElement, onGrab: ((block: HTMLDIVelement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDIVelement, first?: boolean, parent?: HTMLDIVelement) => any) | undefined, spacingX: number, spacingY: number);
     }
     export interface FlowyElementInterface {
       id: number;
@@ -44,7 +46,7 @@ declare namespace Flowy {
       spacingY?: number;
     }
     export interface CanvasConstructor {
-      new (options: CanvasOptions);
+      new(options: CanvasOptions);
     }
     export interface CanvasInterface {
       window: Window;
@@ -116,7 +118,7 @@ declare namespace Flowy {
       childWidth?: number;
     }
     export interface BlockElementConstructor {
-      new (id: number, node: HTMLDivElement, options: BlockElementOptions);
+      new(id: number, node: HTMLDivElement, options: BlockElementOptions);
       static find: (id: number, options: BlockElementOptions) => BlockElementInterface | null;
       static fromElement: (node: HTMLDivElement, options: BlockElementOptions) => BlockElementInterface | null;
     }
@@ -137,7 +139,7 @@ declare namespace Flowy {
       left: number;
     }
     export interface ArrowElementConstructor {
-      new (blockElement: BlockElement.BlockElementInterface, node: HTMLDivElement);
+      new(blockElement: BlockElement.BlockElementInterface, node: HTMLDivElement);
       static find: (blockElement: BlockElement.BlockElementInterface) => ArrowElementInterface | null;
     }
     export interface ArrowElementInterface {
@@ -164,7 +166,7 @@ declare namespace Flowy {
       height: number;
     }
     export interface BlockConstructor {
-      new (options: BlockOptions);
+      new(options: BlockOptions);
     }
     export interface BlockInterface {
       parent: number;

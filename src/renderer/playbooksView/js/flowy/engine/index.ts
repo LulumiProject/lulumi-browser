@@ -2,21 +2,24 @@ import Canvas from './Canvas';
 
 let loaded = false;
 
-const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.Flowy.FlowyElementInterface {
+class Flowy implements Flowy.Flowy.FlowyElementInterface {
   id: number;
   node: HTMLDivElement;
   window: Window;
   onGrab: ((block: HTMLDivElement) => any) | undefined;
   onRelease: (() => any) | undefined;
+  // tslint:disable-next-line:max-line-length
   onSnap: ((block: HTMLDivElement, first?: boolean, parent?: HTMLDivElement | undefined) => any) | undefined;
   import: ((data: any) => void) | undefined;
   output: (() => any) | undefined;
   deleteBlocks: (() => void) | undefined;
 
   constructor(canvas, onGrab, onRelease, onSnap, spacingX, spacingY) {
+    // tslint:disable-next-line:max-line-length
     this.engine(document, new Canvas({ node: canvas, spacingX, spacingY, window, document }), onGrab, onRelease, onSnap);
   }
 
+  // tslint:disable-next-line:max-line-length
   engine = (document: Document, canvas: Flowy.Canvas.CanvasInterface, onGrab = void 0, onRelease = void 0, onSnap = void 0) => {
     // NOTE: set callbacks even when initialized to allow React rerenders
     this.onGrab = onGrab;
@@ -39,7 +42,9 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
     this.deleteBlocks = canvas.reset;
 
     const handleCoordinates = (event: MouseEvent | TouchEvent) => {
-      const { clientX, clientY } = ((event as TouchEvent).targetTouches) ? (event as TouchEvent).targetTouches[0] : (event as MouseEvent);
+      const { clientX, clientY } = (event as TouchEvent).targetTouches
+        ? (event as TouchEvent).targetTouches[0]
+        : (event as MouseEvent);
       return canvas.setState({
         mouseX: clientX,
         mouseY: clientY,
@@ -62,7 +67,7 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
       if (this.onGrab) {
         this.onGrab(grabbedNode);
       }
-    };
+    }
 
     document.addEventListener('mousedown', touchblock, false);
     document.addEventListener('touchstart', touchblock, false);
@@ -137,7 +142,7 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
           canvas.cancelDrop();
         }
       }
-    };
+    }
 
     document.addEventListener('mouseup', touchDone, false);
 
@@ -233,11 +238,11 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
       // TODO: should this be using the first match?
       const arrowY = parseFloat(`${
         y -
-          height / 2 -
-          (canvas.blocks.find(({ parent }) => (parent === block.id)).y +
-            canvas.blocks.find(({ parent }) => (parent === block.id)).height / 2) +
-          scrollTop
-      }`);
+        height / 2 -
+        (canvas.blocks.find(({ parent }) => (parent === block.id)).y +
+          canvas.blocks.find(({ parent }) => (parent === block.id)).height / 2) +
+        scrollTop
+        }`);
 
       if (arrowX < 0) {
         canvas.appendHtml(`
@@ -294,16 +299,17 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
         do {
           const children = canvas.blocks.filter(({ parent }) => (parent === loopBlock.id));
 
-          loopBlock.childWidth = children.reduce((zwidth, { maxWidth }, w) => {
+          loopBlock.childWidth = children.reduce((zWidth, { maxWidth }, w) => {
+            let tmpZWidth = zWidth;
             // skip one item
             if (w !== 0) {
-              zwidth += canvas.spacingX;
+              tmpZWidth += canvas.spacingX;
             }
-            return zwidth + maxWidth();
+            return tmpZWidth + maxWidth();
           }, 0);
 
           loopBlock = canvas.blocks.find(({ id }) => (id === loopBlock.parent));
-        } while (loopBlock.parent !== -1)
+        } while (loopBlock.parent !== -1);
 
         loopBlock.childWidth = totalWidth;
       }
@@ -406,7 +412,8 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
 
     function checkOffset() {
       const widths = canvas.blocks.map(({ width }) => width);
-      const currentOffsetLeft = Math.min(...canvas.blocks.map(({ x }, index) => (x - widths[index] / 2)));
+      const currentOffsetLeft
+        = Math.min(...canvas.blocks.map(({ x }, index) => (x - widths[index] / 2)));
 
       canvas.setState({ currentOffsetLeft });
 
@@ -429,7 +436,9 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
           const arrowX = x - parentX;
 
           arrowElement.styles({
-            left: (arrowX < 0) ? x - currentOffsetLeft + 20 - 5 : parentX - 20 - currentOffsetLeft + 20,
+            left: (arrowX < 0)
+              ? x - currentOffsetLeft + 20 - 5
+              : parentX - 20 - currentOffsetLeft + 20,
           });
         });
 
@@ -475,7 +484,9 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
           const arrowX = x - parentX;
 
           arrowElement.styles({
-            left: (arrowX < 0) ? x - 5 - canvas.position().left : parentX - 20 - canvas.position().left,
+            left: (arrowX < 0)
+              ? x - 5 - canvas.position().left
+              : parentX - 20 - canvas.position().left,
           });
         });
 
@@ -500,12 +511,15 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
           if (canvas.findChildBlocks(block.id).length === 0) {
             block.childWidth = 0;
           }
+
+          let tmp = total;
+
           // skip one item
           if (i !== 0) {
-            total += canvas.spacingX;
+            tmp += canvas.spacingX;
           }
 
-          return total + block.maxWidth();
+          return tmp + block.maxWidth();
         }, 0);
 
         if (parents[z] !== -1) {
@@ -526,11 +540,16 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
 
           if (block.childWidth > block.width) {
             blockElement.styles({
-              left: parentBlock.x - totalWidth / 2 + totalRemove + block.childWidth / 2 - block.width / 2 - left + 'px',
+              left: `${
+                parentBlock.x - totalWidth / 2 +
+                totalRemove
+                + block.childWidth / 2 - block.width / 2 - left}px`,
             });
           } else {
             blockElement.styles({
-              left: parentBlock.x - totalWidth / 2 + totalRemove - left + 'px',
+              left: `${
+                parentBlock.x - totalWidth / 2 +
+                totalRemove - left}px`,
             });
           }
 
@@ -569,8 +588,8 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
             `);
           } else {
             arrowElement.styles({
-              left: parentX - 20 - left
-            })
+              left: parentX - 20 - left,
+            });
             arrowElement.html(`
               <input type="hidden" class="arrowid" value="${block.id}">
               <svg preserveaspectratio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -592,6 +611,6 @@ const Flowy: Flowy.Flowy.FlowyElementConstructor = class Flowy implements Flowy.
       }
     }
   }
-};
+}
 
 export default Flowy;

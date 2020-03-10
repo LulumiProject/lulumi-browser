@@ -1,7 +1,7 @@
 import BlockElement from './BlockElement';
 import Block from './Block';
 
-const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Canvas.CanvasInterface {
+class Canvas implements Flowy.Canvas.CanvasInterface {
   window: Window;
   document: Document;
   node: HTMLDivElement;
@@ -52,7 +52,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
     this.isInitialized = true;
 
     this.reset();
-  };
+  }
 
   position = () => {
     const { top, left } = this.node.getBoundingClientRect();
@@ -63,7 +63,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
       scrollTop: this.node.scrollTop,
       scrollLeft: this.node.scrollLeft,
     };
-  };
+  }
 
   html = (html?: string): string => {
     if (html !== undefined) {
@@ -71,28 +71,32 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
     }
 
     return this.node.innerHTML;
-  };
+  }
 
   appendHtml = html => (this.node.innerHTML += html);
 
   appendChild = (...children) => {
     children.forEach(child => this.node.appendChild(child));
-  };
+  }
 
   findBlockElement = id => BlockElement.find(id, { window: this.window });
 
   import = ({ html, blockarr }) => {
     this.html(html);
     this.replaceBlocks(blockarr);
-  };
+  }
 
   pageX = (element: HTMLElement) => {
-    return element.offsetParent ? element.offsetLeft + this.pageX(element.offsetParent as HTMLElement) : element.offsetLeft;
-  };
+    return element.offsetParent
+      ? element.offsetLeft + this.pageX(element.offsetParent as HTMLElement)
+      : element.offsetLeft;
+  }
 
   pageY = (element: HTMLElement) => {
-    return element.offsetParent ? element.offsetTop + this.pageY(element.offsetParent as HTMLElement) : element.offsetTop;
-  };
+    return element.offsetParent
+      ? element.offsetTop + this.pageY(element.offsetParent as HTMLElement)
+      : element.offsetTop;
+  }
 
   grab = (grabbedNode: HTMLDivElement) => {
     const { mouseX, mouseY } = this.state;
@@ -127,7 +131,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
 
   registerDragger = (draggedNode) => {
     this.draggedElement = BlockElement.fromElement(draggedNode, { window: this.window });
-  };
+  }
 
   toggleDragger = (start, { remove = false } = {}) => {
     const draggedElement = this.draggedElement;
@@ -146,9 +150,11 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         }
       }
     }
-  };
+  }
 
-  nextBlockID = () => ((this.blocks.length === 0) ? 0 : Math.max(...this.blocks.map(({ id }) => id)) + 1);
+  nextBlockID = () => (this.blocks.length === 0)
+    ? 0
+    : Math.max(...this.blocks.map(({ id }) => id)) + 1
 
   addBlockForElement = (blockElement, { parent = -1, childWidth = 0 } = {}) => {
     const { scrollLeft, scrollTop } = this.position();
@@ -164,9 +170,11 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         height: blockElement.position().height,
       }),
     );
-  };
+  }
 
-  findBlock = (id, { tree = false } = {}) => ((tree === true) ? this.draggedTree : this.blocks).find(block => (block.id === id));
+  findBlock = (id, { tree = false } = {}) => ((tree)
+    ? this.draggedTree
+    : this.blocks).find(block => (block.id === id))
 
   replaceBlocks = blocks => this.blocks.splice(0, this.blocks.length, ...blocks);
 
@@ -186,14 +194,14 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         }
       }
     }
-  };
+  }
 
   findChildBlocks = (id) => {
     return this.blocks.filter(({ parent }) => (parent === id));
-  };
+  }
 
   output = () => {
-    const { blocks } = this;
+    const blocks = this.blocks;
 
     if (blocks.length === 0) {
       return null;
@@ -213,12 +221,12 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         };
       }),
     };
-  };
+  }
 
   reset = () => {
     this.html('<div class="indicator invisible"></div>');
     this.blocks.splice(0);
-  };
+  }
 
   groupDraggedTree = () => {
     const draggedElement = this.draggedElement!;
@@ -241,7 +249,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         this.draggedTree.push(block);
 
         const blockElement = this.findBlockElement(block.id)!;
-        const arrowElement = blockElement.arrow();
+        const arrowElement = blockElement.arrow()!;
 
         blockElement.styles({
           left: blockElement.position().left - left,
@@ -260,11 +268,11 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
 
       // finds next children
       layer = this.blocks.filter(({ parent }) => foundids.includes(parent));
-    } while (layer.length)
+    } while (layer.length);
 
     childBlocks.forEach(block => this.removeBlock(block));
     allBlocks.forEach(block => this.removeBlock(block));
-  };
+  }
 
   ungroupDraggedTree = () => {
     const draggedElement = this.draggedElement!;
@@ -275,7 +283,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
       }
 
       const blockElement = this.findBlockElement(block.id)!;
-      const arrowElement = blockElement.arrow();
+      const arrowElement = blockElement.arrow()!;
       const { left, top, scrollLeft, scrollTop } = this.position();
 
       blockElement.styles({
@@ -303,7 +311,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
 
     this.appendBlocks(this.draggedTree);
     this.draggedTree.splice(0);
-  };
+  }
 
   inSnapZoneFor = (block) => {
     const { x, y, width, height } = block;
@@ -319,13 +327,13 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
       zoneY >= y - height / 2 &&
       zoneY <= y + height
     );
-  };
+  }
 
   inDropZone = () => {
     const { top, left } = this.draggedElement!.position();
 
     return (top > this.position().top) && (left > this.position().left);
-  };
+  }
 
   drop = () => {
     const draggedElement = this.draggedElement!;
@@ -338,12 +346,12 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
 
     this.appendChild(draggedElement.node);
     this.addBlockForElement(draggedElement);
-  };
+  }
 
   cancelDrop = () => {
     this.appendChild(this.indicator());
     this.toggleDragger(false, { remove: true });
-  };
+  }
 
   indicator = () => this.document.querySelector('.indicator') as HTMLDivElement | null;
 
@@ -365,7 +373,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         indicator.classList.add('invisible');
       }
     }
-  };
+  }
 
   updateDragPosition = () => {
     const { mouseX, mouseY, dragX, dragY } = this.state;
@@ -376,7 +384,7 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         top: mouseY - dragY,
       });
     }
-  };
+  }
 
   updateRearrangePosition = () => {
     const { mouseX, mouseY, dragX, dragY } = this.state;
@@ -388,11 +396,11 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
         top: mouseY - dragY - top + scrollTop,
       });
     }
-  };
+  }
 
   setState = (state) => {
     return Object.assign(this.state, state);
-  };
+  }
 
   getState = key => this.state[key];
 
@@ -403,6 +411,6 @@ const Canvas: Flowy.Canvas.CanvasConstructor = class Canvas implements Flowy.Can
   toggleRearranging = rearranging => (this.isRearranging = rearranging);
 
   toggleLastEvent = last => (this.isLastEvent = last);
-};
+}
 
 export default Canvas;

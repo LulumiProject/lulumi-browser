@@ -1,6 +1,6 @@
 import ArrowElement from './ArrowElement';
 
-const BlockElement: Flowy.BlockElement.BlockElementConstructor = class BlockElement implements Flowy.BlockElement.BlockElementInterface {
+class BlockElement implements Flowy.BlockElement.BlockElementInterface {
   id: number;
   node: HTMLDivElement;
   window: Window;
@@ -15,11 +15,11 @@ const BlockElement: Flowy.BlockElement.BlockElementConstructor = class BlockElem
   static fromElement = (node, { window }) => {
     const input = node.querySelector('.blockid');
 
-    return (input !== null) ? new BlockElement(parseInt(input.value), node, { window }) : null;
-  };
+    return (input !== null) ? new BlockElement(parseInt(input.value, 10), node, { window }) : null;
+  }
 
   constructor(id, node, { window }) {
-    this.id = parseInt(id);
+    this.id = parseInt(id, 10);
     this.node = node;
     this.window = window;
   }
@@ -31,18 +31,18 @@ const BlockElement: Flowy.BlockElement.BlockElementConstructor = class BlockElem
     return {
       top: top + this.window.scrollY,
       left: left + this.window.scrollX,
-      height: parseInt(height),
-      width: parseInt(width),
+      height: parseInt(height, 10),
+      width: parseInt(width, 10),
     };
-  };
+  }
 
   styles = (styles) => {
     return Object.assign(this.node.style, styles);
-  };
+  }
 
   arrow = () => {
     return ArrowElement.find(this);
-  };
-};
+  }
+}
 
 export default BlockElement;

@@ -1,4 +1,4 @@
-const ArrowElement: Flowy.ArrowElement.ArrowElementConstructor = class ArrowElement implements Flowy.ArrowElement.ArrowElementInterface {
+class ArrowElement implements Flowy.ArrowElement.ArrowElementInterface {
   blockElement: Flowy.BlockElement.BlockElementInterface;
   node: HTMLDivElement;
   window: Window;
@@ -16,7 +16,7 @@ const ArrowElement: Flowy.ArrowElement.ArrowElementConstructor = class ArrowElem
     this.node = node;
     this.window = blockElement.window;
     this.document = blockElement.document;
-  };
+  }
 
   html = (html) => {
     if (html !== undefined) {
@@ -24,7 +24,7 @@ const ArrowElement: Flowy.ArrowElement.ArrowElementConstructor = class ArrowElem
     }
 
     return this.node.innerHTML;
-  };
+  }
 
   position = () => {
     const { top, left } = this.node.getBoundingClientRect();
@@ -33,15 +33,15 @@ const ArrowElement: Flowy.ArrowElement.ArrowElementConstructor = class ArrowElem
       top: top + this.window.scrollY,
       left: left + this.window.scrollX,
     };
-  };
+  }
 
-  styles = styles => {
+  styles = (styles) => {
     return Object.assign(this.node.style, styles);
-  };
+  }
 
   remove = () => {
     this.node.remove();
-  };
-};
+  }
+}
 
 export default ArrowElement;
