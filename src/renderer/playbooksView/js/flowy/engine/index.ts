@@ -16,7 +16,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
 
   constructor(canvas, onGrab, onRelease, onSnap, spacingX, spacingY) {
     // tslint:disable-next-line:max-line-length
-    this.engine(document, new Canvas({ node: canvas, spacingX, spacingY, window, document }), onGrab, onRelease, onSnap);
+    this.engine(document, new Canvas({ spacingX, spacingY, window, document, node: canvas }), onGrab, onRelease, onSnap);
   }
 
   // tslint:disable-next-line:max-line-length

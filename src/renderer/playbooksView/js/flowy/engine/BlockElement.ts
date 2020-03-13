@@ -31,8 +31,8 @@ class BlockElement implements Flowy.BlockElement.BlockElementInterface {
     return {
       top: top + this.window.scrollY,
       left: left + this.window.scrollX,
-      height: parseInt(height, 10),
-      width: parseInt(width, 10),
+      height: height ? parseInt(height, 10) : 0,
+      width: width ? parseInt(width, 10) : 0,
     };
   }
 
