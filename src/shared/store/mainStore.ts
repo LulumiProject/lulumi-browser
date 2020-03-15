@@ -90,6 +90,8 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         if (close) {
           close = false;
         } else {
+          event.preventDefault();
+
           delete windows[globalObject.commandPalette.id];
           close = true;
           globalObject.commandPalette.close();
@@ -171,6 +173,11 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
       window.on('close', (event: Electron.IpcMainEvent) => {
         if (close) {
           close = false;
+
+          // only the commandPalette left
+          if (Object.keys(windows).length === 1) {
+            globalObject.commandPalette.close();
+          }
         } else {
           event.preventDefault();
 
