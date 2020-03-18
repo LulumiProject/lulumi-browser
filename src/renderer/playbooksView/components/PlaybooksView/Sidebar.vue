@@ -1,18 +1,29 @@
 <template lang="pug">
 div
   el-tabs(type="border-card")
-    el-tab-pane
-      span(slot="label")
-        i.el-icon-menu
-        | {{ "Trigger" }}
+    el-tab-pane(label="Triggers")
       trigger
+        template(slot="icon")
+          i.blockico.el-icon-user-solid
         template(slot="title")
-          div.blocktitle {{ "New visitor" }}
+          .blocktitle {{ "New visitor" }}
       trigger
+        template(slot="icon")
+          i.blockico.el-icon-s-promotion
         template(slot="title")
-          div.blocktitle {{ "Action is performed" }}
+          .blocktitle {{ "Action is performed" }}
     el-tab-pane(label="Actions")
-  button(@click="output()") {{ "Output" }}
+      action
+        template(slot="icon")
+          i.blockico.el-icon-document-add
+        template(slot="title")
+          div.blocktitle {{ "Clone the webpage" }}
+    el-tab-pane(label="Conditions")
+      action
+        template(slot="icon")
+          i.blockico.el-icon-check
+        template(slot="title")
+          div.blocktitle {{ "If it's true" }}
 </template>
 
 <script lang="ts">
@@ -22,6 +33,8 @@ import { Card, Col, Row, Tabs, TabPane } from 'element-ui';
 
 import Flowy from '../../js/flowy';
 
+import Action from './Components/Action.vue';
+import Condition from './Components/Condition.vue';
 import Trigger from './Components/Trigger.vue';
 
 @Component({
@@ -32,6 +45,8 @@ import Trigger from './Components/Trigger.vue';
     },
   },
   components: {
+    Action,
+    Condition,
     Trigger,
     'el-card': Card,
     'el-col': Col,
@@ -56,12 +71,6 @@ export default class Sidebar extends Vue {
   }
   onSnap(block, first, parent) {
     return true;
-  }
-  output() {
-    if (this.flowy.output) {
-      // tslint:disable-next-line
-      console.log(JSON.stringify(this.flowy.output()));
-    }
   }
 
   mounted() {

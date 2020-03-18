@@ -1,29 +1,37 @@
 <template lang="pug">
-el-tree(:props="{ label: 'label', children: 'children' }",
-        :data="data",
-        :default-expand-all="true")
+el-row.handle
+  el-col
+    .blockelem.create-flowy
+      .blockin
+        slot(name="icon")
+          i.blockico.el-icon-menu
+        .blocktext
+          slot(name="title")
+            .blocktitle {{ "New visitor" }}
+          slot(name="desc")
+            .blockdesc {{ "Conditions when somebody visits a specified page" }}
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { Tree } from 'element-ui';
+import { Col, Row } from 'element-ui';
+
+import '../../../css/flowy.min.css';
+import '../../../css/styles.css';
 
 @Component({
-  props: {
-    data: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
-    'el-tree': Tree,
+    'el-col': Col,
+    'el-row': Row,
   },
 })
 export default class Condition extends Vue {
-  data: [];
 }
 </script>
 
 <style lang="less" scoped>
+.handle {
+  z-index: 9999;
+}
 </style>
