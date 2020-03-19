@@ -17,9 +17,6 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Col, Row } from 'element-ui';
 
-import '../../../css/flowy.min.css';
-import '../../../css/styles.css';
-
 @Component({
   components: {
     'el-col': Col,
@@ -31,6 +28,9 @@ export default class Action extends Vue {
 </script>
 
 <style lang="less" scoped>
+@import '../../../css/flowy.min.css';
+@import '../../../css/styles.css';
+
 .handle {
   z-index: 9999;
 }

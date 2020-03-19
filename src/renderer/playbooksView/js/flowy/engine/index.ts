@@ -88,7 +88,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
 
       canvas.showIndicator(false);
 
-      const { draggedElement } = canvas;
+      const draggedElement = canvas.draggedElement!;
 
       if (canvas.isDragging) {
         canvas.toggleDragger(false);
@@ -154,7 +154,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
     document.addEventListener('touchend', endDrag, false);
 
     function snap(block) {
-      const { draggedElement } = canvas;
+      const draggedElement = canvas.draggedElement!;
       if (!canvas.isRearranging) {
         // TODO: replace with `canvas.drop()`?
         canvas.appendChild(draggedElement.node);
@@ -166,7 +166,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
 
       const totalWidth = childBlocks.reduce(
         (total, { maxWidth }) => total + maxWidth() + canvas.spacingX,
-        canvas.draggedElement.position().width,
+        canvas.draggedElement!.position().width,
       );
 
       childBlocks.forEach((childBlock) => {
@@ -181,12 +181,14 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
           left += childWidth / 2 - width / 2;
         }
 
-        childElement.styles({ left });
+        if (childElement) {
+          childElement.styles({ left });
+        }
       });
 
       const { top, left, scrollTop, scrollLeft } = canvas.position();
 
-      canvas.draggedElement.styles({
+      canvas.draggedElement!.styles({
         left: block.x - totalWidth / 2 + totalRemove - left + scrollLeft,
         top: block.y + block.height / 2 + canvas.spacingY - top,
       });
@@ -206,7 +208,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
             return;
           }
 
-          const blockElement = canvas.findBlockElement(treeBlock.id);
+          const blockElement = canvas.findBlockElement(treeBlock.id)!;
           const arrowElement = blockElement.arrow();
           const blockParent = blockElement.node;
           const arrowParent = arrowElement.node;
@@ -239,8 +241,8 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
       const arrowY = parseFloat(`${
         y -
         height / 2 -
-        (canvas.blocks.find(({ parent }) => (parent === block.id)).y +
-          canvas.blocks.find(({ parent }) => (parent === block.id)).height / 2) +
+        (canvas.blocks.find(({ parent }) => (parent === block.id))!.y +
+          canvas.blocks.find(({ parent }) => (parent === block.id))!.height / 2) +
         scrollTop
         }`);
 
@@ -344,7 +346,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
         canvas.toggleDraggingBlock(true);
         canvas.registerDragger(theblock);
 
-        const { draggedElement } = canvas;
+        const draggedElement = canvas.draggedElement!;
 
         if (mouseX && mouseY) {
           canvas.setState({
@@ -421,7 +423,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
         canvas.toggleLastEvent(true);
 
         canvas.blocks.forEach(({ id, x, width, parent }) => {
-          const blockElement = canvas.findBlockElement(id);
+          const blockElement = canvas.findBlockElement(id)!;
 
           blockElement.styles({
             left: x - width / 2 - currentOffsetLeft + 20,
@@ -432,7 +434,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
           }
 
           const arrowElement = blockElement.arrow();
-          const parentX = canvas.blocks.find(({ id }) => (id === parent)).x;
+          const parentX = canvas.blocks.find(({ id }) => (id === parent))!.x;
           const arrowX = x - parentX;
 
           arrowElement.styles({
@@ -443,12 +445,12 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
         });
 
         canvas.blocks.forEach((block) => {
-          const blockElement = canvas.findBlockElement(block.id);
+          const blockElement = canvas.findBlockElement(block.id)!;
 
           block.x =
             blockElement.position().left +
             (canvas.position().left + canvas.position().scrollLeft) -
-            canvas.draggedElement.position().width / 2 -
+            canvas.draggedElement!.position().width / 2 -
             40;
         });
 
@@ -468,7 +470,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
 
         canvas.blocks.forEach((block) => {
           const { id, x, width, parent } = block;
-          const blockElement = canvas.findBlockElement(id);
+          const blockElement = canvas.findBlockElement(id)!;
           const arrowElement = blockElement.arrow();
 
           blockElement.styles({
@@ -480,7 +482,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
             return;
           }
 
-          const parentX = canvas.blocks.find(({ id }) => (id === parent)).x;
+          const parentX = canvas.blocks.find(({ id }) => (id === parent))!.x;
           const arrowX = x - parentX;
 
           arrowElement.styles({
@@ -529,7 +531,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
         const { left, top } = canvas.position();
 
         childBlocks.forEach((block) => {
-          const blockElement = canvas.findBlockElement(block.id);
+          const blockElement = canvas.findBlockElement(block.id)!;
           const arrowElement = blockElement.arrow();
 
           // blockElement.styles({
@@ -558,7 +560,7 @@ class Flowy implements Flowy.Flowy.FlowyElementInterface {
 
           const parent = canvas.findBlock(block.parent)!;
           const { x: parentX, y: parentY, height: parentHeight } = parent;
-          const { x, y, height } = canvas.blocks.find(({ id }) => (id === block.id));
+          const { x, y, height } = canvas.blocks.find(({ id }) => (id === block.id))!;
           const arrowX = x - parentX + 20;
           const arrowY = y - height / 2 - (parentY + parentHeight / 2);
 
