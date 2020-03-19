@@ -3,20 +3,20 @@
 declare namespace Flowy {
   export namespace Flowy {
     export interface FlowyElementConstructor {
-      new(canvas: HTMLDivElement, onGrab: ((block: HTMLDIVelement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDIVelement, first?: boolean, parent?: HTMLDIVelement) => any) | undefined, spacingX: number, spacingY: number);
+      new(canvas: HTMLDivElement, onGrab: ((block: HTMLDivElement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDivElement, first?: boolean, parent?: HTMLDivElement) => any) | undefined, spacingX: number, spacingY: number);
     }
     export interface FlowyElementInterface {
       id: number;
       node: HTMLDivElement;
       window: Window;
-      onGrab: ((block: HTMLDIVelement) => any) | undefined;
+      onGrab: ((block: HTMLDivElement) => any) | undefined;
       onRelease: (() => any) | undefined;
-      onSnap: ((block: HTMLDIVelement, first?: boolean, parent?: HTMLDIVelement | undefined) => any) | undefined;
+      onSnap: ((block: HTMLDivElement, first?: boolean, parent?: HTMLDivElement | undefined) => any) | undefined;
       import: ((data: any) => void) | undefined;
       output: (() => any) | undefined;
       deleteBlocks: (() => void) | undefined;
 
-      engine: (document: Document, canvas: Canvas.CanvasInterface, onGrab: ((block: HTMLDIVelement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDIVelement, first?: boolean, parent?: HTMLDIVelement | undefined) => any) | undefined) => void;
+      engine: (document: Document, canvas: Canvas.CanvasInterface, onGrab: ((block: HTMLDivElement) => any) | undefined, onRelease: (() => any) | undefined, onSnap: ((block: HTMLDivElement, first?: boolean, parent?: HTMLDivElement | undefined) => any) | undefined) => void;
     }
   }
 
@@ -55,22 +55,22 @@ declare namespace Flowy {
       spacingX: number;
       spacingY: number;
       state: State;
-      blocks: BlockInterface[];
+      blocks: Block.BlockInterface[];
       isInitialized: boolean;
       isDragging: boolean;
       isDraggingBlock: boolean;
       isRearranging: boolean;
       isLastEvent: boolean;
       grabbedNode: HTMLDivElement | null;
-      draggedElement: Flowy.BlockElement.BlockElementInterface | null;
-      draggedTree: Flowy.Block.BlockInterface[];
+      draggedElement: BlockElement.BlockElementInterface | null;
+      draggedTree: Block.BlockInterface[];
 
       initialize: () => void;
       position: () => Position;
       html: (html?: string) => string;
       appendHtml: (html: string) => void;
       appendChild: (...children: HTMLDivElement[]) => void;
-      findBlockElement: (id: number) => BlockElementInterface | null;
+      findBlockElement: (id: number) => BlockElement.BlockElementInterface | null;
       import: (data: any) => void;
       pageX: (element: HTMLElement) => number;
       pageY: (element: HTMLElement) => number;
@@ -93,7 +93,7 @@ declare namespace Flowy {
       drop: () => void;
       cancelDrop: () => void;
       indicator: () => HTMLDivElement | null;
-      showIndicator: (show: boolean, block?: boolean) => void;
+      showIndicator: (show: boolean, block?: Block.BlockInterface) => void;
       updateDragPosition: () => void;
       updateRearrangePosition: () => void;
       setState: (state: State) => State;
