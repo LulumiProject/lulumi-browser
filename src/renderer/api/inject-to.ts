@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import { specs } from 'lulumi';
 import * as path from 'path';
 import * as url from 'url';
-import generate from 'nanoid/generate';
+import { customAlphabet } from 'nanoid';
 import { Store, get, set, del, keys } from 'idb-keyval';
 
 import IpcEvent from './ipc-event';
@@ -15,7 +15,7 @@ import Port from './port';
 /* tslint:disable:align */
 /* tslint:disable:max-line-length */
 
-const generateSuffix = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
+const generateSuffix = customAlphabet('abcdefghijklmnopqrstuvwxyz', 32);
 
 // Generate all possible signatures for a given API function.
 function getSignatures(parameterSignatureString) {

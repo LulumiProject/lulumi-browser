@@ -4,7 +4,7 @@ import { Store } from 'vuex';
 import localshortcut from 'electron-localshortcut';
 import * as fs from 'fs';
 import * as path from 'path';
-import generate from 'nanoid/generate';
+import { customAlphabet } from 'nanoid';
 import * as urllib from 'url';
 import * as mimeTypes from 'mime-types';
 
@@ -28,7 +28,7 @@ const manifestNameMap: Lulumi.API.ManifestNameMap = {};
 const backgroundPages: Lulumi.API.BackgroundPages = {};
 let renderProcessPreferences: Lulumi.API.ManifestObject[] = [];
 
-const generateExtensionIdFromName = () => generate('abcdefghijklmnopqrstuvwxyz', 32);
+const generateExtensionIdFromName = customAlphabet('abcdefghijklmnopqrstuvwxyz', 32);
 
 // Create or get manifest object from |srcDirectory|.
 const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject | null =

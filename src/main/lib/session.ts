@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain, session } from 'electron';
 import * as forge from 'node-forge';
-import generate from 'nanoid/generate';
+import { customAlphabet } from 'nanoid';
 
 import mainStore from '../../shared/store/mainStore';
 
@@ -11,7 +11,7 @@ import mainStore from '../../shared/store/mainStore';
 
 ipcMain.setMaxListeners(0);
 
-const generateRequestId = () => generate('1234567890', 32);
+const generateRequestId = customAlphabet('1234567890', 32);
 
 const register = (eventName: any, sess: Electron.Session, eventLispCaseName: string, id: number, digest: string, filter): void => {
   if ((eventName === 'onBeforeRequest') || (eventName === 'onBeforeSendHeaders')) {
