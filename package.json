@@ -139,7 +139,7 @@
     "vue-html-loader": "^1.2.4",
     "vue-input-autowidth": "^1.0.10",
     "vue-loader": "^15.9.1",
-    "vue-logics": "^1.0.1",
+    "vue-logics": "^1.0.2",
     "vue-property-decorator": "^8.4.1",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.11",
