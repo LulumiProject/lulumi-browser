@@ -12227,6 +12227,16 @@ vue-loader@^15.9.0:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
+vue-logics@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/vue-logics/-/vue-logics-1.0.1.tgz#9e2f9630c5711d7d091a40a8130d39a701348ac3"
+  integrity sha512-14RW/0DqUphRPu2ry72JBpqaKlK3qubbP6NGan3h6HaX6oJWmBfgy00i2nSdiFBLxGLjgV7RkHhmq3hVDsk+6Q==
+  dependencies:
+    element-ui "^2.13.0"
+    is-plain-object "^3.0.0"
+    vue "^2.6.11"
+    vue-class-component "^7.2.3"
+
 vue-property-decorator@^8.4.0:
   version "8.4.0"
   resolved "https://registry.npmjs.org/vue-property-decorator/-/vue-property-decorator-8.4.0.tgz#f4e641f84ca51a7b4721e236392a1efbb6eac00b"

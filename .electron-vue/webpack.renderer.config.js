@@ -516,7 +516,8 @@ let playbooksViewConfig = {
           path.join(__dirname, '../src/renderer/playbooksView'),
           path.join(__dirname, '../node_modules/element-ui/lib/theme-chalk'),
           path.join(__dirname, '../node_modules/modern-normalize'),
-          path.join(__dirname, '../node_modules/vue-awesome/components')
+          path.join(__dirname, '../node_modules/vue-awesome/components'),
+          path.join(__dirname, '../node_modules/vue-logics/theme')
         ]
       },
       {
