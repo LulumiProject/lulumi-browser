@@ -11,6 +11,7 @@ const webpack = require('webpack')
 const openInEditor = require('launch-editor-middleware')
 const webpackDevMiddleware = require('webpack-dev-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const dllConfig = require('./webpack.dll.config')
 const mainConfig = require('./webpack.main.config')
@@ -72,8 +73,8 @@ function startRenderer () {
 
     multiCompiler.compilers.map(c => {
       if (c.name !== 'preloads') {
-        c.hooks.compilation.tap('compilation', compilation => {
-          compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
+        c.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('HtmlWebpackPluginAfterEmit', (data, cb) => {
             hotMiddleware.publish({ action: 'reload' })
             cb()
           })

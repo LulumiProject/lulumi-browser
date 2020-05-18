@@ -103,9 +103,7 @@ export default class Download extends Vue {
     this.$electron.ipcRenderer.send('cancel-downloads-progress', startTime);
   }
   closeDownloadBar(): void {
-    if ((this.$parent as BrowserMainView).onCloseDownloadBar) {
-      (this.$parent as BrowserMainView).onCloseDownloadBar();
-    }
+    (this.$parent as BrowserMainView).onCloseDownloadBar();
   }
   getFileIcon(savePath: string, index: number): void {
     if (savePath) {
