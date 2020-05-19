@@ -23,7 +23,7 @@ import Event from '../../../api/event';
 
 import BrowserMainView from '../BrowserMainView.vue';
 
-const resizeSensor = require('css-element-queries/src/ResizeSensor');
+const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
 @Component({
   props: {
@@ -50,7 +50,7 @@ const resizeSensor = require('css-element-queries/src/ResizeSensor');
   },
 })
 export default class Tab extends Vue {
-  hidden: boolean = true;
+  hidden = true;
   requestId: number | null | void = null;
   onMessageEvent: Event = new Event();
 
@@ -80,8 +80,8 @@ export default class Tab extends Vue {
 
   navigateTo(url) {
     if (this.$refs.webview) {
-      if (!(process.env.NODE_ENV === 'test'
-        && process.env.TEST_ENV === 'unit')) {
+      if (!(process.env.NODE_ENV === 'test' &&
+        process.env.TEST_ENV === 'unit')) {
         (this.$refs.webview as Electron.WebviewTag)
           .setAttribute('src', urlUtil.getUrlFromInput(url));
       } else {
@@ -104,7 +104,8 @@ export default class Tab extends Vue {
         'tab.findInPage.status', {
           activeMatch: 0,
           matches: 0,
-        })} ${this.$tc('tab.findInPage.match', 1)}`;
+        }
+      )} ${this.$tc('tab.findInPage.match', 1)}`;
     } else {
       this.findinpage.input.focus();
       (this.findinpage.input as HTMLInputElement).select();
@@ -167,7 +168,8 @@ export default class Tab extends Vue {
 
         if ((this.findinpage.input as HTMLInputElement).value) {
           this.requestId = this.findinpage.activeWebview.findInPage(
-            (this.findinpage.input as HTMLInputElement).value);
+            (this.findinpage.input as HTMLInputElement).value
+          );
         }
       },
       end: () => {
@@ -191,7 +193,8 @@ export default class Tab extends Vue {
     this.findinpage.input.addEventListener('input', (event) => {
       if ((event.target as HTMLInputElement).value) {
         this.requestId = this.findinpage.activeWebview.findInPage(
-          (event.target as HTMLInputElement).value);
+          (event.target as HTMLInputElement).value
+        );
       }
     });
 
@@ -201,7 +204,8 @@ export default class Tab extends Vue {
           (this.findinpage.input as HTMLInputElement).value, {
             forward: true,
             findNext: true,
-          });
+          }
+        );
       }
     });
 
@@ -211,16 +215,17 @@ export default class Tab extends Vue {
           (this.findinpage.input as HTMLInputElement).value, {
             forward: false,
             findNext: true,
-          });
+          }
+        );
       }
     });
 
     this.findinpage.next.addEventListener('click', () => {
       if ((this.findinpage.input as HTMLInputElement).value) {
-        this.requestId
-          = this.findinpage.activeWebview.findInPage(
-            (this.findinpage.input as HTMLInputElement).value,
-            { forward: true, findNext: true });
+        this.requestId = this.findinpage.activeWebview.findInPage(
+          (this.findinpage.input as HTMLInputElement).value,
+          { forward: true, findNext: true }
+        );
       }
     });
 
@@ -234,12 +239,12 @@ export default class Tab extends Vue {
           } else {
             match = 2;
           }
-          this.findinpage.counter.textContent
-            = `${this.$t(
-              'tab.findInPage.status', {
-                activeMatch: event.result.activeMatchOrdinal,
-                matches: event.result.matches,
-              })} ${this.$tc('tab.findInPage.match', match)}`;
+          this.findinpage.counter.textContent = `${this.$t(
+            'tab.findInPage.status', {
+              activeMatch: event.result.activeMatchOrdinal,
+              matches: event.result.matches,
+            }
+          )} ${this.$tc('tab.findInPage.match', match)}`;
         }
       }
     });
@@ -251,15 +256,16 @@ export default class Tab extends Vue {
         * register the resize event on nav element to dynamically adjust
         * the height of webview element
         */
-      new resizeSensor(nav, () => {
-        webview.style.height
-          = (this.$parent as BrowserMainView).getViewHeight();
+      // eslint-disable-next-line no-new
+      new ResizeSensor(nav, () => {
+        webview.style.height =
+          (this.$parent as BrowserMainView).getViewHeight();
         findinpageBar.style.top = `${nav.clientHeight}px`;
       });
 
       // fired once
-      webview.style.height
-        = (this.$parent as BrowserMainView).getViewHeight();
+      webview.style.height =
+        (this.$parent as BrowserMainView).getViewHeight();
       findinpageBar.style.top = `${nav.clientHeight}px`;
 
       // navigate

@@ -87,7 +87,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
             }
           }
         } else {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error('[Element Error][Autocomplete]autocomplete suggestions must be an array');
         }
       });

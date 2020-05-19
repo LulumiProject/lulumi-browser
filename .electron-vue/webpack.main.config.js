@@ -43,7 +43,7 @@ let mainConfig = {
         exclude: /node_modules/
       },
       {
-        test: /\.js$/,
+        test: /\.(js|ts|vue)$/,
         enforce: 'pre',
         use: {
           loader: 'eslint-loader',
@@ -51,8 +51,7 @@ let mainConfig = {
             formatter: require('eslint-friendly-formatter')
           }
         },
-        include: [ path.join(__dirname, '../src/main') ],
-        exclude: /node_modules/
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       },
       {
         test: /\.js$/,
@@ -86,8 +85,8 @@ let mainConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       tslintAutoFix: false,
       vue: true
     }),

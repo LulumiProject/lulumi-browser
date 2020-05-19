@@ -14,7 +14,7 @@ import * as zhTW from '../../helper/i18n/zh-TW';
 
 const langPath: string = path.join(app.getPath('userData'), 'lululmi-lang');
 
-let lang: string = '';
+let lang = '';
 try {
   lang = readFileSync(langPath, 'utf8');
 } catch (langError) {

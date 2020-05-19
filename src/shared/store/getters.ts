@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+
 interface BrowserState extends Lulumi.Store.State {
   browser: Lulumi.Store.State;
 }

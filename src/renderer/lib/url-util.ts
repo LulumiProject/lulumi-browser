@@ -1,9 +1,9 @@
 import constants from '../mainBrowserWindow/constants';
 
 // characters, then : with optional //
-const rscheme: RegExp = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
-const defaultScheme: string = 'http://';
-const fileScheme: string = 'file://';
+const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i;
+const defaultScheme = 'http://';
+const fileScheme = 'file://';
 const os: any = require('os');
 
 function getLulumiExtUrl(relativeUrl: string): string {
@@ -262,7 +262,7 @@ const urlUtil = {
    * @param {String} input The input URL.
    * @returns {String} The host name.
    */
-  getHostname(input: string, excludePort: boolean = false): string | null {
+  getHostname(input: string, excludePort = false): string | null {
     try {
       if (excludePort) {
         return new window.URL(input).hostname;
@@ -305,7 +305,9 @@ const urlUtil = {
     if (url) {
       if (url.includes(errorPage)) {
         return decodeURIComponent(url).replace(
-          /^file:.+\/pages\/error\/index.html\?.*url=(\w+:\/\/.+)/, '$1');
+          /^file:.+\/pages\/error\/index.html\?.*url=(\w+:\/\/.+)/,
+          '$1'
+        );
       }
       return url;
     }

@@ -9,18 +9,17 @@ const state = {
   extensions: {},
 };
 
-/* tslint:disable:function-name */
 const mutations = {
-  [types.UPDATE_ABOUT](state, data) {
-    state.about.about = data.about;
-    state.about.lulumi = data.lulumi;
-    state.about.preferences = data.preferences;
+  [types.UPDATE_ABOUT](stateContext, data) {
+    stateContext.about.about = data.about;
+    stateContext.about.lulumi = data.lulumi;
+    stateContext.about.preferences = data.preferences;
     if (data.path) {
-      state.about.path = data.path;
+      stateContext.about.path = data.path;
     }
   },
-  [types.UPDATE_EXTENSIONS](state, data) {
-    state.extensions = data;
+  [types.UPDATE_EXTENSIONS](stateContext, data) {
+    stateContext.extensions = data;
   },
 };
 

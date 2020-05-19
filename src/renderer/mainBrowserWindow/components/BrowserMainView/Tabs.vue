@@ -13,7 +13,9 @@
              :data-id="index",
              :key="`tab-${tab.id}`")
         .tab-favicon
-          svg(v-if="tab.isLoading", viewBox="25 25 50 50", :class="tab.didNavigate ? 'circular' : 'circular-reverse'")
+          svg(v-if="tab.isLoading",
+              viewBox="25 25 50 50",
+              :class="tab.didNavigate ? 'circular' : 'circular-reverse'")
             circle(cx="50",
                    cy="50",
                    r="20",
@@ -22,21 +24,30 @@
                    stroke-miterlimit="10",
                    :class="tab.didNavigate ? 'path' : 'path-reverse'")
           object(v-else, :data="tab.favIconUrl", type='image/png', height='16', width='16')
-            i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`", style='font-size: 16px;')
-          awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-off", class="volume volume-off")
-          awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted", @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)", name="volume-up", class="volume volume-up")
-        el-tooltip(:content="tab.title || $t('tabs.loading')", placement="bottom", :openDelay="1500")
+            i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`",
+              style='font-size: 16px;')
+          awesome-icon(v-if="tab.hasMedia && tab.isAudioMuted",
+                       @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)",
+                       name="volume-off",
+                       class="volume volume-off")
+          awesome-icon(v-else-if="tab.hasMedia && !tab.isAudioMuted",
+                       @click.native.stop="$parent.onToggleAudio($event, index, !tab.isAudioMuted)",
+                       name="volume-up",
+                       class="volume volume-up")
+        el-tooltip(:content="tab.title || $t('tabs.loading')",
+                   placement="bottom",
+                   :openDelay="1500")
           span(class="tab-content")
             | {{ tab.title || $t('tabs.loading') }}
         .tab-close(@click.stop="$parent.onTabClose(index)")
           svg(viewBox="0 0 24 24")
-            path(d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z")
+            path(:d="path")
       li.tabs-add(@click="$parent.onNewTab(windowId, 'about:newtab', false)")
   .custom-buttons(v-if="enableCustomButtons")
     svg(@click="onCustomButtonClick")
       use(:xlink:href="loadButton('minimize-window')")
     svg(@click="onCustomButtonClick")
-      use(:xlink:href="window && window.state === 'maximized' ? loadButton('restore-window') : loadButton('maximize-window')")
+      use(:xlink:href="windowState")
     svg.close(@click="onCustomButtonClick")
       use(:xlink:href="loadButton('close-window')")
 </template>
@@ -95,7 +106,7 @@ export default class Tabs extends Vue {
   sortable: any;
 
   windowId: number;
-  enableCustomButtons: boolean = !is.macos;
+  enableCustomButtons = !is.macos;
 
   get window(): Lulumi.Store.LulumiBrowserWindowProperty {
     return this.$store.getters.windows.find(window => window.id === this.windowId);
@@ -106,6 +117,17 @@ export default class Tabs extends Vue {
   get tabs(): Lulumi.Store.TabObject[] {
     return this.$store.getters.tabs.filter(tab => tab.windowId === this.windowId);
   }
+  get path(): string {
+    // eslint-disable-next-line max-len
+    return 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z';
+  }
+  get windowState(): string {
+    if (this.window && this.window.state === 'maximized') {
+      return this.loadButton('restore-window');
+    }
+
+    return this.loadButton('maximize-window');
+  }
 
   loadButton(id: string): string {
     return process.env.NODE_ENV !== 'production'
@@ -113,11 +135,11 @@ export default class Tabs extends Vue {
       : fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
   }
   onCustomButtonClick(event) {
-    const currentWindow: Electron.BrowserWindow | null
-      = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+    const currentWindow: Electron.BrowserWindow | null =
+      this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       this.$nextTick(() => {
-        let pattern: string = '';
+        let pattern = '';
         if (event.target.tagName === 'svg') {
           pattern = event.target.firstElementChild.getAttribute('xlink:href');
         } else if (event.target.tagName === 'use') {
@@ -138,8 +160,8 @@ export default class Tabs extends Vue {
   }
   onDoubleClick(event: Electron.Event) {
     if (event.target) {
-      const currentWindow: Electron.BrowserWindow | null
-        = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+      const currentWindow: Electron.BrowserWindow | null =
+        this.$electron.remote.BrowserWindow.fromId(this.windowId);
       if (currentWindow) {
         if (currentWindow.isMaximized()) {
           currentWindow.unmaximize();
@@ -196,7 +218,8 @@ export default class Tabs extends Vue {
         &.tab {
           flex-basis: 220px;
           display: flex;
-          min-width: 0; /* http://stackoverflow.com/questions/34934586/white-space-nowrap-and-flexbox-did-not-work-in-chrome */
+          // https://bit.ly/3e22atx
+          min-width: 0;
           position: relative;
           background-color: #dbdbdb;
           z-index: 5;
@@ -262,8 +285,10 @@ export default class Tabs extends Vue {
                 &.path-reverse {
                   stroke-dasharray: 1,200;
                   stroke-dashoffset: 0;
-                  -webkit-animation: dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
-                  animation: dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
+                  -webkit-animation:
+                    dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
+                  animation:
+                    dash 1.5s ease-in-out infinite reverse, color 6s ease-in-out infinite reverse;
                   stroke-linecap: round;
                 }
               }

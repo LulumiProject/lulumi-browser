@@ -5,8 +5,12 @@
     el-table-column(prop="key", :label="$t('about.lulumiPage.item')", width="200", align="center")
     el-table-column(:label="$t('about.lulumiPage.value')", width="180", align="center")
       template(slot-scope="scope", v-if="scope.row !== undefined")
-        a.cell(v-if="scope.row.key === 'rev'", :href="`https://github.com/LulumiProject/lulumi-browser/commit/${scope.row.value}`") {{ scope.row.value.substring(0, 7) }}
-        .cell(v-else-if="scope.row.key === 'userData'", style="color: cornflowerblue; cursor: pointer;", @click="openItem(scope.row.value)") {{ scope.row.value }}
+        a.cell(v-if="scope.row.key === 'rev'",
+               :href="`https://github.com/LulumiProject/lulumi-browser/commit/${scope.row.value}`")
+          | {{ scope.row.value.substring(0, 7) }}
+        .cell(v-else-if="scope.row.key === 'userData'",
+              style="color: cornflowerblue; cursor: pointer;",
+              @click="openItem(scope.row.value)") {{ scope.row.value }}
         .cell(v-else) {{ scope.row.value }}
 </template>
 

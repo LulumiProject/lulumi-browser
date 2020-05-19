@@ -1,6 +1,6 @@
 import { net } from 'electron';
 
-export default function request(provider: string, url: string, callback: Function) {
+export default function fetch(provider: string, url: string, callback: Function) {
   let bodyData = '';
   const urlRequest = net.request(url);
   urlRequest.on('response', (response) => {

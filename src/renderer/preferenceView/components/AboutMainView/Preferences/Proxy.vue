@@ -40,9 +40,9 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class TabConfig extends Vue {
-  pacScript: string = '';
-  proxyRules: string = '';
-  proxyBypassRules: string = '';
+  pacScript = '';
+  proxyRules = '';
+  proxyBypassRules = '';
 
   setProxy(): void {
     ipcRenderer.send('set-proxy-config', {
@@ -58,7 +58,8 @@ export default class TabConfig extends Vue {
         this.pacScript = proxyConfig.pacScript;
         this.proxyRules = proxyConfig.proxyRules;
         this.proxyBypassRules = proxyConfig.proxyBypassRules;
-      });
+      }
+    );
     ipcRenderer.send('guest-want-data', 'proxyConfig');
   }
   beforeDestroy() {

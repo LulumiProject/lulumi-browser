@@ -22,7 +22,8 @@ div
   div {{ `&lt;i class="el-icon-${tabFavicon}"&gt;&lt;/i&gt;` }}
     hr
     | Ref:&nbsp;
-    a(href="https://element.eleme.io/#/en-US/component/icon", target="_blank") https://element.eleme.io/#/en-US/component/icon
+    a(href="https://element.eleme.io/#/en-US/component/icon", target="_blank")
+      | https://element.eleme.io/#/en-US/component/icon
 </template>
 
 <script lang="ts">
@@ -38,8 +39,8 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class TabConfig extends Vue {
-  defaultUrl: string = '';
-  tabFavicon: string = '';
+  defaultUrl = '';
+  tabFavicon = '';
 
   setTabConfig(): void {
     ipcRenderer.send('set-tab-config', {
@@ -53,7 +54,8 @@ export default class TabConfig extends Vue {
       'guest-here-your-data', (event: Electron.Event, tabConfig: Lulumi.Store.TabConfig) => {
         this.defaultUrl = tabConfig.dummyTabObject.url;
         this.tabFavicon = tabConfig.lulumiDefault.tabFavicon;
-      });
+      }
+    );
     ipcRenderer.send('guest-want-data', 'tabConfig');
   }
   beforeDestroy() {

@@ -28,7 +28,8 @@ export default class SwipeArrow extends Vue {
       (event) => {
         (this.$parent as BrowserMainView).onWheel(event);
       },
-      { passive: true, capture: true });
+      { passive: true, capture: true }
+    );
   }
 }
 </script>

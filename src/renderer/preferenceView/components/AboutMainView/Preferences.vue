@@ -25,7 +25,7 @@ import { Col, Menu, MenuItem, Row } from 'element-ui';
   },
 })
 export default class Preferences extends Vue {
-  path: string = '/preferences';
+  path = '/preferences';
 
   get datas() {
     return this.$store.getters.about;

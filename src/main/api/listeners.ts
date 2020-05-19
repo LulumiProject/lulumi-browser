@@ -1,8 +1,8 @@
+/* eslint-disable max-len */
+
 import { BrowserWindow, dialog, ipcMain, webContents, IpcMainEvent } from 'electron';
 
 const windows = require('../../shared/store/mainStore').default.getWindows();
-
-/* tslint:disable:max-line-length */
 
 ipcMain.on('open-dev-tools', (event, webContentsId) => {
   if (webContentsId) {
@@ -13,8 +13,8 @@ ipcMain.on('add-lulumi-extension', (event: IpcMainEvent) => {
   dialog.showOpenDialog(BrowserWindow.fromWebContents(event.sender), { properties: ['openDirectory'] }).then((res) => {
     if (!res.canceled && res.filePaths && res.filePaths.length > 0) {
       const dir: string = res.filePaths[0];
-      let name: string = '';
-      let result: string = 'OK';
+      let name = '';
+      let result = 'OK';
       try {
         if (dir) {
           // an array of directory paths chosen by the user will be returned, but we only want one path
@@ -40,7 +40,7 @@ ipcMain.on('add-lulumi-extension', (event: IpcMainEvent) => {
   });
 });
 ipcMain.on('remove-lulumi-extension', (event, extensionId) => {
-  let result: string = 'OK';
+  let result = 'OK';
   try {
     const ret: string = ((BrowserWindow as any) as Lulumi.BrowserWindow).removeLulumiExtension(extensionId);
     ipcMain.once(`remove-lulumi-extension-${extensionId}`, () => {

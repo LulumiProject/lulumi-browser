@@ -1,0 +1,100 @@
+{
+  "extends": [
+    "eslint-config-airbnb-base",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:vue/vue3-recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "project": "tsconfig.json",
+    "tsconfigRootDir": "src",
+    "ecmaVersion": 2019,
+    "extraFileExtensions": [".vue"]
+  },
+  "rules": {
+    "no-implied-eval": "error",
+    "no-trailing-spaces": [
+      "error",
+      { "ignoreComments": true }
+    ],
+    "semi": "error",
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "camelcase": "error",
+    "max-len": [
+      "error",
+      { "code": 100 }
+    ],
+    "no-console": [
+      "error",
+      { "allow": ["warn", "error"] }
+    ],
+    "radix": "error",
+    "indent": "off",
+    "@typescript-eslint/indent": ["error", 2],
+    "comma-dangle": [
+      "error",
+      "only-multiline"
+    ],
+    "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+    "lines-between-class-members": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "arrow-parens": [
+      "error",
+      "as-needed",
+      { "requireForBlockBody": true }
+    ],
+    "object-curly-newline": [
+      "error",
+      { "consistent": true }
+    ],
+    "no-return-assign": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "no-param-reassign": [
+      "error",
+      { "props": false }
+    ],
+    "no-loop-func": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "vue/component-tags-order": [
+      "error",
+      { "order": ["template", "script", "style"] }
+    ],
+    "class-methods-use-this": "off",
+    "no-underscore-dangle": "off",
+    "operator-linebreak": [
+      "error",
+      "after",
+      { "overrides": { "?": "before", ":": "before" } }
+    ],
+    "@typescript-eslint/no-var-requires" : "off",
+    "prefer-object-spread": "off",
+    "prefer-rest-params": "off",
+    "global-require": "off",
+    "func-names": [
+      "error",
+      "as-needed"
+    ],
+    "max-classes-per-file": "off",
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "args": "after-used" }
+    ],
+    "import/newline-after-import": "off",
+    "no-control-regex": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
+    }
+  }
+}

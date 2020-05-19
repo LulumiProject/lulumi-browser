@@ -23,7 +23,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class Homepage extends Vue {
-  homepage: string = '';
+  homepage = '';
 
   setHomepage(): void {
     ipcRenderer.send('set-homepage', {

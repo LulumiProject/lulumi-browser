@@ -4,17 +4,30 @@ div
     el-col(:span="12")
       h1 {{ $t('about.extensionsPage.title') }}
     el-col(:span="6", :offset="3")
-      el-button(type="success", size="medium", @click="addLulumiExtension") {{ $t('about.extensionsPage.add') }}
+      el-button(type="success",
+                size="medium",
+                @click="addLulumiExtension") {{ $t('about.extensionsPage.add') }}
   el-row
     el-col(:span="24")
       ul(class="extensions-list")
-        li(v-for="extension in Object.keys(extensions)", :key="extension", class="extensions-list__item")
-          el-button(:plain="true", type="danger", size="mini", icon="el-icon-close", @click="removeLulumiExtension(extension)")
-          a(v-if="extensions[extension].webContentsId !== undefined", class="extensions-list__item-name extensions-list__item-link", @click.prevent="openDevTools(extensions[extension].webContentsId)")
-            img(:src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
+        li(v-for="extension in Object.keys(extensions)",
+           :key="extension",
+           class="extensions-list__item")
+          el-button(:plain="true",
+                    type="danger",
+                    size="mini",
+                    icon="el-icon-close",
+                    @click="removeLulumiExtension(extension)")
+          a(v-if="extensions[extension].webContentsId !== undefined",
+            class="extensions-list__item-name extensions-list__item-link",
+            @click.prevent="openDevTools(extensions[extension].webContentsId)")
+            img(:src="loadIcon(extension)",
+                style="width: 32px; margin-left: -30px; padding-right: 15px;")
             | {{ loadName(extension) }}
           span(v-else, class="extensions-list__item-name")
-            img(v-if="loadIcon(extension) !== undefined", :src="loadIcon(extension)", style="width: 32px; margin-left: -30px; padding-right: 15px;")
+            img(v-if="loadIcon(extension) !== undefined",
+                :src="loadIcon(extension)",
+                style="width: 32px; margin-left: -30px; padding-right: 15px;")
             span(v-else)
             | {{ loadName(extension) }}
           div
@@ -28,6 +41,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Button, Col, Row } from 'element-ui';
 
 interface Window extends Lulumi.API.GlobalObject {
+  // eslint-disable-next-line no-undef
   createFromPath?: typeof Electron.NativeImage.createFromPath;
   join?: (...paths: string[]) => string;
   location: {
@@ -63,7 +77,8 @@ export default class Extensions extends Vue {
     if (window.join && window.createFromPath && window.renderProcessPreferences[id].icons) {
       return window.createFromPath(window.join(
         window.renderProcessPreferences[id].srcDirectory,
-        Object.values(window.renderProcessPreferences[id].icons)[0])).toDataURL();
+        Object.values(window.renderProcessPreferences[id].icons)[0]
+      )).toDataURL();
     }
     return undefined;
   }
@@ -83,7 +98,8 @@ export default class Extensions extends Vue {
         } else {
           (this as any).$message.error(data.result);
         }
-      });
+      }
+    );
     ipcRenderer.send('add-lulumi-extension');
   }
   removeLulumiExtension(extensionId: string): void {
@@ -96,7 +112,8 @@ export default class Extensions extends Vue {
         } else {
           (this as any).$message.error(data.result);
         }
-      });
+      }
+    );
     ipcRenderer.send('remove-lulumi-extension', window.renderProcessPreferences[id].extensionId);
   }
 }

@@ -1,6 +1,8 @@
+/* eslint-disable no-bitwise */
+
 import { ipcRenderer } from 'electron';
 
-(String.prototype as any).hashCode = function () {
+(String.prototype as any).hashCode = function hashCode() {
   let hash = 0;
   let i;
   let chr;
@@ -8,7 +10,7 @@ import { ipcRenderer } from 'electron';
   if (this.length === 0) {
     return hash;
   }
-  for (i = 0; i < this.length; i = i + 1) {
+  for (i = 0; i < this.length; i += 1) {
     chr = this.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;
     hash |= 0; // convert to 32bit integer
@@ -35,8 +37,10 @@ class Event {
     ipcRenderer.on(
       `lulumi-${this.scope}-${this.event}-intercepted-${digest}`, (event, requestId, details) => {
         ipcRenderer.send(
-          `lulumi-${this.scope}-${this.event}-response-${digest}-${requestId}`, callback(details));
-      });
+          `lulumi-${this.scope}-${this.event}-response-${digest}-${requestId}`, callback(details)
+        );
+      }
+    );
     ipcRenderer.send(
       `lulumi-${this.scope}-add-listener-${this.event}`,
       this.name,
@@ -55,7 +59,8 @@ class Event {
 
   removeAllListeners() {
     this.listeners.forEach(l => ipcRenderer.removeAllListeners(
-      `lulumi-${this.scope}-${this.event}-intercepted-${l}`));
+      `lulumi-${this.scope}-${this.event}-intercepted-${l}`
+    ));
     ipcRenderer.send(
       `lulumi-${this.scope}-remove-listener-${this.event}`,
       this.name,

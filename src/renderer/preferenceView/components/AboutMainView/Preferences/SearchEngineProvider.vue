@@ -2,15 +2,30 @@
 div
   el-row
     h1 {{ $t('about.preferencesPage.searchEngineProviderPage.title') }}
-    el-table(ref="table", :data="tableData", highlight-current-row, :default-sort = "{prop: 'name', order: 'descending'}", @row-click="handleRowClick")
-      el-table-column(prop="current", :label="$t('about.preferencesPage.searchEngineProviderPage.current')", width="180", align="center")
-      el-table-column(prop="search", :label="$t('about.preferencesPage.searchEngineProviderPage.searchEngine')", align="center")
-      el-table-column(prop="name", :label="$t('about.preferencesPage.searchEngineProviderPage.name')", width="180", align="center")
+    el-table(ref="table",
+             :data="tableData",
+             highlight-current-row,
+             :default-sort = "{prop: 'name', order: 'descending'}",
+             @row-click="handleRowClick")
+      el-table-column(prop="current",
+                      :label="$t('about.preferencesPage.searchEngineProviderPage.current')",
+                      width="180",
+                      align="center")
+      el-table-column(prop="search",
+                      :label="$t('about.preferencesPage.searchEngineProviderPage.searchEngine')",
+                      align="center")
+      el-table-column(prop="name",
+                      :label="$t('about.preferencesPage.searchEngineProviderPage.name')",
+                      width="180",
+                      align="center")
   el-row(type="flex", justify="start")
     h3 {{ $t('about.preferencesPage.searchEngineProviderPage.options') }}
   el-row(type="flex", justify="start")
     el-col(:span="2")
-      el-switch(@change="toggleAutoFetch", v-model="autoFetch", active-color="#13ce66", inactive-color="#ff4949")
+      el-switch(@change="toggleAutoFetch",
+                v-model="autoFetch",
+                active-color="#13ce66",
+                inactive-color="#ff4949")
     el-col(style="text-align: start;")
       | {{ $t('about.preferencesPage.searchEngineProviderPage.autoFetch') }}
 </template>
@@ -40,7 +55,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
 })
 export default class SearchEngineProvider extends Vue {
   tableData: TableData[] = [];
-  autoFetch: boolean = false;
+  autoFetch = false;
 
   handleRowClick(row: TableData): void {
     if (row) {

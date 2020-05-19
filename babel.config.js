@@ -7,7 +7,7 @@ module.exports = function(api) {
 
   const envOpts = {
     targets: {
-      node: "10.13.0",
+      node: "10.18.0",
     }
   };
 
@@ -24,13 +24,9 @@ module.exports = function(api) {
 
   const config = {
     comments: false,
-    presets: [["@babel/preset-env", envOpts]],
-    plugins: []
+    plugins: [["@babel/plugin-proposal-decorators", { "legacy": true }], ["@babel/plugin-proposal-class-properties", { "loose" : true }]],
+    presets: [["@babel/preset-env", envOpts], ["@babel/preset-typescript", envOpts]]
   };
-
-  if (testEnv) {
-    config.plugins.push("istanbul");
-  }
 
   return config;
 };

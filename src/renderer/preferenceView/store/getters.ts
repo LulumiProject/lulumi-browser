@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+
 export const getters = {
   about(state) {
     return state.guest.about;

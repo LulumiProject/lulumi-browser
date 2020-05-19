@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-/* tslint:disable */
 import PlaybooksView from '../components/PlaybooksView.vue';
 
 Vue.use(Router);

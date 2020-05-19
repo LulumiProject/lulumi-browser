@@ -3,33 +3,49 @@
   .control-group
     a(@click="$parent.onClickHome", class="enabled")
       iview-icon(type="md-home", size="16")
-    a(id="browser-navbar__goBack", @click="$parent.onClickBack", @contextmenu="$parent.onClickBackContextMenu()", @mousedown="onGoBackMouseDown", @mouseup="onGoBackMouseUp", :class="tab.canGoBack ? 'enabled' : 'disabled'")
+    a(id="browser-navbar__goBack",
+      @click="$parent.onClickBack",
+      @contextmenu="$parent.onClickBackContextMenu()",
+      @mousedown="onGoBackMouseDown",
+      @mouseup="onGoBackMouseUp",
+      :class="tab.canGoBack ? 'enabled' : 'disabled'")
       iview-icon(type="md-arrow-round-back", size="16")
-    a(id="browser-navbar__goForward", @click="$parent.onClickForward", @contextmenu="$parent.onClickForwardContextMenu()", @mousedown="onGoForwardMouseDown", @mouseup="onGoForwardMouseUp", :class="tab.canGoForward ? 'enabled' : 'disabled'")
+    a(id="browser-navbar__goForward",
+      @click="$parent.onClickForward",
+      @contextmenu="$parent.onClickForwardContextMenu()",
+      @mousedown="onGoForwardMouseDown",
+      @mouseup="onGoForwardMouseUp",
+      :class="tab.canGoForward ? 'enabled' : 'disabled'")
       iview-icon(type="md-arrow-round-forward", size="16")
-    a(v-if="tab.isLoading", id="browser-navbar__stop", @click="$parent.onClickStop", class="enabled")
+    a(v-if="tab.isLoading",
+      id="browser-navbar__stop",
+      @click="$parent.onClickStop",
+      class="enabled")
       iview-icon(type="md-close", size="16")
-    a(v-else, @click="$parent.onClickRefresh", id="browser-navbar__refresh", :class="tab.canRefresh ? 'enabled' : 'disabled'")
+    a(v-else,
+      @click="$parent.onClickRefresh",
+      id="browser-navbar__refresh",
+      :class="tab.canRefresh ? 'enabled' : 'disabled'")
       iview-icon(type="md-refresh", size="16")
   .input-group
     good-custom-autocomplete#url-input.hidden(ref="input",
-                                       @compositionstart.native="handleComposition",
-                                       @compositionupdate.native="handleComposition",
-                                       @compositionend.native="handleComposition",
-                                       @contextmenu.native="onNavContextMenu",
-                                       @keyup.shift.up.native="selectPortion",
-                                       @keyup.shift.down.native="selectPortion",
-                                       @focus="onFocus",
-                                       @blur="onBlur",
-                                       @select="onSelect",
-                                       @input="onChange",
-                                       :trigger-on-focus="false",
-                                       :select-when-unmatched="true",
-                                       :placeholder="$t('navbar.placeholder')",
-                                       :fetch-suggestions="querySearch",
-                                       :value="showUrl",
-                                       popper-class="my-autocomplete",
-                                       :debounce="0")
+                                              @compositionstart.native="handleComposition",
+                                              @compositionupdate.native="handleComposition",
+                                              @compositionend.native="handleComposition",
+                                              @contextmenu.native="onNavContextMenu",
+                                              @keyup.shift.up.native="selectPortion",
+                                              @keyup.shift.down.native="selectPortion",
+                                              @focus="onFocus",
+                                              @blur="onBlur",
+                                              @select="onSelect",
+                                              @input="onChange",
+                                              :trigger-on-focus="false",
+                                              :select-when-unmatched="true",
+                                              :placeholder="$t('navbar.placeholder')",
+                                              :fetch-suggestions="querySearch",
+                                              :value="showUrl",
+                                              popper-class="my-autocomplete",
+                                              :debounce="0")
       el-button(slot="prepend", @click.native="showCertificate()")
         div.secure(v-if="secure")
           awesome-icon(name="lock")
@@ -48,7 +64,7 @@
                           @mouseenter.self="onMouseEnter",
                           @mouseleave.self="onMouseLeave")
       template(slot-scope="props")
-        component(:is="'suggestion-item'", :item="props.item")
+        component(:is="'SuggestionItem'", :item="props.item")
   .extensions-group(v-sortable="")
     div.block(v-for="extension in extensions",
               :key="extension.extensionId")
@@ -59,11 +75,11 @@
                  :disabled="showPopupOrNot(extension)",
                  :popper-options={ gpuAcceleration: true })
         el-badge.badge(:ref="`badge-${extension.extensionId}`",
-                        :value="showBrowserActionBadgeText(extension.extensionId)",
-                        :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)",
-                        @click.native="sendIPC($event, extension)",
-                        @contextmenu.native="onContextmenu(extension)",
-                        slot="reference")
+                       :value="showBrowserActionBadgeText(extension.extensionId)",
+                       :background="showBrowserActionBadgeBackgroundColor(extension.extensionId)",
+                       @click.native="sendIPC($event, extension)",
+                       @contextmenu.native="onContextmenu(extension)",
+                       slot="reference")
           img.extension(v-if="(extension !== undefined) && (loadIcon(extension) !== undefined)",
                         :src="loadIcon(extension)",
                         :class="showOrNot(extension)",
@@ -93,28 +109,37 @@ import IViewIcon from 'iview/src/components/icon';
 
 import Event from '../../../api/event';
 
-import '../../css/el-autocomplete';
-import '../../css/el-badge';
-import '../../css/el-input';
 import urlUtil from '../../../lib/url-util';
 import config from '../../constants';
 
 import BrowserMainView from '../BrowserMainView.vue';
 
-Vue.component('suggestion-item', {
+/* eslint-disable import/no-unresolved */
+import '../../css/el-autocomplete';
+import '../../css/el-badge';
+import '../../css/el-input';
+/* eslint-enable import/no-unresolved */
+
+Vue.component('SuggestionItem', {
   functional: true,
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+  },
   render(h, ctx) {
     const suggestion: Lulumi.Renderer.SuggestionObject = ctx.props.item;
-    const item: Lulumi.Renderer.SuggestionItem = suggestion.item;
+    const { item } = suggestion;
     if (item.title) {
       if (suggestion.matches) {
         let renderElementsOfTitle: any[] = [];
         let renderElementsOfValue: any[] = [];
         suggestion.matches.forEach((match) => {
           const renderElements: any[] = [];
-          const key: string = match.key;
+          const { key } = match;
           const tmpStr: string = item[key];
-          let prefixIndex: number = 0;
+          let prefixIndex = 0;
           match.indices.forEach((indexPair, index) => {
             const prefix: string = tmpStr.substring(prefixIndex, indexPair[0]);
             const target: string = tmpStr.substring(indexPair[0], indexPair[1] + 1);
@@ -131,7 +156,7 @@ Vue.component('suggestion-item', {
           }
           if (key === 'title') {
             renderElementsOfTitle = renderElements;
-          } else  if (key === 'value') {
+          } else if (key === 'value') {
             renderElementsOfValue = renderElements;
           }
         });
@@ -140,8 +165,7 @@ Vue.component('suggestion-item', {
         } else if (renderElementsOfValue.length === 0) {
           renderElementsOfValue.push(item.value);
         }
-        if (item.icon.startsWith('http')
-          || item.icon.startsWith('data:')) {
+        if (item.icon.startsWith('http') || item.icon.startsWith('data:')) {
           return h('div', { attrs: { class: 'url' } }, [
             h('object', {
               attrs: {
@@ -150,14 +174,14 @@ Vue.component('suggestion-item', {
                 style: 'padding-right: 10px; height: 14px; width: 14px;',
               },
             },
-              [
-                h('i', {
-                  attrs: {
-                    class:
-                      `el-icon-${ctx.parent.$store.getters.tabConfig.lulumiDefault.tabFavicon}`,
-                  },
-                }),
-              ]),
+            [
+              h('i', {
+                attrs: {
+                  class:
+                    `el-icon-${ctx.parent.$store.getters.tabConfig.lulumiDefault.tabFavicon}`,
+                },
+              }),
+            ]),
             h('span', renderElementsOfValue),
             h('span', { attrs: { class: 'name' } }, [
               ' - ',
@@ -187,12 +211,6 @@ Vue.component('suggestion-item', {
       h('i', { attrs: { class: `el-icon-${item.icon}`, style: 'padding-right: 10px;' } }),
       h('span', item.value),
     ]);
-  },
-  props: {
-    item: {
-      type: Object,
-      required: true,
-    },
   },
 });
 
@@ -225,10 +243,10 @@ export default class Navbar extends Vue {
   handler: any;
   clickHandler: any;
   blurHandler: any;
-  secure: boolean = false;
-  typing: boolean = false;
-  focused: boolean = false;
-  value: string = '';
+  secure = false;
+  typing = false;
+  focused = false;
+  value = '';
   search: any;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   extensions: Lulumi.API.ManifestObject[] = [];
@@ -295,7 +313,7 @@ export default class Navbar extends Vue {
   }
   get suggestionItemsByHistory(): any {
     const suggestionItems: Lulumi.Renderer.SuggestionItem[] = [];
-    const regex = new RegExp('(^\w+:|^)\/\/');
+    const regex = new RegExp(/(^\w+:|^)\/\//);
     this.$store.getters.history.forEach((history) => {
       const part: string = history.url.replace(regex, '');
       suggestionItems.push({
@@ -350,7 +368,7 @@ export default class Navbar extends Vue {
     this.value = newTab.url;
   }
   @Watch('url')
-  onUrl(newUrl: string): void {
+  onUrl(): void {
     if (!this.typing) {
       if (document) {
         (document.querySelector('.my-autocomplete') as HTMLDivElement)
@@ -380,33 +398,35 @@ export default class Navbar extends Vue {
             (this.$refs.input as any).suggestions.length = 0;
           }
         },
-        200);
+        200
+      );
     }
   }
 
   chunk(r: any[], j: number): any[][] {
-    return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
+    // eslint-disable-next-line no-confusing-arrow
+    return r.reduce((a, b, i, g) => !(i % j) ? a.concat([g.slice(i, i + j)]) : a, []);
   }
   escapePattern(pattern: string): string {
     return pattern.replace(/[\\^$+?.()|[\]{}]/g, '\\$&');
   }
-  updateSecure(url: string): void {
-    if (url === '') {
+  updateSecure(urlString: string): void {
+    if (urlString === '') {
       this.secure = true;
       return;
     }
-    const scheme = urlUtil.getScheme(url);
+    const scheme = urlUtil.getScheme(urlString);
     if (scheme === 'lulumi://' || scheme === 'lulumi-extension://' || scheme === 'about:') {
       this.secure = true;
       return;
     }
     if (scheme === 'https://') {
-      const hostname = urlUtil.getHostname(url);
+      const hostname = urlUtil.getHostname(urlString);
       if (hostname) {
-        const certificateObjectKey = Object.keys(this.certificates).find((regex) => {
-          return hostname.match(`^${regex.split('*')
-            .map(this.escapePattern).join('.*')}$`) !== null;
-        });
+        const certificateObjectKey =
+          Object.keys(this.certificates).find(regex => (
+            hostname.match(`^${regex.split('*').map(this.escapePattern).join('.*')}$`) !== null
+          ));
         if (certificateObjectKey !== undefined) {
           const certificateObject = this.certificates[certificateObjectKey];
           if (certificateObject) {
@@ -424,22 +444,23 @@ export default class Navbar extends Vue {
     const ipc = this.$electron.ipcRenderer;
     const hostname = urlUtil.getHostname(this.value);
     if (hostname) {
-      const certificateObjectKey = Object.keys(this.certificates).find((regex) => {
-        return hostname.match(`^${regex.split('*').map(this.escapePattern).join('.*')}$`) !== null;
-      });
+      const certificateObjectKey = Object.keys(this.certificates).find(regex => (
+        hostname.match(`^${regex.split('*').map(this.escapePattern).join('.*')}$`) !== null
+      ));
       if (certificateObjectKey !== undefined) {
         const certificateObject = this.certificates[certificateObjectKey];
         if (certificateObject) {
           ipc.send(
             'show-certificate',
             certificateObject.certificate,
-            `${hostname}\n${certificateObject.verificationResult}`);
+            `${hostname}\n${certificateObject.verificationResult}`
+          );
         }
       }
     }
   }
   selectPortion(event): void {
-    const code: string = event.code;
+    const { code } = event.code;
     const el = event.target;
     if (code === 'ArrowUp') {
       el.selectionEnd = el.selectionStart;
@@ -461,12 +482,12 @@ export default class Navbar extends Vue {
     return newSuggestions;
   }
   onGoBackMouseDown(): void {
-    this.handler
-      = setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
+    this.handler =
+      setTimeout(() => (this.$parent as BrowserMainView).onClickBackContextMenu(), 300);
   }
   onGoForwardMouseDown(): void {
-    this.handler
-      = setTimeout(() => (this.$parent as BrowserMainView).onClickForwardContextMenu(), 300);
+    this.handler =
+      setTimeout(() => (this.$parent as BrowserMainView).onClickForwardContextMenu(), 300);
   }
   onGoBackMouseUp(): void {
     if (this.handler) {
@@ -483,7 +504,9 @@ export default class Navbar extends Vue {
 
     if (securityIndicator) {
       securityIndicator.setAttribute(
-        'style', 'border: 2px ridge #ccc; margin: 4px 0 2px -4px; line-height: 20px;');
+        'style',
+        'border: 2px ridge #ccc; margin: 4px 0 2px -4px; line-height: 20px;'
+      );
     }
   }
   onMouseLeave(event): void {
@@ -491,7 +514,9 @@ export default class Navbar extends Vue {
 
     if (securityIndicator) {
       securityIndicator.setAttribute(
-        'style', 'border: 1px solid #bbb; border-left: 0; margin: 4px 0 2px; line-height: 22px;');
+        'style',
+        'border: 1px solid #bbb; border-left: 0; margin: 4px 0 2px; line-height: 22px;'
+      );
     }
   }
   handleComposition(event): void {
@@ -510,7 +535,9 @@ export default class Navbar extends Vue {
 
     if (input) {
       input.setAttribute(
-        'style', 'border: 2px ridge #0089ff; margin: 4px 0 2px -2px; line-height: 22px;');
+        'style',
+        'border: 2px ridge #0089ff; margin: 4px 0 2px -2px; line-height: 22px;'
+      );
     }
 
     this.focused = true;
@@ -520,7 +547,9 @@ export default class Navbar extends Vue {
 
     if (input) {
       input.setAttribute(
-        'style', 'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;');
+        'style',
+        'border: 1px solid #bbb; margin: 4px 0 2px; line-height: 22px;'
+      );
     }
 
     this.typing = false;
@@ -538,9 +567,9 @@ export default class Navbar extends Vue {
     }
   }
   onDrop(event): void {
-    const url = event.dataTransfer.getData('url');
-    if (url) {
-      this.value = url;
+    const urlString: string = event.dataTransfer.getData('url');
+    if (urlString) {
+      this.value = urlString;
       this.onNewElementParentClick();
     }
   }
@@ -548,16 +577,16 @@ export default class Navbar extends Vue {
     if (document) {
       const si = document.getElementById('security-indicator');
       if (si) {
-        if (event.fromElement
-          && event.toElement
-          // tslint:disable-next-line:max-line-length
-          && event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend'
-          && event.toElement.className === 'el-input__inner') {
+        if (event.fromElement &&
+          event.toElement &&
+          // eslint-disable-next-line max-len
+          event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
+          event.toElement.className === 'el-input__inner') {
           si.querySelector('.security-hint')!.classList.add('selection');
-        } else if (event.fromElement
-          && event.toElement
-          && event.fromElement.className === 'el-input-group__append'
-          && event.toElement.className === 'el-input__inner') {
+        } else if (event.fromElement &&
+          event.toElement &&
+          event.fromElement.className === 'el-input-group__append' &&
+          event.toElement.className === 'el-input__inner') {
           si.querySelector('.security-hint')!.classList.add('selection');
         }
       }
@@ -567,16 +596,16 @@ export default class Navbar extends Vue {
     if (document) {
       const si = document.getElementById('security-indicator');
       if (si) {
-        if (event.fromElement
-          && event.toElement
-          && event.fromElement.className === 'el-input-group__append'
-          && event.toElement.className === 'el-input__inner') {
+        if (event.fromElement &&
+          event.toElement &&
+          event.fromElement.className === 'el-input-group__append' &&
+          event.toElement.className === 'el-input__inner') {
           si.querySelector('.security-hint')!.classList.remove('selection');
-        } else if (event.fromElement
-          && event.toElement
-          // tslint:disable-next-line:max-line-length
-          && event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend'
-          && event.toElement.className === 'el-input__inner') {
+        } else if (event.fromElement &&
+          event.toElement &&
+          // eslint-disable-next-line max-len
+          event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
+          event.toElement.className === 'el-input__inner') {
           si.querySelector('.security-hint')!.classList.remove('selection');
         }
       }
@@ -587,9 +616,11 @@ export default class Navbar extends Vue {
     this.focused = false;
     if (event.item) {
       if (event.item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
-        const item: Lulumi.Renderer.SuggestionItem = event.item;
+        const { item } = event;
         this.value = this.currentSearchEngine.search.replace(
-          '{queryString}', encodeURIComponent(item.url));
+          '{queryString}',
+          encodeURIComponent(item.url)
+        );
       } else {
         this.value = event.item.url;
       }
@@ -777,8 +808,8 @@ export default class Navbar extends Vue {
     }
 
     // calling out fuse results using web workers
-    const entries: Lulumi.Renderer.SuggestionObject[][]
-      = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
+    const entries: Lulumi.Renderer.SuggestionObject[][] =
+      await Promise.all(this.chunk(this.suggestionItemsByHistory, 10)
         .map(suggestionItem => this.search(suggestionItem, queryString.toLowerCase()))) as any;
     if (entries.length !== 0) {
       entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestions.push(entry));
@@ -804,7 +835,7 @@ export default class Navbar extends Vue {
             });
           });
         } else {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error(result.error);
         }
         cb(this.unique(suggestions));
@@ -813,9 +844,10 @@ export default class Navbar extends Vue {
         'fetch-search-suggestions',
         currentSearchEngine,
         this.currentSearchEngine.autocomplete
-        .replace('{queryString}', this.value)
-        .replace('{language}', this.$store.getters.lang),
-        timestamp);
+          .replace('{queryString}', this.value)
+          .replace('{language}', this.$store.getters.lang),
+        timestamp
+      );
     } else {
       cb(this.unique(suggestions));
     }
@@ -824,7 +856,7 @@ export default class Navbar extends Vue {
     return suggestion => (suggestion.item.url.indexOf(queryString.toLowerCase()) === 0);
   }
   extensionsMetadata(extensionId: string): Lulumi.Store.ExtensionMetadata | null {
-    const extensionsMetadata = this.tab.extensionsMetadata;
+    const { extensionsMetadata } = this.tab;
     if (Object.keys(extensionsMetadata).length && extensionsMetadata[extensionId]) {
       return extensionsMetadata[extensionId];
     }
@@ -990,18 +1022,18 @@ export default class Navbar extends Vue {
     return '';
   }
   sendIPC(event: Electron.Event, extension: any): void {
-    const currentWindow: Electron.BrowserWindow | null
-      = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+    const currentWindow: Electron.BrowserWindow | null =
+      this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       const isPageAction = extension.page_action;
       const isBrowserAction = extension.browser_action;
       if (isPageAction || isBrowserAction) {
         const webview: Electron.WebviewTag = this.$refs[`webview-${extension.extensionId}`][0];
-        const contextMenuEvent = (event: any) => {
+        const contextMenuEvent = (event2) => {
           const { Menu, MenuItem } = this.$electron.remote;
           const menu = new Menu();
 
-          const params: Electron.ContextMenuParams = (event as any).params;
+          const { params } = event2;
 
           menu.append(new MenuItem({
             label: this.$t('navbar.extensions.contextMenu.inspectElement') as string,
@@ -1012,9 +1044,9 @@ export default class Navbar extends Vue {
 
           menu.popup({ window: currentWindow });
         };
-        const ipcMessageEvent = (event: Electron.IpcMessageEvent) => {
-          if (event.channel === 'resize') {
-            const size = event.args[0];
+        const ipcMessageEvent = (event3: Electron.IpcMessageEvent) => {
+          if (event3.channel === 'resize') {
+            const size = event3.args[0];
             webview.style.height = `${size.height}px`;
             webview.style.width = `${size.width}px`;
             webview.style.overflow = 'hidden';
@@ -1083,8 +1115,8 @@ export default class Navbar extends Vue {
     ipc.send('remove-lulumi-extension', extensionId);
   }
   onContextmenu(extension: any): void {
-    const currentWindow: Electron.BrowserWindow | null
-      = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+    const currentWindow: Electron.BrowserWindow | null =
+      this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       const { Menu, MenuItem } = this.$electron.remote;
       const menu = new Menu();
@@ -1137,13 +1169,15 @@ export default class Navbar extends Vue {
       (event, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
-      });
+      }
+    );
     ipc.on(
       'lulumi-commands-execute-browser-action',
       (event, extensionId: string) => {
         const extension = this.$refs[`popover-${extensionId}`][0].referenceElm;
         extension.click();
-      });
+      }
+    );
 
     ipc.on('add-lulumi-extension-result', (event, data: any): void => {
       if (data.result === 'OK') {
@@ -1155,14 +1189,14 @@ export default class Navbar extends Vue {
       if (data.result === 'OK') {
         (this.$parent as BrowserMainView).extensionService.update();
       } else {
-        alert(data.result);
+        // TODO: fix this
       }
     });
     ipc.on('remove-lulumi-extension', (event, extensionId) => {
       ipc.send('remove-lulumi-extension', extensionId);
     });
     ipc.on('omnibox-ready', (): void => {
-      alert(1);
+      // TODO: fix this
     });
   }
 }

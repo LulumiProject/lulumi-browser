@@ -3,6 +3,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es6",
+    "noEmit": true,
     "noImplicitAny": false,
     "removeComments": false,
     "experimentalDecorators": true,
@@ -24,10 +25,6 @@
       "./typings"
     ]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.vue"
-  ],
   "exclude": [
     "../node_modules"
   ]

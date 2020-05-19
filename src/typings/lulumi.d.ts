@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/member-delimiter-style */
+
 declare namespace Lulumi {
   import VueI18n from 'vue-i18n';
 

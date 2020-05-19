@@ -36,8 +36,8 @@ export default class Language extends Vue {
       label: '正體中文',
     },
   ];
-  lang: string = '';
-  currentLang: string = '';
+  lang = '';
+  currentLang = '';
 
   setLang(): void {
     if (this.currentLang !== this.lang) {

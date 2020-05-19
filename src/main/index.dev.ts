@@ -5,9 +5,9 @@
  *  environment.
  */
 
-const { app } = require('electron');
+/* eslint-disable no-console */
 
-/* tslint:disable:no-console */
+const { app } = require('electron');
 
 if (typeof process.env.NODE_ENV === 'string') {
   // we don't have to reassign the value to `process.env.NODE_ENV`
@@ -26,7 +26,7 @@ app.on('browser-window-created', (event, window) => {
     });
   });
 
-  /// Workaround for https://github.com/electron/electron/issues/12438
+  // Workaround for https://github.com/electron/electron/issues/12438
   window.webContents.once('dom-ready', () => {
     window.webContents.openDevTools({ mode: 'bottom' });
   });
@@ -37,7 +37,7 @@ require('electron').app.whenReady().then(() => {
   require('devtron').install();
   const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
   installExtension(VUEJS_DEVTOOLS)
-    .then(() => { })
+    .then()
     .catch((err) => {
       console.error(`(lulumi-browser) Unable to install \`vue-devtools\`: \n${err}`);
     });

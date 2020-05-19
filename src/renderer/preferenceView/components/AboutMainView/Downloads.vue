@@ -4,21 +4,51 @@ div
     el-col(:span="12")
       h1 {{ $t('about.downloadsPage.title') }}
     el-col(:span="6", :offset="3")
-      el-button(type="danger", size="medium" , @click="setDownloads(-1)") {{ $t('about.downloadsPage.clear') }}
+      el-button(type="danger",
+                size="medium" ,
+                @click="setDownloads(-1)") {{ $t('about.downloadsPage.clear') }}
   el-row
     el-col(:span="24")
       ul(class="download-list")
         li(v-for="(file, index) in files", :key="index", class="download-list__item")
-          span(v-if="file.state !== 'progressing'", class="el-icon-close", @click="setDownloads(index)")
-          el-progress(:status="checkStateForProgress(file.state)", :text-inside="true", :percentage="percentage(file)", :stroke-width="18", class="download-list__item-progress")
+          span(v-if="file.state !== 'progressing'",
+               class="el-icon-close",
+               @click="setDownloads(index)")
+          el-progress(:status="checkStateForProgress(file.state)",
+                      :text-inside="true",
+                      :percentage="percentage(file)",
+                      :stroke-width="18",
+                      class="download-list__item-progress")
           a(class="download-list__item-name download-list__item-link", :href="`${file.url}`")
             i(class="el-icon-document")
               span(style="font-family: initial;") {{ file.name }}
           el-button-group
-            el-button(:disabled="file.state !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="small", icon="el-icon-caret-right", @click="resumeDownload(file.startTime)")
-            el-button(:disabled="file.state !== 'progressing'", v-else, :plain="true", type="warning", size="small", icon="el-icon-minus", @click="pauseDownload(file.startTime)")
-            el-button(:disabled="file.state !== 'progressing'", :plain="true", type="danger", size="small", icon="el-icon-circle-close", @click="cancelDownload(file.startTime)")
-            el-button(:disabled="file.state === 'cancelled'", :plain="true", type="info", size="small", icon="el-icon-document", @click="showItemInFolder(file.savePath)")
+            el-button(:disabled="file.state !== 'progressing'",
+                      v-if="file.isPaused && file.canResume",
+                      :plain="true",
+                      type="warning",
+                      size="small",
+                      icon="el-icon-caret-right",
+                      @click="resumeDownload(file.startTime)")
+            el-button(:disabled="file.state !== 'progressing'",
+                      v-else,
+                      :plain="true",
+                      type="warning",
+                      size="small",
+                      icon="el-icon-minus",
+                      @click="pauseDownload(file.startTime)")
+            el-button(:disabled="file.state !== 'progressing'",
+                      :plain="true",
+                      type="danger",
+                      size="small",
+                      icon="el-icon-circle-close",
+                      @click="cancelDownload(file.startTime)")
+            el-button(:disabled="file.state === 'cancelled'",
+                      :plain="true",
+                      type="info",
+                      size="small",
+                      icon="el-icon-document",
+                      @click="showItemInFolder(file.savePath)")
 </template>
 
 <script lang="ts">
@@ -58,7 +88,8 @@ export default class Downloads extends Vue {
       () => {
         ipcRenderer.send('guest-want-data', 'downloads');
       },
-      100);
+      100
+    );
   }
   clear(): void {
     clearInterval(this.handler);

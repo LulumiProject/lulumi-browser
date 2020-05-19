@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+
 class Event {
   listeners: Function[];
 
@@ -19,7 +21,7 @@ class Event {
         listener(...args);
       } catch (err) {
         // TODO: we got here becase we didn't clear all listeners related to certain extension
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         // console.error(err);
         this.removeListener(listener);
       }

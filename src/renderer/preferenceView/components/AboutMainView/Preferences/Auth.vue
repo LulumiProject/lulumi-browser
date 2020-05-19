@@ -32,8 +32,8 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class TabConfig extends Vue {
-  username: string = '';
-  password: string = '';
+  username = '';
+  password = '';
 
   setAuth(): void {
     ipcRenderer.send('set-auth', {
@@ -47,7 +47,8 @@ export default class TabConfig extends Vue {
       'guest-here-your-data', (event: Electron.Event, auth: any) => {
         this.username = auth.username;
         this.password = auth.password;
-      });
+      }
+    );
     ipcRenderer.send('guest-want-data', 'auth');
   }
   beforeDestroy() {

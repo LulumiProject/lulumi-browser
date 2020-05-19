@@ -21,9 +21,9 @@ new Vue({
   i18n,
   router,
   store,
+  name: 'Root',
   components: { App },
   render(h) {
     return h('App');
   },
-  name: 'root',
 }).$mount('#app');

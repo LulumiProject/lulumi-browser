@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+
 import Vue from 'vue';
 import ElementUI from 'element-ui';
 
@@ -5,8 +7,6 @@ import App from 'renderer/App';
 
 import router from 'renderer/router';
 import store from 'renderer/store';
-
-/* eslint-disable no-unused-expressions */
 
 Vue.prototype.$t = () => {};
 Vue.use(ElementUI);

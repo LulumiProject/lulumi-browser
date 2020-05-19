@@ -1,19 +1,20 @@
+/* eslint-disable max-len */
+
 import { ipcRenderer, remote, webFrame } from 'electron';
 import * as urllib from 'url';
 
 import requirePreload from './require-preload';
 import injectTo from '../renderer/api/inject-to';
 
-/* tslint:disable:align */
-/* tslint:disable:max-line-length */
-/* tslint:disable:function-name */
-
+declare const location;
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.includes('--guest-instance-id='));
 if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(
-      process.argv[guestInstanceIndex].indexOf('=') + 1), 10);
+      process.argv[guestInstanceIndex].indexOf('=') + 1
+    ), 10
+  );
 }
 
 // Check whether pattern matches.
@@ -47,7 +48,8 @@ const runContentScript = (name, extensionId, isolatedWorldId, url, code) => {
     webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
       code: 'window',
     }], false).then((window) => {
-      window.chrome = window.lulumi = context.lulumi;
+      window.lulumi = context.lulumi;
+      window.chrome = window.lulumi;
     });
   }
   webFrame.executeJavaScriptInIsolatedWorld(isolatedWorldId, [{
@@ -132,14 +134,14 @@ process.once('loaded', () => {
         window.ipcRenderer = ipcRenderer;
         window.require = requirePreload.require;
         window.module = moduleTmp;
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
       }).catch(err => console.error(err));
     }
-    if (process.env.NODE_ENV === 'test'
-      && process.env.TEST_ENV === 'e2e') {
+    if (process.env.NODE_ENV === 'test' &&
+      process.env.TEST_ENV === 'e2e') {
       webFrame.executeJavaScript('window').then((window) => {
         window.require = requirePreload.electronRequire;
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
       }).catch(err => console.error(err));
     }
   }

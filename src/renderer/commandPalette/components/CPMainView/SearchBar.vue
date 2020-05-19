@@ -14,7 +14,7 @@
         enable-background="new 0 0 283.753 284.51",
         xml:space="preserve",
         style="fill: #635d5c;")
-      path(d="M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z")
+      path(:d="path")
   input(type="text",
         class="search-input",
         :placeholder="$t('hits.navbar.search')",
@@ -35,11 +35,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { debounce } from 'lodash';
+import * as Comlink from 'comlink';
 
 import Hits from './Hits.vue';
-
-import * as Comlink from 'comlink';
-import { debounce } from 'lodash';
 
 import urlUtil from '../../../lib/url-util';
 import config from '../../../mainBrowserWindow/constants';
@@ -50,7 +49,7 @@ import config from '../../../mainBrowserWindow/constants';
   directives: {
     focus: {
       // When the bound element is inserted into the DOM...
-      update (el, { value }) {
+      update(el, { value }) {
         if (value) {
           // Focus the element
           el.focus();
@@ -60,12 +59,12 @@ import config from '../../../mainBrowserWindow/constants';
   },
 })
 export default class SearchBar extends Vue {
-  value: string = '';
-  spanValue: string = '';
-  icon: string = '';
-  focus: boolean = false;
-  loading: boolean = false;
-  isComposing: boolean = false;
+  value = '';
+  spanValue = '';
+  icon = '';
+  focus = false;
+  loading = false;
+  isComposing = false;
   recommender: any;
   suggestionItems: Lulumi.CommandPalette.SuggestionItem[] = config.recommendTopSite;
   debouncedQuerySearch: Function;
@@ -82,7 +81,7 @@ export default class SearchBar extends Vue {
   }
   get suggestionItemsByHistory(): any {
     const suggestionItems: Lulumi.CommandPalette.SuggestionItem[] = [];
-    const regex = new RegExp('(^\w+:|^)\/\/');
+    const regex = new RegExp(/(^\w+:|^)\/\//);
     this.$store.getters.history.forEach((history) => {
       const part: string = history.url.replace(regex, '');
       suggestionItems.push({
@@ -93,6 +92,10 @@ export default class SearchBar extends Vue {
       });
     });
     return suggestionItems;
+  }
+  get path(): string {
+    // eslint-disable-next-line max-len
+    return 'M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z';
   }
 
   sendFocus(event): void {
@@ -106,7 +109,8 @@ export default class SearchBar extends Vue {
     }
   }
   chunk(r: any[], j: number): any[][] {
-    return r.reduce((a,b,i,g) => !(i % j) ? a.concat([g.slice(i,i+j)]) : a, []);
+    // eslint-disable-next-line no-confusing-arrow
+    return r.reduce((a, b, i, g) => !(i % j) ? a.concat([g.slice(i, i + j)]) : a, []);
   }
   unique(suggestions: Lulumi.CommandPalette.Suggestion[]): Lulumi.CommandPalette.Suggestion[] {
     let suggestionObjects: Lulumi.CommandPalette.SuggestionObject[] = [];
@@ -178,10 +182,12 @@ export default class SearchBar extends Vue {
     }
 
     // calling out fuse results using web workers
-    const entries: Lulumi.CommandPalette.SuggestionObject[][]
-      = await Promise.all(this.chunk(this.suggestionItemsByHistory, 10).map(
+    const entries: Lulumi.CommandPalette.SuggestionObject[][] =
+      await Promise.all(this.chunk(this.suggestionItemsByHistory, 10).map(
         suggestionItem => this.recommender.browsingHistories(
-          suggestionItem, queryString.toLowerCase()))) as any;
+          suggestionItem, queryString.toLowerCase()
+        )
+      )) as any;
     if (entries.length !== 0) {
       entries.reduce((a, b) => a.concat(b)).forEach(entry => suggestionObjects.push(entry));
     }
@@ -204,7 +210,7 @@ export default class SearchBar extends Vue {
       this.hits.suggestions = this.unique(suggestions);
       this.hits.highlightedIndex = '0-0';
       this.hits!.isOpen = true;
-      const item = this.hits.suggestions[0].results[0].item;
+      const { item } = this.hits.suggestions[0].results[0];
       if (item.title !== undefined) {
         this.spanValue = item.title;
         this.icon = this.hits.suggestions[0].icon;
@@ -235,12 +241,12 @@ export default class SearchBar extends Vue {
             if (this.hits) {
               suggestions[suggestions
                 .findIndex(suggestion => suggestion.header === 'Online Search')]
-                  .results = suggestionObjects;
+                .results = suggestionObjects;
               this.hits.suggestions = this.unique(suggestions);
             }
           });
         } else {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error(result.error);
         }
       });
@@ -248,9 +254,10 @@ export default class SearchBar extends Vue {
         'fetch-search-suggestions',
         currentSearchEngine,
         this.currentSearchEngine.autocomplete
-        .replace('{queryString}', this.value)
-        .replace('{language}', this.$store.getters.lang),
-        timestamp);
+          .replace('{queryString}', this.value)
+          .replace('{language}', this.$store.getters.lang),
+        timestamp
+      );
     }
 
     const items = await this.recommender.onlineSearch(queryString);
@@ -268,7 +275,7 @@ export default class SearchBar extends Vue {
     if (this.hits) {
       suggestions[suggestions
         .findIndex(suggestion => suggestion.header === 'Online Search')]
-          .results = suggestionObjects;
+        .results = suggestionObjects;
       this.hits.suggestions = this.unique(suggestions);
     }
   }
@@ -314,13 +321,15 @@ export default class SearchBar extends Vue {
       const suggestion = this.hits!.$el.querySelector('.hit-list-container');
       if (suggestion !== null) {
         const header = suggestion.querySelector(
-          'li.results-category > div.highlighted-header') as Element;
+          'li.results-category > div.highlighted-header'
+        ) as Element;
         const results = suggestion.querySelectorAll(
-          `li.results-category:nth-child(${newHIndex + 1}) > ul > li.results-items`);
+          `li.results-category:nth-child(${newHIndex + 1}) > ul > li.results-items`
+        );
 
         const highlightItem = results[newIndex];
-        const scrollTop = suggestion.scrollTop;
-        const offsetTop = (highlightItem as HTMLDataListElement).offsetTop;
+        const { scrollTop } = suggestion;
+        const { offsetTop } = (highlightItem as HTMLDataListElement);
 
         if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
           if (newHIndex !== oldHIndex) {
@@ -338,7 +347,7 @@ export default class SearchBar extends Vue {
 
       this.hits!.highlightedIndex = `${newHIndex}-${newIndex}`;
       this.icon = this.hits!.suggestions[newHIndex].icon;
-      const item = this.hits!.suggestions[newHIndex].results[newIndex].item;
+      const { item } = this.hits!.suggestions[newHIndex].results[newIndex];
       if (item.title !== undefined) {
         this.spanValue = item.title;
       } else {
@@ -353,7 +362,7 @@ export default class SearchBar extends Vue {
       const [hIndex, index] = this.hits.highlightedIndex.split('-', 2);
       if (parseInt(hIndex, 10) < this.hits.suggestions.length) {
         event.preventDefault();
-        const item = this.hits.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)].item;
+        const { item } = this.hits.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)];
         if (item.title !== undefined) {
           this.spanValue = item.title;
         }

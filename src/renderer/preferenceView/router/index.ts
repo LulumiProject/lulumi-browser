@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-/* tslint:disable */
 import AboutMainView from '../components/AboutMainView.vue';
 import Lulumi from '../components/AboutMainView/Lulumi.vue';
 import Preferences from '../components/AboutMainView/Preferences.vue';

@@ -11,8 +11,13 @@
             | {{ result.item.title }}
   .hit-detail-container
     .hit-detail
-      object(v-if="!loading", :data="currentHitProp('icon')", type='image/png', height='64', width='64')
-        i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`", style='font-size: 64px;')
+      object(v-if="!loading",
+             :data="currentHitProp('icon')",
+             type='image/png',
+             height='64',
+             width='64')
+        i(:class="`el-icon-${$store.getters.tabConfig.lulumiDefault.tabFavicon}`",
+          style='font-size: 64px;')
       .hit-detail-title {{ currentHitProp('title') }}
       hr.hit-detail-hr
       span {{ currentHitProp('value') }}
@@ -27,11 +32,11 @@ import SearchBar from './SearchBar.vue';
   name: 'hits',
 })
 export default class Hits extends Vue {
-  highlightedIndex: string = '';
+  highlightedIndex = '';
   suggestions: Lulumi.CommandPalette.Suggestion[] = [];
   searchBar: SearchBar | null = null;
-  loading: boolean = false;
-  isOpen: boolean = false;
+  loading = false;
+  isOpen = false;
 
   get lastActiveWindow(): Lulumi.Store.LulumiBrowserWindowProperty {
     return this.$store.getters.windows.find(window => window.lastActive);

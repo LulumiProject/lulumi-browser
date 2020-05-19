@@ -1,5 +1,5 @@
-import Event from './event';
 import { ipcRenderer } from 'electron';
+import Event from './event';
 
 const ports: Port[] = [];
 
@@ -68,7 +68,6 @@ class Port {
     this._init();
   }
 
-  // tslint:disable-next-line:function-name
   _init() {
     ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}-${this.name}`, (event, message) => {
       // https://developer.chrome.com/extensions/runtime#property-Port-onMessage
@@ -118,13 +117,13 @@ class Port {
     );
   }
 
-  // tslint:disable-next-line:function-name
   _onDisconnect() {
     this.disconnected = true;
     ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}-${this.name}`);
     if (!this.otherEnd) {
       ipcRenderer.removeAllListeners(
-        `lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
+        `lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`
+      );
       require('electron').remote.webContents.fromId(this.webContentsId)
         .send(`lulumi-runtime-port-${this.extensionId}-${this.name}-disconnect`);
     }
@@ -132,7 +131,6 @@ class Port {
     this._Destroy();
   }
 
-  // tslint:disable-next-line:function-name
   _Destroy() {
     invalidateEvent(this.onDisconnect);
     invalidateEvent(this.onMessage);

@@ -1,13 +1,12 @@
+/* eslint-disable max-len */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { BrowserWindow, ipcMain, session } from 'electron';
 import * as forge from 'node-forge';
 import { customAlphabet } from 'nanoid';
 
 import mainStore from '../../shared/store/mainStore';
-
-/* tslint:disable:max-line-length */
-/* tslint:disable:no-console */
-/* tslint:disable:object-shorthand-properties-first */
-/* tslint:disable:align */
 
 ipcMain.setMaxListeners(0);
 
@@ -291,10 +290,10 @@ const onWillDownload = (windows, path: string): void => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
-    if (item.getMimeType() === 'application/pdf'
-      && itemURL.indexOf('blob:') !== 0
-      && !itemURL.includes('#pdfjs.action=download')
-      && !itemURL.includes('skip=true')) {
+    if (item.getMimeType() === 'application/pdf' &&
+      itemURL.indexOf('blob:') !== 0 &&
+      !itemURL.includes('#pdfjs.action=download') &&
+      !itemURL.includes('skip=true')) {
       event.preventDefault();
       const qs = require('querystring');
       const param = qs.stringify({ file: itemURL });
@@ -325,23 +324,23 @@ const onWillDownload = (windows, path: string): void => {
         });
       });
 
-      ipcMain.on('pause-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+      ipcMain.on('pause-downloads-progress', (event2: Electron.Event, remoteStartTime: number) => {
         if (startTime === remoteStartTime) {
           item.pause();
         }
       });
-      ipcMain.on('resume-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+      ipcMain.on('resume-downloads-progress', (event2: Electron.Event, remoteStartTime: number) => {
         if (startTime === remoteStartTime) {
           item.resume();
         }
       });
-      ipcMain.on('cancel-downloads-progress', (event: Electron.Event, remoteStartTime: number) => {
+      ipcMain.on('cancel-downloads-progress', (event2: Electron.Event, remoteStartTime: number) => {
         if (startTime === remoteStartTime) {
           item.cancel();
         }
       });
 
-      item.on('updated', (event: Electron.Event, state: string) => {
+      item.on('updated', (event2: Electron.Event, state: string) => {
         Object.keys(windows).forEach((key) => {
           const id = parseInt(key, 10);
           const window = windows[id];
@@ -357,7 +356,7 @@ const onWillDownload = (windows, path: string): void => {
         });
       });
 
-      item.on('done', (event: Electron.Event, state: string) => {
+      item.on('done', (event2: Electron.Event, state: string) => {
         ipcMain.removeAllListeners('pause-downloads-progress');
         ipcMain.removeAllListeners('resume-downloads-progress');
         ipcMain.removeAllListeners('cancel-downloads-progress');
@@ -399,7 +398,7 @@ const setPermissionRequestHandler = (windows): void => {
 
 const registerProxy = (proxyConfig: Electron.Config): void => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
-  sess.setProxy(proxyConfig).then(() => { });
+  sess.setProxy(proxyConfig).then();
 };
 
 export default {

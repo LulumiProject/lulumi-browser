@@ -8,8 +8,7 @@ import modules from './modules';
 
 Vue.use(Vuex);
 
-if (!(process.env.NODE_ENV === 'test'
-  && process.env.TEST_ENV === 'unit')) {
+if (!(process.env.NODE_ENV === 'test' && process.env.TEST_ENV === 'unit')) {
   const state = ipcRenderer.sendSync('vuex-connect');
 
   Object.keys(modules).forEach((module) => {
@@ -27,9 +26,8 @@ const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
 });
 
-if (!(process.env.NODE_ENV === 'test'
-  && process.env.TEST_ENV === 'unit')) {
-  (store as Lulumi.Store.CustomStore).dispatch = function (type, ...payload) {
+if (!(process.env.NODE_ENV === 'test' && process.env.TEST_ENV === 'unit')) {
+  (store as Lulumi.Store.CustomStore).dispatch = function dispatch(type, ...payload) {
     let newType = type;
     let newPayload = payload;
     if (typeof type === 'object' && type.type && arguments.length === 1) {

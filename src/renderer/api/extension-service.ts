@@ -1,13 +1,13 @@
+/* eslint-disable max-len */
+
 import { ipcRenderer } from 'electron';
 import * as url from 'url';
 import Vue from 'vue';
 
 import apiFactory, { initializeExtensionApi } from './api-factory';
 
-/* tslint:disable:max-line-length */
-
 export default class ExtensionService {
-  newtabOverrides: string = '';
+  newtabOverrides = '';
   manifestMap: Lulumi.API.ManifestMap = {};
   instance: Vue;
   constructor(vueInstance) {
@@ -29,14 +29,18 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-env-app-name-result-${data.suffix}`, require('lulumi').env.appName());
+          `lulumi-env-app-name-result-${data.suffix}`,
+          require('lulumi').env.appName()
+        );
       }
     });
     ipc.on('lulumi-env-app-version', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-env-app-version-result-${data.suffix}`, require('lulumi').env.appVersion());
+          `lulumi-env-app-version-result-${data.suffix}`,
+          require('lulumi').env.appVersion()
+        );
       }
     });
 
@@ -45,7 +49,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-browser-action-set-icon-result-${data.suffix}`,
-          require('lulumi').browserAction.setIcon(data.extensionId, data.startPage, data.details));
+          require('lulumi').browserAction.setIcon(data.extensionId, data.startPage, data.details)
+        );
       }
     });
     ipc.on('lulumi-browser-action-set-badge-text', (event, data) => {
@@ -53,7 +58,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           'lulumi-browser-action-set-badge-text-result',
-          require('lulumi').browserAction.setBadgeText(data.extensionId, data.details));
+          require('lulumi').browserAction.setBadgeText(data.extensionId, data.details)
+        );
       }
     });
     ipc.on('lulumi-browser-action-set-badge-background-color', (event, data) => {
@@ -61,7 +67,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           'lulumi-browser-action-set-badge-background-color-result',
-          require('lulumi').browserAction.setBadgeBackgroundColor(data.extensionId, data.details));
+          require('lulumi').browserAction.setBadgeBackgroundColor(data.extensionId, data.details)
+        );
       }
     });
     ipc.on('lulumi-browser-action-add-listener-on-message', (event, data) => {
@@ -70,7 +77,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-browser-action-add-listener-on-message-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onClickedEvent = require('lulumi').browserAction.onClicked(data.webContentsId);
         if (onClickedEvent) {
@@ -84,7 +92,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-browser-action-add-listener-on-message-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onClickedEvent = require('lulumi').browserAction.onClicked(data.webContentsId);
         if (onClickedEvent) {
@@ -106,7 +115,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-page-action-set-icon-result-${data.suffix}`,
-          require('lulumi').pageAction.setIcon(data.extensionId, data.startPage, data.details));
+          require('lulumi').pageAction.setIcon(data.extensionId, data.startPage, data.details)
+        );
       }
     });
     ipc.on('lulumi-page-action-show', (event, data) => {
@@ -133,7 +143,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-page-action-add-listener-on-clicked-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
         if (onClickedEvent) {
@@ -147,7 +158,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-page-action-add-listener-on-clicked-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onClickedEvent = require('lulumi').pageAction.onClicked(data.webContentsId);
         if (onClickedEvent) {
@@ -170,7 +182,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-commands-add-listener-on-command-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onCommandEvent = require('lulumi').commands.onCommand(data.webContentsId);
         if (onCommandEvent) {
@@ -184,7 +197,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-commands-add-listener-on-command-result-${data.digest}`,
-            args);
+            args
+          );
         };
         const onCommandEvent = require('lulumi').commands.onCommand(data.webContentsId);
         if (onCommandEvent) {
@@ -204,25 +218,37 @@ export default class ExtensionService {
     ipc.on('lulumi-alarms-get', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-alarms-get-result-${data.suffix}`, vue.getAlarm(data.name));
+        webContents.send(
+          `lulumi-alarms-get-result-${data.suffix}`,
+          vue.getAlarm(data.name)
+        );
       }
     });
     ipc.on('lulumi-alarms-get-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-alarms-get-all-result-${data.suffix}`, vue.getAllAlarm());
+        webContents.send(
+          `lulumi-alarms-get-all-result-${data.suffix}`,
+          vue.getAllAlarm()
+        );
       }
     });
     ipc.on('lulumi-alarms-clear', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-alarms-clear-result-${data.suffix}`, vue.clearAlarm(data.name));
+        webContents.send(
+          `lulumi-alarms-clear-result-${data.suffix}`,
+          vue.clearAlarm(data.name)
+        );
       }
     });
     ipc.on('lulumi-alarms-clear-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-alarms-clear-all-result-${data.suffix}`, vue.clearAllAlarm());
+        webContents.send(
+          `lulumi-alarms-clear-all-result-${data.suffix}`,
+          vue.clearAllAlarm()
+        );
       }
     });
     ipc.on('lulumi-alarms-create', (event, data) => {
@@ -236,7 +262,7 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-alarms-add-listener-on-alarm-result-${data.digest}`, args);
         };
-        const onAlarmEvent = vue.onAlarmEvent;
+        const { onAlarmEvent } = vue;
         if (onAlarmEvent) {
           onAlarmEvent.addListener(wrapper);
         }
@@ -248,7 +274,7 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(`lulumi-alarms-add-listener-on-alarm-result-${data.digest}`, args);
         };
-        const onAlarmEvent = vue.onAlarmEvent;
+        const { onAlarmEvent } = vue;
         if (onAlarmEvent) {
           onAlarmEvent.removeListener(wrapper);
         }
@@ -256,7 +282,7 @@ export default class ExtensionService {
     });
     ipc.on('lulumi-alarms-emit-on-alarm', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
-        const onAlarmEvent = vue.onAlarmEvent;
+        const { onAlarmEvent } = vue;
         if (onAlarmEvent) {
           onAlarmEvent.emit(data.alarm, data.sender);
         }
@@ -269,7 +295,8 @@ export default class ExtensionService {
           data.extensionId,
           data.message,
           data.external,
-          data.webContentsId);
+          data.webContentsId
+        );
       }
     });
     ipc.on('lulumi-runtime-add-listener-on-message', (event, data) => {
@@ -341,28 +368,36 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-tabs-get-result-${data.suffix}`, require('lulumi').tabs.get(data.tabId));
+          `lulumi-tabs-get-result-${data.suffix}`,
+          require('lulumi').tabs.get(data.tabId)
+        );
       }
     });
     ipc.on('lulumi-tabs-get-current', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-tabs-get-current-result-${data.suffix}`, require('lulumi').tabs.getCurrent(data.guestInstanceId));
+          `lulumi-tabs-get-current-result-${data.suffix}`,
+          require('lulumi').tabs.getCurrent(data.guestInstanceId)
+        );
       }
     });
     ipc.on('lulumi-tabs-duplicate', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-tabs-duplicate-result-${data.suffix}`, require('lulumi').tabs.duplicate(data.tabId));
+          `lulumi-tabs-duplicate-result-${data.suffix}`,
+          require('lulumi').tabs.duplicate(data.tabId)
+        );
       }
     });
     ipc.on('lulumi-tabs-query', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-tabs-query-result-${data.suffix}`, require('lulumi').tabs.query(data.queryInfo));
+          `lulumi-tabs-query-result-${data.suffix}`,
+          require('lulumi').tabs.query(data.queryInfo)
+        );
       }
     });
     ipc.on('lulumi-tabs-update', (event, data) => {
@@ -370,7 +405,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-update-result-${data.suffix}`,
-          require('lulumi').tabs.update(data.tabId, data.updateProperties));
+          require('lulumi').tabs.update(data.tabId, data.updateProperties)
+        );
       }
     });
     ipc.on('lulumi-tabs-reload', (event, data) => {
@@ -378,14 +414,17 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-reload-result-${data.suffix}`,
-          require('lulumi').tabs.reload(data.tabId, data.reloadProperties));
+          require('lulumi').tabs.reload(data.tabId, data.reloadProperties)
+        );
       }
     });
     ipc.on('lulumi-tabs-create', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-tabs-create-result-${data.suffix}`, require('lulumi').tabs.create(data.createProperties));
+          `lulumi-tabs-create-result-${data.suffix}`,
+          require('lulumi').tabs.create(data.createProperties)
+        );
       }
     });
     ipc.on('lulumi-tabs-remove', (event, data) => {
@@ -393,7 +432,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-remove-result-${data.suffix}`,
-          require('lulumi').tabs.remove(data.tabIds));
+          require('lulumi').tabs.remove(data.tabIds)
+        );
       }
     });
     ipc.on('lulumi-tabs-detect-language', (event, data) => {
@@ -404,7 +444,10 @@ export default class ExtensionService {
     ipc.on('lulumi-tabs-detect-language-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-tabs-detect-language-result-${data.suffix}`, data.value);
+        webContents.send(
+          `lulumi-tabs-detect-language-result-${data.suffix}`,
+          data.value
+        );
       }
     });
     ipc.on('lulumi-tabs-execute-script', (event, data) => {
@@ -412,7 +455,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-execute-script-result-${data.suffix}`,
-          require('lulumi').tabs.executeScript(data.tabId, data.details));
+          require('lulumi').tabs.executeScript(data.tabId, data.details)
+        );
       }
     });
     ipc.on('lulumi-tabs-insert-css', (event, data) => {
@@ -420,7 +464,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-insert-css-result-${data.suffix}`,
-          require('lulumi').tabs.insertCSS(data.tabId, data.details));
+          require('lulumi').tabs.insertCSS(data.tabId, data.details)
+        );
       }
     });
     ipc.on('lulumi-tabs-send-message', (event, data) => {
@@ -428,14 +473,18 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-tabs-send-message-result-${data.suffix}`,
-          require('lulumi').tabs.sendMessage(data.tabId, data.message));
+          require('lulumi').tabs.sendMessage(data.tabId, data.message)
+        );
       }
     });
     ipc.on('lulumi-tabs-add-listener-on-activated', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-activated-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-activated-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onActivated.addListener(wrapper);
       }
@@ -444,7 +493,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-activated-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-activated-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onActivated.removeListener(wrapper);
       }
@@ -458,7 +510,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-updated-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-updated-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onUpdated.addListener(wrapper);
       }
@@ -467,7 +522,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-updated-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-updated-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onUpdated.removeListener(wrapper);
       }
@@ -481,7 +539,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-created-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-created-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onCreated.addListener(wrapper);
       }
@@ -490,7 +551,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-created-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-created-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onCreated.removeListener(wrapper);
       }
@@ -504,7 +568,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-removed-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-removed-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onRemoved.addListener(wrapper);
       }
@@ -513,7 +580,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-tabs-add-listener-on-removed-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-tabs-add-listener-on-removed-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').tabs.onRemoved.removeListener(wrapper);
       }
@@ -528,21 +598,27 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-windows-get-result-${data.suffix}`, require('lulumi').windows.get(data.windowId, data.getInfo));
+          `lulumi-windows-get-result-${data.suffix}`,
+          require('lulumi').windows.get(data.windowId, data.getInfo)
+        );
       }
     });
     ipc.on('lulumi-windows-get-current', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-windows-get-current-result-${data.suffix}`, require('lulumi').windows.getCurrent(data.getInfo, data.guestInstanceId));
+          `lulumi-windows-get-current-result-${data.suffix}`,
+          require('lulumi').windows.getCurrent(data.getInfo, data.guestInstanceId)
+        );
       }
     });
     ipc.on('lulumi-windows-get-all', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
-          `lulumi-windows-get-all-result-${data.suffix}`, require('lulumi').windows.getAll(data.getInfo));
+          `lulumi-windows-get-all-result-${data.suffix}`,
+          require('lulumi').windows.getAll(data.getInfo)
+        );
       }
     });
 
@@ -550,7 +626,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-storage-add-listener-on-changed-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-storage-add-listener-on-changed-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').storage.onChanged.addListener(wrapper);
       }
@@ -559,7 +638,10 @@ export default class ExtensionService {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         const wrapper = function (...args) {
-          webContents.send(`lulumi-storage-add-listener-on-changed-result-${data.digest}`, args);
+          webContents.send(
+            `lulumi-storage-add-listener-on-changed-result-${data.digest}`,
+            args
+          );
         };
         require('lulumi').storage.onChanged.removeListener(wrapper);
       }
@@ -575,7 +657,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-context-menus-create-result-${data.suffix}`,
-          require('lulumi').contextMenus.create(data.menuItems, data.webContentsId));
+          require('lulumi').contextMenus.create(data.menuItems, data.webContentsId)
+        );
       }
     });
     ipc.on('lulumi-context-menus-remove', (event, data) => {
@@ -583,7 +666,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-context-menus-remove-result-${data.suffix}`,
-          require('lulumi').contextMenus.remove(data.menuItems, data.webContentsId));
+          require('lulumi').contextMenus.remove(data.menuItems, data.webContentsId)
+        );
       }
     });
     ipc.on('lulumi-context-menus-remove-all', (event, data) => {
@@ -591,7 +675,8 @@ export default class ExtensionService {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
         webContents.send(
           `lulumi-context-menus-remove-all-result-${data.suffix}`,
-          require('lulumi').contextMenus.removeAll(data.menuItems, data.webContentsId));
+          require('lulumi').contextMenus.removeAll(data.menuItems, data.webContentsId)
+        );
       }
     });
 
@@ -603,7 +688,10 @@ export default class ExtensionService {
     ipc.on('lulumi-web-navigation-get-frame-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-web-navigation-get-frame-result-${data.suffix}`, data.details);
+        webContents.send(
+          `lulumi-web-navigation-get-frame-result-${data.suffix}`,
+          data.details
+        );
       }
     });
     ipc.on('lulumi-web-navigation-get-all-frames', (event, data) => {
@@ -614,7 +702,10 @@ export default class ExtensionService {
     ipc.on('lulumi-web-navigation-get-all-frames-result', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        webContents.send(`lulumi-web-navigation-get-all-frames-result-${data.suffix}`, data.details);
+        webContents.send(
+          `lulumi-web-navigation-get-all-frames-result-${data.suffix}`,
+          data.details
+        );
       }
     });
     ipc.on('lulumi-web-navigation-add-listener-on-before-navigate', (event, data) => {
@@ -623,7 +714,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-before-navigate-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onBeforeNavigate.addListener(wrapper);
       }
@@ -634,7 +726,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-before-navigate-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onBeforeNavigate.removeListener(wrapper);
       }
@@ -650,7 +743,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-committed-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCommitted.addListener(wrapper);
       }
@@ -661,7 +755,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-committed-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCommitted.removeListener(wrapper);
       }
@@ -677,7 +772,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-dom-content-loaded-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onDOMContentLoaded.addListener(wrapper);
       }
@@ -688,7 +784,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-dom-content-loaded-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onDOMContentLoaded.removeListener(wrapper);
       }
@@ -704,7 +801,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-completed-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCompleted.addListener(wrapper);
       }
@@ -715,7 +813,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-completed-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCompleted.removeListener(wrapper);
       }
@@ -731,7 +830,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-created-navigation-target-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCreatedNavigationTarget.addListener(wrapper);
       }
@@ -742,7 +842,8 @@ export default class ExtensionService {
         const wrapper = function (...args) {
           webContents.send(
             `lulumi-web-navigation-add-listener-on-created-navigation-target-result-${data.digest}`,
-            args);
+            args
+          );
         };
         require('lulumi').webNavigation.onCreatedNavigationTarget.removeListener(wrapper);
       }
@@ -755,15 +856,15 @@ export default class ExtensionService {
     ipc.on('lulumi-web-request-intercepted', (event, data) => {
       if (vue.$electron.remote.webContents.fromId(data.webContentsId)) {
         const webContents = vue.$electron.remote.webContents.fromId(data.webContentsId);
-        const details = data.details;
-        const requestId = data.requestId;
+        const { details, requestId } = data;
         const tab = require('lulumi').tabs.query({ webContentsId: details.webContentsId })[0];
 
         details.tabId = (tab === undefined) ? -1 : tab.id;
         webContents.send(
           `lulumi-web-request-${data.eventLispCaseName}-intercepted-${data.digest}`,
           requestId,
-          details);
+          details
+        );
       }
     });
   }
@@ -781,15 +882,15 @@ export default class ExtensionService {
 
   registerAction() {
     const manifest: Lulumi.API.ManifestObject[] = [];
-    const backgroundPages
-      = this.instance.$electron.ipcRenderer.sendSync('get-background-pages');
+    const backgroundPages =
+      this.instance.$electron.ipcRenderer.sendSync('get-background-pages');
 
     this.newtabOverrides = '';
     Object.keys(this.manifestMap).forEach((extension) => {
       const ext = this.manifestMap[extension];
       if (ext) {
         if (backgroundPages[extension]) {
-          const webContentsId = backgroundPages[extension].webContentsId;
+          const { webContentsId } = backgroundPages[extension];
           ext.webContentsId = webContentsId;
         }
         const cuo = ext.chrome_url_overrides;

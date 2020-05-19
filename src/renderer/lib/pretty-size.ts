@@ -10,12 +10,12 @@ const prettySize = {
    * @param {Boolean} [nospace=false] Don't print a space
    * @param {Boolean} [one=false] Only print one character
    */
-  process(size: number, nospace: boolean = false, one: boolean = false): string {
-    let mysize: string = '';
-    let f: string;
+  process(size: number, nospace = false, one = false): string {
+    let mysize = '';
+    let outF: string;
 
     sizes.forEach((f, id) => {
-      let first: string = '';
+      let first = '';
       if (one) {
         first = f.slice(0, 1);
       }
@@ -34,8 +34,8 @@ const prettySize = {
     // zero handling
     // always prints in Bytes
     if (!mysize) {
-      f = (one ? sizes[0].slice(0, 1) : sizes[0]);
-      mysize = `0${nospace ? '' : ' '}${f}`;
+      outF = (one ? sizes[0].slice(0, 1) : sizes[0]);
+      mysize = `0${nospace ? '' : ' '}${outF}`;
     }
 
     return mysize;

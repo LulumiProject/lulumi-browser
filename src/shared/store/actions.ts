@@ -1,6 +1,7 @@
-import * as types from './mutation-types';
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable max-len */
 
-/* tslint:disable:max-line-length */
+import * as types from './mutation-types';
 
 export const actions = {
   incrementTabId({ commit }) {

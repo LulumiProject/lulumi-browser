@@ -5,19 +5,33 @@ div
       h1 {{ $t('about.historyPage.title') }}
     el-col(:span="4")
       div {{ `${$t('about.historyPage.sync')} ${syncStatus()}` }}
-      el-switch(@change="toggleSync", v-model="sync", active-color="#13ce66", inactive-color="#ff4949")
+      el-switch(@change="toggleSync",
+                v-model="sync",
+                active-color="#13ce66",
+                inactive-color="#ff4949")
     el-col(:span="12")
-      el-input#history-filter(@focus="toggleSync(false)", @blur="toggleSync(true)", :placeholder="$t('about.historyPage.placeholder')", v-model="filterText")
+      el-input#history-filter(@focus="toggleSync(false)",
+                              @blur="toggleSync(true)",
+                              :placeholder="$t('about.historyPage.placeholder')",
+                              v-model="filterText")
     el-col(:span="2")
-      el-button(:disabled="sync", type="danger", size="medium", @click="setHistory") {{ $t('about.historyPage.clear') }}
+      el-button(:disabled="sync",
+                type="danger",
+                size="medium",
+                @click="setHistory") {{ $t('about.historyPage.clear') }}
   el-row
     el-col(:span="24")
-      el-tree(ref="tree", :empty-text="$t('about.historyPage.noData')", :data="data", :show-checkbox="true", :default-expand-all="true", :render-content="customRender", :filter-node-method="filterNode")
+      el-tree(ref="tree",
+              :empty-text="$t('about.historyPage.noData')",
+              :data="data",
+              :show-checkbox="true",
+              :default-expand-all="true",
+              :render-content="customRender",
+              :filter-node-method="filterNode")
 </template>
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import VueI18n from 'vue-i18n';
 import { CreateElement, VNode } from 'vue';
 
 import { Button, Col, Input, Row, Switch, Tree } from 'element-ui';
@@ -49,8 +63,8 @@ export default class History extends Vue {
   history: HistoryItem[] = [];
   data: HistoryItem[] = [];
   handler: any = null;
-  filterText: string = '';
-  sync: boolean = false;
+  filterText = '';
+  sync = false;
 
   @Watch('filterText')
   onFilterText(val: string): void {
@@ -62,7 +76,8 @@ export default class History extends Vue {
       () => {
         ipcRenderer.send('guest-want-data', 'history');
       },
-      1000);
+      1000
+    );
   }
   clear(): void {
     clearInterval(this.handler);
@@ -79,11 +94,11 @@ export default class History extends Vue {
       this.clear();
     }
   }
-  syncStatus(): VueI18n.TranslateResult {
+  syncStatus(): string {
     if (this.sync) {
-      return this.$t('about.historyPage.syncStatus.syncing');
+      return this.$t('about.historyPage.syncStatus.syncing') as string;
     }
-    return this.$t('about.historyPage.syncStatus.notSyncing');
+    return this.$t('about.historyPage.syncStatus.notSyncing') as string;
   }
   setHistory(): void {
     const checkedNodes = (this.$refs.tree as any).getCheckedNodes();
@@ -114,7 +129,7 @@ export default class History extends Vue {
     let j: number;
     let cur: HistoryItem;
     let curLabel: string;
-    for (i = 0, j = history.length; i < j; i = i+1) {
+    for (i = 0, j = history.length; i < j; i += 1) {
       cur = history[i];
       curLabel = cur.label;
       if (!(curLabel in labels)) {
@@ -126,7 +141,7 @@ export default class History extends Vue {
     }
     return newArr;
   }
-  getHostname(input: string, excludePort: boolean = false): string | null {
+  getHostname(input: string, excludePort = false): string | null {
     try {
       if (excludePort) {
         return new window.URL(input).hostname;

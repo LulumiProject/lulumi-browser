@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Store } from 'vuex';
 import { readdirSync, readFileSync, rename, writeFile } from 'fs';
 import * as os from 'os';
@@ -19,14 +21,12 @@ import {
 import collect from 'collect.js';
 import { is } from 'electron-util';
 
+import localshortcut from 'electron-localshortcut';
 import autoUpdater from './lib/auto-updater';
 import constants from './constants';
-import localshortcut from 'electron-localshortcut';
 import menu from './lib/menu';
 import promisify from './lib/promisify';
-import request from './lib/request';
-
-/* tslint:disable:no-console */
+import fetch from './lib/fetch';
 
 const { openProcessManager } = require('electron-process-manager');
 
@@ -59,7 +59,7 @@ const storagePath: string = path.join(app.getPath('userData'), 'lulumi-state');
 const langPath: string = path.join(app.getPath('userData'), 'lulumi-lang');
 
 let lulumiStateSaveHandler: any = null;
-let setLanguage: boolean = false;
+let setLanguage = false;
 
 const autoHideMenuBarSetting: boolean = is.macos;
 const swipeGesture: boolean = is.macos
@@ -85,7 +85,7 @@ const windows: Electron.BrowserWindow[] = mainStore.getWindows();
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
 
-function lulumiStateSave(soft: boolean = true, windowCount = Object.keys(windows).length): void {
+function lulumiStateSave(soft = true, windowCount = Object.keys(windows).length): void {
   if (!soft) {
     let count = 0;
     Object.keys(windows).forEach((key) => {
@@ -120,10 +120,10 @@ function lulumiStateSave(soft: boolean = true, windowCount = Object.keys(windows
     });
 }
 
-/* tslint:disable-next-line:max-line-length */
+// eslint-disable-next-line max-len
 function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
-  const defaultOption: Object = {
+  const defaultOption: Record<string, any> = {
     autoHideMenuBar: autoHideMenuBarSetting,
     frame: !is.windows,
     fullscreenWindowTitle: true,
@@ -190,7 +190,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
     webPreferences.nodeIntegrationInSubFrames = true;
 
-    const backgroundRegExp = new RegExp('^lulumi-extension://.+/\.*background\.*.html$');
+    const backgroundRegExp = new RegExp(/^lulumi-extension:\/\/.+\/.*background.*\.html$/);
     if (params.src.startsWith('lulumi-extension://')) {
       if (params.src.match(backgroundRegExp)) {
         webPreferences.preload = path.join(constants.lulumiPreloadPath, 'extension-preload.js');
@@ -305,7 +305,6 @@ app.whenReady().then(() => {
     } catch (createWindowError) {
       console.error(`(lulumi-browser) Could not create a window: ${createWindowError}`);
       app.exit(1);
-      return;
     }
   }
 });
@@ -313,7 +312,8 @@ app.whenReady().then(() => {
 if (process.env.TEST_ENV !== 'e2e') {
   app.on('remote-require', (event, webContents) => {
     console.error(
-      `(lulumi-browser) Invalid module to require at webContents ${webContents.id}`);
+      `(lulumi-browser) Invalid module to require at webContents ${webContents.id}`
+    );
     event.preventDefault();
   });
   app.on('remote-get-global', (event: Electron.IpcMainEvent, webContents, globalName) => {
@@ -321,14 +321,15 @@ if (process.env.TEST_ENV !== 'e2e') {
       event.returnValue = globalObject.commandPalette;
     } else {
       console.error(
-        `(lulumi-browser) Invalid object to get at webContents ${webContents.id}`);
+        `(lulumi-browser) Invalid object to get at webContents ${webContents.id}`
+      );
       event.preventDefault();
     }
   });
 }
 
 app.on('login', (event, webContents, request, authInfo, callback) => {
-  const auth = store.getters.auth;
+  const { auth } = store.getters;
   if (auth.username && auth.password) {
     callback(auth.username, auth.password);
   } else {
@@ -336,7 +337,7 @@ app.on('login', (event, webContents, request, authInfo, callback) => {
       type: 'warning',
       buttons: ['OK'],
       title: 'Require authentication',
-      // tslint:disable-next-line:max-line-length
+      // eslint-disable-next-line max-len
       message: 'The server requires a username and password. You can set them in "Preferences / Auth".',
       detail: `Server: ${request.url}\nRealm: ${authInfo.realm}`,
     });
@@ -388,16 +389,15 @@ ipcMain.on('get-window-properties', (event: Electron.IpcMainEvent) => {
   const windowProperties: any[] = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
-  let windowPropertyFilenames
-    = collection.filter(v => (v.match(/lulumi-state-window-\d+/) !== null));
+  let windowPropertyFilenames =
+    collection.filter(v => (v.match(/lulumi-state-window-\d+/) !== null));
   if (windowPropertyFilenames.isNotEmpty()) {
-    windowPropertyFilenames = windowPropertyFilenames.sort((a, b) => {
-      return ((b.split('-') as any).pop() - (a.split('-') as any).pop());
-    });
+    windowPropertyFilenames = windowPropertyFilenames.sort((a, b) => (
+      (b.split('-') as any).pop() - (a.split('-') as any).pop()
+    ));
     windowPropertyFilenames.all().forEach((windowPropertyFilename) => {
       const windowPropertyFile = path.join(baseDir, windowPropertyFilename);
-      const windowProperty
-        = JSON.parse(readFileSync(windowPropertyFile, 'utf8'));
+      const windowProperty = JSON.parse(readFileSync(windowPropertyFile, 'utf8'));
       windowProperty.path = windowPropertyFile;
       windowProperty.mtime = startTime;
       windowProperties.push(windowProperty);
@@ -407,22 +407,21 @@ ipcMain.on('get-window-properties', (event: Electron.IpcMainEvent) => {
 });
 // restore windowProperties
 ipcMain.on('restore-window-property', (event: Electron.Event, windowProperty: any) => {
-  let tmpWindow: Electron.BrowserWindow;
-
   const options: Electron.BrowserWindowConstructorOptions = {};
-  const window = windowProperty.window;
+  const { window } = windowProperty;
   const windowState: string = window.state;
   options.width = window.width;
   options.height = window.height;
   options.x = window.left;
   options.y = window.top;
 
-  tmpWindow = createWindow(options, (eventName) => {
-    ipcMain.once(eventName, (event: Electron.IpcMainEvent) => {
-      event.sender.send(eventName.substr(4), null);
+  const tmpWindow = createWindow(options, (eventName) => {
+    ipcMain.once(eventName, (event2: Electron.IpcMainEvent) => {
+      event2.sender.send(eventName.substr(4), null);
       windowProperty.tabs.forEach((tab, index) => {
         tmpWindow.webContents.send(
-          'new-tab', { url: tab.url, follow: index === windowProperty.currentTabIndex });
+          'new-tab', { url: tab.url, follow: index === windowProperty.currentTabIndex }
+        );
       });
       const windowPropertyFilename = path.basename(windowProperty.path);
       const windowPropertyTmp = path.resolve(app.getPath('temp'), windowPropertyFilename);
@@ -461,8 +460,7 @@ ipcMain.on('show-certificate',
     dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
       certificate,
       message,
-      // tslint:disable-next-line:align
-    }).then(() => { });
+    }).then();
   });
 
 // focus the window
@@ -482,16 +480,16 @@ ipcMain.on('set-browser-window-title', (event, data) => {
 });
 
 // show the item on host
-ipcMain.on('show-item-in-folder', (event, path) => {
-  if (path) {
-    shell.showItemInFolder(path);
+ipcMain.on('show-item-in-folder', (event, itemPath) => {
+  if (itemPath) {
+    shell.showItemInFolder(itemPath);
   }
 });
 
 // open the item on host
-ipcMain.on('open-item', (event, path) => {
-  if (path) {
-    shell.openItem(path);
+ipcMain.on('open-item', (event, itemPath) => {
+  if (itemPath) {
+    shell.openItem(itemPath);
   }
 });
 
@@ -500,7 +498,7 @@ ipcMain.on('lulumi-scheme-loaded', (event, val) => {
   const type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
   const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
   if (type === 'about') {
-    const versions = process.versions;
+    const { versions } = process;
 
     data.lulumi = [
       {
@@ -702,10 +700,9 @@ ipcMain.on('new-lulumi-window', (event: Electron.IpcMainEvent, data) => {
     event.returnValue = createWindow({
       width: 800,
       height: 500,
-      // tslint:disable-next-line:align
     }, (eventName) => {
-      ipcMain.once(eventName, (event: Electron.IpcMainEvent) => {
-        event.sender.send(eventName.substr(4), { url: data.url, follow: data.follow });
+      ipcMain.once(eventName, (event2: Electron.IpcMainEvent) => {
+        event2.sender.send(eventName.substr(4), { url: data.url, follow: data.follow });
       });
     });
   }
@@ -713,7 +710,7 @@ ipcMain.on('new-lulumi-window', (event: Electron.IpcMainEvent, data) => {
 
 // load the lang file
 ipcMain.on('request-lang', (event: Electron.IpcMainEvent) => {
-  let lang: string = '';
+  let lang = '';
   try {
     lang = readFileSync(langPath, 'utf8');
   } catch (langError) {
@@ -745,39 +742,38 @@ ipcMain.on('register-local-commands', (event: Electron.IpcMainEvent) => {
 });
 
 ipcMain.on('fetch-search-suggestions',
-  // tslint:disable-next-line:align
   (event: Electron.IpcMainEvent, provider: string, url: string, timestamp: number) => {
-    request(provider, url, (result) => {
+    fetch(provider, url, (result) => {
       event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
     });
   });
 
 ipcMain.on('popup', (event: Electron.IpcMainEvent, popupObject: any) => {
-  const menu = new Menu();
-  popupObject.menuItems.forEach((menuItem) => {
-    if (menuItem.icon) {
-      if (menuItem.type === 'base64') {
-        menuItem.icon = nativeImage.createFromDataURL(menuItem.icon).resize({
+  const popupMenu = new Menu();
+  popupObject.menuItems.forEach((popupMenuItem) => {
+    if (popupMenuItem.icon) {
+      if (popupMenuItem.type === 'base64') {
+        popupMenuItem.icon = nativeImage.createFromDataURL(popupMenuItem.icon).resize({
           width: 14,
           height: 14,
         });
-        delete menuItem.type;
+        delete popupMenuItem.type;
       }
     }
-    if (menuItem.click) {
-      if (menuItem.click === 'open-history') {
-        menuItem.click = () => (event.sender.send('open-history'));
-      } else if (menuItem.click === 'go-to-index') {
-        const index = menuItem.index;
-        delete menuItem.index;
-        menuItem.click = () => {
+    if (popupMenuItem.click) {
+      if (popupMenuItem.click === 'open-history') {
+        popupMenuItem.click = () => (event.sender.send('open-history'));
+      } else if (popupMenuItem.click === 'go-to-index') {
+        const { index } = popupMenuItem;
+        delete popupMenuItem.index;
+        popupMenuItem.click = () => {
           event.sender.send('go-to-index', index);
         };
       }
     }
-    menu.append(new MenuItem(menuItem));
+    popupMenu.append(new MenuItem(popupMenuItem));
   });
-  menu.popup({
+  popupMenu.popup({
     window: BrowserWindow.fromId(popupObject.windowId),
     x: popupObject.x,
     y: popupObject.y,

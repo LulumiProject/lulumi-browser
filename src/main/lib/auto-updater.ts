@@ -9,7 +9,7 @@ const version = app.getVersion();
 export default {
   init() {
     autoUpdater.on(('error' as any), (err, msg) => {
-      // tslint:disable-next-line:no-console
+      // eslint-disable-next-line no-console
       console.error(`Error fetching updates, ${msg} (${err.stack})`);
     });
 

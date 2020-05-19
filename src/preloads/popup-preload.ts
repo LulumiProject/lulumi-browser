@@ -1,28 +1,30 @@
+/* eslint-disable max-len */
+
 import { ipcRenderer } from 'electron';
 
 import injectTo from '../renderer/api/inject-to';
 
-/* tslint:disable:align */
-/* tslint:disable:max-line-length */
-/* tslint:disable:function-name */
+const resizeSensor = require('css-element-queries/src/ResizeSensor');
 
-const resizeSensor = require('css-element-queries/src/ResizeSensor.js');
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.includes('--guest-instance-id='));
 if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(
-      process.argv[guestInstanceIndex].indexOf('=') + 1), 10);
+      process.argv[guestInstanceIndex].indexOf('=') + 1
+    ),
+    10
+  );
 }
 
 const globalObject = global as any;
 
 process.once('loaded', () => {
-  const extensionId = globalObject.location.hostname;
+  const { hostname } = globalObject.location; // hostname equals extensionId
   const context: Lulumi.Preload.Context = { lulumi: {} };
   globalObject.scriptType = 'popup';
-  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
+  injectTo(guestInstanceId, hostname, globalObject.scriptType, context);
   globalObject.lulumi = context.lulumi;
   globalObject.chrome = globalObject.lulumi;
 
@@ -34,7 +36,8 @@ process.once('loaded', () => {
       extensionId,
       connectInfo,
       responseScriptType,
-      webContentsId);
+      webContentsId
+    );
   });
 });
 

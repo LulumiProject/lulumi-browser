@@ -21,7 +21,7 @@ function onlineSearch(niddle) {
   return fetch(`https://api.github.com/search/repositories?q=${niddle}&sort=stars&order=desc`)
     .then(r => r.json())
     .then(r => r.items)
-    .catch(() => {});
+    .catch();
 }
 
 Comlink.expose({

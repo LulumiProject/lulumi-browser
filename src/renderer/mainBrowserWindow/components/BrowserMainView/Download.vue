@@ -2,37 +2,71 @@
 transition(name="download-bar")
   #download-bar
     ul(class="download-list")
-      el-popover(placement="top-start", width="178", trigger="hover", popper-class="download-list__popper"
+      el-popover(placement="top-start",
+                 width="178",
+                 trigger="hover",
+                 popper-class="download-list__popper"
         v-for="(file, index) in files", :key="index")
         div {{ showState(file.dataState) }}
         el-button-group(v-show="checkStateForButtonGroup(file.dataState)")
-          el-button(:disabled="file.dataState !== 'progressing'", v-if="file.isPaused && file.canResume", :plain="true", type="warning", size="mini", icon="el-icon-caret-right", @click="resumeDownload(file.startTime)")
-          el-button(:disabled="file.dataState !== 'progressing'", v-else, :plain="true", type="warning", size="mini", icon="el-icon-minus", @click="pauseDownload(file.startTime)")
-          el-button(:disabled="file.dataState !== 'progressing'", :plain="true", type="danger", size="mini", icon="el-icon-circle-close", @click="cancelDownload(file.startTime)")
-          el-button(:disabled="file.dataState === 'cancelled'", :plain="true", type="info", size="mini", icon="el-icon-document", @click="showItemInFolder(file.savePath)")
+          el-button(:disabled="file.dataState !== 'progressing'",
+                    v-if="file.isPaused && file.canResume",
+                    :plain="true",
+                    type="warning",
+                    size="mini",
+                    icon="el-icon-caret-right",
+                    @click="resumeDownload(file.startTime)")
+          el-button(:disabled="file.dataState !== 'progressing'",
+                    v-else,
+                    :plain="true",
+                    type="warning",
+                    size="mini",
+                    icon="el-icon-minus",
+                    @click="pauseDownload(file.startTime)")
+          el-button(:disabled="file.dataState !== 'progressing'",
+                    :plain="true",
+                    type="danger",
+                    size="mini",
+                    icon="el-icon-circle-close",
+                    @click="cancelDownload(file.startTime)")
+          el-button(:disabled="file.dataState === 'cancelled'",
+                    :plain="true",
+                    type="info",
+                    size="mini",
+                    icon="el-icon-document",
+                    @click="showItemInFolder(file.savePath)")
         li(class="download-list__item", slot="reference")
           div(class="download-list__item-panel")
             div(class="ellipsis")
               img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
-              a(class="download-list__item-name", href='#', @click.prevent="openItem(file.savePath)")
+              a(class="download-list__item-name",
+                href='#',
+                @click.prevent="openItem(file.savePath)")
                 | {{ file.name }}
-            span(class="download-list__item-description") {{ file.dataState === 'progressing' ? `${prettyReceivedSize(file.getReceivedBytes)}/${file.totalSize}`: showState(file.dataState) }}
-          el-progress(:status="checkStateForProgress(file.dataState)", type="circle", :percentage="percentage(file)", :width="30", :stroke-width="3", class="download-list__item-progress")
+            span(class="download-list__item-description") {{ progress(file) }}
+          el-progress(:status="checkStateForProgress(file.dataState)",
+                      type="circle",
+                      :percentage="percentage(file)",
+                      :width="30",
+                      :stroke-width="3",
+                      class="download-list__item-progress")
     span#download-bar-close(class="el-icon-close", @click="closeDownloadBar")
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import VueI18n from 'vue-i18n';
 
 import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
 
-import '../../css/el-progress';
-import '../../css/el-popover';
 import prettySize from '../../../lib/pretty-size';
 import imageUtil from '../../../lib/image-util';
 
 import BrowserMainView from '../BrowserMainView.vue';
+
+/* eslint-disable import/no-unresolved */
+import '../../css/el-progress';
+import '../../css/el-popover';
+/* eslint-enable import/no-unresolved */
 
 @Component({
   components: {
@@ -52,11 +86,19 @@ export default class Download extends Vue {
         (file as any).totalSize = prettySize.process((file as any).totalBytes);
       });
     }
+
     return tmpFiles;
   }
 
-  showState(dataState: string): VueI18n.LocaleMessage {
-    return this.$t(`downloads.state.${dataState}`);
+  progress(file: Lulumi.Store.DownloadItem): string {
+    if (file.dataState === 'progressing') {
+      return `${this.prettyReceivedSize(file.getReceivedBytes)}/${file.totalBytes}`;
+    }
+
+    return this.showState(file.dataState);
+  }
+  showState(dataState: string): string {
+    return this.$t(`downloads.state.${dataState}`) as string;
   }
   prettyReceivedSize(size: number): string {
     return prettySize.process(size);

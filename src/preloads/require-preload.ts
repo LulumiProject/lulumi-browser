@@ -1,3 +1,5 @@
+/* eslint-disable default-case */
+
 export default {
   require(req) {
     switch (req) {

@@ -51,8 +51,8 @@ export default class StatusBar extends Vue {
   }
 
   onClick(event: MouseEvent) {
-    const currentWindow: Electron.BrowserWindow | null
-      = this.$electron.remote.BrowserWindow.fromId(this.windowId);
+    const currentWindow: Electron.BrowserWindow | null =
+      this.$electron.remote.BrowserWindow.fromId(this.windowId);
 
     if (currentWindow) {
       const { Menu, MenuItem } = this.$electron.remote;

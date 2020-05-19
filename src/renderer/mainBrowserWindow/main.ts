@@ -35,7 +35,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
   },
   computed: {
     suggestionVisible() {
-      const suggestions = this.suggestions;
+      const { suggestions } = this;
       const isValidData = Array.isArray(suggestions) && suggestions.length > 0;
       // Don't show suggestions if we have no input there
       return (isValidData || this.loading) && this.activated && this.value;
@@ -74,8 +74,8 @@ const goodCustomAutocomplete = customAutocomplete.extend({
             if (this.lastQueryString !== queryString) {
               const startPos = queryString.length;
               const endPos = this.suggestions[0].item.url.length;
-              this.$refs.input.$refs.input.value
-                = `${queryString}${this.suggestions[0].item.url.substr(queryString.length)}`;
+              this.$refs.input.$refs.input.value =
+                `${queryString}${this.suggestions[0].item.url.substr(queryString.length)}`;
               this.setInputSelection(el, startPos, endPos);
               this.lastQueryString = queryString;
             } else {
@@ -83,7 +83,7 @@ const goodCustomAutocomplete = customAutocomplete.extend({
             }
           }
         } else {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error('[Element Error][Autocomplete]autocomplete suggestions must be an array');
         }
       });
@@ -108,9 +108,9 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
     handleKeyEnter(event) {
       if (!this.isComposing) {
-        if (this.suggestionVisible
-          && this.highlightedIndex >= 0
-          && this.highlightedIndex < this.suggestions.length) {
+        if (this.suggestionVisible &&
+          this.highlightedIndex >= 0 &&
+          this.highlightedIndex < this.suggestions.length) {
           event.preventDefault();
           this.select(this.suggestions[this.highlightedIndex]);
         } else if (this.selectWhenUnmatched) {
@@ -131,11 +131,12 @@ const goodCustomAutocomplete = customAutocomplete.extend({
       if (index >= this.suggestions.length) {
         newIndex = this.suggestions.length - 1;
       }
-      const suggestion = this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
+      const suggestion =
+        this.$refs.suggestions.$el.querySelector('.el-autocomplete-suggestion__wrap');
       const suggestionList = suggestion.querySelectorAll('.el-autocomplete-suggestion__list li');
       const highlightItem = suggestionList[newIndex];
-      const scrollTop = suggestion.scrollTop;
-      const offsetTop = highlightItem.offsetTop;
+      const { scrollTop } = suggestion;
+      const { offsetTop } = highlightItem;
       if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
         suggestion.scrollTop += highlightItem.scrollHeight;
       }
@@ -149,15 +150,15 @@ const goodCustomAutocomplete = customAutocomplete.extend({
     },
   },
 });
-Vue.component('good-custom-autocomplete', goodCustomAutocomplete);
+Vue.component('GoodCustomAutocomplete', goodCustomAutocomplete);
 
 new Vue({
   i18n,
   router,
   store,
+  name: 'Root',
   components: { App },
   render(h) {
     return h('App');
   },
-  name: 'root',
 }).$mount('#app');

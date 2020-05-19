@@ -1,15 +1,29 @@
 <template lang="pug">
-el-row(:gutter="20", type="flex", align="middle", justify="space-between", style="width: 100vw; flex-direction: row;")
+el-row(:gutter="20",
+       type="flex",
+       align="middle",
+       justify="space-between",
+       style="width: 100vw; flex-direction: row;")
   el-col(:span="14") {{ `${template}` }}
   el-col(:span="10")
-    el-checkbox(v-show="visible", v-model="permanent", style="padding-right: 10px;") {{ $t('notification.permission.request.permanent') }}
-    el-button(:plain="true", type="success", size="small", @click="onAllow") {{ $t('notification.permission.request.allow') }}
-    el-button(:plain="true", type="danger", size="small", @click="onDeny") {{ $t('notification.permission.request.deny') }}
+    el-checkbox(v-show="visible",
+                v-model="permanent",
+                style="padding-right: 10px;")
+      | {{ $t('notification.permission.request.permanent') }}
+    el-button(:plain="true",
+              type="success",
+              size="small",
+              @click="onAllow")
+      | {{ $t('notification.permission.request.allow') }}
+    el-button(:plain="true",
+              type="danger",
+              size="small",
+              @click="onDeny")
+      | {{ $t('notification.permission.request.deny') }}
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import VueI18n from 'vue-i18n';
 
 import { Button, ButtonGroup, Checkbox, Col, Row } from 'element-ui';
 
@@ -39,13 +53,13 @@ import BrowserMainView from '../BrowserMainView.vue';
 export default class Notification extends Vue {
   windowWebContentsId: number;
 
-  visible: boolean = true;
-  permanent: boolean = false;
-  type: string = '';
-  template: VueI18n.LocaleMessage = '';
-  permission: string = '';
+  visible = true;
+  permanent = false;
+  type = '';
+  template = '';
+  permission = '';
   hostname: string | null;
-  id: number = -1;
+  id = -1;
   handler: any;
 
   get permissions() {
@@ -76,8 +90,8 @@ export default class Notification extends Vue {
         accept: true,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height
-      = (this.$parent as BrowserMainView).getViewHeight();
+    (this.$parent as BrowserMainView).getWebView().style.height =
+      (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -104,8 +118,8 @@ export default class Notification extends Vue {
         accept: false,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height
-      = (this.$parent as BrowserMainView).getViewHeight();
+    (this.$parent as BrowserMainView).getWebView().style.height =
+      (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -115,9 +129,9 @@ export default class Notification extends Vue {
   }
 
   @Watch('tabId')
-  onTabId(newId) {
-    (this.$parent as BrowserMainView).getWebView().style.height
-      = (this.$parent as BrowserMainView).getViewHeight();
+  onTabId() {
+    (this.$parent as BrowserMainView).getWebView().style.height =
+      (this.$parent as BrowserMainView).getViewHeight();
     (this.$parent as BrowserMainView).showNotification = false;
   }
 
@@ -129,15 +143,18 @@ export default class Notification extends Vue {
     ipc.setMaxListeners(0);
     ipc.on('update-available', (event, data) => {
       this.type = 'update';
-      this.template
-        = this.$t('notification.update.updateAvailable', { releaseName: data.releaseName });
-      (this.$parent as BrowserMainView).getWebView().style.height
-        = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+      this.template =
+        this.$t(
+          'notification.update.updateAvailable',
+          { releaseName: data.releaseName }
+        ) as string;
+      (this.$parent as BrowserMainView).getWebView().style.height =
+        `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
       (this.$parent as BrowserMainView).showNotification = true;
     });
     ipc.on('request-permission', (event, data) => {
-      const webContents: Electron.webContents | null
-        = this.$electron.remote.webContents.fromId(data.webContentsId);
+      const webContents: Electron.webContents | null =
+        this.$electron.remote.webContents.fromId(data.webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
         if ((this.$parent as BrowserMainView).getWebView()
           .getWebContentsId() === data.webContentsId) {
@@ -150,11 +167,12 @@ export default class Notification extends Vue {
               this.visible = false;
               this.hostname = webContents.getURL();
               this.type = 'permission';
-              this.template
-                = this.$t(
-                  'notification.permission.request.setLanguage',
-                  { hostname: this.hostname, lang: data.label });
-              webview.style.height = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+              this.template = this.$t(
+                'notification.permission.request.setLanguage',
+                { hostname: this.hostname, lang: data.label }
+              ) as string;
+              webview.style.height =
+                `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
               (this.$parent as BrowserMainView).showNotification = true;
               this.handler = setTimeout(
                 () => {
@@ -166,21 +184,23 @@ export default class Notification extends Vue {
                   this.id = -1;
                   clearTimeout(this.handler);
                 },
-                10000);
+                10000
+              );
             } else {
               this.visible = true;
-              if (this.permissions[`${this.hostname}`]
-                && this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
+              if (this.permissions[`${this.hostname}`] &&
+                this.permissions[`${this.hostname}`].hasOwnProperty(`${this.permission}`)) {
                 ipc.send(`response-permission-${this.id}`, {
                   accept: this.permissions[`${this.hostname}`][`${this.permission}`],
                 });
               } else {
                 this.type = 'permission';
-                this.template
-                  = this.$t(
-                    'notification.permission.request.normal',
-                    { hostname: this.hostname, permission: this.permission });
-                webview.style.height = `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+                this.template = this.$t(
+                  'notification.permission.request.normal',
+                  { hostname: this.hostname, permission: this.permission }
+                ) as string;
+                webview.style.height =
+                  `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
                 (this.$parent as BrowserMainView).showNotification = true;
                 this.handler = setTimeout(
                   () => {
@@ -192,7 +212,8 @@ export default class Notification extends Vue {
                     this.id = -1;
                     clearTimeout(this.handler);
                   },
-                  5000);
+                  5000
+                );
               }
             }
           }

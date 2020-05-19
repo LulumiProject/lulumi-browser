@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+
 const fakeElectron = {
   BrowserWindow: {
     getFocusedWindow() {

@@ -1,10 +1,10 @@
+/* eslint-disable max-len */
+
 import { nativeImage } from 'electron';
 import { fixPathForAsarUnpack } from 'electron-util';
 import * as path from 'path';
 
 declare const __static;
-
-/* tslint:disable:max-line-length */
 
 const searchEngine = [
   {

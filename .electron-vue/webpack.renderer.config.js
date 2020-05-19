@@ -2,7 +2,6 @@
 
 process.env.BABEL_ENV = 'renderer'
 
-const os = require('os')
 const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
@@ -70,7 +69,7 @@ let mainBrowserWindowConfig = {
         exclude: /node_modules/
       },
       {
-        test: /\.js$/,
+        test: /\.(js|ts|vue)$/,
         enforce: 'pre',
         use: {
           loader: 'eslint-loader',
@@ -78,8 +77,7 @@ let mainBrowserWindowConfig = {
             formatter: require('eslint-friendly-formatter')
           }
         },
-        include: [ path.join(__dirname, '../src/helper') ],
-        exclude: /node_modules/
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       },
       {
         test: /\.less$/,
@@ -214,8 +212,8 @@ let mainBrowserWindowConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       tslintAutoFix: false,
       vue: true
     }),
@@ -274,6 +272,17 @@ let preloadsConfig = {
         },
         include: [ path.join(__dirname, '../src/preload'), path.join(__dirname, '../src/renderer/api') ],
         exclude: /node_modules/
+      },
+      {
+        test: /\.(js|ts|vue)$/,
+        enforce: 'pre',
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        },
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       }
     ]
   },
@@ -295,8 +304,8 @@ let preloadsConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       tslintAutoFix: false,
       vue: true
     }),
@@ -342,6 +351,17 @@ let preferenceViewConfig = {
         },
         include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/preferenceView') ],
         exclude: /node_modules/
+      },
+      {
+        test: /\.(js|ts|vue)$/,
+        enforce: 'pre',
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        },
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       },
       {
         test: /\.less$/,
@@ -455,8 +475,8 @@ let preferenceViewConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preferenceView]', excludeWarnings: false }),
@@ -503,6 +523,17 @@ let playbooksViewConfig = {
         },
         include: [ path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/playbooksView') ],
         exclude: /node_modules/
+      },
+      {
+        test: /\.(js|ts|vue)$/,
+        enforce: 'pre',
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        },
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       },
       {
         test: /\.less$/,
@@ -617,8 +648,8 @@ let playbooksViewConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [playbooksView]', excludeWarnings: false }),
@@ -666,6 +697,17 @@ let commandPaletteConfig = {
         },
         include: [ path.join(__dirname, '../src/shared'), path.join(__dirname, '../src/renderer/lib'), path.join(__dirname, '../src/renderer/mainBrowserWindow'), path.join(__dirname, '../src/renderer/commandPalette') ],
         exclude: /node_modules/
+      },
+      {
+        test: /\.(js|ts|vue)$/,
+        enforce: 'pre',
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        },
+        exclude: [ path.join(__dirname, '../src/helper'), /node_modules/ ]
       },
       {
         test: /\.less$/,
@@ -781,8 +823,8 @@ let commandPaletteConfig = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
+      eslint: true,
       tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslint: path.join(__dirname, '../tslint.json'),
       vue: true
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [commandPalette]', excludeWarnings: false }),

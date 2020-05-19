@@ -32,7 +32,7 @@ export default class PDFViewer extends Vue {
       label: 'PDF Reader in JavaScript',
     },
   ];
-  pdfViewer: string = '';
+  pdfViewer = '';
 
   setPDFViewer(): void {
     ipcRenderer.send('set-pdf-viewer', {

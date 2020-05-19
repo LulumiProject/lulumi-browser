@@ -1,7 +1,6 @@
 const state = {
 };
 
-/* tslint:disable:function-name */
 const mutations = {
 };
 

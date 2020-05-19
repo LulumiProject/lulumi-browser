@@ -1,3 +1,7 @@
+/* eslint-disable no-console */
+/* eslint-disable max-len */
+/* eslint-disable no-restricted-syntax */
+
 import { app, BrowserWindow, ipcMain, webContents } from 'electron';
 import { Buffer } from 'buffer';
 import { Store } from 'vuex';
@@ -10,9 +14,6 @@ import * as mimeTypes from 'mime-types';
 
 import config from '../constants';
 import './listeners';
-
-/* tslint:disable:no-console */
-/* tslint:disable:max-line-length */
 
 // ../../shared/store/mainStore.ts
 const { default: mainStore } = require('../../shared/store/mainStore');
@@ -54,7 +55,8 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
 
     if (!manifestNameMap[manifest.name]) {
       const extensionId = generateExtensionIdFromName();
-      manifestMap[extensionId] = manifestNameMap[manifest.name] = manifest;
+      manifestNameMap[manifest.name] = manifest;
+      manifestMap[extensionId] = manifestNameMap[manifest.name];
 
       let messages = {};
       let lang = '';
@@ -68,7 +70,8 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
         lang = JSON.parse(lang);
         try {
           messages = JSON.parse(fs.readFileSync(
-            path.join(srcDirectory, '_locales', lang.replace('-', '_'), 'messages.json'), 'utf8'));
+            path.join(srcDirectory, '_locales', lang.replace('-', '_'), 'messages.json'), 'utf8'
+          ));
         } catch (readError) {
           console.warn(`${manifest.name}: Reading messages.json failed.`);
           console.warn(readError.stack || readError);
@@ -77,7 +80,6 @@ const getManifestFromPath: (srcDirectory: string) => Lulumi.API.ManifestObject |
       messages = Object.assign({
         '@@extension_id': { message: extensionId },
         '@@ui_locale': { message: lang || 'en' },
-        // tslint:disable-next-line:align
       }, messages);
 
       Object.assign(manifest, {
@@ -115,7 +117,7 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
   } else {
     name = '_generated_background_page.html';
     if (manifest.background.scripts) {
-      const scripts = manifest.background.scripts.map(name => `<script src="${name}"></script>`).join('');
+      const scripts = manifest.background.scripts.map(script => `<script src="${script}"></script>`).join('');
       html = Buffer.from(`<html><body>${scripts}</body></html>`, 'utf8');
     }
   }
@@ -139,8 +141,8 @@ const startBackgroundPages = (manifest: Lulumi.API.ManifestObject) => {
 const removeBackgroundPages = (manifest) => {
   const extension = backgroundPages[manifest.extensionId];
   if (extension) {
-    const toBeRemovedwebContents
-      = (webContents.fromId(extension.webContentsId) as Electron.WebContents);
+    const toBeRemovedwebContents =
+      (webContents.fromId(extension.webContentsId) as Electron.WebContents);
 
     ipcMain.once(`lulumi-extension-${manifest.extensionId}-clean-done`, () => {
       (toBeRemovedwebContents as any).destroy();
@@ -158,12 +160,12 @@ const removeBackgroundPages = (manifest) => {
 };
 
 const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
-  const commands = manifest.commands;
+  const { commands } = manifest;
   if (commands) {
     Object.keys(commands).forEach((command) => {
-      const suggested_key = commands[command].suggested_key;
-      if (suggested_key) {
-        localshortcut.register(window, suggested_key.default, () => {
+      const { suggested_key: suggestedKey } = commands[command];
+      if (suggestedKey) {
+        localshortcut.register(window, suggestedKey.default, () => {
           if (commands[command].suggested_key) {
             const browserWindow = BrowserWindow.getFocusedWindow();
             if (command === '_execute_page_action') {
@@ -186,7 +188,7 @@ const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
           }
         });
         ipcMain.once(`lulumi-extension-${manifest.extensionId}-local-shortcut-unregister`, () => {
-          localshortcut.unregister(window, suggested_key.default);
+          localshortcut.unregister(window, suggestedKey.default);
         });
       }
     });
@@ -205,6 +207,7 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
       code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
     });
     const contentScriptToEntry = script => ({
+      // eslint-disable-next-line @typescript-eslint/camelcase
       all_frames: script.all_frames,
       matches: script.matches,
       js: script.js ? script.js.map(readArrayOfFiles) : [],
@@ -213,6 +216,7 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
     });
 
     try {
+      // eslint-disable-next-line @typescript-eslint/camelcase
       manifest.content_scripts = manifest.content_scripts.map(contentScriptToEntry);
     } catch (readError) {
       console.error('Failed to read content scripts', readError);
@@ -256,6 +260,8 @@ const loadExtension = (manifest: Lulumi.API.ManifestObject) => {
     enabled: true,
     extensionid: extensionInfo.id,
   });
+
+  return true;
 };
 
 // the lulumi-extension can map a extension URL request to real file path
@@ -287,6 +293,8 @@ const lulumiExtensionHandler = (request, callback) => {
       mimeType: mimeTypes.lookup(path.basename(parsed.pathname!)),
     });
   });
+
+  return true;
 };
 
 app.on(('session-created' as any), (sess: Electron.Session) => {

@@ -1,64 +1,66 @@
+/* eslint-disable max-len */
+
 import { ipcRenderer } from 'electron';
 
 import injectTo from '../renderer/api/inject-to';
-
-/* tslint:disable:align */
-/* tslint:disable:max-line-length */
-/* tslint:disable:function-name */
 
 let guestInstanceId = -1;
 const guestInstanceIndex = process.argv.findIndex(e => e.includes('--guest-instance-id='));
 if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(
-      process.argv[guestInstanceIndex].indexOf('=') + 1), 10);
+      process.argv[guestInstanceIndex].indexOf('=') + 1
+    ),
+    10
+  );
 }
 
 const globalObject = global as any;
 
 process.once('loaded', () => {
-  const extensionId = globalObject.location.hostname;
+  const { hostname } = globalObject.location; // hostname equals extensionId
   const context: any = {};
   globalObject.scriptType = 'event';
-  injectTo(guestInstanceId, extensionId, globalObject.scriptType, context);
+  injectTo(guestInstanceId, hostname, globalObject.scriptType, context);
   globalObject.lulumi = context.lulumi;
   globalObject.chrome = globalObject.lulumi;
 
   globalObject.ipcRenderer = ipcRenderer;
 
-  ipcRenderer.once(`lulumi-extension-${extensionId}-going-removed`, (event) => {
+  ipcRenderer.once(`lulumi-extension-${hostname}-going-removed`, () => {
     // remove all the registered things related to this extension
     Object.values(globalObject.lulumi.webRequest).forEach(v => (v as any).removeAllListeners());
     globalObject.lulumi.contextMenus.removeAll(() => {
       // removeBackgroundPages of src/main/api/lulumi-extension.ts
-      ipcRenderer.send(`lulumi-extension-${extensionId}-local-shortcut-unregister`);
+      ipcRenderer.send(`lulumi-extension-${hostname}-local-shortcut-unregister`);
       // removeBackgroundPages of src/main/api/listeners.ts
-      ipcRenderer.send(`remove-lulumi-extension-${extensionId}`);
+      ipcRenderer.send(`remove-lulumi-extension-${hostname}`);
       // removeBackgroundPages of src/main/api/lulumi-extension.ts
-      ipcRenderer.send(`lulumi-extension-${extensionId}-clean-done`);
+      ipcRenderer.send(`lulumi-extension-${hostname}-clean-done`);
     });
   });
-  ipcRenderer.on('lulumi-runtime-send-message', (event, external, message, sender) => {
+  ipcRenderer.on('lulumi-runtime-send-message', (_, external, message, sender) => {
     if (external) {
       globalObject.lulumi.runtime.onMessageExternal.emit(message, sender);
     } else {
       globalObject.lulumi.runtime.onMessage.emit(message, sender);
     }
   });
-  ipcRenderer.on('lulumi-runtime-before-connect', (event, extensionId, connectInfo, responseScriptType, webContentsId) => {
+  ipcRenderer.on('lulumi-runtime-before-connect', (_, extensionId, connectInfo, responseScriptType, webContentsId) => {
     globalObject.lulumi.runtime.beforeConnect(
       extensionId,
       connectInfo,
       responseScriptType,
-      webContentsId);
+      webContentsId
+    );
   });
-  ipcRenderer.on('lulumi-browser-action-clicked', (event, tab) => {
-    globalObject.lulumi.tabs.get(tab.id, tab => globalObject.lulumi.browserAction.onClicked.emit(tab));
+  ipcRenderer.on('lulumi-browser-action-clicked', (_, clickedTab) => {
+    globalObject.lulumi.tabs.get(clickedTab.id, tab => globalObject.lulumi.browserAction.onClicked.emit(tab));
   });
-  ipcRenderer.on('lulumi-page-action-clicked', (event, tab) => {
-    globalObject.lulumi.tabs.get(tab.id, tab => globalObject.lulumi.pageAction.onClicked.emit(tab));
+  ipcRenderer.on('lulumi-page-action-clicked', (_, clickedTab) => {
+    globalObject.lulumi.tabs.get(clickedTab.id, tab => globalObject.lulumi.pageAction.onClicked.emit(tab));
   });
-  ipcRenderer.on('lulumi-commands-triggered', (event, command) => {
+  ipcRenderer.on('lulumi-commands-triggered', (_, command) => {
     globalObject.lulumi.commands.onCommand.emit(command);
   });
 });
