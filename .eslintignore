@@ -1,5 +1,4 @@
-test/unit/coverage/**
-test/unit/*.js
-test/e2e/*.js
+test/unit/**
+test/e2e/**
 src/helper/pages/**
 src/helper/pdfjs/**
