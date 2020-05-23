@@ -217,9 +217,9 @@ function saveWindowState(windowId: number): Promise<any> {
 const register = (storagePath: string, swipeGesture: boolean): void => {
   ipcMain.on('vuex-connect', (event: Electron.IpcMainEvent) => {
     let close = false;
-    const window: BrowserWindow | undefined = BrowserWindow.fromWebContents(event.sender);
+    const window = BrowserWindow.fromWebContents(event.sender);
     // command-palette window
-    if (window === undefined || event.sender.getURL().endsWith('cp.html#/')) {
+    if (window === null || event.sender.getURL().endsWith('cp.html#/')) {
       windows[globalObject.commandPalette.id] = globalObject.commandPalette;
       (globalObject.commandPalette as BrowserWindow).on('close', (event2: Electron.IpcMainEvent) => {
         if (close) {
@@ -241,7 +241,7 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         return;
       }
 
-      window.setMaxListeners(0);
+      (window as any).setMaxListeners(0);
 
       window.on('blur', () => {
         handleWindowProperty(window, 'update');
@@ -297,10 +297,12 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
       ipcMain.on('window-id', (event2: Electron.IpcMainEvent) => {
         const window2 = BrowserWindow.fromWebContents(event2.sender);
-        event2.returnValue = {
-          windowId: window2.id,
-          windowWebContentsId: window2.webContents.id,
-        };
+        if (window2) {
+          event2.returnValue = {
+            windowId: window2.id,
+            windowWebContentsId: window2.webContents.id,
+          };
+        }
       });
 
       (window as any).callback(`any-new-tab-suggestion-for-window-${windowId}`);
@@ -338,20 +340,22 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
 
           store.dispatch('closeWindow', windowId);
           delete windows[windowId];
-          window.webContents.removeAllListeners('blur');
-          window.webContents.removeAllListeners('focus');
-          window.webContents.removeAllListeners('maximize');
-          window.webContents.removeAllListeners('unmaximize');
-          window.webContents.removeAllListeners('minimize');
-          window.webContents.removeAllListeners('restore');
-          window.webContents.removeAllListeners('resize');
-          window.webContents.removeAllListeners('move');
+
+          // https://github.com/electron/electron/issues/22290
+          (window as any).removeAllListeners('blur');
+          (window as any).removeAllListeners('focus');
+          (window as any).removeAllListeners('maximize');
+          (window as any).removeAllListeners('unmaximize');
+          (window as any).removeAllListeners('minimize');
+          (window as any).removeAllListeners('restore');
+          (window as any).removeAllListeners('resize');
+          (window as any).removeAllListeners('move');
           if (isWindows) {
-            window.webContents.removeAllListeners('app-command');
+            (window as any).removeAllListeners('app-command');
           }
-          window.webContents.removeAllListeners('scroll-touch-end');
-          window.webContents.removeAllListeners('scroll-touch-edge');
-          window.webContents.removeAllListeners('window-id');
+          (window as any).removeAllListeners('scroll-touch-end');
+          (window as any).removeAllListeners('scroll-touch-edge');
+          (window as any).removeAllListeners('window-id');
           close = true;
           window.close();
         }

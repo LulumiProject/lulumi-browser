@@ -162,7 +162,9 @@ export default (vueInstance: any) => {
     sendMessage: (tabId: number, message: any): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, tabId);
       if (tab.windowId === vueInstance.windowId) {
-        vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.getWebContents().send('lulumi-tabs-send-message', message);
+        vueInstance.$electron.remote.webContents.fromId(
+          vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.getWebContentsId()
+        ).send('lulumi-tabs-send-message', message);
       }
     },
     onActivated: vueInstance.onActivatedEvent,
@@ -377,7 +379,9 @@ export default (vueInstance: any) => {
     getFrame: (details: chrome.webNavigation.GetFrameDetails, suffix: string, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
-        const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
+        const processId = vueInstance.$electron.remote.webContents.fromId(
+          vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContentsId()
+        ).getOSProcessId();
         if (details.processId === processId) {
           vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
             String.prototype.hashCode = function() {
@@ -428,7 +432,9 @@ export default (vueInstance: any) => {
     getAllFrames: (details: chrome.webNavigation.GetAllFrameDetails, suffix: string, webContentsId: number): void => {
       const tab = findAndUpdateOrCreate(vueInstance, false, details.tabId);
       if (tab.windowId === vueInstance.windowId) {
-        const processId = vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContents().getOSProcessId();
+        const processId = vueInstance.$electron.remote.webContents.fromId(
+          vueInstance.getWebView(getBuiltInTabIndex(vueInstance, tab.index)).getWebContentsId()
+        ).getOSProcessId();
         vueInstance.getTab(getBuiltInTabIndex(vueInstance, tab.index)).$refs.webview.executeJavaScript(`
           String.prototype.hashCode = function() {
             var hash = 0, i, chr;

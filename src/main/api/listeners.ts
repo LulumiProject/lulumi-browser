@@ -10,34 +10,37 @@ ipcMain.on('open-dev-tools', (event, webContentsId) => {
   }
 });
 ipcMain.on('add-lulumi-extension', (event: IpcMainEvent) => {
-  dialog.showOpenDialog(BrowserWindow.fromWebContents(event.sender), { properties: ['openDirectory'] }).then((res) => {
-    if (!res.canceled && res.filePaths && res.filePaths.length > 0) {
-      const dir: string = res.filePaths[0];
-      let name = '';
-      let result = 'OK';
-      try {
-        if (dir) {
-          // an array of directory paths chosen by the user will be returned, but we only want one path
-          name = ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension(dir);
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow) {
+    dialog.showOpenDialog(browserWindow, { properties: ['openDirectory'] }).then((res) => {
+      if (!res.canceled && res.filePaths && res.filePaths.length > 0) {
+        const dir: string = res.filePaths[0];
+        let name = '';
+        let result = 'OK';
+        try {
+          if (dir) {
+            // an array of directory paths chosen by the user will be returned, but we only want one path
+            name = ((BrowserWindow as any) as Lulumi.BrowserWindow).addLulumiExtension(dir);
+          }
+        } catch (readError) {
+          result = readError.message;
         }
-      } catch (readError) {
-        result = readError.message;
-      }
 
-      Object.keys(windows).forEach((key) => {
-        const id = parseInt(key, 10);
-        const window = windows[id];
-        window.webContents.send('add-lulumi-extension-result', {
+        Object.keys(windows).forEach((key) => {
+          const id = parseInt(key, 10);
+          const window = windows[id];
+          window.webContents.send('add-lulumi-extension-result', {
+            name,
+            result,
+          });
+        });
+        event.sender.send('add-lulumi-extension-result', {
           name,
           result,
         });
-      });
-      event.sender.send('add-lulumi-extension-result', {
-        name,
-        result,
-      });
-    }
-  });
+      }
+    });
+  }
 });
 ipcMain.on('remove-lulumi-extension', (event, extensionId) => {
   let result = 'OK';

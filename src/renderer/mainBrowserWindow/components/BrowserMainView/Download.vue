@@ -41,7 +41,7 @@ transition(name="download-bar")
               img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
               a(class="download-list__item-name",
                 href='#',
-                @click.prevent="openItem(file.savePath)")
+                @click.prevent="openPath(file.savePath)")
                 | {{ file.name }}
             span(class="download-list__item-description") {{ progress(file) }}
           el-progress(:status="checkStateForProgress(file.dataState)",
@@ -109,8 +109,8 @@ export default class Download extends Vue {
   showItemInFolder(savePath: string): void {
     this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
   }
-  openItem(savePath: string): void {
-    this.$electron.ipcRenderer.send('open-item', savePath);
+  openPath(savePath: string): void {
+    this.$electron.ipcRenderer.send('open-path', savePath);
   }
   checkStateForButtonGroup(state: string): boolean {
     switch (state) {

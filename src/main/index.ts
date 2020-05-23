@@ -101,7 +101,8 @@ function lulumiStateSave(soft = true, windowCount = Object.keys(windows).length)
         }
       });
       window.close();
-      window.removeAllListeners('close');
+      // https://github.com/electron/electron/issues/22290
+      (window as any).removeAllListeners('close');
     });
   }
   if (setLanguage) {
@@ -203,7 +204,10 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     }
   });
 
-  mainWindow.on('close', () => (mainWindow.removeAllListeners('will-attach-webview')));
+  mainWindow.on('close', () => {
+    // https://github.com/electron/electron/issues/22290
+    (mainWindow as any).removeAllListeners('will-attach-webview');
+  });
 
   mainWindow.on('closed', () => ((mainWindow as any) = null));
 
@@ -457,10 +461,13 @@ ipcMain.on('get-window-count', (event: Electron.IpcMainEvent) => {
 // show the certificate
 ipcMain.on('show-certificate',
   (event: Electron.IpcMainEvent, certificate: Electron.Certificate, message: string) => {
-    dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
-      certificate,
-      message,
-    }).then();
+    const browserWindow = BrowserWindow.fromWebContents(event.sender);
+    if (browserWindow) {
+      dialog.showCertificateTrustDialog(browserWindow, {
+        certificate,
+        message,
+      }).then();
+    }
   });
 
 // focus the window
@@ -487,9 +494,9 @@ ipcMain.on('show-item-in-folder', (event, itemPath) => {
 });
 
 // open the item on host
-ipcMain.on('open-item', (event, itemPath) => {
+ipcMain.on('open-path', (event, itemPath) => {
   if (itemPath) {
-    shell.openItem(itemPath);
+    shell.openPath(itemPath);
   }
 });
 

@@ -340,7 +340,9 @@ export default class BrowserMainView extends Vue {
     this.onCommitted.emit({
       frameId: 0,
       parentFrameId: -1,
-      processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+      processId: this.$electron.remote.webContents.fromId(
+        this.getWebView(tabIndex).getWebContentsId()
+      ).getOSProcessId(),
       tabId: this.getTabObject(tabIndex).id,
       timeStamp: Date.now(),
       url: webview.getAttribute('src'),
@@ -356,7 +358,9 @@ export default class BrowserMainView extends Vue {
     this.onCompleted.emit({
       frameId: 0,
       parentFrameId: -1,
-      processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+      processId: this.$electron.remote.webContents.fromId(
+        this.getWebView(tabIndex).getWebContentsId()
+      ).getOSProcessId(),
       tabId: this.getTabObject(tabIndex).id,
       timeStamp: Date.now(),
       url: event.url,
@@ -398,7 +402,9 @@ export default class BrowserMainView extends Vue {
           windowId: this.windowId,
         });
       } else {
-        webview.getWebContents().downloadURL(parsedURL.query.src as string);
+        this.$electron.remote.webContents.fromId(
+          webview.getWebContentsId()
+        ).downloadURL(parsedURL.query.src as string);
       }
     } else {
       this.$store.dispatch('domReady', {
@@ -413,7 +419,9 @@ export default class BrowserMainView extends Vue {
       url,
       frameId: 0,
       parentFrameId: -1,
-      processId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+      processId: this.$electron.remote.webContents.fromId(
+        this.getWebView(tabIndex).getWebContentsId()
+      ).getOSProcessId(),
       tabId: this.getTabObject(tabIndex).id,
       timeStamp: Date.now(),
     });
@@ -595,7 +603,9 @@ export default class BrowserMainView extends Vue {
     }
     this.onCreatedNavigationTarget.emit({
       sourceTabId: this.getTabObject(tabIndex).id,
-      sourceProcessId: this.getWebView(tabIndex).getWebContents().getOSProcessId(),
+      sourceProcessId: this.$electron.remote.webContents.fromId(
+        this.getWebView(tabIndex).getWebContentsId()
+      ).getOSProcessId(),
       sourceFrameId: 0,
       timeStamp: Date.now(),
       url: event.url,
@@ -1018,12 +1028,14 @@ export default class BrowserMainView extends Vue {
     const webview = this.getWebView();
     const url = urlUtil.getUrlIfError(this.tab.url);
     if (webview.getURL() === url) {
-      webview.getWebContents().openDevTools({ mode: 'bottom' });
+      this.$electron.remote.webContents.fromId(
+        webview.getWebContentsId()
+      ).openDevTools({ mode: 'bottom' });
     }
   }
   onClickJavaScriptPanel(): void {
     const webview = this.getWebView();
-    const webContent = webview.getWebContents();
+    const webContent = this.$electron.remote.webContents.fromId(webview.getWebContentsId());
     if (webContent.isDevToolsOpened()) {
       webContent.closeDevTools();
     } else {
@@ -1081,7 +1093,7 @@ export default class BrowserMainView extends Vue {
     if (currentWindow) {
       const menuItems: any[] = [];
       const webview = this.getWebView();
-      const webContents: any = webview.getWebContents();
+      const webContents: any = this.$electron.remote.webContents.fromId(webview.getWebContentsId());
       const navbar = document.getElementById('browser-navbar');
       const goBack = document.getElementById('browser-navbar__goBack');
 
@@ -1145,7 +1157,7 @@ export default class BrowserMainView extends Vue {
     if (currentWindow) {
       const menuItems: any[] = [];
       const webview = this.getWebView();
-      const webContents: any = webview.getWebContents();
+      const webContents: any = this.$electron.remote.webContents.fromId(webview.getWebContentsId());
       const navbar = document.getElementById('browser-navbar');
       const goForward = document.getElementById('browser-navbar__goForward');
 
@@ -1477,8 +1489,9 @@ export default class BrowserMainView extends Vue {
         menu.append(new MenuItem({
           label: this.$t('webview.contextMenu.openLinkInNewWindow') as string,
           click: () => {
-            const webContent = webview.getWebContents();
-            webContent.executeJavaScript(`window.open('${params.linkURL}')`);
+            this.$electron.remote.webContents.fromId(
+              webview.getWebContentsId()
+            ).executeJavaScript(`window.open('${params.linkURL}')`);
           },
         }));
 
@@ -1632,15 +1645,21 @@ export default class BrowserMainView extends Vue {
     const ipc = this.$electron.ipcRenderer;
 
     ipc.on('reset-zoom', () => {
-      this.getWebView().getWebContents().setZoomLevel(0);
+      this.$electron.remote.webContents.fromId(
+        this.getWebView().getWebContentsId()
+      ).setZoomLevel(0);
     });
     ipc.on('zoom-in', () => {
-      const webContents = this.getWebView().getWebContents();
+      const webContents = this.$electron.remote.webContents.fromId(
+        this.getWebView().getWebContentsId()
+      );
       const zoomLevel = webContents.getZoomLevel();
       webContents.setZoomLevel(zoomLevel + 0.5);
     });
     ipc.on('zoom-out', () => {
-      const webContents = this.getWebView().getWebContents();
+      const webContents = this.$electron.remote.webContents.fromId(
+        this.getWebView().getWebContentsId()
+      );
       const zoomLevel = webContents.getZoomLevel();
       webContents.setZoomLevel(zoomLevel - 0.5);
     });

@@ -10,7 +10,7 @@
           | {{ scope.row.value.substring(0, 7) }}
         .cell(v-else-if="scope.row.key === 'userData'",
               style="color: cornflowerblue; cursor: pointer;",
-              @click="openItem(scope.row.value)") {{ scope.row.value }}
+              @click="openPath(scope.row.value)") {{ scope.row.value }}
         .cell(v-else) {{ scope.row.value }}
 </template>
 
@@ -32,8 +32,8 @@ export default class Lulumi extends Vue {
     return this.$store.getters.about.lulumi;
   }
 
-  openItem(userData: string): void {
-    ipcRenderer.send('open-item', userData);
+  openPath(userData: string): void {
+    ipcRenderer.send('open-path', userData);
   }
 }
 </script>
