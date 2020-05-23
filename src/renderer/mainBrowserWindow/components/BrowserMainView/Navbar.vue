@@ -285,6 +285,13 @@ export default class Navbar extends Vue {
   get certificates(): Lulumi.Store.Certificates {
     return this.$store.getters.certificates;
   }
+  get ensureInput(): boolean {
+    if (document && this.$refs.input) {
+      return true;
+    }
+
+    return false;
+  }
   get url(): string {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
       this.value = '';
@@ -366,41 +373,6 @@ export default class Navbar extends Vue {
   @Watch('tab')
   onTab(newTab: Lulumi.Store.TabObject) {
     this.value = newTab.url;
-  }
-  @Watch('url')
-  onUrl(): void {
-    if (!this.typing) {
-      if (document) {
-        (document.querySelector('.my-autocomplete') as HTMLDivElement)
-          .style.display = 'none';
-      }
-      (this.$refs.input as any).suggestions.length = 0;
-    }
-  }
-  @Watch('focused')
-  onFocused(isFocus: boolean): void {
-    if (document) {
-      setTimeout(
-        () => {
-          if (!isFocus) {
-            if (document) {
-              (document.querySelector('.my-autocomplete') as HTMLDivElement)
-                .style.display = 'none';
-              const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
-              const si = document.getElementById('security-indicator') as HTMLDivElement;
-              if (el && si && si.parentElement) {
-                if (!el.querySelector('input')!.classList.contains('hidden')) {
-                  el.querySelector('input')!.classList.add('hidden');
-                  si.parentElement.classList.remove('hidden');
-                }
-              }
-            }
-            (this.$refs.input as any).suggestions.length = 0;
-          }
-        },
-        200
-      );
-    }
   }
 
   chunk(r: any[], j: number): any[][] {
@@ -539,8 +511,6 @@ export default class Navbar extends Vue {
         'border: 2px ridge #0089ff; margin: 4px 0 2px -2px; line-height: 22px;'
       );
     }
-
-    this.focused = true;
   }
   onBlur(event): void {
     const input = event.target as HTMLDivElement;
@@ -553,11 +523,10 @@ export default class Navbar extends Vue {
     }
 
     this.typing = false;
-    this.focused = false;
-    if (document) {
+    if (this.ensureInput) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement) {
+      if (si && si.parentElement) {
         if (!el.querySelector('input')!.classList.contains('hidden')) {
           el.querySelector('input')!.classList.add('hidden');
           si.parentElement.classList.remove('hidden');
@@ -574,46 +543,41 @@ export default class Navbar extends Vue {
     }
   }
   onDragEnter(event): void {
-    if (document) {
+    if (this.ensureInput) {
       const si = document.getElementById('security-indicator');
-      if (si) {
-        if (event.fromElement &&
-          event.toElement &&
-          // eslint-disable-next-line max-len
-          event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
-          event.toElement.className === 'el-input__inner') {
-          si.querySelector('.security-hint')!.classList.add('selection');
-        } else if (event.fromElement &&
-          event.toElement &&
-          event.fromElement.className === 'el-input-group__append' &&
-          event.toElement.className === 'el-input__inner') {
-          si.querySelector('.security-hint')!.classList.add('selection');
-        }
+      if (event.fromElement &&
+        event.toElement &&
+        // eslint-disable-next-line max-len
+        event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
+        event.toElement.className === 'el-input__inner') {
+        si!.querySelector('.security-hint')!.classList.add('selection');
+      } else if (event.fromElement &&
+        event.toElement &&
+        event.fromElement.className === 'el-input-group__append' &&
+        event.toElement.className === 'el-input__inner') {
+        si!.querySelector('.security-hint')!.classList.add('selection');
       }
     }
   }
   onDragLeave(event): void {
-    if (document) {
+    if (this.ensureInput) {
       const si = document.getElementById('security-indicator');
-      if (si) {
-        if (event.fromElement &&
-          event.toElement &&
-          event.fromElement.className === 'el-input-group__append' &&
-          event.toElement.className === 'el-input__inner') {
-          si.querySelector('.security-hint')!.classList.remove('selection');
-        } else if (event.fromElement &&
-          event.toElement &&
-          // eslint-disable-next-line max-len
-          event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
-          event.toElement.className === 'el-input__inner') {
-          si.querySelector('.security-hint')!.classList.remove('selection');
-        }
+      if (event.fromElement &&
+        event.toElement &&
+        event.fromElement.className === 'el-input-group__append' &&
+        event.toElement.className === 'el-input__inner') {
+        si!.querySelector('.security-hint')!.classList.remove('selection');
+      } else if (event.fromElement &&
+        event.toElement &&
+        // eslint-disable-next-line max-len
+        event.fromElement.className === 'el-input el-input-group el-input-group--append el-input-group--prepend' &&
+        event.toElement.className === 'el-input__inner') {
+        si!.querySelector('.security-hint')!.classList.remove('selection');
       }
     }
   }
   onSelect(event: Lulumi.Renderer.SuggestionObject): void {
     this.typing = false;
-    this.focused = false;
     if (event.item) {
       if (event.item.title === `${this.currentSearchEngine.name} ${this.$t('navbar.search')}`) {
         const { item } = event;
@@ -639,19 +603,17 @@ export default class Navbar extends Vue {
     this.value = val;
   }
   selectText(): void {
-    if (document) {
+    if (this.ensureInput) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
-      if (el) {
-        el.querySelector('input')!.selectionStart = 0;
-        el.querySelector('input')!.selectionEnd = this.value.length;
-      }
+      el.querySelector('input')!.selectionStart = 0;
+      el.querySelector('input')!.selectionEnd = this.value.length;
     }
   }
   onNewElementParentClick(): void {
-    if (document) {
+    if (this.ensureInput) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement) {
+      if (si && si.parentElement) {
         if (el.querySelector('input')!.classList.contains('hidden')) {
           el.querySelector('input')!.classList.remove('hidden');
           si.parentElement.classList.add('hidden');
@@ -1149,10 +1111,10 @@ export default class Navbar extends Vue {
   }
 
   mounted() {
-    if (document) {
+    if (this.ensureInput) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;
-      if (el && si && si.parentElement) {
+      if (si && si.parentElement) {
         if (!el.querySelector('input')!.classList.contains('hidden')) {
           el.querySelector('input')!.classList.add('hidden');
           si.parentElement.classList.remove('hidden');

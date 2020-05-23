@@ -72,12 +72,14 @@ const goodCustomAutocomplete = customAutocomplete.extend({
 
           if (el && el.selectionStart === queryString.length) {
             if (this.lastQueryString !== queryString) {
-              const startPos = queryString.length;
-              const endPos = this.suggestions[0].item.url.length;
+              const firstUrl: string = this.suggestions[0].item.url;
+              const startPos: number = queryString.length;
+              const endPos: number = firstUrl.length;
               this.$refs.input.$refs.input.value =
-                `${queryString}${this.suggestions[0].item.url.substr(queryString.length)}`;
+                `${queryString}${firstUrl.substr(queryString.length)}`;
               this.setInputSelection(el, startPos, endPos);
-              this.lastQueryString = queryString;
+              this.lastQueryString = firstUrl;
+              this.$emit('input', firstUrl); // trigeer onChange
             } else {
               this.lastQueryString = this.lastQueryString.slice(0, -1);
             }
@@ -88,12 +90,14 @@ const goodCustomAutocomplete = customAutocomplete.extend({
         }
       });
     },
-    handleChange(value) {
+    handleInput(value) {
       this.$emit('input', value);
       this.suggestionDisabled = false;
       if (!this.triggerOnFocus && !value) {
-        this.suggestionDisabled = true;
-        this.suggestions = [];
+        this.$nextTick(() => {
+          this.suggestionDisabled = true;
+          this.suggestions = [];
+        });
         return;
       }
       this.debouncedGetData(value);
