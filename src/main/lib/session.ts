@@ -212,23 +212,7 @@ const registerScheme = (scheme: string): void => {
     sess = session.fromPartition('persist:lulumi');
   }
   if (sess) {
-    if (process.env.NODE_ENV === 'development') {
-      sess.protocol.registerHttpProtocol(scheme, (request, callback) => {
-        const url: string = request.url.substr(`${scheme}://`.length);
-        const [type, ...params] = url.split('/');
-        if (params[0] === '#') {
-          callback({
-            method: request.method,
-            url: `http://localhost:${require('../../../.electron-vue/config').port}/${type}.html`,
-          });
-        } else {
-          callback({
-            method: request.method,
-            url: `http://localhost:${require('../../../.electron-vue/config').port}/${params.join('/')}`,
-          });
-        }
-      });
-    } else {
+    if (process.env.NODE_ENV !== 'development') {
       sess.protocol.registerFileProtocol(scheme, (request, callback) => {
         const url: string = request.url.substr(`${scheme}://`.length);
         const [type, ...params] = url.split('/');

@@ -502,8 +502,14 @@ ipcMain.on('open-path', (event, itemPath) => {
 
 // load preference things into global when users accessing 'lulumi' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
+  let type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
   const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
+
+  if (process.env.NODE_ENV === 'development' && val.startsWith('http://localhost:')) {
+    if (require('url').parse(val).pathname === '/about.html') {
+      type = 'about';
+    }
+  }
   if (type === 'about') {
     const { versions } = process;
 

@@ -321,6 +321,7 @@ const urlUtil = {
    */
   getUrlIfPrivileged(url: string): Lulumi.Renderer.AboutLocationObject {
     const pivot = `${constants.lulumiPagesCustomProtocol}://`;
+
     if (url === 'chrome://gpu/') {
       return {
         omniUrl: `${pivot}gpu`,
@@ -346,19 +347,34 @@ const urlUtil = {
         return {
           omniUrl: `${pivot}${newUrl.host}`,
           title: `about:${newUrl.host}`,
-          url: privilegedUrls(`about:${newUrl.host}`),
+          // eslint-disable-next-line no-nested-ternary
+          url: (process.env.NODE_ENV === 'development')
+            ? (newUrl.host === 'playbooks')
+              ? `http://localhost:${require('../../../.electron-vue/config').port}/playbooks.html`
+              // eslint-disable-next-line max-len
+              : `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${newUrl.host}`
+            : privilegedUrls(`about:${newUrl.host}`),
         };
       }
       return {
         omniUrl: `${pivot}${hash}`,
         title: `about:${hash}`,
-        url: privilegedUrls(`about:${hash}`),
+        url: (process.env.NODE_ENV === 'development')
+          // eslint-disable-next-line max-len
+          ? `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${hash}`
+          : privilegedUrls(`about:${hash}`),
       };
     }
     return {
       omniUrl: `${pivot}${newUrl.host}`,
       title: `about:${newUrl.host}`,
-      url: privilegedUrls(`about:${newUrl.host}`),
+      // eslint-disable-next-line no-nested-ternary
+      url: (process.env.NODE_ENV === 'development')
+        ? (newUrl.host === 'playbooks')
+          ? `http://localhost:${require('../../../.electron-vue/config').port}/playbooks.html`
+          // eslint-disable-next-line max-len
+          : `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${newUrl.host}`
+        : privilegedUrls(`about:${newUrl.host}`),
     };
   },
 

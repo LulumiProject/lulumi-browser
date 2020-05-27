@@ -13,7 +13,8 @@ if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(
       process.argv[guestInstanceIndex].indexOf('=') + 1
-    ), 10
+    ),
+    10,
   );
 }
 
@@ -122,7 +123,8 @@ const moduleTmp = module;
 
 process.once('loaded', () => {
   if (document.location) {
-    if (document.location.href.startsWith('lulumi://')) {
+    if (document.location.href.startsWith('lulumi://') ||
+      (process.env.NODE_ENV === 'development' && document.location.href.startsWith('http://localhost:'))) {
       webFrame.executeJavaScript('window').then((window) => {
         window.about = ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href);
         window.backgroundPages = ipcRenderer.sendSync('get-background-pages');

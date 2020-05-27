@@ -80,14 +80,8 @@ export default class Tab extends Vue {
 
   navigateTo(url) {
     if (this.$refs.webview) {
-      if (!(process.env.NODE_ENV === 'test' &&
-        process.env.TEST_ENV === 'unit')) {
-        (this.$refs.webview as Electron.WebviewTag)
-          .setAttribute('src', urlUtil.getUrlFromInput(url));
-      } else {
-        (this.$refs.webview as Electron.WebviewTag)
-          .setAttribute('src', urlUtil.getUrlFromInput(url));
-      }
+      (this.$refs.webview as Electron.WebviewTag)
+        .setAttribute('src', urlUtil.getUrlFromInput(url));
     }
   }
   webviewHandler(self, fnName) {
