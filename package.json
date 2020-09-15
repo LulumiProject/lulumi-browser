@@ -117,7 +117,7 @@
     "mockery": "^2.1.0",
     "modern-normalize": "^0.6.0",
     "multispinner": "^0.2.1",
-    "node-forge": "^0.9.1",
+    "node-forge": "^0.10.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "pug": "^2.0.4",
     "pug-plain-loader": "^1.0.0",
