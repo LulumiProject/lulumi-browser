@@ -86,6 +86,7 @@ declare namespace Lulumi {
       [index: string]: ExtensionMetadata;
     }
     export interface TabObject {
+      browserViewId: number; // Id of the corresponding BrowserView
       webContentsId: number; // Id of the corresponding webContents
       id: number; // 頁籤的標識符。(某些狀況可能會沒有 id)
       index: number; // 頁籤在所在窗口中的索引，從 0 開始。

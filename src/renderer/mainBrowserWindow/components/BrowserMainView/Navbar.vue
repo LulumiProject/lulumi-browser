@@ -35,6 +35,7 @@
                                               @contextmenu.native="onNavContextMenu",
                                               @keyup.shift.up.native="selectPortion",
                                               @keyup.shift.down.native="selectPortion",
+                                              @keydown.native="detectBackspace",
                                               @focus="onFocus",
                                               @blur="onBlur",
                                               @select="onSelect",
@@ -248,6 +249,7 @@ export default class Navbar extends Vue {
   focused = false;
   value = '';
   search: any;
+  suggestionIndicator = true;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   extensions: Lulumi.API.ManifestObject[] = [];
   onbrowserActionClickedEvent: Event = new Event();
@@ -432,13 +434,19 @@ export default class Navbar extends Vue {
     }
   }
   selectPortion(event): void {
-    const { code } = event.code;
+    const { code } = event;
     const el = event.target;
     if (code === 'ArrowUp') {
       el.selectionEnd = el.selectionStart;
       el.selectionStart = 0;
     } else if (code === 'ArrowDown') {
       el.selectionEnd = el.value.length;
+    }
+  }
+  detectBackspace(event): void {
+    const { code } = event;
+    if (code === 'Backspace') {
+      this.suggestionIndicator = false;
     }
   }
   unique(suggestions: Lulumi.Renderer.SuggestionObject[]): Lulumi.Renderer.SuggestionObject[] {
@@ -601,6 +609,9 @@ export default class Navbar extends Vue {
   onChange(val: string) {
     this.typing = true;
     this.value = val;
+    if (this.value.length === 0) {
+      this.suggestionIndicator = true;
+    }
   }
   selectText(): void {
     if (this.ensureInput) {
@@ -627,10 +638,12 @@ export default class Navbar extends Vue {
     const currentSearchEngine: string = this.currentSearchEngine.name;
     const navbarSearch = this.$t('navbar.search');
     let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
-    this.suggestionItems.forEach((item) => {
-      item.icon = this.tabFavicon;
-      suggestions.push({ item });
-    });
+    if (this.suggestionIndicator) {
+      this.suggestionItems.forEach((item) => {
+        item.icon = this.tabFavicon;
+        suggestions.push({ item });
+      });
+    }
     if (queryString) {
       if (queryString.startsWith('about:')) {
         // Privileged Pages
@@ -751,6 +764,7 @@ export default class Navbar extends Vue {
       }
       suggestions = suggestions.filter(this.createFilter(queryString));
     }
+
     suggestions.push({
       item: {
         title: `${currentSearchEngine} ${this.$t('navbar.search')}`,

@@ -54,6 +54,7 @@ const pdfViewer = 'pdf-viewer';
 
 const tabConfig: Lulumi.Store.TabConfig = {
   dummyTabObject: {
+    browserViewId: -1,
     webContentsId: -1,
     id: -1,
     index: -1,

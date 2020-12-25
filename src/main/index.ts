@@ -6,6 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 import {
   app,
+  BrowserView,
   BrowserWindow,
   dialog,
   globalShortcut,
@@ -27,6 +28,7 @@ import constants from './constants';
 import menu from './lib/menu';
 import promisify from './lib/promisify';
 import fetch from './lib/fetch';
+import View from './lib/view';
 
 const { openProcessManager } = require('electron-process-manager');
 
@@ -81,6 +83,7 @@ const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
+const views: View[] = [];
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
@@ -186,6 +189,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   menu.init();
 
+  /*
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     webPreferences.nativeWindowOpen = false;
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
@@ -198,17 +202,14 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       } else {
         webPreferences.preload = path.join(constants.lulumiPreloadPath, 'popup-preload.js');
       }
-    } else {
-      webPreferences.contextIsolation = true;
-      webPreferences.preload = path.join(constants.lulumiPreloadPath, 'webview-preload.js');
     }
   });
+  */
 
   mainWindow.on('close', () => {
     // https://github.com/electron/electron/issues/22290
     (mainWindow as any).removeAllListeners('will-attach-webview');
   });
-
   mainWindow.on('closed', () => ((mainWindow as any) = null));
 
   if (!isTesting) {
@@ -456,6 +457,42 @@ ipcMain.on('open-process-manager', () => {
 // return the number of BrowserWindow
 ipcMain.on('get-window-count', (event: Electron.IpcMainEvent) => {
   event.returnValue = Object.keys(windows).length;
+});
+
+// create a BrowserView
+ipcMain.on('create-browser-view', (event, data) => {
+  const { tabId, tabIndex, url }: { tabId: number; tabIndex: number; url: string } = data;
+
+  const window = windows[data.windowId] as Electron.BrowserWindow;
+  if (window) {
+    views.push(new View(window, tabIndex, tabId, url));
+  }
+});
+
+// destroy a BrowserView
+ipcMain.on('destroy-browser-view', (event, browserViewId) => {
+  const browserView = views.find(view => (view.id === browserViewId));
+  if (browserView) {
+    browserView.destroy();
+  }
+});
+
+// resize a BrowserView
+ipcMain.on('resize-browser-view', (event, browserViewId) => {
+  const browserView = views.find(view => (view.id === browserViewId));
+  if (browserView) {
+    browserView.fitWindow();
+  }
+});
+
+// focus a BrowserView
+ipcMain.on('focus-browser-view', (event, data) => {
+  const { browserViewId }: { browserViewId: number } = data;
+
+  const window = windows[data.windowId] as Electron.BrowserWindow;
+  if (window) {
+    window.setBrowserView(BrowserView.fromId(browserViewId));
+  }
 });
 
 // show the certificate

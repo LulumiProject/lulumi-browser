@@ -19,16 +19,8 @@ if (typeof process.env.NODE_ENV === 'string') {
 }
 
 app.on('browser-window-created', (event, window) => {
-  window.webContents.once('devtools-opened', () => {
-    // Workaround for https://github.com/electron/electron/issues/13095
-    setImmediate(() => {
-      window.focus();
-    });
-  });
-
-  // Workaround for https://github.com/electron/electron/issues/12438
   window.webContents.once('dom-ready', () => {
-    window.webContents.openDevTools({ mode: 'bottom' });
+    window.webContents.openDevTools({ mode: 'bottom', active: false });
   });
 });
 

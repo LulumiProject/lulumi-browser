@@ -79,8 +79,11 @@ export default class StatusBar extends Vue {
 }
 
 #status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 22px;
-  width: 100vw;
   background: #007acc;
   color: #ffffff;
   cursor: default;

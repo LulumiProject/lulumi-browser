@@ -295,6 +295,34 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
         window.webContents.send('leave-full-screen', isDarwin);
       });
 
+      ipcMain.on(`window-${window.id}-set-bounds`, (event2, bounds) => {
+        const browserView = window.getBrowserView();
+
+        if (browserView) {
+          browserView.setBounds({
+            x: 0,
+            y: 72,
+            width: bounds.width,
+            height: bounds.height - /* nav */ 72 - /* status-bar */ 22,
+          });
+        }
+      });
+
+      window.webContents.executeJavaScript(`
+        function triggerResize() {
+          const width = document.body.offsetWidth
+          const height = document.body.offsetHeight;
+          require('electron')
+            .ipcRenderer.send('window-${window.id}-set-bounds', {
+              width,
+              height,
+            });
+        }
+        triggerResize();
+        const ResizeSensor = require('css-element-queries/src/ResizeSensor');
+        new ResizeSensor(document.getElementById("app"), triggerResize);
+      `);
+
       ipcMain.on('window-id', (event2: Electron.IpcMainEvent) => {
         const window2 = BrowserWindow.fromWebContents(event2.sender);
         if (window2) {
@@ -355,7 +383,6 @@ const register = (storagePath: string, swipeGesture: boolean): void => {
           }
           (window as any).removeAllListeners('scroll-touch-end');
           (window as any).removeAllListeners('scroll-touch-edge');
-          (window as any).removeAllListeners('window-id');
           close = true;
           window.close();
         }

@@ -1,17 +1,5 @@
 <template lang="pug">
 div
-  webview(partition="persist:lulumi",
-          plugins,
-          :element-loading-text="$t('tab.loading')",
-          ref="webview",
-          :class="isActive ? 'active' : 'hidden'")
-  .findinpage-bar(ref="findinpageBar", v-show="!hidden && isActive")
-    input(ref="findinpageInput", :placeholder="$t('tab.findInPage.placeholder')")
-    span(ref="findinpageCount")
-    div
-      i(ref="findinpagePreviousMatch", class="el-icon-arrow-up")
-      i(ref="findinpageNextMatch", class="el-icon-arrow-down")
-      i(ref="findinpageEnd", class="el-icon-circle-close")
 </template>
 
 <script lang="ts">
@@ -20,10 +8,6 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import urlUtil from '../../../lib/url-util';
 
 import Event from '../../../api/event';
-
-import BrowserMainView from '../BrowserMainView.vue';
-
-const ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
 @Component({
   props: {
@@ -79,18 +63,12 @@ export default class Tab extends Vue {
   }
 
   navigateTo(url) {
-    if (this.$refs.webview) {
-      (this.$refs.webview as Electron.WebviewTag)
-        .setAttribute('src', urlUtil.getUrlFromInput(url));
+    if (this.tab.browserViewId !== -1) {
+      this.$electron.remote.BrowserView.fromId(this.tab.browserViewId).webContents
+        .loadURL(urlUtil.getUrlFromInput(url));
     }
   }
-  webviewHandler(self, fnName) {
-    return (event) => {
-      if (self.$parent[fnName]) {
-        self.$parent[fnName](event, this.tabIndex, this.tabId);
-      }
-    };
-  }
+  /*
   findInPage() {
     if (this.hidden) {
       this.findinpage.start();
@@ -105,46 +83,30 @@ export default class Tab extends Vue {
       (this.findinpage.input as HTMLInputElement).select();
     }
   }
+  */
+
+  getBrowserView() {
+    return this.$electron.remote.BrowserView.fromId(this.tab.browserViewId);
+  }
 
   @Watch('isActive')
-  onIsActive(newState: string): void {
+  onIsActive(active: boolean): void {
+    /*
     if (newState && !this.hidden) {
       (this.$refs.findinpageInput as HTMLInputElement).focus();
+    }
+    */
+    if (active) {
+      this.$electron.ipcRenderer.send('resize-browser-view', this.tab.browserViewId);
+      this.$electron.ipcRenderer.send('focus-browser-view', {
+        browserViewId: this.tab.browserViewId,
+        windowId: this.windowId,
+      });
     }
   }
 
   mounted() {
-    const webview = this.$refs.webview as Electron.WebviewTag;
-
-    const webviewEvents = {
-      'did-start-loading': 'onDidStartLoading',
-      'did-navigate': 'onDidNavigate',
-      'page-title-set': 'onPageTitleSet',
-      'dom-ready': 'onDomReady',
-      'did-frame-finish-load': 'onDidFrameFinishLoad',
-      'page-favicon-updated': 'onPageFaviconUpdated',
-      'did-stop-loading': 'onDidStopLoading',
-      'did-fail-load': 'onDidFailLoad',
-      'did-finish-load': 'onDidFinishLoad',
-      'ipc-message': 'onIpcMessage',
-      'console-message': 'onConsoleMessage',
-      'update-target-url': 'onUpdateTargetUrl',
-      'media-started-playing': 'onMediaStartedPlaying',
-      'media-paused': 'onMediaPaused',
-      'enter-html-full-screen': 'onEnterHtmlFullScreen',
-      'leave-html-full-screen': 'onLeaveHtmlFullScreen',
-      'new-window': 'onNewWindow',
-      'scroll-touch-begin': 'onScrollTouchBegin',
-      'scroll-touch-end': 'onScrollTouchEnd',
-      'context-menu': 'onContextMenu',
-      'will-navigate': 'onWillNavigate',
-      'did-navigate-in-page': 'onDidNavigateInPage',
-    };
-
-    Object.keys(webviewEvents).forEach((key) => {
-      webview.addEventListener(key, this.webviewHandler(this, webviewEvents[key]));
-    });
-
+    /*
     this.findinpage = {
       input: this.$refs.findinpageInput,
       counter: this.$refs.findinpageCount,
@@ -242,29 +204,18 @@ export default class Tab extends Vue {
         }
       }
     });
+    */
 
-    const nav = this.$parent.$refs.nav as HTMLDivElement;
-    const findinpageBar = this.$refs.findinpageBar as HTMLDivElement;
-    if (nav && findinpageBar) {
-      /*
-        * register the resize event on nav element to dynamically adjust
-        * the height of webview element
-        */
-      // eslint-disable-next-line no-new
-      new ResizeSensor(nav, () => {
-        webview.style.height =
-          (this.$parent as BrowserMainView).getViewHeight();
-        findinpageBar.style.top = `${nav.clientHeight}px`;
-      });
+    this.$electron.ipcRenderer.send('create-browser-view', {
+      tabId: this.tabId,
+      tabIndex: this.tabIndex,
+      windowId: this.windowId,
+      url: this.tab.url,
+    });
+  }
 
-      // fired once
-      webview.style.height =
-        (this.$parent as BrowserMainView).getViewHeight();
-      findinpageBar.style.top = `${nav.clientHeight}px`;
-
-      // navigate
-      this.navigateTo(this.tab.url);
-    }
+  beforeDestroy() {
+    this.$electron.ipcRenderer.send('destroy-browser-view', this.tab.browserViewId);
   }
 }
 </script>

@@ -33,6 +33,7 @@ const state: Lulumi.Store.State = {
 // eslint-disable-next-line max-len
 function createTabObject(stateContext: Lulumi.Store.State, wid: number, openUrl: string | null = null): Lulumi.Store.TabObject {
   return {
+    browserViewId: -1,
     webContentsId: -1,
     id: 0,
     index: 0,
@@ -267,6 +268,16 @@ const mutations = {
     Vue.set(stateContext.tabs[index], 'active', true);
   },
   // tab handlers
+  [types.SET_BROWSER_VIEW_ID](stateContext: Lulumi.Store.State, payload) {
+    const browserViewId: number = payload.browserViewId;
+    const tabId: number = payload.tabId;
+
+    const tabsIndex = stateContext.tabs.findIndex(tab => tab.id === tabId);
+
+    if (stateContext.tabs[tabsIndex]) {
+      stateContext.tabs[tabsIndex].browserViewId = browserViewId;
+    }
+  },
   [types.DID_START_LOADING](stateContext: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const webContentsId: number = payload.webContentsId;
@@ -309,7 +320,7 @@ const mutations = {
       stateContext.tabs[tabsIndex].hasMedia = false;
     }
   },
-  [types.PAGE_TITLE_SET](stateContext: Lulumi.Store.State, payload) {
+  [types.PAGE_TITLE_UPDATED](stateContext: Lulumi.Store.State, payload) {
     // const windowId: number = payload.windowId;
     const tabId: number = payload.tabId;
     // const tabIndex: number = payload.tabIndex;

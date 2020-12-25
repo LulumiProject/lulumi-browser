@@ -37,6 +37,12 @@ export const actions = {
     });
   },
 
+  setBrowserViewId({ commit }, { browserViewId, tabId }) {
+    commit(types.SET_BROWSER_VIEW_ID, {
+      browserViewId,
+      tabId,
+    });
+  },
   didStartLoading({ commit }, { webContentsId, windowId, tabId, tabIndex, url }) {
     commit(types.DID_START_LOADING, {
       webContentsId,
@@ -54,8 +60,8 @@ export const actions = {
       url,
     });
   },
-  pageTitleSet({ commit }, { windowId, tabId, tabIndex, title }) {
-    commit(types.PAGE_TITLE_SET, {
+  pageTitleUpdated({ commit }, { windowId, tabId, tabIndex, title }) {
+    commit(types.PAGE_TITLE_UPDATED, {
       windowId,
       tabId,
       tabIndex,
