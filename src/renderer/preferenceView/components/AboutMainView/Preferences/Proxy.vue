@@ -28,6 +28,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
@@ -52,7 +54,7 @@ export default class TabConfig extends Vue {
     });
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, proxyConfig: any) => {
         this.pacScript = proxyConfig.pacScript;
@@ -62,7 +64,7 @@ export default class TabConfig extends Vue {
     );
     ipcRenderer.send('guest-want-data', 'proxyConfig');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }

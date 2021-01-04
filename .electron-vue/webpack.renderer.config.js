@@ -45,7 +45,7 @@ let whiteListedModules = ['vue']
 
 let mainBrowserWindowConfig = {
   name: 'main-browser-window',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'main-browser-window': path.join(__dirname, '../src/renderer/mainBrowserWindow/main.ts')
   },
@@ -57,6 +57,7 @@ let mainBrowserWindowConfig = {
     rules: [
       {
         test: /\.ts$/,
+        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -81,11 +82,13 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.less$/,
+        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/mainBrowserWindow') ]
       },
       {
         test: /\.css$/,
+        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/mainBrowserWindow'),
@@ -97,12 +100,14 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.html$/,
+        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.js$/,
+        enforce: 'post',
         use: {
           loader: 'babel-loader',
           options: {
@@ -114,6 +119,7 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.pug$/,
+        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -131,31 +137,15 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'imgs/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: 'media/[name]--[folder].[ext]'
-        }
+        type: 'asset/resource'
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'fonts/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       }
     ]
   },
@@ -211,11 +201,19 @@ let mainBrowserWindowConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslintAutoFix: false,
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
     new VueLoaderPlugin(),
@@ -248,7 +246,7 @@ let mainBrowserWindowConfig = {
 
 let preloadsConfig = {
   name: 'preloads',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'webview-preload': path.join(__dirname, '../src/preloads/webview-preload.ts'),
     'extension-preload': path.join(__dirname, '../src/preloads/extension-preload.ts'),
@@ -303,11 +301,19 @@ let preloadsConfig = {
       test: /-preload\.js$/
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslintAutoFix: false,
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preloads]', excludeWarnings: false })
   ],
@@ -330,7 +336,7 @@ let preloadsConfig = {
 
 let preferenceViewConfig = {
   name: 'preference-view',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'preference-view': path.join(__dirname, '../src/renderer/preferenceView/main.ts')
   },
@@ -341,6 +347,7 @@ let preferenceViewConfig = {
     rules: [
       {
         test: /\.ts$/,
+        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -365,11 +372,13 @@ let preferenceViewConfig = {
       },
       {
         test: /\.less$/,
+        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/preferenceView') ]
       },
       {
         test: /\.css$/,
+        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/preferenceView'),
@@ -380,12 +389,14 @@ let preferenceViewConfig = {
       },
       {
         test: /\.html$/,
+        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
+        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -399,31 +410,15 @@ let preferenceViewConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'imgs/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: 'media/[name]--[folder].[ext]'
-        }
+        type: 'asset/resource'
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'fonts/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       }
     ]
   },
@@ -474,10 +469,19 @@ let preferenceViewConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preferenceView]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -502,7 +506,7 @@ let preferenceViewConfig = {
 
 let playbooksViewConfig = {
   name: 'playbooks-view',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'playbooks-view': path.join(__dirname, '../src/renderer/playbooksView/main.ts')
   },
@@ -513,6 +517,7 @@ let playbooksViewConfig = {
     rules: [
       {
         test: /\.ts$/,
+        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -537,11 +542,13 @@ let playbooksViewConfig = {
       },
       {
         test: /\.less$/,
+        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/playbooksView') ]
       },
       {
         test: /\.css$/,
+        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/playbooksView'),
@@ -553,12 +560,14 @@ let playbooksViewConfig = {
       },
       {
         test: /\.html$/,
+        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
+        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -572,31 +581,15 @@ let playbooksViewConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'imgs/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: 'media/[name]--[folder].[ext]'
-        }
+        type: 'asset/resource'
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'fonts/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       }
     ]
   },
@@ -647,10 +640,19 @@ let playbooksViewConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [playbooksView]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -675,7 +677,7 @@ let playbooksViewConfig = {
 
 let commandPaletteConfig = {
   name: 'command-palette',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'command-palette': path.join(__dirname, '../src/renderer/commandPalette/main.ts')
   },
@@ -687,6 +689,7 @@ let commandPaletteConfig = {
     rules: [
       {
         test: /\.ts$/,
+        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -711,11 +714,13 @@ let commandPaletteConfig = {
       },
       {
         test: /\.less$/,
+        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/commandPalette') ]
       },
       {
         test: /\.css$/,
+        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/commandPalette'),
@@ -725,12 +730,14 @@ let commandPaletteConfig = {
       },
       {
         test: /\.html$/,
+        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
+        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -744,31 +751,15 @@ let commandPaletteConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'imgs/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: 'media/[name]--[folder].[ext]'
-        }
+        type: 'asset/resource'
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'fonts/[name]--[folder].[ext]'
-          }
-        },
+        type: 'asset/resource'
       }
     ]
   },
@@ -822,10 +813,19 @@ let commandPaletteConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [commandPalette]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -851,7 +851,7 @@ let commandPaletteConfig = {
 
 let workerConfig = {
   name: 'worker',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'search-worker': path.join(__dirname, '../src/renderer/mainBrowserWindow/js/search-worker.js'),
     'recommender': path.join(__dirname, '../src/renderer/commandPalette/js/recommender.js'),
@@ -894,12 +894,6 @@ if (process.env.NODE_ENV === 'production') {
   preferenceViewConfig.performance = { hints: false }
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   playbooksViewConfig.performance = { hints: false }
-  mainBrowserWindowConfig.devtool = false
-  preloadsConfig.devtool = false
-  preferenceViewConfig.devtool = false
-  playbooksViewConfig.devtool = false
-  commandPaletteConfig.devtool = false
-  workerConfig.devtool = false
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({

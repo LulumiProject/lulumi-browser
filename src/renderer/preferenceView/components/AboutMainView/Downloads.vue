@@ -52,6 +52,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Col, Row } from 'element-ui';
@@ -130,13 +132,13 @@ export default class Downloads extends Vue {
     ipcRenderer.send('cancel-downloads-progress', startTime);
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.files = ret;
     });
     this.fetch();
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.clear();
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }

@@ -159,7 +159,7 @@ const removeBackgroundPages = (manifest) => {
   }
 };
 
-const registerLocalCommands = (window: Electron.BrowserWindow, manifest) => {
+const registerLocalCommands = (window: Electron.BrowserWindow, manifest: any): void => {
   const { commands } = manifest;
   if (commands) {
     Object.keys(commands).forEach((command) => {
@@ -207,7 +207,6 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
       code: String(fs.readFileSync(path.join(manifest.srcDirectory, relativePath))),
     });
     const contentScriptToEntry = script => ({
-      // eslint-disable-next-line @typescript-eslint/camelcase
       all_frames: script.all_frames,
       matches: script.matches,
       js: script.js ? script.js.map(readArrayOfFiles) : [],
@@ -216,7 +215,6 @@ const injectContentScripts = (manifest: Lulumi.API.ManifestObject) => {
     });
 
     try {
-      // eslint-disable-next-line @typescript-eslint/camelcase
       manifest.content_scripts = manifest.content_scripts.map(contentScriptToEntry);
     } catch (readError) {
       console.error('Failed to read content scripts', readError);
@@ -367,7 +365,7 @@ app.whenReady().then(() => {
 
 // we can not use protocol or BrowserWindow until app is ready,
 // and hopefully, this function will be called after app is ready
-const loadExtensions = () => {
+const loadExtensions: () => void = () => {
   try {
     const loadedExtensions = JSON.parse(fs.readFileSync(loadedExtensionsPath, 'utf8'));
     if (Array.isArray(loadedExtensions)) {
@@ -384,7 +382,7 @@ const loadExtensions = () => {
   }
 };
 
-function getManifestMap() {
+function getManifestMap(): any {
   return manifestMap;
 }
 

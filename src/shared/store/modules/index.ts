@@ -1,7 +1,7 @@
 import { ModuleTree } from 'vuex';
 
 interface RequireContext extends __WebpackModuleApi.RequireContext {
-  default: object;
+  default: any;
 }
 
 const files = require.context('.', false, /\.ts$/);

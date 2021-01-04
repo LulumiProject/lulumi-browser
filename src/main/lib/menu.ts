@@ -387,10 +387,10 @@ const getTemplate = () => {
 };
 
 export default {
-  init() {
+  init(): void {
     Menu.setApplicationMenu(getTemplate());
   },
-  setLocale(locale) {
+  setLocale(locale: any): void {
     i18n.locale = locale;
   },
 };

@@ -511,6 +511,6 @@ function defineAPI(apiFactory) {
   return Promise.resolve(() => nodeModule._load = original);
 }
 
-export function initializeExtensionApi(apiFactory) {
+export function initializeExtensionApi(apiFactory: any) {
   return defineAPI(apiFactory);
 }

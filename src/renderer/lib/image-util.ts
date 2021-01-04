@@ -65,7 +65,7 @@ const imageUtil = {
    * @param {String} input The input value.
    * @param {Function} cb The callback function.
    */
-  getWorkingImageUrl(input: string, cb: Function): void {
+  getWorkingImageUrl(input: string, cb: (boolean) => any): void {
     const img = new (window as any).Image();
     img.onload = () => cb(true);
     img.onerror = () => cb(false);

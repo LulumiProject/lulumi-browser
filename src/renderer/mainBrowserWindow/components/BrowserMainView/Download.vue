@@ -54,6 +54,8 @@ transition(name="download-bar")
 </template>
 
 <script lang="ts">
+/* global Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
@@ -78,8 +80,8 @@ import '../../css/el-popover';
 })
 
 export default class Download extends Vue {
-  get files() {
-    let tmpFiles: object[] = [];
+  get files(): any {
+    let tmpFiles: any = [];
     if (this.$store.getters.downloads.length !== 0) {
       tmpFiles = this.$store.getters.downloads.filter(download => download.style !== 'hidden');
       tmpFiles.forEach((file) => {

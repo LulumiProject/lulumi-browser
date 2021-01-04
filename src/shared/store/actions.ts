@@ -4,11 +4,11 @@
 import * as types from './mutation-types';
 
 export const actions = {
-  incrementTabId({ commit }) {
+  incrementTabId({ commit }): void {
     commit(types.INCREMENT_TAB_ID);
   },
 
-  createTab({ commit }, { windowId, url, isURL, follow }) {
+  createTab({ commit }, { windowId, url, isURL, follow }): void {
     commit(types.CREATE_TAB, {
       windowId,
       url,
@@ -16,20 +16,20 @@ export const actions = {
       follow,
     });
   },
-  closeTab({ commit }, { windowId, tabId, tabIndex }) {
+  closeTab({ commit }, { windowId, tabId, tabIndex }): void {
     commit(types.CLOSE_TAB, {
       windowId,
       tabId,
       tabIndex,
     });
   },
-  closeAllTabs({ commit }, { windowId, amount }) {
+  closeAllTabs({ commit }, { windowId, amount }): void {
     commit(types.CLOSE_ALL_TABS, {
       windowId,
       amount,
     });
   },
-  clickTab({ commit }, { windowId, tabId, tabIndex }) {
+  clickTab({ commit }, { windowId, tabId, tabIndex }): void {
     commit(types.CLICK_TAB, {
       windowId,
       tabId,
@@ -37,13 +37,13 @@ export const actions = {
     });
   },
 
-  setBrowserViewId({ commit }, { browserViewId, tabId }) {
+  setBrowserViewId({ commit }, { browserViewId, tabId }): void {
     commit(types.SET_BROWSER_VIEW_ID, {
       browserViewId,
       tabId,
     });
   },
-  didStartLoading({ commit }, { webContentsId, windowId, tabId, tabIndex, url }) {
+  didStartLoading({ commit }, { webContentsId, windowId, tabId, tabIndex, url }): void {
     commit(types.DID_START_LOADING, {
       webContentsId,
       windowId,
@@ -52,7 +52,7 @@ export const actions = {
       url,
     });
   },
-  didNavigate({ commit }, { windowId, tabId, tabIndex, url }) {
+  didNavigate({ commit }, { windowId, tabId, tabIndex, url }): void {
     commit(types.DID_NAVIGATE, {
       windowId,
       tabId,
@@ -60,7 +60,7 @@ export const actions = {
       url,
     });
   },
-  pageTitleUpdated({ commit }, { windowId, tabId, tabIndex, title }) {
+  pageTitleUpdated({ commit }, { windowId, tabId, tabIndex, title }): void {
     commit(types.PAGE_TITLE_UPDATED, {
       windowId,
       tabId,
@@ -68,7 +68,7 @@ export const actions = {
       title,
     });
   },
-  domReady({ commit }, { windowId, tabId, tabIndex, canGoBack, canGoForward }) {
+  domReady({ commit }, { windowId, tabId, tabIndex, canGoBack, canGoForward }): void {
     commit(types.DOM_READY, {
       windowId,
       tabId,
@@ -77,7 +77,7 @@ export const actions = {
       canGoForward,
     });
   },
-  didFrameFinishLoad({ commit }, { windowId, tabId, tabIndex, url, canGoBack, canGoForward }) {
+  didFrameFinishLoad({ commit }, { windowId, tabId, tabIndex, url, canGoBack, canGoForward }): void {
     commit(types.DID_FRAME_FINISH_LOAD, {
       windowId,
       tabId,
@@ -87,7 +87,7 @@ export const actions = {
       canGoForward,
     });
   },
-  pageFaviconUpdated({ commit }, { windowId, tabId, tabIndex, url }) {
+  pageFaviconUpdated({ commit }, { windowId, tabId, tabIndex, url }): void {
     commit(types.PAGE_FAVICON_UPDATED, {
       windowId,
       tabId,
@@ -95,7 +95,7 @@ export const actions = {
       url,
     });
   },
-  didStopLoading({ commit }, { windowId, tabId, tabIndex, url, canGoBack, canGoForward }) {
+  didStopLoading({ commit }, { windowId, tabId, tabIndex, url, canGoBack, canGoForward }): void {
     commit(types.DID_STOP_LOADING, {
       windowId,
       tabId,
@@ -105,7 +105,7 @@ export const actions = {
       canGoForward,
     });
   },
-  didFailLoad({ commit }, { windowId, tabId, tabIndex, isMainFrame }) {
+  didFailLoad({ commit }, { windowId, tabId, tabIndex, isMainFrame }): void {
     commit(types.DID_FAIL_LOAD, {
       windowId,
       tabId,
@@ -113,7 +113,7 @@ export const actions = {
       isMainFrame,
     });
   },
-  updateTargetUrl({ commit }, { windowId, tabId, tabIndex, url }) {
+  updateTargetUrl({ commit }, { windowId, tabId, tabIndex, url }): void {
     commit(types.UPDATE_TARGET_URL, {
       windowId,
       tabId,
@@ -121,7 +121,7 @@ export const actions = {
       url,
     });
   },
-  mediaStartedPlaying({ commit }, { windowId, tabId, tabIndex, isAudioMuted }) {
+  mediaStartedPlaying({ commit }, { windowId, tabId, tabIndex, isAudioMuted }): void {
     commit(types.MEDIA_STARTED_PLAYING, {
       windowId,
       tabId,
@@ -129,14 +129,14 @@ export const actions = {
       isAudioMuted,
     });
   },
-  mediaPaused({ commit }, { windowId, tabId, tabIndex }) {
+  mediaPaused({ commit }, { windowId, tabId, tabIndex }): void {
     commit(types.MEDIA_PAUSED, {
       windowId,
       tabId,
       tabIndex,
     });
   },
-  toggleAudio({ commit }, { windowId, tabId, tabIndex, muted }) {
+  toggleAudio({ commit }, { windowId, tabId, tabIndex, muted }): void {
     commit(types.TOGGLE_AUDIO, {
       windowId,
       tabId,
@@ -144,7 +144,7 @@ export const actions = {
       muted,
     });
   },
-  updateCertificate({ commit }, { hostname, certificate, verificationResult, errorCode }) {
+  updateCertificate({ commit }, { hostname, certificate, verificationResult, errorCode }): void {
     commit(types.UPDATE_CERTIFICATE, {
       hostname,
       certificate,
@@ -152,7 +152,7 @@ export const actions = {
       errorCode,
     });
   },
-  updateExtensionMetadata({ commit }, { tabId, extensionId, browserActionIcon, pageActionIcon, badgeText, badgeBackgroundColor }) {
+  updateExtensionMetadata({ commit }, { tabId, extensionId, browserActionIcon, pageActionIcon, badgeText, badgeBackgroundColor }): void {
     commit(types.UPDATE_EXTENSION_METADATA, {
       tabId,
       extensionId,
@@ -163,54 +163,54 @@ export const actions = {
     });
   },
 
-  setCurrentSearchEngineProvider({ commit }, val) {
+  setCurrentSearchEngineProvider({ commit }, val: any): void {
     commit(types.SET_CURRENT_SEARCH_ENGINE_PROVIDER, { val });
   },
-  setHomepage({ commit }, val) {
+  setHomepage({ commit }, val: any): void {
     commit(types.SET_HOMEPAGE, { val });
   },
-  setPDFViewer({ commit }, val) {
+  setPDFViewer({ commit }, val: any): void {
     commit(types.SET_PDF_VIEWER, { val });
   },
-  setTabConfig({ commit }, val) {
+  setTabConfig({ commit }, val: any): void {
     commit(types.SET_TAB_CONFIG, { val });
   },
-  setLang({ commit }, val) {
+  setLang({ commit }, val: any): void {
     commit(types.SET_LANG, { val });
   },
-  setProxyConfig({ commit }, val) {
+  setProxyConfig({ commit }, val: any): void {
     commit(types.SET_PROXY_CONFIG, { val });
   },
-  setAuth({ commit }, val) {
+  setAuth({ commit }, val: any): void {
     commit(types.SET_AUTH, { val });
   },
-  setDownloads({ commit }, val) {
+  setDownloads({ commit }, val: any): void {
     commit(types.SET_DOWNLOADS, { val });
   },
-  setHistory({ commit }, val) {
+  setHistory({ commit }, val: any): void {
     commit(types.SET_HISTORY, { val });
   },
-  setTabsOrder({ commit }, { windowId, tabsOrder }) {
+  setTabsOrder({ commit }, { windowId, tabsOrder }): void {
     commit(types.SET_TABS_ORDER, {
       windowId,
       tabsOrder,
     });
   },
-  setPageAction({ commit }, { tabId, extensionId, enabled }) {
+  setPageAction({ commit }, { tabId, extensionId, enabled }): void {
     commit(types.SET_PAGE_ACTION, {
       tabId,
       extensionId,
       enabled,
     });
   },
-  clearPageAction({ commit }, { windowId, tabId, tabIndex }) {
+  clearPageAction({ commit }, { windowId, tabId, tabIndex }): void {
     commit(types.CLEAR_PAGE_ACTION, {
       windowId,
       tabId,
       tabIndex,
     });
   },
-  createDownloadTask({ commit }, { name, url, totalBytes, isPaused, canResume, startTime, getReceivedBytes, dataState, style }) {
+  createDownloadTask({ commit }, { name, url, totalBytes, isPaused, canResume, startTime, getReceivedBytes, dataState, style }): void {
     commit(types.CREATE_DOWNLOAD_TASK, {
       name,
       url,
@@ -223,7 +223,7 @@ export const actions = {
       style,
     });
   },
-  updateDownloadsProgress({ commit }, { startTime, getReceivedBytes, savePath, isPaused, canResume, dataState }) {
+  updateDownloadsProgress({ commit }, { startTime, getReceivedBytes, savePath, isPaused, canResume, dataState }): void {
     commit(types.UPDATE_DOWNLOADS_PROGRESS, {
       startTime,
       getReceivedBytes,
@@ -233,7 +233,7 @@ export const actions = {
       dataState,
     });
   },
-  completeDownloadsProgress({ commit }, { name, startTime, dataState }) {
+  completeDownloadsProgress({ commit }, { name, startTime, dataState }): void {
     commit(types.COMPLETE_DOWNLOADS_PROGRESS, {
       name,
       startTime,
@@ -243,7 +243,7 @@ export const actions = {
   closeDownloadBar({ commit }) {
     commit(types.CLOSE_DOWNLOAD_BAR);
   },
-  setPermissions({ commit }, { hostname, permission, accept }) {
+  setPermissions({ commit }, { hostname, permission, accept }): void {
     commit(types.SET_PERMISSIONS, {
       hostname,
       permission,
@@ -251,11 +251,11 @@ export const actions = {
     });
   },
 
-  setLulumiState({ commit }, newState) {
+  setLulumiState({ commit }, newState: any): void {
     commit(types.SET_LULUMI_STATE, { newState });
   },
 
-  createWindow({ commit }, { windowId, width, height, left, top, windowState, type }) {
+  createWindow({ commit }, { windowId, width, height, left, top, windowState, type }): void {
     commit(types.CREATE_WINDOW, {
       windowId,
       width,
@@ -266,10 +266,10 @@ export const actions = {
       type,
     });
   },
-  closeWindow({ commit }, windowId) {
+  closeWindow({ commit }, windowId: number): void {
     commit(types.CLOSE_WINDOW, { windowId });
   },
-  updateWindowProperty({ commit }, { windowId, width, height, left, top, focused, windowState }) {
+  updateWindowProperty({ commit }, { windowId, width, height, left, top, focused, windowState }): void {
     commit(types.UPDATE_WINDOW_PROPERTY, {
       windowId,
       width,
@@ -281,17 +281,17 @@ export const actions = {
     });
   },
 
-  addExtension({ commit }, { extensionInfo }) {
+  addExtension({ commit }, { extensionInfo }): void {
     commit(types.ADD_EXTENSION, {
       extensionInfo,
     });
   },
-  removeExtension({ commit }, { extensionId }) {
+  removeExtension({ commit }, { extensionId }): void {
     commit(types.REMOVE_EXTENSION, {
       extensionId,
     });
   },
-  updateExtension({ commit }, { enabled, extensionId }) {
+  updateExtension({ commit }, { enabled, extensionId }): void {
     commit(types.UPDATE_EXTENSION, {
       enabled,
       extensionId,

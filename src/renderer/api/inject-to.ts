@@ -121,7 +121,7 @@ function normalizeArgumentsAndValidate(namespace, name, args) {
   }
 }
 
-function wrapper(action: Function | null, ...args: any[]) {
+function wrapper(action: (results: any) => any | null, ...args: any) {
   const scope: string = args.shift();
   const suffix = generateSuffix();
   const count = ipcRenderer.sendSync('get-window-count');
@@ -146,7 +146,7 @@ let nextPortId = 0;
 const localStorage = new Store('local-store', 'local-storage');
 
 ipcRenderer.setMaxListeners(0);
-export default function injectTo(guestInstanceId, thisExtensionId, scriptType, context: Lulumi.Preload.Context) {
+export default function injectTo(guestInstanceId: number, thisExtensionId: string, scriptType: string, context: Lulumi.Preload.Context) {
   context.lulumi = context.lulumi || {};
   const { lulumi } = context;
 

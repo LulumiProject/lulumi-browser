@@ -15,6 +15,8 @@
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Table, TableColumn } from 'element-ui';
@@ -28,7 +30,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class Lulumi extends Vue {
-  get lulumi() {
+  get lulumi(): any {
     return this.$store.getters.about.lulumi;
   }
 

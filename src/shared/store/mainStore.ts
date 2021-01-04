@@ -462,7 +462,7 @@ function saveLulumiState(soft = true, bumpWindowIdsBy = 0): Promise<any> {
   );
 }
 
-function bumpWindowIds(bumpWindowIdsBy: number) {
+function bumpWindowIds(bumpWindowIdsBy: number): void {
   saveLulumiState(true, bumpWindowIdsBy).then((state) => {
     if (state && state.windows.length > 0) {
       let tmpWindow: Electron.BrowserWindow;

@@ -11,6 +11,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
@@ -31,13 +33,13 @@ export default class Homepage extends Vue {
     });
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.homepage = ret.homepage;
     });
     ipcRenderer.send('guest-want-data', 'homepage');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }

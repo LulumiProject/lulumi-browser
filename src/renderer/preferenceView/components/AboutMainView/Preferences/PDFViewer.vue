@@ -9,6 +9,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Option, Select } from 'element-ui';
@@ -22,7 +24,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class PDFViewer extends Vue {
-  options: object[] = [
+  options: Array<{ value: string, label: string}> = [
     {
       value: 'pdf-viewer',
       label: 'Chrome pdf extension',
@@ -40,13 +42,13 @@ export default class PDFViewer extends Vue {
     });
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.pdfViewer = ret.pdfViewer;
     });
     ipcRenderer.send('guest-want-data', 'pdfViewer');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }

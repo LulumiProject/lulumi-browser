@@ -11,7 +11,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class AboutMainView extends Vue {
-  get datas() {
+  get datas(): any {
     return this.$store.getters.about;
   }
 

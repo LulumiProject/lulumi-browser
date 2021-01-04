@@ -31,6 +31,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { CreateElement, VNode } from 'vue';
 
@@ -124,7 +126,7 @@ export default class History extends Vue {
   }
   transformArr(history: HistoryItem[]): HistoryItem[] {
     const newArr: HistoryItem[] = [];
-    const labels: object = {};
+    const labels: any = {};
     let i: number;
     let j: number;
     let cur: HistoryItem;
@@ -172,7 +174,7 @@ export default class History extends Vue {
     );
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.history = ret;
       this.data = this.transformArr(this.history);
@@ -180,7 +182,7 @@ export default class History extends Vue {
     // fetch once when the component is mounted
     ipcRenderer.send('guest-want-data', 'history');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.clear();
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }

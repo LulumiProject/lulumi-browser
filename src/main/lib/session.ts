@@ -28,7 +28,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
         details.type = details.resourceType;
       }
       if (details.requestHeaders) {
-        const requestHeaders: object[] = [];
+        const requestHeaders: any = [];
         Object.keys(details.requestHeaders).forEach((k) => {
           requestHeaders.push({ name: k, value: details.requestHeaders[k] });
         });
@@ -39,7 +39,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           if (request.cancel) {
             callback({ cancel: true });
           } else if (request.requestHeaders) {
-            const requestHeaders: object = {};
+            const requestHeaders: any = {};
             request.requestHeaders.forEach((requestHeader) => {
               requestHeaders[requestHeader.name] = requestHeader.value;
             });
@@ -75,7 +75,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
         details.type = details.resourceType;
       }
       if (details.responseHeaders) {
-        const responseHeaders: object[] = [];
+        const responseHeaders: any[] = [];
         Object.keys(details.responseHeaders).forEach((k) => {
           responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
         });
@@ -87,7 +87,7 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
           if (response.cancel) {
             callback({ cancel: true });
           } else if (response.responseHeaders) {
-            const responseHeaders: object = {};
+            const responseHeaders: any = {};
             response.responseHeaders.forEach((responseHeader) => {
               responseHeaders[responseHeader.name] = responseHeader.value;
             });
@@ -124,14 +124,14 @@ const register = (eventName: any, sess: Electron.Session, eventLispCaseName: str
         details.type = details.resourceType;
       }
       if (details.requestHeaders) {
-        const requestHeaders: object[] = [];
+        const requestHeaders: any = [];
         Object.keys(details.requestHeaders).forEach((k) => {
           requestHeaders.push({ name: k, value: details.requestHeaders[k] });
         });
         details.requestHeaders = requestHeaders;
       }
       if (details.responseHeaders) {
-        const responseHeaders: object[] = [];
+        const responseHeaders: any = [];
         Object.keys(details.responseHeaders).forEach((k) => {
           responseHeaders.push({ name: k, value: details.responseHeaders[k][0] });
         });
@@ -226,7 +226,7 @@ const registerScheme = (scheme: string): void => {
   }
 };
 
-const registerCertificateVerifyProc = () => {
+const registerCertificateVerifyProc: () => void = () => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   const store = mainStore.getStore();
   sess.setCertificateVerifyProc((request, callback) => {
@@ -270,7 +270,7 @@ const registerCertificateVerifyProc = () => {
   });
 };
 
-const onWillDownload = (windows, path: string): void => {
+const onWillDownload = (windows: any, path: string): void => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.on('will-download', (event, item, webContents) => {
     const itemURL = item.getURL();
@@ -359,7 +359,7 @@ const onWillDownload = (windows, path: string): void => {
   });
 };
 
-const setPermissionRequestHandler = (windows): void => {
+const setPermissionRequestHandler = (windows: any): void => {
   const sess = session.fromPartition('persist:lulumi') as Electron.Session;
   sess.setPermissionRequestHandler((webContents, permission, callback) => {
     Object.keys(windows).forEach((key) => {

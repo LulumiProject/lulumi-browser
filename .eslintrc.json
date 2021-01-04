@@ -88,7 +88,8 @@
       { "args": "after-used" }
     ],
     "import/newline-after-import": "off",
-    "no-control-regex": "off"
+    "no-control-regex": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
   },
   "settings": {
     "import/resolver": {

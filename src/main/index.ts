@@ -125,7 +125,7 @@ function lulumiStateSave(soft = true, windowCount = Object.keys(windows).length)
 }
 
 // eslint-disable-next-line max-len
-function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
+function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: (eventName: string) => void): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
   const defaultOption: Record<string, any> = {
     autoHideMenuBar: autoHideMenuBarSetting,
@@ -391,7 +391,7 @@ app.on('second-instance', () => {
 
 // load windowProperties
 ipcMain.on('get-window-properties', (event: Electron.IpcMainEvent) => {
-  const windowProperties: any[] = [];
+  const windowProperties: any = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
   let windowPropertyFilenames =

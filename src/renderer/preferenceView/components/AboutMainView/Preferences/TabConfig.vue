@@ -27,6 +27,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
@@ -49,7 +51,7 @@ export default class TabConfig extends Vue {
     });
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, tabConfig: Lulumi.Store.TabConfig) => {
         this.defaultUrl = tabConfig.dummyTabObject.url;
@@ -58,7 +60,7 @@ export default class TabConfig extends Vue {
     );
     ipcRenderer.send('guest-want-data', 'tabConfig');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }

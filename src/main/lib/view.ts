@@ -194,15 +194,15 @@ export default class View {
     this.webContents.loadURL(urlUtil.getUrlFromInput(url));
   }
 
-  public get id() {
+  public get id(): number {
     return this.browserView.id;
   }
 
-  public get webContents() {
+  public get webContents(): Electron.WebContents {
     return this.browserView.webContents;
   }
 
-  public async fitWindow() {
+  public async fitWindow(): Promise<void> {
     const { width } = this.window.getContentBounds();
     const height = await this.window.webContents
       .executeJavaScript(`
@@ -217,7 +217,7 @@ export default class View {
     });
   }
 
-  public destroy() {
+  public destroy(): boolean {
     this.browserView.destroy();
     return this.browserView.isDestroyed();
   }

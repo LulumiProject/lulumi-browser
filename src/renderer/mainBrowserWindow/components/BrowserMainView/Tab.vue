@@ -3,6 +3,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
 import urlUtil from '../../../lib/url-util';
@@ -62,7 +64,7 @@ export default class Tab extends Vue {
     return this.tabs[this.tabIndex];
   }
 
-  navigateTo(url) {
+  navigateTo(url: string): void {
     if (this.tab.browserViewId !== -1) {
       this.$electron.remote.BrowserView.fromId(this.tab.browserViewId).webContents
         .loadURL(urlUtil.getUrlFromInput(url));
@@ -85,7 +87,7 @@ export default class Tab extends Vue {
   }
   */
 
-  getBrowserView() {
+  getBrowserView(): Electron.BrowserView {
     return this.$electron.remote.BrowserView.fromId(this.tab.browserViewId);
   }
 
@@ -105,7 +107,7 @@ export default class Tab extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     /*
     this.findinpage = {
       input: this.$refs.findinpageInput,
@@ -214,7 +216,7 @@ export default class Tab extends Vue {
     });
   }
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.$electron.ipcRenderer.send('destroy-browser-view', this.tab.browserViewId);
   }
 }

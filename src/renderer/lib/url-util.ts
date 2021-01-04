@@ -108,11 +108,11 @@ const urlUtil = {
     }
   },
 
-  isImageAddress(url: string): object | null {
+  isImageAddress(url: string): any | null {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/));
   },
 
-  isHttpAddress(url: string): object | null {
+  isHttpAddress(url: string): any | null {
     return (url.match(/^https?:\/\/(.*)/));
   },
 

@@ -21,16 +21,16 @@ import { ipcRenderer } from 'electron';
 class Event {
   scope: string;
   event: string;
-  listeners: Function[];
+  listeners: string[];
 
-  constructor(scope, event) {
+  constructor(scope: string, event: string) {
     this.scope = scope;
     this.event = event;
     this.listeners = [];
   }
 
-  addListener(callback) {
-    const digest = callback.toString().hashCode();
+  addListener(callback: (...args: any) => any): void {
+    const digest = (callback.toString() as any).hashCode();
     this.listeners.push(digest);
     ipcRenderer.on(
       `lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`, (event, args) => {
@@ -40,8 +40,8 @@ class Event {
     ipcRenderer.send(`lulumi-${this.scope}-add-listener-${this.event}`, digest);
   }
 
-  removeListener(callback) {
-    const digest = callback.toString().hashCode();
+  removeListener(callback: (...args: any) => any): void {
+    const digest = (callback.toString() as any).hashCode();
     this.listeners = this.listeners.filter(c => (c !== digest));
     ipcRenderer.removeAllListeners(
       `lulumi-${this.scope}-add-listener-${this.event}-result-${digest}`
@@ -49,7 +49,7 @@ class Event {
     ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, digest);
   }
 
-  emit(...args) {
+  emit(...args: any): void {
     ipcRenderer.send(`lulumi-${this.scope}-emit-${this.event}`, args);
   }
 }

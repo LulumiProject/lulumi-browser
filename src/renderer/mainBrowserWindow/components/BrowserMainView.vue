@@ -24,6 +24,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import * as path from 'path';
@@ -71,7 +73,7 @@ export default class BrowserMainView extends Vue {
   startTime = 0;
   showDownloadBar = false;
   extensionService: ExtensionService;
-  contextMenus: object = {};
+  contextMenus: any = {};
   onCommandEvent: Event = new Event();
   onUpdatedEvent: Event = new Event();
   onCreatedEvent: Event = new Event();
@@ -116,7 +118,7 @@ export default class BrowserMainView extends Vue {
     return this.$store.getters.certificates;
   }
   get historyMenuItem(): Electron.MenuItemConstructorOptions[] {
-    const recentlyClosed: any[] = [];
+    const recentlyClosed: any = [];
     this.lastOpenedTabs().forEach((lastOpenedTab) => {
       recentlyClosed.push(
         {
@@ -194,7 +196,7 @@ export default class BrowserMainView extends Vue {
     }
     return 0;
   }
-  async historyMappings() {
+  async historyMappings(): Promise<any> {
     const out: any = {};
     this.$store.getters.history.forEach((h) => {
       if (!out[h.url]) {
@@ -257,7 +259,7 @@ export default class BrowserMainView extends Vue {
     return lastOpenedTabs;
   }
   // lulumi.alarms
-  getAlarm(name): Lulumi.BrowserMainView.Alarm | undefined {
+  getAlarm(name: string): Lulumi.BrowserMainView.Alarm | undefined {
     return this.alarms[name];
   }
   getAllAlarm(): Lulumi.BrowserMainView.AlarmArray {
@@ -281,7 +283,7 @@ export default class BrowserMainView extends Vue {
   clearAllAlarm(): boolean {
     return Object.keys(this.getAllAlarm()).every(name => (this.clearAlarm(name)));
   }
-  createAlarm(name: string, alarmInfo): void {
+  createAlarm(name: string, alarmInfo: any): void {
     const alarm: Lulumi.BrowserMainView.Alarm = {
       handler: null,
     };
@@ -309,7 +311,7 @@ export default class BrowserMainView extends Vue {
       Vue.set(this.alarms, name, alarm);
     }
   }
-  addContextMenus(menuItems, webContentsId: number): void {
+  addContextMenus(menuItems: any, webContentsId: number): void {
     if (menuItems) {
       if (menuItems.length === 0) {
         Vue.delete((this.contextMenus as any), webContentsId);
@@ -617,7 +619,7 @@ export default class BrowserMainView extends Vue {
     });
   }
   */
-  onOpenPDF(event: Electron.Event, data): void {
+  onOpenPDF(event: Electron.Event, data: any): void {
     const webContents: Electron.webContents | null =
       this.$electron.remote.webContents.fromId(data.webContentsId);
     if (webContents && webContents.getType() === 'browserView') {
@@ -637,7 +639,7 @@ export default class BrowserMainView extends Vue {
       }
     }
   }
-  onWillDownloadAnyFile(event: Electron.Event, data): void {
+  onWillDownloadAnyFile(event: Electron.Event, data: any): void {
     const webContents: Electron.webContents | null =
       this.$electron.remote.webContents.fromId(data.webContentsId);
     if (webContents && webContents.getType() === 'browserView') {
@@ -663,7 +665,7 @@ export default class BrowserMainView extends Vue {
       }
     }
   }
-  onUpdateDownloadsProgress(event: Electron.Event, data): void {
+  onUpdateDownloadsProgress(event: Electron.Event, data: any): void {
     if (data.hostWebContentsId === this.windowWebContentsId) {
       this.$store.dispatch('updateDownloadsProgress', {
         startTime: data.startTime,
@@ -675,7 +677,7 @@ export default class BrowserMainView extends Vue {
       });
     }
   }
-  onCompleteDownloadsProgress(event: Electron.Event, data): void {
+  onCompleteDownloadsProgress(event: Electron.Event, data: any): void {
     if (data.hostWebContentsId === this.windowWebContentsId) {
       this.$store.dispatch('completeDownloadsProgress', {
         name: data.name,
@@ -1191,7 +1193,7 @@ export default class BrowserMainView extends Vue {
     const currentWindow: Electron.BrowserWindow | null =
       this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
-      const menuItems: any[] = [];
+      const menuItems: any = [];
       const view = this.getBrowserView();
       const webContents: any = this.$electron.remote.webContents.fromId(view.webContents.id);
       const navbar = document.getElementById('browser-navbar');
@@ -1255,7 +1257,7 @@ export default class BrowserMainView extends Vue {
     const currentWindow: Electron.BrowserWindow | null =
       this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
-      const menuItems: any[] = [];
+      const menuItems: any = [];
       const view = this.getBrowserView();
       const webContents: any = this.$electron.remote.webContents.fromId(view.webContents.id);
       const navbar = document.getElementById('browser-navbar');
@@ -1709,7 +1711,7 @@ export default class BrowserMainView extends Vue {
     }
   }
 
-  beforeMount() {
+  beforeMount(): void {
     const ipc = this.$electron.ipcRenderer;
 
     if (!(process.env.NODE_ENV === 'test' && process.env.TEST_ENV === 'unit')) {
@@ -1737,7 +1739,7 @@ export default class BrowserMainView extends Vue {
 
     this.extensionService = new ExtensionService(this);
   }
-  mounted() {
+  mounted(): void {
     if (is.macos) {
       document.body.classList.add('darwin');
     }

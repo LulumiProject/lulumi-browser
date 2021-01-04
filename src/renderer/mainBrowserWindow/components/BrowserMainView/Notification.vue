@@ -23,6 +23,8 @@ el-row(:gutter="20",
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Checkbox, Col, Row } from 'element-ui';
@@ -62,16 +64,16 @@ export default class Notification extends Vue {
   id = -1;
   handler: any;
 
-  get permissions() {
+  get permissions(): any {
     return this.$store.getters.permissions;
   }
 
-  clear() {
+  clear(): void {
     if (this.handler) {
       clearTimeout(this.handler);
     }
   }
-  onAllow() {
+  onAllow(): void {
     const ipc = this.$electron.ipcRenderer;
 
     if (this.type === 'permission') {
@@ -102,7 +104,7 @@ export default class Notification extends Vue {
       clearTimeout(this.handler);
     }
   }
-  onDeny() {
+  onDeny(): void {
     const ipc = this.$electron.ipcRenderer;
 
     if (this.type === 'permission') {
@@ -134,7 +136,7 @@ export default class Notification extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     const ipc = this.$electron.ipcRenderer;
 
     // Every page would add a listenter to the request-permission and
@@ -233,7 +235,7 @@ export default class Notification extends Vue {
       }
     });
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     const ipc = this.$electron.ipcRenderer;
     ipc.removeAllListeners('update-available');
     ipc.removeAllListeners('request-permission');

@@ -20,7 +20,7 @@ import SearchBar from './SearchBar.vue';
   },
 })
 export default class Spotlight extends Vue {
-  handleClear() {
+  handleClear(): void {
     this.$electron.remote.getGlobal('commandPalette').hide();
   }
 }

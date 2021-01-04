@@ -31,6 +31,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Col, Row, Switch, Table, TableColumn } from 'element-ui';
@@ -76,7 +78,7 @@ export default class SearchEngineProvider extends Vue {
     });
   }
 
-  mounted() {
+  mounted(): void {
     ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.autoFetch = ret.autoFetch;
       this.tableData.length = 0;
@@ -98,7 +100,7 @@ export default class SearchEngineProvider extends Vue {
     });
     ipcRenderer.send('guest-want-data', 'searchEngineProvider');
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }

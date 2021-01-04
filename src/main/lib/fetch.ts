@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
+
 import { net } from 'electron';
 
-export default function fetch(provider: string, url: string, callback: Function) {
+export default function fetch(provider: string, url: string, callback: ({ body: string, error: any, ok: boolean }) => any): void {
   let bodyData = '';
   const urlRequest = net.request(url);
   urlRequest.on('response', (response) => {

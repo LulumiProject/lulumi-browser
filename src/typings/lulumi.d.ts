@@ -12,7 +12,7 @@ declare namespace Lulumi {
   export namespace Scheme {
     // lulumi:// scheme
     export interface LulumiObject extends Object {
-      lulumi: object[];
+      lulumi: Array<{ key: string, value: string }>;
       preferences: string[][];
       about: string[][];
     }
@@ -74,7 +74,7 @@ declare namespace Lulumi {
   export namespace Store {
     // store
     export interface CustomStore {
-      dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
+      dispatch: (type: any, ...payload: any) => Promise<any> | void;
     }
     export interface ExtensionMetadata {
       browserActionIcon: string;
@@ -113,7 +113,7 @@ declare namespace Lulumi {
       error: boolean;
       hasMedia: boolean;
       isAudioMuted: boolean;
-      pageActionMapping: object;
+      pageActionMapping: any;
       extensionsMetadata: ExtensionsMetadata;
     }
     export interface CommandPaletteConfig {
@@ -197,7 +197,7 @@ declare namespace Lulumi {
       auth: { username: string, password: string };
       downloads: DownloadItem[];
       history: TabHistory[];
-      permissions: object;
+      permissions: any;
       lastOpenedTabs: LastOpenedTabObject[];
       certificates: Certificates;
       windows: LulumiBrowserWindowProperty[];

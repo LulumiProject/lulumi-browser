@@ -7,16 +7,16 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 interface Window {
-  about: object;
-  manifestMap: object;
-  backgroundPages: object;
+  about: any;
+  manifestMap: any;
+  backgroundPages: any;
 }
 
 declare const window: Window;
 
 @Component({ name: 'lulumi-browser' })
 export default class App extends Vue {
-  mounted() {
+  mounted(): void {
     if (!(process.env.NODE_ENV === 'test' &&
       process.env.TEST_ENV === 'unit')) {
       if (window.about) {

@@ -36,6 +36,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, Col, Row } from 'element-ui';
@@ -60,7 +62,7 @@ declare const window: Window;
   },
 })
 export default class Extensions extends Vue {
-  get extensions() {
+  get extensions(): any {
     return this.$store.getters.extensions;
   }
 
@@ -96,7 +98,7 @@ export default class Extensions extends Vue {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(data.result);
+          this.$message.error(data.result);
         }
       }
     );
@@ -110,7 +112,7 @@ export default class Extensions extends Vue {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(data.result);
+          this.$message.error(data.result);
         }
       }
     );

@@ -8,6 +8,8 @@
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import AwesomeIcon from 'vue-awesome/components/Icon.vue';
@@ -50,7 +52,7 @@ export default class StatusBar extends Vue {
     return this.tabs[this.currentTabIndex];
   }
 
-  onClick(event: MouseEvent) {
+  onClick(event: MouseEvent): void {
     const currentWindow: Electron.BrowserWindow | null =
       this.$electron.remote.BrowserWindow.fromId(this.windowId);
 

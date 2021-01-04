@@ -3,13 +3,12 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="electron" />
 
-import Vue from 'vue';
 // augment types of Vue.$electron
 declare module 'vue/types/vue' {
   interface BrowserWindow {
     static createWindow(
       options?: Electron.BrowserWindowConstructorOptions,
-      callback?: Function): Electron.BrowserWindow;
+      callback?: (eventName: string) => void): Electron.BrowserWindow;
   }
   interface Remote extends Electron.Remote {
     BrowserWindow: BrowserWindow & typeof Electron.BrowserWindow;

@@ -7,7 +7,7 @@ const FEED_URL = `https://updater-for-lulumi-browser.herokuapp.com/update/${plat
 const version = app.getVersion();
 
 export default {
-  init() {
+  init(): any {
     autoUpdater.on(('error' as any), (err, msg) => {
       // eslint-disable-next-line no-console
       console.error(`Error fetching updates, ${msg} (${err.stack})`);
@@ -18,7 +18,7 @@ export default {
     setTimeout(() => autoUpdater.checkForUpdates(), 1000 * 10);
     setInterval(() => autoUpdater.checkForUpdates(), 1000 * 60 * 5);
   },
-  listen(windows) {
+  listen(windows: any): void {
     autoUpdater.once('update-downloaded', (event, releaseNotes, releaseName) => {
       Object.keys(windows).forEach((key) => {
         const id = parseInt(key, 10);
