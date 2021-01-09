@@ -334,13 +334,13 @@ export default class SearchBar extends Vue {
         const { offsetTop } = (highlightItem as HTMLDataListElement);
 
         if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
-          if (newHIndex !== oldHIndex) {
+          if (newHIndex !== parseInt(oldHIndex, 10)) {
             suggestion.scrollTop += header.clientHeight;
           }
           suggestion.scrollTop += highlightItem.scrollHeight;
         }
         if (offsetTop < scrollTop) {
-          if (newHIndex !== oldHIndex) {
+          if (newHIndex !== parseInt(oldHIndex, 10)) {
             suggestion.scrollTop -= header.clientHeight;
           }
           suggestion.scrollTop -= highlightItem.scrollHeight;

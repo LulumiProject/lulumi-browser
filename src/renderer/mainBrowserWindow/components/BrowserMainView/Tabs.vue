@@ -143,21 +143,23 @@ export default class Tabs extends Vue {
       this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       this.$nextTick(() => {
-        let pattern = '';
+        let pattern: string | null = '';
         if ((event.target as SVGElement).tagName === 'svg') {
-          pattern = (event.target as SVGElement).firstElementChild.getAttribute('xlink:href');
+          pattern = (event.target as SVGElement).firstElementChild!.getAttribute('xlink:href');
         } else if ((event.target as HTMLElement).tagName === 'use') {
           pattern = (event.target as HTMLElement).getAttribute('xlink:href');
         }
-        const state: string = pattern.split('#').reverse()[0].split('-')[0];
-        if (state === 'minimize') {
-          currentWindow.minimize();
-        } else if (state === 'restore') {
-          currentWindow.unmaximize();
-        } else if (state === 'maximize') {
-          currentWindow.maximize();
-        } else if (state === 'close') {
-          currentWindow.close();
+        if (pattern) {
+          const state: string = pattern.split('#').reverse()[0].split('-')[0];
+          if (state === 'minimize') {
+            currentWindow.minimize();
+          } else if (state === 'restore') {
+            currentWindow.unmaximize();
+          } else if (state === 'maximize') {
+            currentWindow.maximize();
+          } else if (state === 'close') {
+            currentWindow.close();
+          }
         }
       });
     }

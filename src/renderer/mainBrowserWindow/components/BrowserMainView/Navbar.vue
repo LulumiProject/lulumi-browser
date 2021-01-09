@@ -546,10 +546,12 @@ export default class Navbar extends Vue {
     }
   }
   onDrop(event: DragEvent): void {
-    const urlString: string = event.dataTransfer.getData('url');
-    if (urlString) {
-      this.value = urlString;
-      this.onNewElementParentClick();
+    if (event.dataTransfer) {
+      const urlString: string = event.dataTransfer.getData('url');
+      if (urlString) {
+        this.value = urlString;
+        this.onNewElementParentClick();
+      }
     }
   }
   onDragEnter(event: any): void {

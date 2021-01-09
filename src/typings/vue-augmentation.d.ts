@@ -3,6 +3,9 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="electron" />
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Vue from 'vue';
+
 // augment types of Vue.$electron
 declare module 'vue/types/vue' {
   interface BrowserWindow {
@@ -25,6 +28,7 @@ declare module 'vue/types/vue' {
     webFrame: Electron.WebFrame;
   }
 
+  // eslint-disable-next-line no-shadow
   interface Vue {
     $electron: MyElectron;
   }

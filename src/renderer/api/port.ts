@@ -33,14 +33,14 @@ class Port {
   extensionId: string;
   connectInfo: any;
   scriptType: string;
-  responseScriptType: string;
-  webContentsId: number;
+  responseScriptType: string | null;
+  webContentsId: number | null;
   name: string;
   onDisconnect: Event;
   onMessage: Event;
   sender: MessageSender;
 
-  constructor(portId: number, extensionId: string, connectInfo: any, scriptType: string, responseScriptType: string, webContentsId: number) {
+  constructor(portId: number, extensionId: string, connectInfo: any, scriptType: string, responseScriptType: string | null, webContentsId: number | null) {
     this.portId = portId;
     this.disconnected = false;
     this.otherEnd = false;

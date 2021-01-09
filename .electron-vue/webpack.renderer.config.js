@@ -57,7 +57,6 @@ let mainBrowserWindowConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -82,13 +81,11 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.less$/,
-        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/mainBrowserWindow') ]
       },
       {
         test: /\.css$/,
-        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/mainBrowserWindow'),
@@ -100,14 +97,12 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.html$/,
-        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.js$/,
-        enforce: 'post',
         use: {
           loader: 'babel-loader',
           options: {
@@ -119,7 +114,6 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.pug$/,
-        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -137,15 +131,31 @@ let mainBrowserWindowConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        type: 'asset/resource'
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
       }
     ]
   },
@@ -347,7 +357,6 @@ let preferenceViewConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -372,13 +381,11 @@ let preferenceViewConfig = {
       },
       {
         test: /\.less$/,
-        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/preferenceView') ]
       },
       {
         test: /\.css$/,
-        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/preferenceView'),
@@ -389,14 +396,12 @@ let preferenceViewConfig = {
       },
       {
         test: /\.html$/,
-        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
-        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -410,15 +415,31 @@ let preferenceViewConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        type: 'asset/resource'
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
       }
     ]
   },
@@ -517,7 +538,6 @@ let playbooksViewConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -542,13 +562,11 @@ let playbooksViewConfig = {
       },
       {
         test: /\.less$/,
-        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/playbooksView') ]
       },
       {
         test: /\.css$/,
-        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/playbooksView'),
@@ -560,14 +578,12 @@ let playbooksViewConfig = {
       },
       {
         test: /\.html$/,
-        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
-        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -581,15 +597,31 @@ let playbooksViewConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        type: 'asset/resource'
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
       }
     ]
   },
@@ -689,7 +721,6 @@ let commandPaletteConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'post',
         use: {
           loader: 'ts-loader',
           options: {
@@ -714,13 +745,11 @@ let commandPaletteConfig = {
       },
       {
         test: /\.less$/,
-        enforce: 'post',
         use: returnLess,
         include: [ path.join(__dirname, '../src/renderer/commandPalette') ]
       },
       {
         test: /\.css$/,
-        enforce: 'post',
         use: returnCss,
         include: [
           path.join(__dirname, '../src/renderer/commandPalette'),
@@ -730,14 +759,12 @@ let commandPaletteConfig = {
       },
       {
         test: /\.html$/,
-        enforce: 'post',
         use: [{
           loader: 'vue-html-loader'
         }]
       },
       {
         test: /\.pug$/,
-        enforce: 'post',
         use: [{
           loader: 'pug-plain-loader'
         }]
@@ -751,15 +778,31 @@ let commandPaletteConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'imgs/[name]--[folder].[ext]'
+          }
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        type: 'asset/resource'
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
+        }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        type: 'asset/resource'
+        use: {
+          loader: 'url-loader',
+          query: {
+            limit: 10000,
+            name: 'fonts/[name]--[folder].[ext]'
+          }
+        },
       }
     ]
   },
