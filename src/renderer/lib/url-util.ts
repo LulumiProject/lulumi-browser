@@ -97,11 +97,8 @@ const urlUtil = {
   },
 
   canParseURL(input: string): boolean {
-    if (window === undefined) {
-      return true;
-    }
     try {
-      const url = new window.URL(input);
+      const url = new URL(input);
       return !!url;
     } catch (e) {
       return false;
@@ -186,7 +183,7 @@ const urlUtil = {
     }
 
     try {
-      return new window.URL(newInput).href;
+      return new URL(newInput).href;
     } catch (e) {
       return newInput;
     }
@@ -265,9 +262,9 @@ const urlUtil = {
   getHostname(input: string, excludePort = false): string | null {
     try {
       if (excludePort) {
-        return new window.URL(input).hostname;
+        return new URL(input).hostname;
       }
-      return new window.URL(input).host;
+      return new URL(input).host;
     } catch (e) {
       return null;
     }
@@ -385,7 +382,7 @@ const urlUtil = {
    */
   getDefaultFaviconUrl(url: string): string {
     if (urlUtil.isURL(url)) {
-      const loc = new window.URL(url);
+      const loc = new URL(url);
       return `${loc.protocol}//${loc.host}/favicon.ico`;
     }
     return '';

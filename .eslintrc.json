@@ -89,7 +89,8 @@
     ],
     "import/newline-after-import": "off",
     "no-control-regex": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/member-delimiter-style": "error"
   },
   "settings": {
     "import/resolver": {

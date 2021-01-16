@@ -9,9 +9,15 @@ import * as enUS from '../../helper/i18n/en-US';
 import * as zhCN from '../../helper/i18n/zh-CN';
 import * as zhTW from '../../helper/i18n/zh-TW';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
 
-const lang = ipcRenderer.sendSync('request-lang');
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
+
+const lang = window.ipcRenderer.sendSync('request-lang');
 
 Vue.use(VueI18n);
 

@@ -6,14 +6,17 @@ const lulumiRootPath = process.env.NODE_ENV === 'development'
 const lulumiHelperPath = process.env.NODE_ENV === 'development'
   ? path.resolve(lulumiRootPath, 'src', 'helper')
   : path.resolve(lulumiRootPath, 'dist');
+const lulumiPreloadPath = process.env.NODE_ENV === 'development'
+  ? `http://localhost:${require('../../.electron-vue/config').port}`
+  : path.resolve(lulumiRootPath, 'dist');
 
 export default {
   lulumiRootPath,
   lulumiHelperPath,
+  lulumiPreloadPath,
   devUserData: `${path.resolve(lulumiRootPath, 'userData')}`,
   testUserData: `${path.resolve(lulumiRootPath, 'test', 'userData')}`,
   lulumiPagesCustomProtocol: 'lulumi',
-  lulumiPreloadPath: `${path.resolve(lulumiRootPath, 'dist')}`,
   lulumiPDFJSPath: `${path.resolve(lulumiHelperPath, 'pdfjs')}`,
-  lulumiRev: 'dab6f25887f6e66a96e07990b6ce576d0316c750',
+  lulumiRev: '9d2efbaa0bb8d90e30c1b73a7fcc620e9f453781',
 };

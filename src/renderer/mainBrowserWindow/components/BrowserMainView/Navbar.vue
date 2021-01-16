@@ -823,7 +823,6 @@ export default class Navbar extends Vue {
       });
       ipc.send(
         'fetch-search-suggestions',
-        currentSearchEngine,
         this.currentSearchEngine.autocomplete
           .replace('{queryString}', this.value)
           .replace('{language}', this.$store.getters.lang),

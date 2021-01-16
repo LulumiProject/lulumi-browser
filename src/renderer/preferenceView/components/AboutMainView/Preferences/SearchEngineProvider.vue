@@ -31,7 +31,7 @@ div
 </template>
 
 <script lang="ts">
-/* global Electron */
+/* global Electron, Lulumi */
 
 import { Component, Vue } from 'vue-property-decorator';
 
@@ -44,7 +44,13 @@ interface TableData {
   autocomplete: string;
 }
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
 
 @Component({
   components: {
@@ -61,7 +67,7 @@ export default class SearchEngineProvider extends Vue {
 
   handleRowClick(row: TableData): void {
     if (row) {
-      ipcRenderer.send('set-current-search-engine-provider', {
+      window.ipcRenderer.send('set-current-search-engine-provider', {
         currentSearchEngine: {
           name: row.name,
           search: row.search,
@@ -72,14 +78,14 @@ export default class SearchEngineProvider extends Vue {
     }
   }
   toggleAutoFetch(val: boolean): void {
-    ipcRenderer.send('set-current-search-engine-provider', {
+    window.ipcRenderer.send('set-current-search-engine-provider', {
       currentSearchEngine: null,
       autoFetch: val,
     });
   }
 
   mounted(): void {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.autoFetch = ret.autoFetch;
       this.tableData.length = 0;
       ret.searchEngine.forEach((val, index) => {
@@ -98,10 +104,10 @@ export default class SearchEngineProvider extends Vue {
         });
       });
     });
-    ipcRenderer.send('guest-want-data', 'searchEngineProvider');
+    window.ipcRenderer.send('guest-want-data', 'searchEngineProvider');
   }
   beforeDestroy(): void {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

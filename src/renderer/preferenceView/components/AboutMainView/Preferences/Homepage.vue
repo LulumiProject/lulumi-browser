@@ -11,13 +11,19 @@ div
 </template>
 
 <script lang="ts">
-/* global Electron */
+/* global Electron, Lulumi */
 
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
 
 @Component({
   components: {
@@ -28,19 +34,19 @@ export default class Homepage extends Vue {
   homepage = '';
 
   setHomepage(): void {
-    ipcRenderer.send('set-homepage', {
+    window.ipcRenderer.send('set-homepage', {
       homepage: this.homepage,
     });
   }
 
   mounted(): void {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.homepage = ret.homepage;
     });
-    ipcRenderer.send('guest-want-data', 'homepage');
+    window.ipcRenderer.send('guest-want-data', 'homepage');
   }
   beforeDestroy(): void {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

@@ -21,7 +21,14 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Table, TableColumn } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+// eslint-disable-next-line no-use-before-define
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
 
 @Component({
   components: {
@@ -35,7 +42,7 @@ export default class Lulumi extends Vue {
   }
 
   openPath(userData: string): void {
-    ipcRenderer.send('open-path', userData);
+    window.ipcRenderer.send('open-path', userData);
   }
 }
 </script>

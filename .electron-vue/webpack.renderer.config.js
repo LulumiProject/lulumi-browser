@@ -16,12 +16,21 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
+function inlineOptions(loaders) {
+  return loaders.map(({ loader, options={} }) => {
+    if (!isString(loader)) throw new Error('inlineOptions: loader should be a string!')
+    if (!isObjectLike(options)) throw new Error('inlineOptions: options should be an object!')
+    return loader + '?' + JSON.stringify(options)
+  })
+}
+
 function returnLess() {
   return [
     process.env.NODE_ENV !== 'production'
       ? 'vue-style-loader'
       : MiniCssExtractPlugin.loader,
-    'css-loader',
+    // https://blog.csdn.net/vv_bug/article/details/108148263
+    'css-loader?{"esModule":false}',
     'less-loader'
   ]
 }
@@ -30,7 +39,8 @@ function returnCss() {
     process.env.NODE_ENV !== 'production'
       ? 'vue-style-loader'
       : MiniCssExtractPlugin.loader,
-    'css-loader'
+    // https://blog.csdn.net/vv_bug/article/details/108148263
+    'css-loader?{"esModule":false}'
   ]
 }
 

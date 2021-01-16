@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { BrowserView } from 'electron';
+import { app, BrowserView } from 'electron';
 import { Store } from 'vuex';
+import * as fs from 'fs';
 import * as path from 'path';
 import urlUtil from '../../renderer/lib/url-util';
 import constants from '../constants';
+import fetch from './fetch';
 
 const { default: mainStore } = require('../../shared/store/mainStore');
 const store: Store<any> = mainStore.getStore();
@@ -15,13 +17,22 @@ export default class View {
   public tabIndex: number;
 
   private window: Electron.BrowserWindow;
+  private preloadCachePath: string;
 
   public constructor(window: Electron.BrowserWindow, tabIndex: number, tabId: number, url: string) {
+    this.preloadCachePath = '';
+    if (process.env.NODE_ENV === 'development') {
+      this.fetchPreload(`${constants.lulumiPreloadPath}/webview-preload.js`);
+    }
     this.browserView = new BrowserView({
       webPreferences: {
-        preload: path.join(constants.lulumiPreloadPath, 'webview-preload.js'),
+        preload: (this.preloadCachePath.length === 0)
+          ? path.join(constants.lulumiPreloadPath, 'webview-preload.js')
+          : this.preloadCachePath,
+        enableRemoteModule: true,
         nodeIntegration: false,
         nodeIntegrationInSubFrames: true,
+        worldSafeExecuteJavaScript: true,
         contextIsolation: true,
         sandbox: false,
         partition: 'persist:lulumi',
@@ -220,5 +231,17 @@ export default class View {
   public destroy(): boolean {
     this.browserView.destroy();
     return this.browserView.isDestroyed();
+  }
+
+  private fetchPreload(preloadPath: string): void {
+    this.preloadCachePath = path.join(app.getPath('userData'), 'webview-preload.js');
+    fetch(preloadPath, (result) => {
+      if (result.ok) {
+        if (!fs.existsSync(path.dirname(this.preloadCachePath))) {
+          fs.mkdirSync(path.dirname(this.preloadCachePath));
+        }
+        fs.writeFileSync(this.preloadCachePath, result.body);
+      }
+    });
   }
 }

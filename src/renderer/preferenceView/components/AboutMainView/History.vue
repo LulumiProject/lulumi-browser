@@ -31,7 +31,7 @@ div
 </template>
 
 <script lang="ts">
-/* global Electron */
+/* global Electron, Lulumi */
 
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { CreateElement, VNode } from 'vue';
@@ -49,7 +49,14 @@ interface HistoryItem {
   children: HistoryItem[];
 }
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+  URL: any;
+}
+
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
 
 @Component({
   components: {
@@ -76,7 +83,7 @@ export default class History extends Vue {
   fetch(): void {
     this.handler = setInterval(
       () => {
-        ipcRenderer.send('guest-want-data', 'history');
+        window.ipcRenderer.send('guest-want-data', 'history');
       },
       1000
     );
@@ -113,7 +120,7 @@ export default class History extends Vue {
     } else {
       this.history = [];
     }
-    ipcRenderer.send('set-history', this.history);
+    window.ipcRenderer.send('set-history', this.history);
   }
   filterNode(value: string, data: HistoryItem): boolean {
     if (!value) {
@@ -175,16 +182,16 @@ export default class History extends Vue {
   }
 
   mounted(): void {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.history = ret;
       this.data = this.transformArr(this.history);
     });
     // fetch once when the component is mounted
-    ipcRenderer.send('guest-want-data', 'history');
+    window.ipcRenderer.send('guest-want-data', 'history');
   }
   beforeDestroy(): void {
     this.clear();
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

@@ -43,7 +43,7 @@ export const getters = {
   proxyConfig(state: BrowserState): Config {
     return state.browser.proxyConfig;
   },
-  auth(state: BrowserState): { username: string, password: string } {
+  auth(state: BrowserState): { username: string; password: string } {
     return state.browser.auth;
   },
   downloads(state: BrowserState): Lulumi.Store.DownloadItem[] {

@@ -62,10 +62,8 @@ declare namespace Lulumi {
     export interface GlobalObject extends NodeJS.Global {
       isOnline: boolean;
       __static: string;
-      renderProcessPreferences: ManifestObject[];
-      backgroundPages: BackgroundPages;
-      manifestMap: ManifestMap;
-      manifestNameMap: ManifestNameMap;
+      data: Record<'about' | 'backgroundPages' | 'manifestMap' | 'renderProcessPreferences', any>;
+      func: Record<'createFromPath' | 'join' | 'ipcRenderer' | 'require' | 'module', any>;
       guestData: Scheme.LulumiObject;
       commandPalette: Electron.BrowserWindow;
     }

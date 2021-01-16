@@ -135,6 +135,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
+      worldSafeExecuteJavaScript: true,
       contextIsolation: false,
       nodeIntegration: true,
       webSecurity: false,
@@ -792,8 +793,8 @@ ipcMain.on('register-local-commands', (event: Electron.IpcMainEvent) => {
 });
 
 ipcMain.on('fetch-search-suggestions',
-  (event: Electron.IpcMainEvent, provider: string, url: string, timestamp: number) => {
-    fetch(provider, url, (result) => {
+  (event: Electron.IpcMainEvent, url: string, timestamp: number) => {
+    fetch(url, (result) => {
       event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
     });
   });

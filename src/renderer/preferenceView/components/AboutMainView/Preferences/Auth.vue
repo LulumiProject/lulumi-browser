@@ -20,13 +20,19 @@ div
 </template>
 
 <script lang="ts">
-/* global Electron */
+/* global Electron, Lulumi */
 
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
+
+window.ipcRenderer = window.func.ipcRenderer;
 
 @Component({
   components: {
@@ -38,23 +44,23 @@ export default class TabConfig extends Vue {
   password = '';
 
   setAuth(): void {
-    ipcRenderer.send('set-auth', {
+    window.ipcRenderer.send('set-auth', {
       username: this.username,
       password: this.password,
     });
   }
 
   mounted(): void {
-    ipcRenderer.on(
+    window.ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, auth: any) => {
         this.username = auth.username;
         this.password = auth.password;
       }
     );
-    ipcRenderer.send('guest-want-data', 'auth');
+    window.ipcRenderer.send('guest-want-data', 'auth');
   }
   beforeDestroy(): void {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>
