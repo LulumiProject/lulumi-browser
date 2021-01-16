@@ -32,7 +32,7 @@ export default class View {
         enableRemoteModule: true,
         nodeIntegration: false,
         nodeIntegrationInSubFrames: true,
-        worldSafeExecuteJavaScript: true,
+        worldSafeExecuteJavaScript: false,
         contextIsolation: true,
         sandbox: false,
         partition: 'persist:lulumi',

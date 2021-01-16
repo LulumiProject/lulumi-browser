@@ -134,14 +134,20 @@ process.once('loaded', () => {
       contextBridge.exposeInMainWorld('func', {
         createFromPath: remote.nativeImage.createFromPath,
         join: require('path').join,
-        require: requirePreload.require,
         module: moduleTmp,
-        ipcRenderer,
       });
+      webFrame.executeJavaScript('window').then((window) => {
+        window.require = requirePreload.require;
+        window.ipcRenderer = ipcRenderer;
+        // eslint-disable-next-line no-console
+      }).catch(err => console.error(err));
     }
     if (process.env.NODE_ENV === 'test' &&
       process.env.TEST_ENV === 'e2e') {
-      contextBridge.exposeInMainWorld('func', { require: requirePreload.electronRequire });
+      webFrame.executeJavaScript('window').then((window) => {
+        window.require = requirePreload.electronRequire;
+        // eslint-disable-next-line no-console
+      }).catch(err => console.error(err));
     }
   }
   ipcRenderer.on('lulumi-tabs-send-message', (event, message) => {

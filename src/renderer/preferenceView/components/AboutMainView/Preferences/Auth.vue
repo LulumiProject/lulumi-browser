@@ -32,8 +32,6 @@ interface Window extends Lulumi.API.GlobalObject {
 
 declare const window: Window;
 
-window.ipcRenderer = window.func.ipcRenderer;
-
 @Component({
   components: {
     'el-input': Input,

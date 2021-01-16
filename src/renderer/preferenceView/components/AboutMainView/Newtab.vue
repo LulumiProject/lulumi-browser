@@ -14,8 +14,6 @@ interface Window extends Lulumi.API.GlobalObject {
 
 declare const window: Window;
 
-window.ipcRenderer = window.func.ipcRenderer;
-
 @Component
 export default class Newtab extends Vue {
   beforeMount(): void {

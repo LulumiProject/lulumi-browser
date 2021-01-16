@@ -15,8 +15,6 @@ interface Window extends Lulumi.API.GlobalObject {
 
 declare const window: Window;
 
-window.ipcRenderer = window.func.ipcRenderer;
-
 const lang = window.ipcRenderer.sendSync('request-lang');
 
 Vue.use(VueI18n);

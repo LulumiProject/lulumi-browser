@@ -63,7 +63,7 @@ declare namespace Lulumi {
       isOnline: boolean;
       __static: string;
       data: Record<'about' | 'backgroundPages' | 'manifestMap' | 'renderProcessPreferences', any>;
-      func: Record<'createFromPath' | 'join' | 'ipcRenderer' | 'require' | 'module', any>;
+      func: Record<'createFromPath' | 'join' | 'module', any>;
       guestData: Scheme.LulumiObject;
       commandPalette: Electron.BrowserWindow;
     }
