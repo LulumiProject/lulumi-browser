@@ -41,7 +41,7 @@ transition(name="download-bar")
               img(:fetch="getFileIcon(file.savePath, index)", :id="`icon-${index}`")
               a(class="download-list__item-name",
                 href='#',
-                @click.prevent="openItem(file.savePath)")
+                @click.prevent="openPath(file.savePath)")
                 | {{ file.name }}
             span(class="download-list__item-description") {{ progress(file) }}
           el-progress(:status="checkStateForProgress(file.dataState)",
@@ -54,6 +54,8 @@ transition(name="download-bar")
 </template>
 
 <script lang="ts">
+/* global Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Progress, Popover } from 'element-ui';
@@ -78,8 +80,8 @@ import '../../css/el-popover';
 })
 
 export default class Download extends Vue {
-  get files() {
-    let tmpFiles: object[] = [];
+  get files(): any {
+    let tmpFiles: any = [];
     if (this.$store.getters.downloads.length !== 0) {
       tmpFiles = this.$store.getters.downloads.filter(download => download.style !== 'hidden');
       tmpFiles.forEach((file) => {
@@ -109,8 +111,8 @@ export default class Download extends Vue {
   showItemInFolder(savePath: string): void {
     this.$electron.ipcRenderer.send('show-item-in-folder', savePath);
   }
-  openItem(savePath: string): void {
-    this.$electron.ipcRenderer.send('open-item', savePath);
+  openPath(savePath: string): void {
+    this.$electron.ipcRenderer.send('open-path', savePath);
   }
   checkStateForButtonGroup(state: string): boolean {
     switch (state) {

@@ -6,6 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 import {
   app,
+  BrowserView,
   BrowserWindow,
   dialog,
   globalShortcut,
@@ -27,6 +28,7 @@ import constants from './constants';
 import menu from './lib/menu';
 import promisify from './lib/promisify';
 import fetch from './lib/fetch';
+import View from './lib/view';
 
 const { openProcessManager } = require('electron-process-manager');
 
@@ -81,6 +83,7 @@ const { default: mainStore } = require('../shared/store/mainStore');
 mainStore.register(storagePath, swipeGesture);
 const store: Store<any> = mainStore.getStore();
 const windows: Electron.BrowserWindow[] = mainStore.getWindows();
+const views: View[] = [];
 
 // ./api/lulumi-extension.ts
 const { default: lulumiExtension } = require('./api/lulumi-extension');
@@ -101,7 +104,8 @@ function lulumiStateSave(soft = true, windowCount = Object.keys(windows).length)
         }
       });
       window.close();
-      window.removeAllListeners('close');
+      // https://github.com/electron/electron/issues/22290
+      (window as any).removeAllListeners('close');
     });
   }
   if (setLanguage) {
@@ -121,7 +125,7 @@ function lulumiStateSave(soft = true, windowCount = Object.keys(windows).length)
 }
 
 // eslint-disable-next-line max-len
-function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: Function): Electron.BrowserWindow {
+function createWindow(options?: Electron.BrowserWindowConstructorOptions, callback?: (eventName: string) => void): Electron.BrowserWindow {
   let mainWindow: Electron.BrowserWindow;
   const defaultOption: Record<string, any> = {
     autoHideMenuBar: autoHideMenuBarSetting,
@@ -131,6 +135,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
+      worldSafeExecuteJavaScript: true,
       contextIsolation: false,
       nodeIntegration: true,
       webSecurity: false,
@@ -185,6 +190,7 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
 
   menu.init();
 
+  /*
   mainWindow.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     webPreferences.nativeWindowOpen = false;
     webPreferences.enableBlinkFeatures = 'OverlayScrollbars';
@@ -197,14 +203,14 @@ function createWindow(options?: Electron.BrowserWindowConstructorOptions, callba
       } else {
         webPreferences.preload = path.join(constants.lulumiPreloadPath, 'popup-preload.js');
       }
-    } else {
-      webPreferences.contextIsolation = true;
-      webPreferences.preload = path.join(constants.lulumiPreloadPath, 'webview-preload.js');
     }
   });
+  */
 
-  mainWindow.on('close', () => (mainWindow.removeAllListeners('will-attach-webview')));
-
+  mainWindow.on('close', () => {
+    // https://github.com/electron/electron/issues/22290
+    (mainWindow as any).removeAllListeners('will-attach-webview');
+  });
   mainWindow.on('closed', () => ((mainWindow as any) = null));
 
   if (!isTesting) {
@@ -386,7 +392,7 @@ app.on('second-instance', () => {
 
 // load windowProperties
 ipcMain.on('get-window-properties', (event: Electron.IpcMainEvent) => {
-  const windowProperties: any[] = [];
+  const windowProperties: any = [];
   const baseDir = path.dirname(storagePath);
   const collection = collect(readdirSync(baseDir, 'utf8'));
   let windowPropertyFilenames =
@@ -454,13 +460,52 @@ ipcMain.on('get-window-count', (event: Electron.IpcMainEvent) => {
   event.returnValue = Object.keys(windows).length;
 });
 
+// create a BrowserView
+ipcMain.on('create-browser-view', (event, data) => {
+  const { tabId, tabIndex, url }: { tabId: number; tabIndex: number; url: string } = data;
+
+  const window = windows[data.windowId] as Electron.BrowserWindow;
+  if (window) {
+    views.push(new View(window, tabIndex, tabId, url));
+  }
+});
+
+// destroy a BrowserView
+ipcMain.on('destroy-browser-view', (event, browserViewId) => {
+  const browserView = views.find(view => (view.id === browserViewId));
+  if (browserView) {
+    browserView.destroy();
+  }
+});
+
+// resize a BrowserView
+ipcMain.on('resize-browser-view', (event, browserViewId) => {
+  const browserView = views.find(view => (view.id === browserViewId));
+  if (browserView) {
+    browserView.fitWindow();
+  }
+});
+
+// focus a BrowserView
+ipcMain.on('focus-browser-view', (event, data) => {
+  const { browserViewId }: { browserViewId: number } = data;
+
+  const window = windows[data.windowId] as Electron.BrowserWindow;
+  if (window) {
+    window.setBrowserView(BrowserView.fromId(browserViewId));
+  }
+});
+
 // show the certificate
 ipcMain.on('show-certificate',
   (event: Electron.IpcMainEvent, certificate: Electron.Certificate, message: string) => {
-    dialog.showCertificateTrustDialog(BrowserWindow.fromWebContents(event.sender), {
-      certificate,
-      message,
-    }).then();
+    const browserWindow = BrowserWindow.fromWebContents(event.sender);
+    if (browserWindow) {
+      dialog.showCertificateTrustDialog(browserWindow, {
+        certificate,
+        message,
+      }).then();
+    }
   });
 
 // focus the window
@@ -487,16 +532,22 @@ ipcMain.on('show-item-in-folder', (event, itemPath) => {
 });
 
 // open the item on host
-ipcMain.on('open-item', (event, itemPath) => {
+ipcMain.on('open-path', (event, itemPath) => {
   if (itemPath) {
-    shell.openItem(itemPath);
+    shell.openPath(itemPath);
   }
 });
 
 // load preference things into global when users accessing 'lulumi' protocol
 ipcMain.on('lulumi-scheme-loaded', (event, val) => {
-  const type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
+  let type: string = val.substr(`${constants.lulumiPagesCustomProtocol}://`.length).split('/')[0];
   const data: Lulumi.Scheme.LulumiObject = {} as Lulumi.Scheme.LulumiObject;
+
+  if (process.env.NODE_ENV === 'development' && val.startsWith('http://localhost:')) {
+    if (require('url').parse(val).pathname === '/about.html') {
+      type = 'about';
+    }
+  }
   if (type === 'about') {
     const { versions } = process;
 
@@ -742,8 +793,8 @@ ipcMain.on('register-local-commands', (event: Electron.IpcMainEvent) => {
 });
 
 ipcMain.on('fetch-search-suggestions',
-  (event: Electron.IpcMainEvent, provider: string, url: string, timestamp: number) => {
-    fetch(provider, url, (result) => {
+  (event: Electron.IpcMainEvent, url: string, timestamp: number) => {
+    fetch(url, (result) => {
       event.sender.send(`fetch-search-suggestions-${timestamp}`, result);
     });
   });

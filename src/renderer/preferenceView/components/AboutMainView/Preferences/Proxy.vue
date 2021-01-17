@@ -28,11 +28,17 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -45,25 +51,25 @@ export default class TabConfig extends Vue {
   proxyBypassRules = '';
 
   setProxy(): void {
-    ipcRenderer.send('set-proxy-config', {
+    window.ipcRenderer.send('set-proxy-config', {
       pacScript: this.pacScript,
       proxyRules: this.proxyRules,
       proxyBypassRules: this.proxyBypassRules,
     });
   }
 
-  mounted() {
-    ipcRenderer.on(
+  mounted(): void {
+    window.ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, proxyConfig: any) => {
         this.pacScript = proxyConfig.pacScript;
         this.proxyRules = proxyConfig.proxyRules;
         this.proxyBypassRules = proxyConfig.proxyBypassRules;
       }
     );
-    ipcRenderer.send('guest-want-data', 'proxyConfig');
+    window.ipcRenderer.send('guest-want-data', 'proxyConfig');
   }
-  beforeDestroy() {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+  beforeDestroy(): void {
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

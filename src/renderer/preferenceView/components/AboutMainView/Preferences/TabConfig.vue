@@ -27,11 +27,17 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Input } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -43,23 +49,23 @@ export default class TabConfig extends Vue {
   tabFavicon = '';
 
   setTabConfig(): void {
-    ipcRenderer.send('set-tab-config', {
+    window.ipcRenderer.send('set-tab-config', {
       defaultUrl: this.defaultUrl,
       tabFavicon: this.tabFavicon,
     });
   }
 
-  mounted() {
-    ipcRenderer.on(
+  mounted(): void {
+    window.ipcRenderer.on(
       'guest-here-your-data', (event: Electron.Event, tabConfig: Lulumi.Store.TabConfig) => {
         this.defaultUrl = tabConfig.dummyTabObject.url;
         this.tabFavicon = tabConfig.lulumiDefault.tabFavicon;
       }
     );
-    ipcRenderer.send('guest-want-data', 'tabConfig');
+    window.ipcRenderer.send('guest-want-data', 'tabConfig');
   }
-  beforeDestroy() {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+  beforeDestroy(): void {
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

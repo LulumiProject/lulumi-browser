@@ -1,21 +1,21 @@
 /* eslint-disable no-restricted-syntax */
 
 class Event {
-  listeners: Function[];
+  listeners: ((...args: any) => any)[];
 
   constructor() {
     this.listeners = [];
   }
 
-  addListener(callback: Function): void {
+  addListener(callback: (...args: any) => any): void {
     this.listeners.push(callback);
   }
 
-  removeListener(callback: Function): void {
+  removeListener(callback: (...args: any) => any): void {
     this.listeners = this.listeners.filter(c => (c !== callback));
   }
 
-  emit(...args): void {
+  emit(...args: any): void {
     for (const listener of this.listeners) {
       try {
         listener(...args);

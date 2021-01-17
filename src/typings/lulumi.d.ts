@@ -12,7 +12,7 @@ declare namespace Lulumi {
   export namespace Scheme {
     // lulumi:// scheme
     export interface LulumiObject extends Object {
-      lulumi: object[];
+      lulumi: Array<{ key: string, value: string }>;
       preferences: string[][];
       about: string[][];
     }
@@ -62,10 +62,8 @@ declare namespace Lulumi {
     export interface GlobalObject extends NodeJS.Global {
       isOnline: boolean;
       __static: string;
-      renderProcessPreferences: ManifestObject[];
-      backgroundPages: BackgroundPages;
-      manifestMap: ManifestMap;
-      manifestNameMap: ManifestNameMap;
+      data: Record<'about' | 'backgroundPages' | 'manifestMap' | 'renderProcessPreferences', any>;
+      func: Record<'createFromPath' | 'join' | 'module', any>;
       guestData: Scheme.LulumiObject;
       commandPalette: Electron.BrowserWindow;
     }
@@ -74,7 +72,7 @@ declare namespace Lulumi {
   export namespace Store {
     // store
     export interface CustomStore {
-      dispatch: (type: any, ...payload: any[]) => Promise<any[]> | void;
+      dispatch: (type: any, ...payload: any) => Promise<any> | void;
     }
     export interface ExtensionMetadata {
       browserActionIcon: string;
@@ -86,6 +84,7 @@ declare namespace Lulumi {
       [index: string]: ExtensionMetadata;
     }
     export interface TabObject {
+      browserViewId: number; // Id of the corresponding BrowserView
       webContentsId: number; // Id of the corresponding webContents
       id: number; // 頁籤的標識符。(某些狀況可能會沒有 id)
       index: number; // 頁籤在所在窗口中的索引，從 0 開始。
@@ -112,7 +111,7 @@ declare namespace Lulumi {
       error: boolean;
       hasMedia: boolean;
       isAudioMuted: boolean;
-      pageActionMapping: object;
+      pageActionMapping: any;
       extensionsMetadata: ExtensionsMetadata;
     }
     export interface CommandPaletteConfig {
@@ -196,7 +195,7 @@ declare namespace Lulumi {
       auth: { username: string, password: string };
       downloads: DownloadItem[];
       history: TabHistory[];
-      permissions: object;
+      permissions: any;
       lastOpenedTabs: LastOpenedTabObject[];
       certificates: Certificates;
       windows: LulumiBrowserWindowProperty[];

@@ -22,17 +22,17 @@ class Event {
   name: string;
   scope: string;
   event: string;
-  listeners: Function[];
+  listeners: ((details: any) => any)[];
 
-  constructor(name, scope, event) {
+  constructor(name: string, scope: string, event: string) {
     this.name = name; // extension's name
     this.scope = scope;
     this.event = event;
     this.listeners = [];
   }
 
-  addListener(callback, filter = {}) {
-    const digest = callback.toString().hashCode();
+  addListener(callback: (details: any) => any, filter = {}): void {
+    const digest = (callback.toString() as any).hashCode();
     this.listeners.push(digest);
     ipcRenderer.on(
       `lulumi-${this.scope}-${this.event}-intercepted-${digest}`, (event, requestId, details) => {
@@ -50,14 +50,14 @@ class Event {
     );
   }
 
-  removeListener(callback) {
-    const digest = callback.toString().hashCode();
+  removeListener(callback: (details: any) => any): void {
+    const digest = (callback.toString() as any).hashCode();
     this.listeners = this.listeners.filter(c => (c !== digest));
     ipcRenderer.removeAllListeners(`lulumi-${this.scope}-${this.event}-intercepted-${digest}`);
     ipcRenderer.send(`lulumi-${this.scope}-remove-listener-${this.event}`, this.name, this.event);
   }
 
-  removeAllListeners() {
+  removeAllListeners(): void {
     this.listeners.forEach(l => ipcRenderer.removeAllListeners(
       `lulumi-${this.scope}-${this.event}-intercepted-${l}`
     ));

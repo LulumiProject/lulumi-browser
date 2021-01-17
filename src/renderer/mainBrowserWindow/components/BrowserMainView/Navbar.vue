@@ -35,6 +35,7 @@
                                               @contextmenu.native="onNavContextMenu",
                                               @keyup.shift.up.native="selectPortion",
                                               @keyup.shift.down.native="selectPortion",
+                                              @keydown.native="detectBackspace",
                                               @focus="onFocus",
                                               @blur="onBlur",
                                               @select="onSelect",
@@ -92,6 +93,8 @@
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Watch, Vue } from 'vue-property-decorator';
 
 import * as path from 'path';
@@ -133,10 +136,10 @@ Vue.component('SuggestionItem', {
     const { item } = suggestion;
     if (item.title) {
       if (suggestion.matches) {
-        let renderElementsOfTitle: any[] = [];
-        let renderElementsOfValue: any[] = [];
+        let renderElementsOfTitle: any = [];
+        let renderElementsOfValue: any = [];
         suggestion.matches.forEach((match) => {
-          const renderElements: any[] = [];
+          const renderElements: any = [];
           const { key } = match;
           const tmpStr: string = item[key];
           let prefixIndex = 0;
@@ -248,6 +251,7 @@ export default class Navbar extends Vue {
   focused = false;
   value = '';
   search: any;
+  suggestionIndicator = true;
   suggestionItems: Lulumi.Renderer.SuggestionItem[] = config.recommendTopSite;
   extensions: Lulumi.API.ManifestObject[] = [];
   onbrowserActionClickedEvent: Event = new Event();
@@ -276,7 +280,7 @@ export default class Navbar extends Vue {
   get autoFetch(): boolean {
     return this.$store.getters.autoFetch;
   }
-  get pageActionMapping(): object {
+  get pageActionMapping(): any {
     if (this.tabs.length === 0 || this.currentTabIndex === undefined) {
       return {};
     }
@@ -371,11 +375,11 @@ export default class Navbar extends Vue {
   }
 
   @Watch('tab')
-  onTab(newTab: Lulumi.Store.TabObject) {
+  onTab(newTab: Lulumi.Store.TabObject): void {
     this.value = newTab.url;
   }
 
-  chunk(r: any[], j: number): any[][] {
+  chunk(r: any, j: number): any {
     // eslint-disable-next-line no-confusing-arrow
     return r.reduce((a, b, i, g) => !(i % j) ? a.concat([g.slice(i, i + j)]) : a, []);
   }
@@ -431,14 +435,20 @@ export default class Navbar extends Vue {
       }
     }
   }
-  selectPortion(event): void {
-    const { code } = event.code;
-    const el = event.target;
+  selectPortion(event: KeyboardEvent): void {
+    const { code } = event;
+    const el = event.target as HTMLInputElement;
     if (code === 'ArrowUp') {
       el.selectionEnd = el.selectionStart;
       el.selectionStart = 0;
     } else if (code === 'ArrowDown') {
       el.selectionEnd = el.value.length;
+    }
+  }
+  detectBackspace(event: KeyboardEvent): void {
+    const { code } = event;
+    if (code === 'Backspace') {
+      this.suggestionIndicator = false;
     }
   }
   unique(suggestions: Lulumi.Renderer.SuggestionObject[]): Lulumi.Renderer.SuggestionObject[] {
@@ -471,7 +481,7 @@ export default class Navbar extends Vue {
       clearTimeout(this.handler);
     }
   }
-  onMouseEnter(event): void {
+  onMouseEnter(event: MouseEvent): void {
     const securityIndicator = event.target as HTMLDivElement;
 
     if (securityIndicator) {
@@ -481,7 +491,7 @@ export default class Navbar extends Vue {
       );
     }
   }
-  onMouseLeave(event): void {
+  onMouseLeave(event: MouseEvent): void {
     const securityIndicator = event.target as HTMLDivElement;
 
     if (securityIndicator) {
@@ -491,18 +501,18 @@ export default class Navbar extends Vue {
       );
     }
   }
-  handleComposition(event): void {
+  handleComposition(event: CompositionEvent): void {
     if (event.type === 'compositionend') {
       (this.$refs.input as any).isComposing = false;
     } else {
       (this.$refs.input as any).isComposing = true;
     }
   }
-  onNavContextMenu(event): void {
+  onNavContextMenu(event: MouseEvent): void {
     this.onNewElementParentClick();
     (this.$parent as BrowserMainView).onNavContextMenu(event);
   }
-  onFocus(event): void {
+  onFocus(event: KeyboardEvent): void {
     const input = event.target as HTMLDivElement;
 
     if (input) {
@@ -512,7 +522,7 @@ export default class Navbar extends Vue {
       );
     }
   }
-  onBlur(event): void {
+  onBlur(event: KeyboardEvent): void {
     const input = event.target as HTMLDivElement;
 
     if (input) {
@@ -535,14 +545,16 @@ export default class Navbar extends Vue {
       }
     }
   }
-  onDrop(event): void {
-    const urlString: string = event.dataTransfer.getData('url');
-    if (urlString) {
-      this.value = urlString;
-      this.onNewElementParentClick();
+  onDrop(event: DragEvent): void {
+    if (event.dataTransfer) {
+      const urlString: string = event.dataTransfer.getData('url');
+      if (urlString) {
+        this.value = urlString;
+        this.onNewElementParentClick();
+      }
     }
   }
-  onDragEnter(event): void {
+  onDragEnter(event: any): void {
     if (this.ensureInput) {
       const si = document.getElementById('security-indicator');
       if (event.fromElement &&
@@ -559,7 +571,7 @@ export default class Navbar extends Vue {
       }
     }
   }
-  onDragLeave(event): void {
+  onDragLeave(event: any): void {
     if (this.ensureInput) {
       const si = document.getElementById('security-indicator');
       if (event.fromElement &&
@@ -598,9 +610,12 @@ export default class Navbar extends Vue {
       el.querySelector('input')!.blur();
     }
   }
-  onChange(val: string) {
+  onChange(val: string): void {
     this.typing = true;
     this.value = val;
+    if (this.value.length === 0) {
+      this.suggestionIndicator = true;
+    }
   }
   selectText(): void {
     if (this.ensureInput) {
@@ -622,15 +637,18 @@ export default class Navbar extends Vue {
       }
     }
   }
-  async querySearch(queryString: string, cb: Function): Promise<void> {
+  // eslint-disable-next-line max-len
+  async querySearch(queryString: string, cb: (suggestions: Lulumi.Renderer.SuggestionObject[]) => void): Promise<void> {
     const ipc = this.$electron.ipcRenderer;
     const currentSearchEngine: string = this.currentSearchEngine.name;
     const navbarSearch = this.$t('navbar.search');
     let suggestions: Lulumi.Renderer.SuggestionObject[] = [];
-    this.suggestionItems.forEach((item) => {
-      item.icon = this.tabFavicon;
-      suggestions.push({ item });
-    });
+    if (this.suggestionIndicator) {
+      this.suggestionItems.forEach((item) => {
+        item.icon = this.tabFavicon;
+        suggestions.push({ item });
+      });
+    }
     if (queryString) {
       if (queryString.startsWith('about:')) {
         // Privileged Pages
@@ -751,6 +769,7 @@ export default class Navbar extends Vue {
       }
       suggestions = suggestions.filter(this.createFilter(queryString));
     }
+
     suggestions.push({
       item: {
         title: `${currentSearchEngine} ${this.$t('navbar.search')}`,
@@ -804,7 +823,6 @@ export default class Navbar extends Vue {
       });
       ipc.send(
         'fetch-search-suggestions',
-        currentSearchEngine,
         this.currentSearchEngine.autocomplete
           .replace('{queryString}', this.value)
           .replace('{language}', this.$store.getters.lang),
@@ -842,7 +860,7 @@ export default class Navbar extends Vue {
       ? extensionMetadata.browserActionIcon
       : '#';
   }
-  setBrowserActionBadgeText(extensionId: string, details): void {
+  setBrowserActionBadgeText(extensionId: string, details: any): void {
     this.$nextTick(() => {
       this.$store.dispatch('updateExtensionMetadata', {
         extensionId,
@@ -860,7 +878,7 @@ export default class Navbar extends Vue {
       ? extensionMetadata.badgeText
       : '';
   }
-  setBrowserActionBadgeBackgroundColor(extensionId: string, details): void {
+  setBrowserActionBadgeBackgroundColor(extensionId: string, details: any): void {
     this.$nextTick(() => {
       this.$store.dispatch('updateExtensionMetadata', {
         extensionId,
@@ -1110,7 +1128,7 @@ export default class Navbar extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     if (this.ensureInput) {
       const el = ((this.$refs.input as Vue).$el as HTMLInputElement);
       const si = document.getElementById('security-indicator') as HTMLDivElement;

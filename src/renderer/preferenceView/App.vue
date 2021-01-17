@@ -7,25 +7,23 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 interface Window {
-  about: object;
-  manifestMap: object;
-  backgroundPages: object;
+  data: Record<string, any>;
 }
 
 declare const window: Window;
 
 @Component({ name: 'lulumi-browser' })
 export default class App extends Vue {
-  mounted() {
+  mounted(): void {
     if (!(process.env.NODE_ENV === 'test' &&
       process.env.TEST_ENV === 'unit')) {
-      if (window.about) {
-        this.$store.dispatch('updateAbout', window.about);
+      if (window.data.about) {
+        this.$store.dispatch('updateAbout', window.data.about);
       } else {
-        console.warn('Error: window.about not found!');
+        console.warn('Error: window.data.about not found!');
       }
-      if (window.manifestMap) {
-        const { backgroundPages, manifestMap } = window;
+      if (window.data.manifestMap) {
+        const { backgroundPages, manifestMap } = window.data;
         const extensions = {};
         Object.keys(manifestMap).forEach((extension) => {
           if (backgroundPages[extension]) {

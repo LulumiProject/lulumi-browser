@@ -16,12 +16,21 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
+function inlineOptions(loaders) {
+  return loaders.map(({ loader, options={} }) => {
+    if (!isString(loader)) throw new Error('inlineOptions: loader should be a string!')
+    if (!isObjectLike(options)) throw new Error('inlineOptions: options should be an object!')
+    return loader + '?' + JSON.stringify(options)
+  })
+}
+
 function returnLess() {
   return [
     process.env.NODE_ENV !== 'production'
       ? 'vue-style-loader'
       : MiniCssExtractPlugin.loader,
-    'css-loader',
+    // https://blog.csdn.net/vv_bug/article/details/108148263
+    'css-loader?{"esModule":false}',
     'less-loader'
   ]
 }
@@ -30,7 +39,8 @@ function returnCss() {
     process.env.NODE_ENV !== 'production'
       ? 'vue-style-loader'
       : MiniCssExtractPlugin.loader,
-    'css-loader'
+    // https://blog.csdn.net/vv_bug/article/details/108148263
+    'css-loader?{"esModule":false}'
   ]
 }
 
@@ -45,7 +55,7 @@ let whiteListedModules = ['vue']
 
 let mainBrowserWindowConfig = {
   name: 'main-browser-window',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'main-browser-window': path.join(__dirname, '../src/renderer/mainBrowserWindow/main.ts')
   },
@@ -211,11 +221,19 @@ let mainBrowserWindowConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslintAutoFix: false,
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [mainBrowserWindow]', excludeWarnings: false }),
     new VueLoaderPlugin(),
@@ -248,7 +266,7 @@ let mainBrowserWindowConfig = {
 
 let preloadsConfig = {
   name: 'preloads',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'webview-preload': path.join(__dirname, '../src/preloads/webview-preload.ts'),
     'extension-preload': path.join(__dirname, '../src/preloads/extension-preload.ts'),
@@ -303,11 +321,19 @@ let preloadsConfig = {
       test: /-preload\.js$/
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslintAutoFix: false,
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preloads]', excludeWarnings: false })
   ],
@@ -330,7 +356,7 @@ let preloadsConfig = {
 
 let preferenceViewConfig = {
   name: 'preference-view',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'preference-view': path.join(__dirname, '../src/renderer/preferenceView/main.ts')
   },
@@ -474,10 +500,19 @@ let preferenceViewConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [preferenceView]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -502,7 +537,7 @@ let preferenceViewConfig = {
 
 let playbooksViewConfig = {
   name: 'playbooks-view',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'playbooks-view': path.join(__dirname, '../src/renderer/playbooksView/main.ts')
   },
@@ -647,10 +682,19 @@ let playbooksViewConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [playbooksView]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -675,7 +719,7 @@ let playbooksViewConfig = {
 
 let commandPaletteConfig = {
   name: 'command-palette',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'command-palette': path.join(__dirname, '../src/renderer/commandPalette/main.ts')
   },
@@ -822,10 +866,19 @@ let commandPaletteConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Renderer Process [commandPalette]', excludeWarnings: false }),
     new VueLoaderPlugin()
@@ -851,7 +904,7 @@ let commandPaletteConfig = {
 
 let workerConfig = {
   name: 'worker',
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     'search-worker': path.join(__dirname, '../src/renderer/mainBrowserWindow/js/search-worker.js'),
     'recommender': path.join(__dirname, '../src/renderer/commandPalette/js/recommender.js'),
@@ -894,12 +947,6 @@ if (process.env.NODE_ENV === 'production') {
   preferenceViewConfig.performance = { hints: false }
   // Because the target is 'web'. Ref: https://github.com/webpack/webpack/issues/6715
   playbooksViewConfig.performance = { hints: false }
-  mainBrowserWindowConfig.devtool = false
-  preloadsConfig.devtool = false
-  preferenceViewConfig.devtool = false
-  playbooksViewConfig.devtool = false
-  commandPaletteConfig.devtool = false
-  workerConfig.devtool = false
 
   mainBrowserWindowConfig.plugins.push(
     new webpack.LoaderOptionsPlugin({

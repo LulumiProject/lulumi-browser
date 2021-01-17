@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { ipcRenderer, remote, webFrame } from 'electron';
+import { contextBridge, ipcRenderer, remote, webFrame } from 'electron';
 import * as urllib from 'url';
 
 import requirePreload from './require-preload';
@@ -13,7 +13,8 @@ if (guestInstanceIndex !== -1) {
   guestInstanceId = parseInt(
     process.argv[guestInstanceIndex].substr(
       process.argv[guestInstanceIndex].indexOf('=') + 1
-    ), 10
+    ),
+    10,
   );
 }
 
@@ -122,18 +123,22 @@ const moduleTmp = module;
 
 process.once('loaded', () => {
   if (document.location) {
-    if (document.location.href.startsWith('lulumi://')) {
+    if (document.location.href.startsWith('lulumi://') ||
+      (process.env.NODE_ENV === 'development' && document.location.href.startsWith('http://localhost:'))) {
+      contextBridge.exposeInMainWorld('data', {
+        about: ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href),
+        backgroundPages: ipcRenderer.sendSync('get-background-pages'),
+        manifestMap: ipcRenderer.sendSync('get-manifest-map'),
+        renderProcessPreferences: ipcRenderer.sendSync('get-render-process-preferences'),
+      });
+      contextBridge.exposeInMainWorld('func', {
+        createFromPath: remote.nativeImage.createFromPath,
+        join: require('path').join,
+        module: moduleTmp,
+      });
       webFrame.executeJavaScript('window').then((window) => {
-        window.about = ipcRenderer.sendSync('lulumi-scheme-loaded', document.location.href);
-        window.backgroundPages = ipcRenderer.sendSync('get-background-pages');
-        window.manifestMap = ipcRenderer.sendSync('get-manifest-map');
-        window.renderProcessPreferences = ipcRenderer.sendSync('get-render-process-preferences');
-        window.createFromPath = remote.nativeImage.createFromPath;
-        window.join = require('path').join;
-
-        window.ipcRenderer = ipcRenderer;
         window.require = requirePreload.require;
-        window.module = moduleTmp;
+        window.ipcRenderer = ipcRenderer;
         // eslint-disable-next-line no-console
       }).catch(err => console.error(err));
     }

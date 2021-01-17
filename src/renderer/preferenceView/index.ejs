@@ -5,6 +5,11 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      if (window.func && window.func.module) {
+        window.module = window.func.module;
+      }
+    </script>
     <!-- webpack builds are automatically injected -->
     <script src="vendor.dll.js"></script>
   </body>

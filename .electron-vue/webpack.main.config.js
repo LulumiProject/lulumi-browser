@@ -84,11 +84,19 @@ let mainConfig = {
       manifest: require('../static/vendor-manifest.json')
     }),
     new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true,
-      eslint: true,
-      tsconfig: path.join(__dirname, '../src/tsconfig.json'),
-      tslintAutoFix: false,
-      vue: true
+      eslint: {
+        files: './src/**/*.{js,ts,vue}'
+      },
+      typescript: {
+        configFile: path.join(__dirname, '../src/tsconfig.json'),
+        diagnosticOptions: {
+          semantic: true,
+          syntactic: true
+        },
+        extensions: {
+          vue: true
+        }
+      }
     }),
     new ForkTsCheckerNotifierWebpackPlugin({ title: 'Main Process', excludeWarnings: false })
   ],

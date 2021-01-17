@@ -24,6 +24,8 @@
 </template>
 
 <script lang="ts">
+/* global Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import SearchBar from './SearchBar.vue';
@@ -42,10 +44,10 @@ export default class Hits extends Vue {
     return this.$store.getters.windows.find(window => window.lastActive);
   }
 
-  handleBlur() {
+  handleBlur(): void {
     this.$electron.remote.getGlobal('commandPalette').hide();
   }
-  select(item) {
+  select(item: { url: string }): void {
     this.$nextTick(() => {
       const browserWindow = this.$electron.remote.BrowserWindow.fromId(this.lastActiveWindow.id);
       if (browserWindow !== null) {
@@ -58,7 +60,7 @@ export default class Hits extends Vue {
     });
     this.$electron.remote.getGlobal('commandPalette').hide();
   }
-  currentHitProp(prop) {
+  currentHitProp(prop: string): string {
     if (this.highlightedIndex === '') {
       return '';
     }
@@ -69,7 +71,7 @@ export default class Hits extends Vue {
     return this.suggestions[parseInt(hIndex, 10)].results[parseInt(index, 10)].item[prop];
   }
 
-  mounted() {
+  mounted(): void {
     this.searchBar = this.$parent.$refs.searchBar as SearchBar;
   }
 }

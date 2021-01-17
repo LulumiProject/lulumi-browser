@@ -52,6 +52,8 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Col, Row } from 'element-ui';
@@ -69,7 +71,11 @@ interface File {
   savePath: string;
 }
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -86,7 +92,7 @@ export default class Downloads extends Vue {
   fetch(): void {
     this.handler = setInterval(
       () => {
-        ipcRenderer.send('guest-want-data', 'downloads');
+        window.ipcRenderer.send('guest-want-data', 'downloads');
       },
       100
     );
@@ -103,10 +109,10 @@ export default class Downloads extends Vue {
     } else {
       this.files = this.files.filter(file => file.state === 'progressing');
     }
-    ipcRenderer.send('set-downloads', this.files);
+    window.ipcRenderer.send('set-downloads', this.files);
   }
   showItemInFolder(savePath: string): void {
-    ipcRenderer.send('show-item-in-folder', savePath);
+    window.ipcRenderer.send('show-item-in-folder', savePath);
   }
   checkStateForProgress(state: string): string {
     switch (state) {
@@ -121,24 +127,24 @@ export default class Downloads extends Vue {
     }
   }
   pauseDownload(startTime: Date): void {
-    ipcRenderer.send('pause-downloads-progress', startTime);
+    window.ipcRenderer.send('pause-downloads-progress', startTime);
   }
   resumeDownload(startTime: Date): void {
-    ipcRenderer.send('resume-downloads-progress', startTime);
+    window.ipcRenderer.send('resume-downloads-progress', startTime);
   }
   cancelDownload(startTime: Date): void {
-    ipcRenderer.send('cancel-downloads-progress', startTime);
+    window.ipcRenderer.send('cancel-downloads-progress', startTime);
   }
 
-  mounted() {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+  mounted(): void {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.files = ret;
     });
     this.fetch();
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.clear();
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

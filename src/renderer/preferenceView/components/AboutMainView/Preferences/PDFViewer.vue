@@ -9,11 +9,17 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Option, Select } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -22,7 +28,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class PDFViewer extends Vue {
-  options: object[] = [
+  options: Array<{ value: string; label: string}> = [
     {
       value: 'pdf-viewer',
       label: 'Chrome pdf extension',
@@ -35,19 +41,19 @@ export default class PDFViewer extends Vue {
   pdfViewer = '';
 
   setPDFViewer(): void {
-    ipcRenderer.send('set-pdf-viewer', {
+    window.ipcRenderer.send('set-pdf-viewer', {
       pdfViewer: this.pdfViewer,
     });
   }
 
-  mounted() {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+  mounted(): void {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.pdfViewer = ret.pdfViewer;
     });
-    ipcRenderer.send('guest-want-data', 'pdfViewer');
+    window.ipcRenderer.send('guest-want-data', 'pdfViewer');
   }
-  beforeDestroy() {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+  beforeDestroy(): void {
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>

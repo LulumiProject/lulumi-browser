@@ -11,10 +11,12 @@
   </head>
   <body>
     <div id="app"></div>
-    <!-- Set `__static` path to static files in production -->
-    <script>
-      if (process.env.NODE_ENV !== 'development') window.__static = require('path').resolve(__dirname, '../static').replace(/\\/g, '\\\\')
-    </script>
+    <!-- Set `__static` path to static files in production (Since Node v12+, you need to explicitly import the process module) -->
+    <% if (!require('process').browser) { %>
+      <script>
+        if (process.env.NODE_ENV !== 'development') window.__static = require('path').resolve(__dirname, '../static').replace(/\\/g, '\\\\')
+      </script>
+    <% } %>
     <!-- webpack builds are automatically injected -->
     <script src="<%= webpackConfig.output.publicPath %>vendor.dll.js"></script>
   </body>

@@ -53,6 +53,8 @@
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import * as path from 'path';
@@ -72,6 +74,7 @@ declare const __static: string;
   directives: {
     sortable: {
       bind(el, binding, vnode) {
+        // eslint-disable-next-line no-use-before-define
         (vnode.context as Tabs).sortable =
           Sortable.create(el, {
             animation: 150,
@@ -81,6 +84,7 @@ declare const __static: string;
             onUpdate() {
               if (vnode.context !== undefined) {
                 vnode.context.$store.dispatch('setTabsOrder', {
+                  // eslint-disable-next-line no-use-before-define
                   windowId: (vnode.context as Tabs).windowId,
                   tabsOrder: this.toArray(),
                 });
@@ -134,31 +138,33 @@ export default class Tabs extends Vue {
       ? `${path.join('static', 'icons', 'icons.svg')}#${id}`
       : fixPathForAsarUnpack(`${path.join(__static, 'icons', 'icons.svg')}#${id}`);
   }
-  onCustomButtonClick(event) {
+  onCustomButtonClick(event: Event): void {
     const currentWindow: Electron.BrowserWindow | null =
       this.$electron.remote.BrowserWindow.fromId(this.windowId);
     if (currentWindow) {
       this.$nextTick(() => {
-        let pattern = '';
-        if (event.target.tagName === 'svg') {
-          pattern = event.target.firstElementChild.getAttribute('xlink:href');
-        } else if (event.target.tagName === 'use') {
-          pattern = event.target.getAttribute('xlink:href');
+        let pattern: string | null = '';
+        if ((event.target as SVGElement).tagName === 'svg') {
+          pattern = (event.target as SVGElement).firstElementChild!.getAttribute('xlink:href');
+        } else if ((event.target as HTMLElement).tagName === 'use') {
+          pattern = (event.target as HTMLElement).getAttribute('xlink:href');
         }
-        const state: string = pattern.split('#').reverse()[0].split('-')[0];
-        if (state === 'minimize') {
-          currentWindow.minimize();
-        } else if (state === 'restore') {
-          currentWindow.unmaximize();
-        } else if (state === 'maximize') {
-          currentWindow.maximize();
-        } else if (state === 'close') {
-          currentWindow.close();
+        if (pattern) {
+          const state: string = pattern.split('#').reverse()[0].split('-')[0];
+          if (state === 'minimize') {
+            currentWindow.minimize();
+          } else if (state === 'restore') {
+            currentWindow.unmaximize();
+          } else if (state === 'maximize') {
+            currentWindow.maximize();
+          } else if (state === 'close') {
+            currentWindow.close();
+          }
         }
       });
     }
   }
-  onDoubleClick(event: Electron.Event) {
+  onDoubleClick(event: Electron.Event): void {
     if (event.target) {
       const currentWindow: Electron.BrowserWindow | null =
         this.$electron.remote.BrowserWindow.fromId(this.windowId);

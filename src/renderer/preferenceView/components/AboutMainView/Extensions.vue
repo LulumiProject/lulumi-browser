@@ -36,20 +36,19 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, Col, Row } from 'element-ui';
 
 interface Window extends Lulumi.API.GlobalObject {
-  // eslint-disable-next-line no-undef
-  createFromPath?: typeof Electron.NativeImage.createFromPath;
-  join?: (...paths: string[]) => string;
+  ipcRenderer: Electron.IpcRenderer;
   location: {
     reload: () => void;
   };
 }
 
-declare const ipcRenderer: Electron.IpcRenderer;
 declare const window: Window;
 
 @Component({
@@ -60,61 +59,66 @@ declare const window: Window;
   },
 })
 export default class Extensions extends Vue {
-  get extensions() {
+  get extensions(): any {
     return this.$store.getters.extensions;
   }
 
   findId(extensionId: string): number {
-    return window.renderProcessPreferences
+    return window.data.renderProcessPreferences
       .findIndex(element => element.extensionId === extensionId);
   }
   loadName(extensionId: string): string {
     const id: number = this.findId(extensionId);
-    return window.renderProcessPreferences[id].name;
+    return window.data.renderProcessPreferences[id].name;
   }
   loadIcon(extensionId: string): string | undefined {
     const id: number = this.findId(extensionId);
-    if (window.join && window.createFromPath && window.renderProcessPreferences[id].icons) {
-      return window.createFromPath(window.join(
-        window.renderProcessPreferences[id].srcDirectory,
-        Object.values(window.renderProcessPreferences[id].icons)[0]
+    if (window.func.join &&
+      window.func.createFromPath &&
+      window.data.renderProcessPreferences[id].icons) {
+      return window.func.createFromPath(window.func.join(
+        window.data.renderProcessPreferences[id].srcDirectory,
+        Object.values(window.data.renderProcessPreferences[id].icons)[0]
       )).toDataURL();
     }
     return undefined;
   }
   loadPath(extensionId: string): string {
     const id = this.findId(extensionId);
-    return `file://${window.renderProcessPreferences[id].srcDirectory}/`;
+    return `file://${window.data.renderProcessPreferences[id].srcDirectory}/`;
   }
   openDevTools(webContentsId: number): void {
-    ipcRenderer.send('open-dev-tools', webContentsId);
+    window.ipcRenderer.send('open-dev-tools', webContentsId);
   }
   addLulumiExtension(): void {
-    ipcRenderer.once(
+    window.ipcRenderer.once(
       'add-lulumi-extension-result',
       (event, data: any): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(data.result);
+          this.$message.error(data.result);
         }
       }
     );
-    ipcRenderer.send('add-lulumi-extension');
+    window.ipcRenderer.send('add-lulumi-extension');
   }
   removeLulumiExtension(extensionId: string): void {
     const id = this.findId(extensionId);
-    ipcRenderer.once(
+    window.ipcRenderer.once(
       'remove-lulumi-extension-result',
       (event, data: any): void => {
         if (data.result === 'OK') {
           window.location.reload();
         } else {
-          (this as any).$message.error(data.result);
+          this.$message.error(data.result);
         }
       }
     );
-    ipcRenderer.send('remove-lulumi-extension', window.renderProcessPreferences[id].extensionId);
+    window.ipcRenderer.send(
+      'remove-lulumi-extension',
+      window.data.renderProcessPreferences[id].extensionId
+    );
   }
 }
 </script>

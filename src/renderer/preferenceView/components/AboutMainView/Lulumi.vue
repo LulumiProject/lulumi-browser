@@ -10,16 +10,23 @@
           | {{ scope.row.value.substring(0, 7) }}
         .cell(v-else-if="scope.row.key === 'userData'",
               style="color: cornflowerblue; cursor: pointer;",
-              @click="openItem(scope.row.value)") {{ scope.row.value }}
+              @click="openPath(scope.row.value)") {{ scope.row.value }}
         .cell(v-else) {{ scope.row.value }}
 </template>
 
 <script lang="ts">
+/* global Electron */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Table, TableColumn } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+// eslint-disable-next-line no-use-before-define
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -28,12 +35,12 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class Lulumi extends Vue {
-  get lulumi() {
+  get lulumi(): any {
     return this.$store.getters.about.lulumi;
   }
 
-  openItem(userData: string): void {
-    ipcRenderer.send('open-item', userData);
+  openPath(userData: string): void {
+    window.ipcRenderer.send('open-path', userData);
   }
 }
 </script>

@@ -23,7 +23,9 @@ el-row(:gutter="20",
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+/* global Electron */
+
+import { Component, Vue } from 'vue-property-decorator';
 
 import { Button, ButtonGroup, Checkbox, Col, Row } from 'element-ui';
 
@@ -62,16 +64,16 @@ export default class Notification extends Vue {
   id = -1;
   handler: any;
 
-  get permissions() {
+  get permissions(): any {
     return this.$store.getters.permissions;
   }
 
-  clear() {
+  clear(): void {
     if (this.handler) {
       clearTimeout(this.handler);
     }
   }
-  onAllow() {
+  onAllow(): void {
     const ipc = this.$electron.ipcRenderer;
 
     if (this.type === 'permission') {
@@ -90,8 +92,11 @@ export default class Notification extends Vue {
         accept: true,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height =
-      (this.$parent as BrowserMainView).getViewHeight();
+    const browserView = (this.$parent as BrowserMainView).getBrowserView();
+    const bounds = browserView.getBounds();
+    bounds.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+    bounds.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+    browserView.setBounds(bounds);
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -99,7 +104,7 @@ export default class Notification extends Vue {
       clearTimeout(this.handler);
     }
   }
-  onDeny() {
+  onDeny(): void {
     const ipc = this.$electron.ipcRenderer;
 
     if (this.type === 'permission') {
@@ -118,8 +123,11 @@ export default class Notification extends Vue {
         accept: false,
       });
     }
-    (this.$parent as BrowserMainView).getWebView().style.height =
-      (this.$parent as BrowserMainView).getViewHeight();
+    const browserView = (this.$parent as BrowserMainView).getBrowserView();
+    const bounds = browserView.getBounds();
+    bounds.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+    bounds.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+    browserView.setBounds(bounds);
     (this.$parent as BrowserMainView).showNotification = false;
     this.id = -1;
 
@@ -128,14 +136,7 @@ export default class Notification extends Vue {
     }
   }
 
-  @Watch('tabId')
-  onTabId() {
-    (this.$parent as BrowserMainView).getWebView().style.height =
-      (this.$parent as BrowserMainView).getViewHeight();
-    (this.$parent as BrowserMainView).showNotification = false;
-  }
-
-  mounted() {
+  mounted(): void {
     const ipc = this.$electron.ipcRenderer;
 
     // Every page would add a listenter to the request-permission and
@@ -148,17 +149,20 @@ export default class Notification extends Vue {
           'notification.update.updateAvailable',
           { releaseName: data.releaseName }
         ) as string;
-      (this.$parent as BrowserMainView).getWebView().style.height =
-        `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+      const browserView = (this.$parent as BrowserMainView).getBrowserView();
+      const bounds = browserView.getBounds();
+      bounds.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight() - 36;
+      bounds.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight() + 36;
+      browserView.setBounds(bounds);
       (this.$parent as BrowserMainView).showNotification = true;
     });
     ipc.on('request-permission', (event, data) => {
       const webContents: Electron.webContents | null =
         this.$electron.remote.webContents.fromId(data.webContentsId);
       if (webContents && webContents.hostWebContents.id === this.windowWebContentsId) {
-        if ((this.$parent as BrowserMainView).getWebView()
-          .getWebContentsId() === data.webContentsId) {
-          const webview = (this.$parent as BrowserMainView).getWebView();
+        if ((this.$parent as BrowserMainView).getBrowserView()
+          .webContents.id === data.webContentsId) {
+          const browserView = (this.$parent as BrowserMainView).getBrowserView();
           this.id = data.webContentsId;
           this.hostname = urlUtil.getHostname(webContents.getURL());
           this.permission = data.permission;
@@ -171,15 +175,20 @@ export default class Notification extends Vue {
                 'notification.permission.request.setLanguage',
                 { hostname: this.hostname, lang: data.label }
               ) as string;
-              webview.style.height =
-                `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+              const bounds = browserView.getBounds();
+              bounds.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight() - 36;
+              bounds.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight() + 36;
+              browserView.setBounds(bounds);
               (this.$parent as BrowserMainView).showNotification = true;
               this.handler = setTimeout(
                 () => {
                   ipc.send(`response-permission-${this.id}`, {
                     accept: false,
                   });
-                  webview.style.height = (this.$parent as BrowserMainView).getViewHeight();
+                  const bounds2 = browserView.getBounds();
+                  bounds2.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+                  bounds2.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+                  browserView.setBounds(bounds2);
                   (this.$parent as BrowserMainView).showNotification = false;
                   this.id = -1;
                   clearTimeout(this.handler);
@@ -199,15 +208,20 @@ export default class Notification extends Vue {
                   'notification.permission.request.normal',
                   { hostname: this.hostname, permission: this.permission }
                 ) as string;
-                webview.style.height =
-                  `calc(${(this.$parent as BrowserMainView).getViewHeight()} - 36px)`;
+                const bounds2 = browserView.getBounds();
+                bounds2.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight() - 36;
+                bounds2.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight() + 36;
+                browserView.setBounds(bounds2);
                 (this.$parent as BrowserMainView).showNotification = true;
                 this.handler = setTimeout(
                   () => {
                     ipc.send(`response-permission-${this.id}`, {
                       accept: false,
                     });
-                    webview.style.height = (this.$parent as BrowserMainView).getViewHeight();
+                    const bounds3 = browserView.getBounds();
+                    bounds3.height -= (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+                    bounds3.y += (this.$parent as BrowserMainView).getNavAndStatusBarHeight();
+                    browserView.setBounds(bounds3);
                     (this.$parent as BrowserMainView).showNotification = false;
                     this.id = -1;
                     clearTimeout(this.handler);
@@ -221,7 +235,7 @@ export default class Notification extends Vue {
       }
     });
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     const ipc = this.$electron.ipcRenderer;
     ipc.removeAllListeners('update-available');
     ipc.removeAllListeners('request-permission');

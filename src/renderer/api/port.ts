@@ -1,7 +1,7 @@
+/* eslint-disable max-len */
+
 import { ipcRenderer } from 'electron';
 import Event from './event';
-
-const ports: Port[] = [];
 
 class MessageSender {
   frameId: number;
@@ -26,20 +26,21 @@ function invalidateEvent(event: Event) {
 }
 
 class Port {
+  ports: Port[] = [];
   portId: number;
   disconnected: boolean;
   otherEnd: boolean;
   extensionId: string;
-  connectInfo: object;
+  connectInfo: any;
   scriptType: string;
-  responseScriptType: string;
-  webContentsId: number;
+  responseScriptType: string | null;
+  webContentsId: number | null;
   name: string;
   onDisconnect: Event;
   onMessage: Event;
   sender: MessageSender;
 
-  constructor(portId, extensionId, connectInfo, scriptType, responseScriptType, webContentsId) {
+  constructor(portId: number, extensionId: string, connectInfo: any, scriptType: string, responseScriptType: string | null, webContentsId: number | null) {
     this.portId = portId;
     this.disconnected = false;
     this.otherEnd = false;
@@ -60,15 +61,15 @@ class Port {
     this.onDisconnect = new Event();
     this.onMessage = new Event();
     this.sender = new MessageSender(this.extensionId);
-    const port = ports[portId];
+    const port = this.ports[portId];
     if (port) {
       throw new Error(`Port '${portId}' already exists.`);
     }
-    ports[portId] = this;
+    this.ports[portId] = this;
     this._init();
   }
 
-  _init() {
+  _init(): void {
     ipcRenderer.on(`lulumi-runtime-port-${this.extensionId}-${this.name}`, (event, message) => {
       // https://developer.chrome.com/extensions/runtime#property-Port-onMessage
       this.onMessage.emit(message, this);
@@ -95,29 +96,29 @@ class Port {
     }
   }
 
-  updateResponse(webContentsId) {
+  updateResponse(webContentsId: number): void {
     this.webContentsId = webContentsId;
   }
 
-  updateResponseScriptType(responseScriptType) {
+  updateResponseScriptType(responseScriptType: string): void {
     this.responseScriptType = responseScriptType;
   }
 
-  disconnect() {
+  disconnect(): void {
     if (this.disconnected) {
       return;
     }
     this._onDisconnect();
   }
 
-  postMessage(message) {
+  postMessage(message: any): void {
     require('electron').remote.webContents.fromId(this.webContentsId).send(
       `lulumi-runtime-port-${this.extensionId}-${this.name}`,
       message,
     );
   }
 
-  _onDisconnect() {
+  _onDisconnect(): void {
     this.disconnected = true;
     ipcRenderer.removeAllListeners(`lulumi-runtime-port-${this.extensionId}-${this.name}`);
     if (!this.otherEnd) {
@@ -131,10 +132,10 @@ class Port {
     this._Destroy();
   }
 
-  _Destroy() {
+  _Destroy(): void {
     invalidateEvent(this.onDisconnect);
     invalidateEvent(this.onMessage);
-    delete ports[this.portId];
+    delete this.ports[this.portId];
   }
 }
 

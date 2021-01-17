@@ -97,22 +97,19 @@ const urlUtil = {
   },
 
   canParseURL(input: string): boolean {
-    if (window === undefined) {
-      return true;
-    }
     try {
-      const url = new window.URL(input);
+      const url = new URL(input);
       return !!url;
     } catch (e) {
       return false;
     }
   },
 
-  isImageAddress(url: string): object | null {
+  isImageAddress(url: string): any | null {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/));
   },
 
-  isHttpAddress(url: string): object | null {
+  isHttpAddress(url: string): any | null {
     return (url.match(/^https?:\/\/(.*)/));
   },
 
@@ -186,7 +183,7 @@ const urlUtil = {
     }
 
     try {
-      return new window.URL(newInput).href;
+      return new URL(newInput).href;
     } catch (e) {
       return newInput;
     }
@@ -265,9 +262,9 @@ const urlUtil = {
   getHostname(input: string, excludePort = false): string | null {
     try {
       if (excludePort) {
-        return new window.URL(input).hostname;
+        return new URL(input).hostname;
       }
-      return new window.URL(input).host;
+      return new URL(input).host;
     } catch (e) {
       return null;
     }
@@ -321,6 +318,7 @@ const urlUtil = {
    */
   getUrlIfPrivileged(url: string): Lulumi.Renderer.AboutLocationObject {
     const pivot = `${constants.lulumiPagesCustomProtocol}://`;
+
     if (url === 'chrome://gpu/') {
       return {
         omniUrl: `${pivot}gpu`,
@@ -346,19 +344,34 @@ const urlUtil = {
         return {
           omniUrl: `${pivot}${newUrl.host}`,
           title: `about:${newUrl.host}`,
-          url: privilegedUrls(`about:${newUrl.host}`),
+          // eslint-disable-next-line no-nested-ternary
+          url: (process.env.NODE_ENV === 'development')
+            ? (newUrl.host === 'playbooks')
+              ? `http://localhost:${require('../../../.electron-vue/config').port}/playbooks.html`
+              // eslint-disable-next-line max-len
+              : `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${newUrl.host}`
+            : privilegedUrls(`about:${newUrl.host}`),
         };
       }
       return {
         omniUrl: `${pivot}${hash}`,
         title: `about:${hash}`,
-        url: privilegedUrls(`about:${hash}`),
+        url: (process.env.NODE_ENV === 'development')
+          // eslint-disable-next-line max-len
+          ? `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${hash}`
+          : privilegedUrls(`about:${hash}`),
       };
     }
     return {
       omniUrl: `${pivot}${newUrl.host}`,
       title: `about:${newUrl.host}`,
-      url: privilegedUrls(`about:${newUrl.host}`),
+      // eslint-disable-next-line no-nested-ternary
+      url: (process.env.NODE_ENV === 'development')
+        ? (newUrl.host === 'playbooks')
+          ? `http://localhost:${require('../../../.electron-vue/config').port}/playbooks.html`
+          // eslint-disable-next-line max-len
+          : `http://localhost:${require('../../../.electron-vue/config').port}/about.html#/${newUrl.host}`
+        : privilegedUrls(`about:${newUrl.host}`),
     };
   },
 
@@ -369,7 +382,7 @@ const urlUtil = {
    */
   getDefaultFaviconUrl(url: string): string {
     if (urlUtil.isURL(url)) {
-      const loc = new window.URL(url);
+      const loc = new URL(url);
       return `${loc.protocol}//${loc.host}/favicon.ico`;
     }
     return '';

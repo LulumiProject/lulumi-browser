@@ -62,7 +62,7 @@ const fakeElectron = {
     },
     showItemInFolder() {
     },
-    openItem() {
+    openPath() {
     },
     beep() {
     },

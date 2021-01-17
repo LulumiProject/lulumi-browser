@@ -14,7 +14,7 @@ import Spotlight from './CPMainView/Spotlight.vue';
   },
 })
 export default class CPMainView extends Vue {
-  mounted() {
+  mounted(): void {
     const ResizeSensor = require('css-element-queries/src/ResizeSensor');
     const overlay = this.$el.querySelector('.overlay') as HTMLDivElement;
     // eslint-disable-next-line no-new

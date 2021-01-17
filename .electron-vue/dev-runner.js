@@ -55,9 +55,7 @@ function startRenderer () {
 
     const app = express()
     const multiCompiler = webpack(Configs)
-    const instance = webpackDevMiddleware(multiCompiler, {
-      hot: true
-    })
+    const instance = webpackDevMiddleware(multiCompiler)
     hotMiddleware = webpackHotMiddleware(multiCompiler, {
       log: false,
       heartbeat: 2500

@@ -34,6 +34,8 @@
 </template>
 
 <script lang="ts">
+/* global Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 import { debounce } from 'lodash';
 import * as Comlink from 'comlink';
@@ -67,7 +69,7 @@ export default class SearchBar extends Vue {
   isComposing = false;
   recommender: any;
   suggestionItems: Lulumi.CommandPalette.SuggestionItem[] = config.recommendTopSite;
-  debouncedQuerySearch: Function;
+  debouncedQuerySearch: (queryString: string) => Promise<void>;
   hits: Hits | null = null;
 
   get tabFavicon(): string {
@@ -98,7 +100,7 @@ export default class SearchBar extends Vue {
     return 'M281.394,264.378l0.135-0.135L176.24,158.954c30.127-38.643,27.45-94.566-8.09-130.104 c-38.467-38.467-100.833-38.467-139.3,0c-38.467,38.467-38.466,100.833,0,139.299c35.279,35.279,90.644,38.179,129.254,8.748 l103.859,103.859c0.01,0.01,0.021,0.021,0.03,0.03l1.495,1.495l0.134-0.134c2.083,1.481,4.624,2.36,7.375,2.36 c7.045,0,12.756-5.711,12.756-12.756C283.753,269.002,282.875,266.462,281.394,264.378z M47.388,149.612 c-28.228-28.229-28.229-73.996,0-102.225c28.228-28.229,73.996-28.228,102.225,0.001c28.229,28.229,28.229,73.995,0,102.224 C121.385,177.841,75.617,177.841,47.388,149.612z';
   }
 
-  sendFocus(event): void {
+  sendFocus(event: MouseEvent): void {
     const firstEle: HTMLElement | null = (event.target as HTMLElement).parentElement;
     if (firstEle) {
       const secondEle: HTMLElement | null = firstEle.parentElement;
@@ -108,7 +110,7 @@ export default class SearchBar extends Vue {
       }
     }
   }
-  chunk(r: any[], j: number): any[][] {
+  chunk(r: any, j: number): any {
     // eslint-disable-next-line no-confusing-arrow
     return r.reduce((a, b, i, g) => !(i % j) ? a.concat([g.slice(i, i + j)]) : a, []);
   }
@@ -128,15 +130,15 @@ export default class SearchBar extends Vue {
     });
     return suggestions;
   }
-  handleComposition(event): void {
+  handleComposition(event: CompositionEvent): void {
     if (event.type === 'compositionend') {
       this.isComposing = false;
     } else {
       this.isComposing = true;
     }
   }
-  debouncedInput(event): void {
-    const queryString: string = event.target.value;
+  debouncedInput(event: KeyboardEvent): void {
+    const queryString: string = (event.target as HTMLInputElement).value;
 
     if (queryString === '') {
       (this.debouncedQuerySearch as any).cancel();
@@ -252,7 +254,6 @@ export default class SearchBar extends Vue {
       });
       ipc.send(
         'fetch-search-suggestions',
-        currentSearchEngine,
         this.currentSearchEngine.autocomplete
           .replace('{queryString}', this.value)
           .replace('{language}', this.$store.getters.lang),
@@ -282,7 +283,7 @@ export default class SearchBar extends Vue {
   createFilter(queryString: string): (suggestion: any) => boolean {
     return suggestion => (suggestion.item.value.indexOf(queryString.toLowerCase()) === 0);
   }
-  highlight(index, direction) {
+  highlight(index: string, direction: number): void {
     if (this.hits === null) {
       return;
     }
@@ -332,13 +333,13 @@ export default class SearchBar extends Vue {
         const { offsetTop } = (highlightItem as HTMLDataListElement);
 
         if (offsetTop + highlightItem.scrollHeight > (scrollTop + suggestion.clientHeight)) {
-          if (newHIndex !== oldHIndex) {
+          if (newHIndex !== parseInt(oldHIndex, 10)) {
             suggestion.scrollTop += header.clientHeight;
           }
           suggestion.scrollTop += highlightItem.scrollHeight;
         }
         if (offsetTop < scrollTop) {
-          if (newHIndex !== oldHIndex) {
+          if (newHIndex !== parseInt(oldHIndex, 10)) {
             suggestion.scrollTop -= header.clientHeight;
           }
           suggestion.scrollTop -= highlightItem.scrollHeight;
@@ -357,7 +358,7 @@ export default class SearchBar extends Vue {
       this.hits!.loading = false;
     });
   }
-  handleKeyEnter(event) {
+  handleKeyEnter(event: KeyboardEvent): void {
     if (!this.isComposing && this.hits && this.hits.highlightedIndex !== '') {
       const [hIndex, index] = this.hits.highlightedIndex.split('-', 2);
       if (parseInt(hIndex, 10) < this.hits.suggestions.length) {
@@ -371,7 +372,7 @@ export default class SearchBar extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     this.recommender = Comlink.wrap(new Worker('recommender.js'));
     this.debouncedQuerySearch = debounce(this.querySearch, 250);
     this.hits = this.$parent.$refs.hits as Hits;

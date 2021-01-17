@@ -9,11 +9,17 @@ div
 </template>
 
 <script lang="ts">
+/* global Electron, Lulumi */
+
 import { Component, Vue } from 'vue-property-decorator';
 
 import { Option, Select } from 'element-ui';
 
-declare const ipcRenderer: Electron.IpcRenderer;
+interface Window extends Lulumi.API.GlobalObject {
+  ipcRenderer: Electron.IpcRenderer;
+}
+
+declare const window: Window;
 
 @Component({
   components: {
@@ -22,7 +28,7 @@ declare const ipcRenderer: Electron.IpcRenderer;
   },
 })
 export default class Language extends Vue {
-  options: any[] = [
+  options: Array<{ value: string; label: string }> = [
     {
       value: 'en-US',
       label: 'English',
@@ -41,22 +47,22 @@ export default class Language extends Vue {
 
   setLang(): void {
     if (this.currentLang !== this.lang) {
-      ipcRenderer.send('set-lang', {
-        label: this.options.find(opt => (opt.value === this.lang)).label,
+      window.ipcRenderer.send('set-lang', {
+        label: this.options.find(opt => (opt.value === this.lang))!.label,
         lang: this.lang,
       });
     }
   }
 
-  mounted() {
-    ipcRenderer.on('guest-here-your-data', (event, ret) => {
+  mounted(): void {
+    window.ipcRenderer.on('guest-here-your-data', (event, ret) => {
       this.lang = ret.lang;
       this.currentLang = ret.lang;
     });
-    ipcRenderer.send('guest-want-data', 'lang');
+    window.ipcRenderer.send('guest-want-data', 'lang');
   }
-  beforeDestroy() {
-    ipcRenderer.removeAllListeners('guest-here-your-data');
+  beforeDestroy(): void {
+    window.ipcRenderer.removeAllListeners('guest-here-your-data');
   }
 }
 </script>
