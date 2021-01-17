@@ -4857,10 +4857,10 @@ electron-util@^0.14.2:
     electron-is-dev "^1.1.0"
     new-github-issue-url "^0.2.1"
 
-electron@^9.4.0:
-  version "9.4.0"
-  resolved "https://registry.npmjs.org/electron/-/electron-9.4.0.tgz#c3c607e3598226ddbaaff8babcdffa8bb2210936"
-  integrity sha512-hOC4q0jkb+UDYZRy8vrZ1IANnq+jznZnbkD62OEo06nU+hIbp2IrwDRBNuSLmQ3cwZMVir0WSIA1qEVK0PkzGA==
+electron@^9.4.1:
+  version "9.4.1"
+  resolved "https://registry.npmjs.org/electron/-/electron-9.4.1.tgz#62a2aae4cd93f1b56d794a47541505a71654177a"
+  integrity sha512-r4CxoVG9Ja7tBtkilWMnBsBGup8G8Z+v7icZmwysHa8/OSr0OrLjrcOF/30BAP7yPE5fz/XTxygnltzW4OTZdw==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^12.0.12"
