@@ -119,7 +119,7 @@
     "multispinner": "^0.2.1",
     "node-forge": "^0.10.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
-    "pug": "^3.0.0",
+    "pug": "^3.0.1",
     "pug-plain-loader": "^1.1.0",
     "require-dir": "^1.2.0",
     "sinon": "^9.2.3",
